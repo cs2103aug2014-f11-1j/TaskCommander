@@ -15,8 +15,14 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
+import com.google.api.client.util.Lists;
 import com.google.api.client.util.store.DataStore;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.CalendarList;
+import com.google.api.services.calendar.model.CalendarListEntry;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.TasksScopes;
 import com.google.api.services.tasks.model.Task;
@@ -49,13 +55,16 @@ public class GoogleAPIConnector {
 	private static final String FLOW_ACCESS_TYPE = "offline";
 	// Option to request approval prompt type for application. Can be "force" or "auto".
 	private static final String FLOW_APPROVAL_PROMPT = "auto";
-	
-	private static final String USERNAME = "User";
 
-	// Global instances
-	private static Tasks service;
+	private static final String USERNAME = "User";
+	private static final String PRIMARY_CALENDAR_ID = "primary";
+
+	//Global instances
+	private static Calendar calendar;
+	static final java.util.List<Calendar> addedCalendarsUsingBatch = Lists.newArrayList();
+	private static Tasks taskService;
 	private static FileDataStoreFactory dataStoreFactory;
-	
+
 	private HttpTransport httpTransport;
 	private JsonFactory jsonFactory;
 	private GoogleAuthorizationCodeFlow flow;
@@ -64,7 +73,7 @@ public class GoogleAPIConnector {
 	/**
 	 * Returns a GoogleTaskConnector after trying to 
 	 * connect to Google.
-	 * 
+	 * @author Michelle Tan
 	 */
 	public GoogleAPIConnector() {
 		httpTransport = new NetHttpTransport();
@@ -84,10 +93,11 @@ public class GoogleAPIConnector {
 	 * Connects to Google and initialises Tasks service.
 	 * Requests can be sent once this method is successfully
 	 * executed.
+	 * @author Michelle Tan
 	 */
 	public void setUp(){
 		GoogleCredential credential = getCredential();
-		service = new Tasks.Builder(httpTransport, jsonFactory, credential)
+		taskService = new Tasks.Builder(httpTransport, jsonFactory, credential)
 		.setApplicationName(APPLICATION_NAME).build();
 	}
 
@@ -95,6 +105,7 @@ public class GoogleAPIConnector {
 	 * Gets a GoogleCredential for use in Google API requests,
 	 * either from storage or by sending a request to Google.
 	 * @return           Credential
+	 * @author Michelle Tan
 	 */
 	private GoogleCredential getCredential() {
 		GoogleCredential credential = new GoogleCredential.Builder()
@@ -103,14 +114,14 @@ public class GoogleAPIConnector {
 		.setClientSecrets(CLIENT_ID, CLIENT_SECRET)
 		.addRefreshListener(new DataStoreCredentialRefreshListener(USERNAME, dataStore))
 		.build();
-		
+
 		try {
 			if(dataStore.containsKey(USERNAME)){
-			    StoredCredential storedCredential = dataStore.get(USERNAME);
-			    credential.setAccessToken(storedCredential.getAccessToken());
-			    credential.setRefreshToken(storedCredential.getRefreshToken());
+				StoredCredential storedCredential = dataStore.get(USERNAME);
+				credential.setAccessToken(storedCredential.getAccessToken());
+				credential.setRefreshToken(storedCredential.getRefreshToken());
 			}else{
-			    credential.setFromTokenResponse(requestAuthorisation());
+				credential.setFromTokenResponse(requestAuthorisation());
 			}
 			saveCredential(credential);
 		} catch (IOException e) {
@@ -121,6 +132,7 @@ public class GoogleAPIConnector {
 
 	/**
 	 * Saves given credential in the datastore.
+	 * @author Michelle Tan
 	 */
 	public void saveCredential(GoogleCredential credential){
 		StoredCredential storedCredential = new StoredCredential();
@@ -132,7 +144,7 @@ public class GoogleAPIConnector {
 			System.out.println(MESSAGE_EXCEPTION_IO);
 		}
 	}
-	
+
 	/**
 	 * Returns a token response after requesting user
 	 * login and authorisation.
@@ -141,6 +153,8 @@ public class GoogleAPIConnector {
 	 * out a URL. The user has to enter the given URL into 
 	 * a browser and login to Google, then paste the returned
 	 * authorisation code into command line. 
+	 * 
+	 * @author Michelle Tan
 	 */
 	private GoogleTokenResponse requestAuthorisation() {
 		try {
@@ -148,7 +162,7 @@ public class GoogleAPIConnector {
 		} catch (IOException e) {
 			System.out.println(MESSAGE_EXCEPTION_IO);
 		}
-		
+
 		askUserForAuthorisationCode(flow);
 		String code = getUserInput();
 
@@ -162,6 +176,7 @@ public class GoogleAPIConnector {
 	 * @param flow
 	 * @param code
 	 * @return      Token response
+	 * @author Michelle Tan
 	 */
 	private GoogleTokenResponse getTokenResponse(GoogleAuthorizationCodeFlow flow, String code) {
 		try {
@@ -182,6 +197,7 @@ public class GoogleAPIConnector {
 	 * @param fdsf           FileDataStoreFactory
 	 * @return               GoogleAuthorizationCodeFlow object
 	 * @throws IOException
+	 * @author Michelle Tan
 	 */
 	private GoogleAuthorizationCodeFlow buildAuthorisationCodeFlow(
 			HttpTransport httpTransport, 
@@ -198,6 +214,7 @@ public class GoogleAPIConnector {
 	 * Creates the authorisation URL, asks the user to open the URL and sign in, then type in the
 	 * authorisation code from Google.
 	 * @param flow
+	 * @author Michelle Tan
 	 */
 	private void askUserForAuthorisationCode(GoogleAuthorizationCodeFlow flow) {
 		String url = flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build();
@@ -208,6 +225,7 @@ public class GoogleAPIConnector {
 	/**
 	 * Reads user input and returns it. 
 	 * @return      String of user input.
+	 * @author Michelle Tan
 	 */
 	private String getUserInput() {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -224,10 +242,11 @@ public class GoogleAPIConnector {
 	/**
 	 * Prints out all tasks.
 	 * @return       Feedback for user.
+	 * @author Michelle Tan
 	 */
 	public String getAllTasks() {
 		try {
-			Tasks.TasksOperations.List request = service.tasks().list("@default");
+			Tasks.TasksOperations.List request = taskService.tasks().list("@default");
 			List<Task> tasks = request.execute().getItems();
 
 			String result = "";
@@ -241,33 +260,101 @@ public class GoogleAPIConnector {
 	}
 
 	/**
-	 * Adds task with given title, notes and date object.
+	 * Adds a task given a FloatingTask object.
+	 * Returns the task name if successful.
 	 * 
-	 * @param title  Title of task.
-	 * @param notes  Notes for task.
-	 * @param date   DateTime object describing due date of task.
+	 * @param task   Custom FloatingTask object
 	 * @return       Feedback for user.
+	 * @author Michelle Tan
 	 */
-	public String addTask(String title, String notes, DateTime date) {
-		if (title == null) {
+	public String addTask(FloatingTask task) {
+		if (task == null) {
 			return MESSAGE_ARGUMENTS_NULL;
 		} else {
-			Task task = new Task();
-			task.setTitle(title);
-			if (notes != null) {
-				task.setNotes(notes);
-			}
-			if (date != null) {
-				task.setDue(date);
-			}
-
+			Task taskToAdd = new Task();
+			taskToAdd.setTitle(task.getName());
 			try {
-				Tasks.TasksOperations.Insert request = service.tasks().insert("@default", task);
+				Tasks.TasksOperations.Insert request = taskService.tasks().insert("@default", taskToAdd);
 				Task result = request.execute();
 				return result.getTitle();
 			} catch (IOException e) {
 				return MESSAGE_EXCEPTION_IO;
 			}
+		}
+	}
+
+	/**
+	 * Adds a task given a DatedTask object.
+	 * Returns the task name if successful.
+	 * 
+	 * @param task   Custom DatedTask object
+	 * @return       Feedback for user.
+	 * @author Michelle Tan
+	 */
+	public String addTask(DatedTask task) {
+		if (task == null) {
+			return MESSAGE_ARGUMENTS_NULL;
+		} else {
+			Task taskToAdd = new Task();
+			taskToAdd.setTitle(task.getName());
+			taskToAdd.setDue(task.getEndDate());
+
+			try {
+				Tasks.TasksOperations.Insert request = taskService.tasks().insert("@default", taskToAdd);
+				Task result = request.execute();
+				return result.getTitle();
+			} catch (IOException e) {
+				return MESSAGE_EXCEPTION_IO;
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * Adds an Event to the primary calendar given a TimedTask object.
+	 * Returns the name of the task if successful. 
+	 * 
+	 * @param task   Custom TimedTask object
+	 * @return	Title of the event
+	 * @author Sean Saito
+	 */
+	public String addEvent(TimedTask task) {
+		if (task == null){
+			return MESSAGE_ARGUMENTS_NULL;
+		} else {
+			Event event = new Event();
+			event.setSummary(task.getName());
+			event.setStart(new EventDateTime().setDateTime(task.getStartDate()));			
+			event.setEnd(new EventDateTime().setDateTime(task.getEndDate()));		
+
+			try {
+				Event createdEvent = calendar.events().insert(PRIMARY_CALENDAR_ID, event).execute();
+				return createdEvent.getSummary();
+			} catch (IOException e) {
+				return MESSAGE_EXCEPTION_IO;
+			}
+		}
+	}
+
+	/**
+	 * Returns a list of all events starting from current system time.
+	 * @return List of all events
+	 * @author Sean Saito
+	 */
+	public String getAllEvents(){
+		try {
+			// Gets events from current time onwards
+			List<Event> events = calendar.events().list(PRIMARY_CALENDAR_ID)
+					.setTimeMin(new DateTime(System.currentTimeMillis())) 
+					.execute().getItems();
+
+			String result = "";
+			for (Event event : events){
+				result += event.getSummary() + "\n";
+			}
+			return result;
+		} catch (IOException e){
+			return MESSAGE_EXCEPTION_IO;
 		}
 	}
 

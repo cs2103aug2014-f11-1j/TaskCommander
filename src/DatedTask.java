@@ -1,8 +1,8 @@
 import com.google.api.client.util.DateTime;
 
 /*
- * A task that has a deadline.
- * Has a name. May also hold a Google API ID.
+ * A task that has a name and a deadline.
+ * May also hold a Google API ID.
  * Related Google API: Tasks
  * 
  * @author Michelle Tan
@@ -10,16 +10,24 @@ import com.google.api.client.util.DateTime;
 
 public class DatedTask extends Task {
 	private DateTime _endDate;
-	
+
+	/*
+	 * Creates a new DatedTask with given name and end time.
+	 * Throws IllegalArgumentException if null arguments are given.
+	 */
 	public DatedTask(String name, DateTime endTime){
 		super(name);
-		_endDate = endTime;
+		if (endTime != null) {
+			_endDate = endTime;
+		} else {
+			throw new IllegalArgumentException();
+		}
 	}
-	
+
 	public DateTime getEndDate() {
 		return _endDate;
 	}
-	
+
 	public void setEndDate(DateTime endDate) {
 		_endDate = endDate;
 	}
