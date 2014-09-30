@@ -1,3 +1,4 @@
+package com.taskcommander;
 import java.util.List;
 import java.util.Date;
 
@@ -11,7 +12,7 @@ import com.google.api.client.util.DateTime;
  * @author Michelle Tan
  */
 
-public class Task {
+public class Task implements Comparable<Task> {
 	private TaskType _taskType;
 	private String _name;
 	private String _id;
@@ -47,5 +48,14 @@ public class Task {
 
 	public void setID(String id) {
 		_id = id;
+	}
+
+	/*
+	 * Compares the name of this task to the given task, using
+	 * alphabetical order of the names.
+	 */
+	@Override
+	public int compareTo(Task arg0) {
+		return (_name.compareTo(arg0.getName()));
 	}
 }

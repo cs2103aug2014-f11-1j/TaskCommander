@@ -1,3 +1,4 @@
+package com.taskcommander;
 import java.awt.Event;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -52,7 +53,7 @@ public class UI {
 		shell = new Shell();
 		shell.setSize(450, 300);
 		shell.setText("Text Commander");
-		final TextBuddy tb = new TextBuddy("C:/Users/Mishie/Desktop/todo.txt");
+		final TaskCommander tb = new TaskCommander();
 		input = new Text(shell, SWT.BORDER);
 		input.setBounds(47, 33, 292, 23);
 		//This event triggered on enter key
@@ -76,7 +77,7 @@ public class UI {
 		
 
 		output = new Text(shell, SWT.BORDER|SWT.WRAP);
-		output.setText("Welcome to Task Manager!\n");
+		output.setText("Welcome to Task Commander!\n");
 		output.setBounds(47, 91, 292, 132);
 
 		/*Button btnEnter = new Button(shell, SWT.NONE);
