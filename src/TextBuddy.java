@@ -95,8 +95,6 @@ public class TextBuddy {
 	 */
 	private static Scanner scanner = new Scanner(System.in);
 
-	public TextBuddy(){};
-
 	public TextBuddy(String fileName) {
 		if (isValidFileName(fileName)) {
 			_fileName = fileName;
