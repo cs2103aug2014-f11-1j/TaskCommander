@@ -1,4 +1,4 @@
-TextCommander
+TaskCommander
 =============
 
 Main project code
