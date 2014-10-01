@@ -12,41 +12,14 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 /**
- * This class is used to manipulate text in a text file. 
- * The user is expected to enter a file name as a parameter when
- * running this program. If the user does not give a file name or
- * the file name is invalid, the program will return an alert.
- *  
- * Text already in the text file will be loaded upon starting the
- * program and added to its memory. Any edits to the contents will
- * be recorded after each action. If the clear command is used, the
- * text file will be wiped of all text.
- * 
- * Commands must follow the format given exactly. Any extra characters
- * after single word commands will invalidate the command.
- * 
- * The command format is given by the example interaction below:
+ * In general the application “Task Commander” is a uncomplicated, command-line based “todo” list app for PC. 
+ * In doing so, it represents a scaled-down version of a “Siri for keyboards” which manages command related 
+ * “todo” tasks. Although these tasks are not truly formulated in natural language, the command format is still 
+ * flexible yet comfortable to use.
 
-Welcome to TextBuddy. mytextfile.txt is ready for use. Type 'help' to see the list of commands.
-Enter command: add little brown fox
-Added to mytextfile.txt: “little brown fox”
-Enter command: display
-1. little brown fox
-Enter command: add jumped over the moon
-Added to mytextfile.txt: “jumped over the moon”
-Enter command: display
-1. little brown fox
-2. jumped over the moon
-Enter command: delete 2
-Deleted from mytextfile.txt: “jumped over the moon”
-Enter command: display
-1. little brown fox
-Enter command: clear
-Enter command: display
-mytextfile.txt is empty
-Enter command: exit
+Examples of commands...
 
- * @author Michelle Tan
+ * @author Group F11-1J
  */
 
 public class TaskCommander {
@@ -55,6 +28,7 @@ public class TaskCommander {
 	private static final String MESSAGE_WELCOME = "Welcome to TextBuddy. %1$s is ready for use. " + 
 			"Type 'help' to see the list of commands.";
 	private static final String MESSAGE_ADDED = "Added to %1$s: \"%2$s\"";
+	private static final String MESSAGE_UPDATED = "Updated %1$s: \"%2$s\"";
 	private static final String MESSAGE_DELETED = "Deleted from %1$s: \"%2$s\"";
 	private static final String MESSAGE_CLEARED = "All content deleted from %1$s";
 	private static final String MESSAGE_INVALID_FORMAT = "Invalid command format: %1$s. " + 
@@ -74,6 +48,7 @@ public class TaskCommander {
 	public enum CommandType {
 		HELP,
 		ADD, 
+		UPDATE,
 		DISPLAY, 
 		DELETE,
 		CLEAR,
@@ -200,7 +175,7 @@ public class TaskCommander {
 	 * @param  userCommand  Command given by user.
 	 * @return              Feedback to show to user.
 	 */
-	public String executeCommand(String userCommand) {
+	public String executeCommand(String userCommand) {	// made static for testing reasons
 		if (userCommand == null) {
 			return MESSAGE_NO_COMMAND;
 		}
@@ -215,6 +190,12 @@ public class TaskCommander {
 			}
 		case ADD:
 			return addTask(removeFirstWord(userCommand));
+		case UPDATE:
+			if (getNumberOfWords(userCommand) >= 3) {
+				return updateTask(getNthWord(userCommand,1),removeFirstWord(removeFirstWord(userCommand)));
+			} else {
+				return String.format(MESSAGE_INVALID_FORMAT, userCommand);
+			}
 		case DISPLAY:
 			if (isSingleWord(userCommand)) {
 				return displayTasks();
@@ -241,17 +222,6 @@ public class TaskCommander {
 	}
 
 	/**
-	 * Checks if the given String is made up of only one word.
-	 * Used to validate commands.
-	 * 
-	 * @param  userCommand 
-	 * @return             Whether the given string is only one word.
-	 */
-	private boolean isSingleWord(String userCommand) {
-		return removeFirstWord(userCommand).equals("");
-	}
-
-	/**
 	 * This operation determines which of the supported command types the user
 	 * wants to perform.
 	 * 
@@ -266,6 +236,8 @@ public class TaskCommander {
 			return CommandType.HELP;
 		} else if (commandTypeString.equalsIgnoreCase("add")) {
 			return CommandType.ADD;
+		} else if (commandTypeString.equalsIgnoreCase("update")) {
+			return CommandType.UPDATE;
 		} else if (commandTypeString.equalsIgnoreCase("display")) {
 			return CommandType.DISPLAY;
 		} else if (commandTypeString.equalsIgnoreCase("delete")) {
@@ -291,6 +263,40 @@ public class TaskCommander {
 		}
 		tasks.add(new Task(taskName));
 		return String.format(MESSAGE_ADDED, _fileName, taskName);
+	}
+	
+	/**
+	 * Updates the task with the given index (as shown with 'display' command) and
+	 * replaces the old task description by the new one.
+	 * Does not execute if there are no lines and if a wrong index is given.
+	 * Eg: Index out of bounds or given a char instead of int.
+	 * 
+	 * @param index        Index of the task to delete, as a string. 
+	 * @param taskName     Description of task. 
+	 * @return             Feedback for user.
+	 */
+	public String updateTask(String index, String taskName) {
+		if (tasks.isEmpty()) {
+			return String.format(MESSAGE_EMPTY, _fileName);
+		} else if (index == null) {
+			return MESSAGE_NO_LINE;
+		}
+
+		int indexToUpdate;
+		try {
+			indexToUpdate = Integer.parseInt(index) - INDEX_OFFSET; // Change the line number to an array index
+		} catch (NumberFormatException e) {
+			return String.format(MESSAGE_INVALID_FORMAT, "update " + index + taskName);
+		} 
+
+		if (indexToUpdate > tasks.size() - INDEX_OFFSET) {
+			return String.format(MESSAGE_NO_INDEX, index);
+		} else {
+			tasks.remove(indexToUpdate);
+			tasks.add(indexToUpdate, new Task(taskName));
+
+			return String.format(MESSAGE_UPDATED, _fileName, taskName);
+		}
 	}
 
 	/**
@@ -370,6 +376,31 @@ public class TaskCommander {
 
 	private void showToUser(String s) {
 		System.out.println(s);
+	}
+	
+	/**
+	 * Checks if the given String is made up of only one word.
+	 * Used to validate commands.
+	 * 
+	 * @param  userCommand 
+	 * @return             Whether the given string is only one word.
+	 */
+	private boolean isSingleWord(String userCommand) {
+		return getNumberOfWords(userCommand) == 1;
+	}
+	
+	private int getNumberOfWords(String userCommand) {
+		String[] allWords = userCommand.trim().split("\\s+");
+		return allWords.length;
+	}
+	
+	private static String getNthWord(String userCommand, int position) {
+		String[] allWords = userCommand.trim().split("\\s+");
+		if (position > allWords.length-1) {
+			return "";	// otherwise there would be a java.lang.ArrayIndexOutOfBoundsException
+		} 
+		String nthWord = userCommand.trim().split("\\s+")[position];
+		return nthWord;
 	}
 
 	private String removeFirstWord(String userCommand) {
