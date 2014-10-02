@@ -10,7 +10,7 @@ import com.google.api.client.util.DateTime;
  */
 
 public class DatedTask extends Task {
-	private DateTime _endDate;
+	private DateTime _endDate;	// Remark by Andi: Format yyyy-mm-ddTHH:MM:ss
 
 	/*
 	 * Creates a new DatedTask with given name and end time.

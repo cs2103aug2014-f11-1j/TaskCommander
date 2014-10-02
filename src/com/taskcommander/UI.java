@@ -54,6 +54,7 @@ public class UI {
 		shell.setSize(450, 300);
 		shell.setText("Text Commander");
 		final TaskCommander tb = new TaskCommander();
+		tb.controller.readFromStorage();					// read old tasks from storage
 		input = new Text(shell, SWT.BORDER);
 		input.setBounds(47, 33, 292, 23);
 		//This event triggered on enter key
@@ -65,10 +66,10 @@ public class UI {
 				if(event.detail == SWT.TRAVERSE_RETURN)
 					try {
 						output.setText("");
-						tb.readFromFile();
 						String command = input.getText();
-						output.setText(tb.executeCommand(command));
+						output.setText(tb.controller.executeCommand(command));
 						input.setText("");
+						tb.controller.safeToStorage();		// write new tasks in storage
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
