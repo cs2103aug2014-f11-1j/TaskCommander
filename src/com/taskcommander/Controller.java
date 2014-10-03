@@ -1,4 +1,8 @@
 package com.taskcommander;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 /**
  * This class represents the Controller, which decides the execution depending on the command.
@@ -8,22 +12,8 @@ package com.taskcommander;
 
 public class Controller {
 	
-	/**
-	 * Static variables
-	 */
-	
-	// This list stores the lines of tasks temporary
-	public static Data tasks;
-	
-	// This file stores the lines of tasks permanently  on the computer
-	public static Storage file;
-	
-	public static Parser parser;
-	
 	public Controller(){
-		tasks = new Data();
-		file = new Storage();
-		parser = new Parser();
+		readFromStorage();
 	}
 	
 	/**
@@ -38,7 +28,8 @@ public class Controller {
 			return Global.MESSAGE_NO_COMMAND;
 		}
 
-		Global.CommandType commandType= parser.determineCommandType(getFirstWord(userCommand));
+		Global.CommandType commandType= TaskCommander.parser.determineCommandType(userCommand);
+		
 		switch (commandType) {
 		case HELP:
 			if (isSingleWord(userCommand)) {
@@ -47,29 +38,47 @@ public class Controller {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			}
 		case ADD:
-			return tasks.addTask(removeFirstWord(userCommand));
+			String taskName = null;
+			try {
+				taskName = TaskCommander.parser.determineTaskName(userCommand);
+			} catch (StringIndexOutOfBoundsException e) {
+				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+			}
+			
+			List<Date> dateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
+
+			if (dateTime == null) {
+				return TaskCommander.tasks.addTask("\""+taskName+"\"");
+			} else if (dateTime.size() ==1 ) {
+				return TaskCommander.tasks.addTask(dateTime.get(0).toString()+" "+"\""+taskName+"\"");
+			} else if (dateTime.size() == 2) {
+				return TaskCommander.tasks.addTask(dateTime.get(0).toString()+" "+dateTime.get(1).toString()+" "+"\""+taskName+"\"");
+			} else {
+				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+			}
+
 		case UPDATE:
 			if (getNumberOfWords(userCommand) >= 3) {
-				return tasks.updateTask(getNthWord(userCommand,1),removeFirstWord(removeFirstWord(userCommand)));
+				return TaskCommander.tasks.updateTask(getNthWord(userCommand,1),removeFirstWord(removeFirstWord(userCommand)));
 			} else {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			}
 		case DISPLAY:
 			if (isSingleWord(userCommand)) {
-				return tasks.displayTasks();
+				return TaskCommander.tasks.displayTasks();
 			} else {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			}
 		case DELETE:
-			return tasks.deleteTask(removeFirstWord(userCommand));
+			return TaskCommander.tasks.deleteTask(removeFirstWord(userCommand));
 		case CLEAR:
 			if (isSingleWord(userCommand)) {
-				return tasks.clearTasks();
+				return TaskCommander.tasks.clearTasks();
 			} else {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			}
 		case SORT:
-			return tasks.sort();
+			return TaskCommander.tasks.sort();
 		case INVALID:
 			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 		case EXIT:
@@ -83,11 +92,11 @@ public class Controller {
 	 * Read and write from storage to temporary data
 	 */
 	public void readFromStorage() {
-		tasks.getStorage(file);
+		TaskCommander.tasks.getStorage(TaskCommander.file);
 	}
 	
 	public void safeToStorage() {
-		file.getData(tasks);
+		TaskCommander.file.getData(TaskCommander.tasks);
 	}
 	
 	/**

@@ -7,7 +7,10 @@ package com.taskcommander;
  * “todo” tasks. Although these tasks are not truly formulated in natural language, the command format is still 
  * flexible yet comfortable to use.
 
-Examples of commands...
+Examples of commands:
+...
+..
+.
 
  * @author Group F11-1J
  */
@@ -15,49 +18,35 @@ Examples of commands...
 public class TaskCommander {
 	
 	/**
-	 * Static variables
+	 * Components
+	 * (Please note: All components except for the framework class "TaskCommander" are  instantiated. 
+	 * In other words, instances instead of classes are used.)
 	 */
 	// Controller
 	public static Controller controller;
-	// This list stores the lines of tasks temporary
+	// Parser
+	public static Parser parser;
+	// Data (temporary memory containing a list of task objects)
 	public static Data tasks;
-	// This file stores the lines of tasks permanently  on the computer
+	// Storage (permanent memory consisting of a local .txt-file)
 	public static Storage file;
 	// User Interface
 	public static UI ui;
 
 	/**
-	 * Launch the application.
-	 * @param args
+	 * Launch the application
+	 * @param  args
 	 */
 	public static void main(String[] args) {
-		// Creation of the components:
-		ui = new UI();
-		controller = new Controller();
-		tasks = new Data();
+		
+		// Creation of the components
 		file = new Storage();
+		tasks = new Data();
+		controller = new Controller();
+		parser = new Parser();
+		ui = new UI();
 		
-		controller.readFromStorage();					// read old tasks from storage
-		
-		// Start the user interface
+		// Start of the user interface
 		UI.open();
 	}
-	
-	/*
-	public void run() {
-		controller.readFromStorage();
-		while (true) {
-			System.out.print("Enter command: ");
-			String userCommand = scanner.nextLine();
-			String feedback = controller.executeCommand(userCommand);
-			showToUser(feedback);
-			controller.safeToStorage();
-		}
-	}
-
-
-	private void showToUser(String s) {
-		System.out.println(s);
-	}
-	*/
 }
