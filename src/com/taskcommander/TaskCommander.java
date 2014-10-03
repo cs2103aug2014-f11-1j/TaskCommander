@@ -44,10 +44,10 @@ public class TaskCommander {
 		scanner = new Scanner(System.in);
 	}
 
-	/**
-	 * Run (Waits for user commands, executes them and shows feedback)
-	 */
-
+	
+	
+	
+	
 	public void run() {
 		controller.readFromStorage();
 		while (true) {
