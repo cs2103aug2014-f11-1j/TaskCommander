@@ -1,6 +1,4 @@
 package com.taskcommander;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +10,9 @@ import java.util.List;
 
 public class Controller {
 	
+	/**
+	 * Constructor
+	 */
 	public Controller(){
 		readFromStorage();
 	}
@@ -39,6 +40,7 @@ public class Controller {
 			}
 		case ADD:
 			String taskName = null;
+			
 			try {
 				taskName = TaskCommander.parser.determineTaskName(userCommand);
 			} catch (StringIndexOutOfBoundsException e) {
@@ -48,37 +50,36 @@ public class Controller {
 			List<Date> dateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
 
 			if (dateTime == null) {
-				return TaskCommander.tasks.addTask("\""+taskName+"\"");
+				return TaskCommander.data.addTask("\""+taskName+"\"");
 			} else if (dateTime.size() ==1 ) {
-				return TaskCommander.tasks.addTask(dateTime.get(0).toString()+" "+"\""+taskName+"\"");
+				return TaskCommander.data.addTask(dateTime.get(0).toString()+" "+"\""+taskName+"\"");
 			} else if (dateTime.size() == 2) {
-				return TaskCommander.tasks.addTask(dateTime.get(0).toString()+" "+dateTime.get(1).toString()+" "+"\""+taskName+"\"");
+				return TaskCommander.data.addTask(dateTime.get(0).toString()+" "+dateTime.get(1).toString()+" "+"\""+taskName+"\"");
 			} else {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			}
-
 		case UPDATE:
 			if (getNumberOfWords(userCommand) >= 3) {
-				return TaskCommander.tasks.updateTask(getNthWord(userCommand,1),removeFirstWord(removeFirstWord(userCommand)));
+				return TaskCommander.data.updateTask(getNthWord(userCommand,1),removeFirstWord(removeFirstWord(userCommand)));
 			} else {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			}
 		case DISPLAY:
 			if (isSingleWord(userCommand)) {
-				return TaskCommander.tasks.displayTasks();
+				return TaskCommander.data.displayTasks();
 			} else {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			}
 		case DELETE:
-			return TaskCommander.tasks.deleteTask(removeFirstWord(userCommand));
+			return TaskCommander.data.deleteTask(removeFirstWord(userCommand));
 		case CLEAR:
 			if (isSingleWord(userCommand)) {
-				return TaskCommander.tasks.clearTasks();
+				return TaskCommander.data.clearTasks();
 			} else {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			}
 		case SORT:
-			return TaskCommander.tasks.sort();
+			return TaskCommander.data.sort();
 		case INVALID:
 			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 		case EXIT:
@@ -92,11 +93,11 @@ public class Controller {
 	 * Read and write from storage to temporary data
 	 */
 	public void readFromStorage() {
-		TaskCommander.tasks.getStorage(TaskCommander.file);
+		TaskCommander.data.readStorage(TaskCommander.storage);
 	}
 	
 	public void safeToStorage() {
-		TaskCommander.file.getData(TaskCommander.tasks);
+		TaskCommander.data.writeStorage(TaskCommander.storage);
 	}
 	
 	/**
@@ -133,6 +134,3 @@ public class Controller {
 	}
 
 }
-	
-	
-

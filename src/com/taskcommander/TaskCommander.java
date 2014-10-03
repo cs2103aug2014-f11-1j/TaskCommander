@@ -27,9 +27,9 @@ public class TaskCommander {
 	// Parser
 	public static Parser parser;
 	// Data (temporary memory containing a list of task objects)
-	public static Data tasks;
+	public static Data data;
 	// Storage (permanent memory consisting of a local .txt-file)
-	public static Storage file;
+	public static Storage storage;
 	// User Interface
 	public static UI ui;
 
@@ -40,8 +40,8 @@ public class TaskCommander {
 	public static void main(String[] args) {
 		
 		// Creation of the components
-		file = new Storage();
-		tasks = new Data();
+		storage = new Storage();
+		data = new Data();
 		controller = new Controller();
 		parser = new Parser();
 		ui = new UI();

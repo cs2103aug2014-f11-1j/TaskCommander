@@ -81,7 +81,6 @@ public class Parser {
 	
 	
 	// Helper methods
-	
 	private static String getFirstWord(String userCommand) {
 		return userCommand.trim().split("\\s+")[0];
 	}

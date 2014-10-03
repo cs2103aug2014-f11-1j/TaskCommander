@@ -6,17 +6,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * This class stores the data permanently on the computer.
+ * This class stores the data permanently in a local file on the computer.
  * 
  * @author Andreas Christian Mayr
  */
-
 
 public class Storage {
 	
 	// This string stores the name of the file being used
 	private static String fileName;
 	
+	/**
+	 * Constructor
+	 */
 	public Storage(){
 		setFileName("tasks.txt");
 	}
@@ -30,7 +32,7 @@ public class Storage {
 			BufferedWriter myBufferedWriter = new BufferedWriter(
 					new FileWriter(new File(fileName)));
 			
-			for(Task task: data) {
+			for(Task task: data.tasks) {
 				myBufferedWriter.write(task.getName());
 				myBufferedWriter.newLine();
 			}
@@ -49,5 +51,4 @@ public class Storage {
 	public static void setFileName(String fileName) {
 		Storage.fileName = fileName;
 	}
-	
 }
