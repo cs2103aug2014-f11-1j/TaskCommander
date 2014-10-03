@@ -1,6 +1,5 @@
 package com.taskcommander;
 
-import java.util.Scanner;
 
 /**
  * In general the application “Task Commander” is a uncomplicated, command-line based “todo” list app for PC. 
@@ -18,36 +17,33 @@ public class TaskCommander {
 	/**
 	 * Static variables
 	 */
-	
+	// Controller
+	public static Controller controller;
 	// This list stores the lines of tasks temporary
 	public static Data tasks;
-	
 	// This file stores the lines of tasks permanently  on the computer
 	public static Storage file;
-	
-	// Controller
-	public Controller controller;
-
-	/*
-	 * This variable is declared for the whole class (instead of declaring it
-	 * inside the readUserCommand() method to facilitate automated testing using
-	 * the I/O redirection technique. If not, only the first line of the input
-	 * text file will be processed.
-	 */
-	private static Scanner scanner;
+	// User Interface
+	public static UI ui;
 
 	/**
-	 * Constructor
+	 * Launch the application.
+	 * @param args
 	 */
-	public TaskCommander() {
+	public static void main(String[] args) {
+		// Creation of the components:
+		ui = new UI();
 		controller = new Controller();
-		scanner = new Scanner(System.in);
+		tasks = new Data();
+		file = new Storage();
+		
+		controller.readFromStorage();					// read old tasks from storage
+		
+		// Start the user interface
+		UI.open();
 	}
-
 	
-	
-	
-	
+	/*
 	public void run() {
 		controller.readFromStorage();
 		while (true) {
@@ -63,4 +59,5 @@ public class TaskCommander {
 	private void showToUser(String s) {
 		System.out.println(s);
 	}
+	*/
 }

@@ -20,18 +20,6 @@ public class UI {
 	private static Text output;
 
 	/**
-	 * Launch the application.
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-			open();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Open the window.
 	 */
 	public static void open() {
@@ -45,7 +33,12 @@ public class UI {
 			}
 		}
 	}
-
+	/**
+	 * Constructor
+	 */
+	public UI() {
+	}
+	
 	/**
 	 * Create contents of the window.
 	 */
@@ -53,8 +46,6 @@ public class UI {
 		shell = new Shell();
 		shell.setSize(450, 300);
 		shell.setText("Text Commander");
-		final TaskCommander tb = new TaskCommander();
-		tb.controller.readFromStorage();					// read old tasks from storage
 		input = new Text(shell, SWT.BORDER);
 		input.setBounds(47, 33, 292, 23);
 		//This event triggered on enter key
@@ -67,9 +58,9 @@ public class UI {
 					try {
 						output.setText("");
 						String command = input.getText();
-						output.setText(tb.controller.executeCommand(command));
+						output.setText(TaskCommander.controller.executeCommand(command));
 						input.setText("");
-						tb.controller.safeToStorage();		// write new tasks in storage
+						TaskCommander.controller.safeToStorage();		// write new tasks in storage
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
