@@ -10,7 +10,7 @@ import com.taskcommander.Global.TaskType;
  * Has a name. May also hold a Google API ID.
  * Related Google API: Tasks
  * 
- * @author Michelle Tan, ANDREAS
+ * @author Michelle Tan, ANDREAS, Sean Saito
  */
 
 public class Task implements Comparable<Task> {
@@ -49,14 +49,5 @@ public class Task implements Comparable<Task> {
 
 	public void setID(String id) {
 		_id = id;
-	}
-
-	/*
-	 * Compares the name of this task to the given task, using
-	 * alphabetical order of the names.
-	 */
-	@Override
-	public int compareTo(Task arg0) {
-		return (_name.compareTo(arg0.getName()));
 	}
 }

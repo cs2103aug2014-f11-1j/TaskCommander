@@ -9,7 +9,7 @@ import com.taskcommander.Global.TaskType;
  * May also hold a Google API ID.
  * Related Google API: Calendar
  * 
- * @author Michelle Tan, ANDREAS
+ * @author Michelle Tan, ANDREAS, Sean Saito
  */
 
 public class TimedTask extends Task {
@@ -23,8 +23,8 @@ public class TimedTask extends Task {
 	public TimedTask(String name, Date startTime, Date endTime){
 		super(name, TaskType.TIMED);
 		if (startTime != null && endTime !=null) {
-		_startDate = startTime;
-		_endDate = endTime;
+			_startDate = startTime;
+			_endDate = endTime;
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -44,5 +44,15 @@ public class TimedTask extends Task {
 	
 	public void setEndDate(Date endDate) {
 		_endDate = endDate;
+	}
+	
+	/*
+	 * Compares the starting time of this task to the given task 
+	 * in a chronological manner.
+	 * Edit by Sean Saito
+	 */
+	@Override
+	public int compareTo(Task otherTask) {
+		return (_startDate.compareTo(otherTask.getStartDate()));
 	}
 }

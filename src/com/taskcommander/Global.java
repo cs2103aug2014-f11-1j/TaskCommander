@@ -2,7 +2,7 @@ package com.taskcommander;
 /**
  * This class stores global variables for use in the program.
  * 
- * @author Michelle, Andreas
+ * @author Michelle, Andreas, Sean Saito
  */
 public class Global {
 	
@@ -39,6 +39,7 @@ public class Global {
 		CLEAR,
 		SORT,
 		INVALID,
+		SYNC,
 		EXIT
 	};
 	

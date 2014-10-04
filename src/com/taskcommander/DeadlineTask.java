@@ -9,7 +9,7 @@ import com.taskcommander.Global.TaskType;
  * May also hold a Google API ID.
  * Related Google API: Tasks
  * 
- * @author Michelle Tan, ANDREAS
+ * @author Michelle Tan, ANDREAS, Sean Saito
  */
 
 public class DeadlineTask extends Task {
@@ -34,5 +34,15 @@ public class DeadlineTask extends Task {
 
 	public void setEndDate(Date endDate) {
 		_endDate = endDate;
+	}
+	
+	/*
+	 * Compares the deadline of this task to the given task in a 
+	 * chronological manner.
+	 * Edit by Sean Saito
+	 */
+	@Override
+	public int compareTo(Task otherTask) {
+		return (_endDate.compareTo(otherTask.getEndDate));
 	}
 }
