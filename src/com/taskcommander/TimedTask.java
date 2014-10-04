@@ -1,24 +1,27 @@
 package com.taskcommander;
+import java.util.Date;
+
 import com.google.api.client.util.DateTime;
+import com.taskcommander.Global.TaskType;
 
 /*
  * A task that has a name, a start date and an end date.
  * May also hold a Google API ID.
  * Related Google API: Calendar
  * 
- * @author Michelle Tan
+ * @author Michelle Tan, ANDREAS
  */
 
 public class TimedTask extends Task {
-	private DateTime _startDate;
-	private DateTime _endDate;
+	private Date _startDate;
+	private Date _endDate;
 	
 	/*
 	 * Creates a new TimedTask with given name, start time and end time.
 	 * Throws IllegalArgumentException if null arguments are given.
 	 */
-	public TimedTask(String name, DateTime startTime, DateTime endTime){
-		super(name);
+	public TimedTask(String name, Date startTime, Date endTime){
+		super(name, TaskType.TIMED);
 		if (startTime != null && endTime !=null) {
 		_startDate = startTime;
 		_endDate = endTime;
@@ -27,19 +30,19 @@ public class TimedTask extends Task {
 		}
 	}
 	
-	public DateTime getStartDate() {
+	public Date getStartDate() {
 		return _startDate;
 	}
 	
-	public DateTime getEndDate() {
+	public Date getEndDate() {
 		return _endDate;
 	}
 	
-	public void setStartDate(DateTime startDate) {
+	public void setStartDate(Date startDate) {
 		_startDate = startDate;
 	}
 	
-	public void setEndDate(DateTime endDate) {
+	public void setEndDate(Date endDate) {
 		_endDate = endDate;
 	}
 }

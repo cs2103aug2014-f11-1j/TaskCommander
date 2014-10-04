@@ -292,13 +292,13 @@ public class GoogleAPIConnector {
 	 * @return       Feedback for user.
 	 * @author Michelle Tan
 	 */
-	public String addTask(DatedTask task) {
+	public String addTask(DeadlineTask task) {
 		if (task == null) {
 			return MESSAGE_ARGUMENTS_NULL;
 		} else {
 			Task taskToAdd = new Task();
 			taskToAdd.setTitle(task.getName());
-			taskToAdd.setDue(task.getEndDate());
+			taskToAdd.setDue(task.getEndDate());	// Remark by Andi: since we now use the Java Format Date in the Logic, you would need to transfer the Date into the Google format DateTime
 
 			try {
 				Tasks.TasksOperations.Insert request = taskService.tasks().insert("@default", taskToAdd);

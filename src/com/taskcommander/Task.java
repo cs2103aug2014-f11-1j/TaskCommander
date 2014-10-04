@@ -3,13 +3,14 @@ import java.util.List;
 import java.util.Date;
 
 import com.google.api.client.util.DateTime;
+import com.taskcommander.Global.TaskType;
 
 /*
  * A basic task object.
  * Has a name. May also hold a Google API ID.
  * Related Google API: Tasks
  * 
- * @author Michelle Tan
+ * @author Michelle Tan, ANDREAS
  */
 
 public class Task implements Comparable<Task> {
@@ -17,23 +18,23 @@ public class Task implements Comparable<Task> {
 	private String _name;
 	private String _id;
 
-	public enum TaskType {
-		FLOATING, TIMED, DATED
-	}
-
 	/*
 	 * Creates a new Task with given name.
 	 * Throws IllegalArgumentException if name is not given.
 	 */
-	public Task(String name){
+	public Task(String name, TaskType taskType){
 		if (name != null) {
 			_name = name;
-			_taskType = TaskType.FLOATING;
+			_taskType = taskType;
 		} else {
 			throw new IllegalArgumentException();
 		}
 	}
 
+	public void setType(TaskType taskTye) {
+		_taskType = taskTye;
+	}
+	
 	public TaskType getType() {
 		return _taskType;
 	}

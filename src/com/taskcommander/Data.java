@@ -1,5 +1,7 @@
 package com.taskcommander;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -8,6 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import com.taskcommander.Global.TaskType;
 
 /**
  * This class stores the data temporary.
@@ -24,6 +28,13 @@ public class Data {
 	public ArrayList<Task> tasks;
 	
 	/**
+	 * History array containing a list of task objects before the last execution of a add, update, delete, clear command.
+	 * This array is needed for the undo-feature.
+	 * 
+	 */
+	public ArrayList<Task> tasksHistory;
+	
+	/**
 	 * Constructor
 	 */
 	public Data() {
@@ -33,8 +44,9 @@ public class Data {
 	/**
 	 * Reads the content of the file into the data array.
 	 */
-	public void readStorage(Storage storage){
+	public void readStorage(Storage storage){	// has to be updated for the use of different taskTypes
 
+		/*
 		try {
 			BufferedReader myBufferedReader = new BufferedReader(
 					new FileReader(new File(Storage.getFileName())));
@@ -49,6 +61,7 @@ public class Data {
 		} catch (IOException e) {
 			System.err.println(Global.MESSAGE_FILE_COULD_NOT_BE_LOADED);
 		}
+		*/
 	}
 	
 	/**
@@ -78,12 +91,30 @@ public class Data {
 	 * @param taskName     
 	 * @return             Feedback for user.
 	 */
-	public String addTask(String taskName) {
-		if (taskName == null) {
-			return Global.MESSAGE_NO_LINE;
+	public String addTask(TaskType taskType, String taskName, Date startDate, Date endDate) {
+		if (taskName == null || taskType == null) {
+			return Global.MESSAGE_NO_TASK;
 		}
-		tasks.add(new Task(taskName));
-		return String.format(Global.MESSAGE_ADDED, taskName);
+		SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy");
+		SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+
+		switch (taskType) {
+			case DEADLINE:
+				DeadlineTask deadlineTask;
+				deadlineTask= new DeadlineTask(taskName,endDate);
+				tasks.add(deadlineTask);
+				return String.format(Global.MESSAGE_ADDED,"[by "+dayFormat.format(endDate)+" "+timeFormat.format(endDate)+"]"+" \""+taskName+"\"");
+			case TIMED:
+				TimedTask timedTask;
+				timedTask = new TimedTask(taskName,startDate,endDate);
+				tasks.add(timedTask);
+				return String.format(Global.MESSAGE_ADDED,"["+dayFormat.format(endDate)+" "+timeFormat.format(startDate)+"-"+timeFormat.format(endDate)+"]"+" \""+taskName+"\"");				
+			default:
+				FloatingTask floatingTask;
+				floatingTask = new FloatingTask(taskName);
+				tasks.add(floatingTask);
+				return String.format(Global.MESSAGE_ADDED,"\""+taskName+"\"");
+		}
 	}
 	
 	/**
@@ -96,11 +127,12 @@ public class Data {
 	 * @param taskName     Description of task. 
 	 * @return             Feedback for user.
 	 */
-	public String updateTask(String index, String taskName) {
+	public String updateTask(String index, String taskName) {	// implementation needs to be adjusted to new parser
+	/*
 		if (tasks.isEmpty()) {
 			return String.format(Global.MESSAGE_EMPTY);
 		} else if (index == null) {
-			return Global.MESSAGE_NO_LINE;
+			return Global.MESSAGE_NO_TASK;
 		}
 
 		int indexToUpdate;
@@ -118,24 +150,53 @@ public class Data {
 
 			return String.format(Global.MESSAGE_UPDATED, taskName);
 		}
+		*/
+		return "out of order";
 	}
 
 	/**
-	 * Returns all tasks in this format:
-	 * <index>. <task name> <line break> 
+	 * Creates an array which only contains the desired types of tasks 
+	 * within the desired time period in the right order.
+	 * See also description for Controller.displayedTasks
 	 * 
-	 * @return  String containing all task names.
+	 * @return  Internal Message, will be hided by the UI
 	 */
 	public String displayTasks() {
 		if (tasks.isEmpty()) {
 			return String.format(Global.MESSAGE_EMPTY);
-		} else {
-			String result = "";
-			for (int i = 0; i < tasks.size(); i++) {
-				result += (i + 1) + ". " + tasks.get(i).getName() + "\n";
-			}
-			return result;
 		}
+
+			String[][] result = new String[tasks.size()][3]; // first [] represents line, second [] represents row of the array
+			SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy");
+			SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+			
+			for (int i = 0; i < tasks.size(); i++) {
+
+				Global.TaskType taskType = tasks.get(i).getType();
+				if (taskType == Global.TaskType.TIMED) {
+					TimedTask timedTask = (TimedTask) tasks.get(i);
+					result[i][0] = dayFormat.format(timedTask.getStartDate());
+					result[i][1] = timeFormat.format(timedTask.getStartDate()) + "-"
+							+ timeFormat.format(timedTask.getEndDate());
+					result[i][2] = tasks.get(i).getName();
+
+				} else if (taskType == Global.TaskType.DEADLINE) {
+					DeadlineTask deadlineTask = (DeadlineTask) tasks.get(i);
+					result[i][0] = dayFormat.format(deadlineTask.getEndDate());
+					result[i][1] = timeFormat.format(deadlineTask.getEndDate());
+					result[i][2] = deadlineTask.getName();
+
+				} else {
+					FloatingTask floatingTask = (FloatingTask) tasks.get(i);
+					result[i][0] = null;
+					result[i][1] = null;
+					result[i][2] = floatingTask.getName();
+				}
+
+				TaskCommander.controller.setDisplayedTasks(result);
+			}
+			return "Internal Message: String Array for the UI was created, see also console output";
+
 	}
 
 	/**
@@ -150,7 +211,7 @@ public class Data {
 		if (tasks.isEmpty()) {
 			return String.format(Global.MESSAGE_EMPTY);
 		} else if (index == null) {
-			return Global.MESSAGE_NO_LINE;
+			return Global.MESSAGE_NO_TASK;
 		}
 
 		int indexToRemove;

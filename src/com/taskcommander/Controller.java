@@ -2,6 +2,8 @@ package com.taskcommander;
 import java.util.Date;
 import java.util.List;
 
+import com.taskcommander.Global.TaskType;
+
 /**
  * This class represents the Controller, which decides the execution depending on the command.
  * 
@@ -17,6 +19,46 @@ public class Controller {
 		readFromStorage();
 	}
 	
+	/**
+	 * Additional feedback array for the display command, which only contains the desired types of tasks 
+	 * within the desired time period in the right order. This array is set by the Data.display method and
+	 * accessed by the UI.
+	 * 
+	 * The array will have the following format.
+	 * 
+	 * Day			Time				Name			|
+	 * --------------------------------------------------				
+	 * null			null				FloatingTask1   |
+	 * null			null				FloatingTask2   |
+	 * null			null				FloatingTask3   |
+	 * ....			....				.............   |
+	 * ..			..					............    |
+	 * .			.					.......         |
+	 * Sat Oct 04	10:00-11:00			TimedTask1      |
+	 * Sat Oct 04	by 12:00			DeadlineTask1
+	 * Sat Oct 04	12:00-13:00			TimedTask2
+	 * Sat Oct 04	14:00-15:00			TimedTask3
+	 * Sat Oct 04	by 18:00			DeadlineTask2
+	 * ....			....				.................
+	 * ..			..					............
+	 * .			.					.......
+	 * Sun Oct 04	10:00-11:00			TimedTask4
+	 * Sun Oct 04	by 12:00			DeadlineTask3
+	 * ....			....				.................
+	 * ..			..					............
+	 * .			.					.......
+	 * 
+	 */
+	private String[][] displayedTasks;
+	
+	public String[][] getDisplayedTasks() {
+		return displayedTasks;
+	}
+
+	public void setDisplayedTasks(String[][] displayedTasks) {
+		this.displayedTasks = displayedTasks;
+	}
+
 	/**
 	 * Parses command from user and executes it if valid. Writes to file after each command.
 	 * Returns feedback to show to user.
@@ -38,38 +80,57 @@ public class Controller {
 			} else {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			}
-		case ADD:
-			String taskName = null;
 			
+		case ADD:
+			if (isSingleWord(userCommand)) {
+				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+			}
+			
+			// TaskName
+			String taskName = null;
 			try {
 				taskName = TaskCommander.parser.determineTaskName(userCommand);
 			} catch (StringIndexOutOfBoundsException e) {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			}
 			
-			List<Date> dateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
-
-			if (dateTime == null) {
-				return TaskCommander.data.addTask("\""+taskName+"\"");
-			} else if (dateTime.size() ==1 ) {
-				return TaskCommander.data.addTask(dateTime.get(0).toString()+" "+"\""+taskName+"\"");
-			} else if (dateTime.size() == 2) {
-				return TaskCommander.data.addTask(dateTime.get(0).toString()+" "+dateTime.get(1).toString()+" "+"\""+taskName+"\"");
+			// TaskDateTime (3 cases depending on taskType)
+			List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
+			if (taskDateTime == null) { 			// case 1: FloatingTask
+				return TaskCommander.data.addTask(Global.TaskType.FLOATING, taskName, null, null);
+			} else if (taskDateTime.size() ==1 ) { 	// case 2: DeadlineTask
+				return TaskCommander.data.addTask(Global.TaskType.DEADLINE, taskName,null, taskDateTime.get(0));
+			} else if (taskDateTime.size() == 2) { 	// case 3: TimedTask
+				return TaskCommander.data.addTask(Global.TaskType.TIMED, taskName, taskDateTime.get(0), taskDateTime.get(1));
 			} else {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			}
-		case UPDATE:
+			
+		case UPDATE:	// implementation needs to be adjusted to new parser
+			
+			/*
 			if (getNumberOfWords(userCommand) >= 3) {
 				return TaskCommander.data.updateTask(getNthWord(userCommand,1),removeFirstWord(removeFirstWord(userCommand)));
 			} else {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			}
+			*/
+			
 		case DISPLAY:
-			if (isSingleWord(userCommand)) {
-				return TaskCommander.data.displayTasks();
-			} else {
+			String feedback;
+			if (!isSingleWord(userCommand)) {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+			} else {
+				feedback = TaskCommander.data.displayTasks();
+				// temporary output of the displayTasks Array in the console
+				if (!(displayedTasks == null)) {
+				for (int i = 0; i < displayedTasks.length; i++) {
+					System.out.println(displayedTasks[i][0]+"\t"+displayedTasks[i][1]+"\t"+displayedTasks[i][1]);
+				};
+				}
+				return feedback;
 			}
+			
 		case DELETE:
 			return TaskCommander.data.deleteTask(removeFirstWord(userCommand));
 		case CLEAR:
