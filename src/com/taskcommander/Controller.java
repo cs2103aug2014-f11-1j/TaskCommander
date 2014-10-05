@@ -141,6 +141,8 @@ public class Controller {
 			}
 		case SORT:
 			return TaskCommander.data.sort();
+		case SYNC:
+			return TaskCommander.syncHandler.sync();
 		case INVALID:
 			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 		case EXIT:

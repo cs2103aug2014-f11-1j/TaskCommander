@@ -27,7 +27,7 @@ public class TaskCommander {
 	public static Data data; // temporary memory containing a list of task objects
 	public static Storage storage; 	// (permanent memory consisting of a local .txt-file
 	public static UI ui; // User Interface
-	public static GoogleAPIHandler googleHandler;
+	public static SyncHandler syncHandler;
 
 	/**
 	 * Launch the application
@@ -50,11 +50,11 @@ public class TaskCommander {
 	//as user should not be asked to login until they
 	//execute a sync command
 	/**
-	 * Sets a new GoogleAPIHandler instance.
+	 * Sets a new SyncHandler instance.
 	 * May start a login process if user is not
 	 * already logged in.
 	 */
-	public static void getGoogleAPIHandler() {
-		googleHandler = new GoogleAPIHandler();
+	public static void getSyncHandler() {
+		syncHandler = new SyncHandler();
 	}
 }
