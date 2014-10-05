@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import com.google.api.client.auth.oauth2.DataStoreCredentialRefreshListener;
@@ -298,8 +299,7 @@ public class GoogleAPIConnector {
 		} else {
 			Task taskToAdd = new Task();
 			taskToAdd.setTitle(task.getName());
-			taskToAdd.setDue(task.getEndDate());	// Remark by Andi: since we now use the Java Format Date in the Logic, you would need to transfer the Date into the Google format DateTime
-
+			taskToAdd.setDue(toDateTime(task.getEndDate()));	
 			try {
 				Tasks.TasksOperations.Insert request = taskService.tasks().insert("@default", taskToAdd);
 				Task result = request.execute();
@@ -325,8 +325,8 @@ public class GoogleAPIConnector {
 		} else {
 			Event event = new Event();
 			event.setSummary(task.getName());
-			event.setStart(new EventDateTime().setDateTime(task.getStartDate()));			
-			event.setEnd(new EventDateTime().setDateTime(task.getEndDate()));		
+			event.setStart(new EventDateTime().setDateTime(toDateTime(task.getStartDate())));			
+			event.setEnd(new EventDateTime().setDateTime(toDateTime(task.getEndDate())));		
 
 			try {
 				Event createdEvent = calendar.events().insert(PRIMARY_CALENDAR_ID, event).execute();
@@ -357,6 +357,11 @@ public class GoogleAPIConnector {
 		} catch (IOException e){
 			return MESSAGE_EXCEPTION_IO;
 		}
+	}
+	
+	// Changes a Date to a DateTime object.
+	private DateTime toDateTime(Date date) {
+		return new DateTime(date);
 	}
 
 }
