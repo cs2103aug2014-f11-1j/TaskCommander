@@ -13,10 +13,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /**
- * This class stores the data permanently in a local file on the computer.
+ * This class stores data permanently as JSON in a local file on the computer.
  */
 
-//@author Andreas Christian Mayr
+//@author A0112828H
 public class Storage {
 	
 	private static String _fileName = "tasks.json";

@@ -16,7 +16,7 @@ public class Controller {
 	 * Constructor
 	 */
 	public Controller(){
-		readFromStorage();
+		
 	}
 	
 	/**
@@ -148,17 +148,6 @@ public class Controller {
 		default:
 			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 		}
-	}
-	
-	/**
-	 * Read and write from storage to temporary data
-	 */
-	public void readFromStorage() {
-		//TaskCommander.data.readStorage(TaskCommander.storage);
-	}
-	
-	public void safeToStorage() {
-		//TaskCommander.data.writeStorage(TaskCommander.storage);
 	}
 	
 	/**

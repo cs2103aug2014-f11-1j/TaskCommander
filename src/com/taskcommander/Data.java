@@ -34,6 +34,7 @@ public class Data {
 	
 	/**
 	 * Returns a Data object.
+	 * Creates a new Storage and loads data from it.
 	 */
 	public Data() {
 		tasks = new ArrayList<Task>();
@@ -42,6 +43,7 @@ public class Data {
 		load();
 	}
 	
+	//@author A0112828H
 	public void save() {
 		storage.writeToFile(tasks);
 	}
@@ -50,6 +52,7 @@ public class Data {
 		tasks = storage.readFromFile();
 	}	
 	
+	//@author Andreas Christian Mayr
 	/**
 	 * Adds a task with given name.
 	 * 
