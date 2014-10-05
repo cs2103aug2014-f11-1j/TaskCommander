@@ -19,6 +19,7 @@ public class Task implements Comparable<Task> {
 	private String _name;
 	private String _id;
 	private boolean _done;
+	private boolean _edited;
 	
 	// Possible task types
 	public enum TaskType {
@@ -46,13 +47,14 @@ public class Task implements Comparable<Task> {
 			_name = name;
 			_taskType = taskType;
 			_done = false;
+			_edited = true;
 		} else {
 			throw new IllegalArgumentException();
 		}
 	}
 
-	public void setType(TaskType taskTye) {
-		_taskType = taskTye;
+	public void setType(TaskType taskType) {
+		_taskType = taskType;
 	}
 	
 	public TaskType getType() {
@@ -70,6 +72,11 @@ public class Task implements Comparable<Task> {
 	public boolean isDone() {
 		return _done;
 	}
+	
+	// Returns true if task has a google id and has not been edited since last sync
+	public boolean isSynced() {
+		return _id != null && !_edited; 
+	}
 
 	public void setName(String name) {
 		_name = name;
@@ -85,6 +92,10 @@ public class Task implements Comparable<Task> {
 	
 	public void markUndone() {
 		_done = false;
+	}
+	
+	public void setSynced() {
+		_edited = false;
 	}
 
 	public int compareTo(DeadlineTask otherTask) {

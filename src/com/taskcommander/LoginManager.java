@@ -55,6 +55,14 @@ public class LoginManager {
 	public LoginManager() {
 		httpTransport = new NetHttpTransport();
 		jsonFactory = new JacksonFactory();
+		File dataStoreFile = new File(DATA_STORE_DIR);
+		try {
+			dataStoreFactory = new FileDataStoreFactory(dataStoreFile);
+			dataStore = dataStoreFactory.getDataStore(DATA_STORE_NAME);
+		} catch (IOException e) {
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+		}
+
 	}
 
 	/**
@@ -144,10 +152,6 @@ public class LoginManager {
 	 */
 	private boolean hasStoredCredential() {
 		try {
-			File dataStoreFile = new File(DATA_STORE_DIR);
-			dataStoreFactory = new FileDataStoreFactory(dataStoreFile);
-			dataStore = dataStoreFactory.getDataStore(DATA_STORE_NAME);
-
 			return !dataStore.isEmpty() && dataStore.containsKey(USERNAME);
 		} catch (IOException e) {
 			System.out.println(Global.MESSAGE_EXCEPTION_IO);
