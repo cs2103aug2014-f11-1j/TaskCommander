@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import com.taskcommander.Global.TaskType;
+import com.taskcommander.Task.TaskType;
 
 /**
  * This class stores temporary data to be manipulated in

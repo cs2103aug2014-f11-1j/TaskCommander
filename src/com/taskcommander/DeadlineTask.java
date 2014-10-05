@@ -2,7 +2,7 @@ package com.taskcommander;
 import java.util.Date;
 
 import com.google.api.client.util.DateTime;
-import com.taskcommander.Global.TaskType;
+import com.taskcommander.Task.TaskType;
 
 /*
  * A task that has a name and a deadline.

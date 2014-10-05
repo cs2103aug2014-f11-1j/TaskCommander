@@ -1,6 +1,6 @@
 package com.taskcommander;
 import com.google.api.client.util.DateTime;
-import com.taskcommander.Global.TaskType;
+import com.taskcommander.Task.TaskType;
 
 /*
  * A floating task that has no deadline. 

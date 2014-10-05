@@ -2,7 +2,7 @@ package com.taskcommander;
 import java.util.Date;
 import java.util.List;
 
-import com.taskcommander.Global.TaskType;
+import com.taskcommander.Task.TaskType;
 
 /**
  * This class represents the Controller, which decides the execution depending on the command.
