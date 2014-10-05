@@ -6,16 +6,15 @@ import com.google.api.client.util.DateTime;
 import com.google.gson.annotations.SerializedName;
 //import com.taskcommander.Global.TaskType;
 
+//@author A0112828H
 /*
  * A basic task object.
  * Has a name. May also hold a Google API ID.
  * Related Google API: Tasks
- * 
- * @author Michelle Tan, ANDREAS, Sean Saito
  */
 
 public class Task implements Comparable<Task> {
-	@SerializedName("type") // For use with GSON
+	@SerializedName("taskType") // For use with GSON
 	private TaskType _taskType;
 	private String _name;
 	private String _id;
@@ -23,12 +22,19 @@ public class Task implements Comparable<Task> {
 	
 	// Possible task types
 	public enum TaskType {
-		@SerializedName("FloatingTask")
-		FLOATING, 
-		@SerializedName("TimedTask")
-		TIMED, 
-		@SerializedName("DeadlineTask")
-		DEADLINE
+		@SerializedName("0") FLOATING("FloatingTask"), 
+		@SerializedName("1") TIMED("TimedTask"), 
+		@SerializedName("2") DEADLINE("DeadlineTask");
+		
+		String name;
+	
+	    private TaskType(String s) {
+	        name = s;
+	    }
+	    
+	    public String toString(){
+	        return name;
+	     }
 	}
 
 	/*
@@ -81,9 +87,10 @@ public class Task implements Comparable<Task> {
 		_done = false;
 	}
 
+	//@author Sean Saito
 	@Override
 	public int compareTo(Task arg0) {
-		// TODO Auto-generated method stub
+		// TODO @Sean
 		return 0;
 	}
 }
