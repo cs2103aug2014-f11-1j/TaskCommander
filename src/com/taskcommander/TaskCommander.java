@@ -17,12 +17,6 @@ Examples of commands:
 
 public class TaskCommander {
 	
-<<<<<<< HEAD
-	//Static variables
-	public static Controller controller;
-	public static Data tasks; // Temporary storage
-	public static Storage file; // Permanent storage
-=======
 	/**
 	 * Components
 	 * (Please note: All components except for the framework class "TaskCommander" are  instantiated. 
@@ -37,7 +31,6 @@ public class TaskCommander {
 	// Storage (permanent memory consisting of a local .txt-file)
 	public static Storage storage;
 	// User Interface
->>>>>>> 2d86fe641f0fa3bbc5216b04a858c9bbda22ff70
 	public static UI ui;
 
 	/**
@@ -45,15 +38,6 @@ public class TaskCommander {
 	 * @param  args
 	 */
 	public static void main(String[] args) {
-<<<<<<< HEAD
-		// Create components
-		ui = new UI();
-		controller = new Controller();
-		tasks = new Data();
-		file = new Storage();
-		
-		controller.readFromStorage(); // Read old tasks from storage
-=======
 		
 		// Creation of the components
 		storage = new Storage();
@@ -61,7 +45,6 @@ public class TaskCommander {
 		controller = new Controller();
 		parser = new Parser();
 		ui = new UI();
->>>>>>> 2d86fe641f0fa3bbc5216b04a858c9bbda22ff70
 		
 		// Start of the user interface
 		UI.open();
