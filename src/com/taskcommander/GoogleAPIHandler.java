@@ -130,7 +130,6 @@ public class GoogleAPIHandler {
 	public boolean addTask(FloatingTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
-			return false;
 		} else {
 			Task taskToAdd = new Task();
 			taskToAdd.setTitle(task.getName());
@@ -140,9 +139,9 @@ public class GoogleAPIHandler {
 				return result != null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
-				return false;
 			}
 		}
+		return false;
 	}
 
 	// @author Sean Saito
@@ -168,7 +167,6 @@ public class GoogleAPIHandler {
 	public boolean addTask(TimedTask task) {
 		if (task == null){
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
-			return false;
 		} else {
 			Event event = new Event();
 			event.setSummary(task.getName());
@@ -180,9 +178,9 @@ public class GoogleAPIHandler {
 				return createdEvent != null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
-				return false;
 			}
 		}
+		return false;
 	}
 	
 	/**
@@ -193,24 +191,20 @@ public class GoogleAPIHandler {
 	 * @param task   Custom FloatingTask object
 	 * @return	     Success of action
 	 */
-	public boolean getTask(FloatingTask task) {
+	public Task getTask(FloatingTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
-			return false;
 		} else if (task.getId() == null) {
 			System.out.println(MESSAGE_NO_ID);
-			return false;
 		} else {
 			try {
-				Tasks.TasksOperations.Delete request = tasks.tasks().delete("@default", task.getId());
-				request.execute();
 				Task check = tasks.tasks().get("@default", task.getId()).execute();
-				return check == null;
+				return check;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
-				return false;
 			}
 		}
+		return null;
 	}
 	
 	/**
@@ -250,10 +244,8 @@ public class GoogleAPIHandler {
 	public boolean deleteTask(FloatingTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
-			return false;
 		} else if (task.getId() == null) {
 			System.out.println(MESSAGE_NO_ID);
-			return false;
 		} else {
 			try {
 				Tasks.TasksOperations.Delete request = tasks.tasks().delete("@default", task.getId());
@@ -262,9 +254,9 @@ public class GoogleAPIHandler {
 				return check == null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
-				return false;
 			}
 		}
+		return false;
 	}
 	
 	/**
