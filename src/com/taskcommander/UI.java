@@ -45,7 +45,7 @@ public class UI {
 	protected static void createContents() {
 		shell = new Shell();
 		shell.setSize(450, 300);
-		shell.setText("Text Commander");
+		shell.setText(Global.APPLICATION_NAME);
 		input = new Text(shell, SWT.BORDER);
 		input.setBounds(47, 33, 292, 23);
 		//This event triggered on enter key
@@ -69,7 +69,7 @@ public class UI {
 		
 
 		output = new Text(shell, SWT.BORDER|SWT.WRAP);
-		output.setText("Welcome to Task Commander!\n");
+		output.setText(Global.MESSAGE_WELCOME);
 		output.setBounds(47, 91, 292, 132);
 
 		/*Button btnEnter = new Button(shell, SWT.NONE);

@@ -6,10 +6,11 @@ package com.taskcommander;
  */
 public class Global {
 	
+	public static final String APPLICATION_NAME = "Task Commander";
+	
 	public static final String MESSAGE_FILE_NOT_GIVEN = "File not given. Please enter a valid file name.";
 	public static final String MESSAGE_FILE_NOT_FOUND = "File not found. Please enter a valid file name.";
-	public static final String MESSAGE_WELCOME = "Welcome to TextBuddy. %1$s is ready for use. " + 
-			"Type 'help' to see the list of commands.";
+	public static final String MESSAGE_WELCOME = "Welcome to TaskCommander.";
 	public static final String MESSAGE_ADDED = "Added: %1$s";
 	public static final String MESSAGE_UPDATED = "Updated: \"%1$s\"";
 	public static final String MESSAGE_DELETED = "Deleted: \"%1$s\"";
@@ -26,6 +27,8 @@ public class Global {
 	public static final String MESSAGE_SORTED = "Tasks has been sorted.";
 	public static final String MESSAGE_FILE_COULD_NOT_BE_WRITTEN = "Error: The File could not be written.";
 	public static final String MESSAGE_FILE_COULD_NOT_BE_LOADED = "Error: The File could not be loaded.";
+	public static final String MESSAGE_EXCEPTION_IO = "Unable to read the data retrieved.";
+	public static final String MESSAGE_ARGUMENTS_NULL = "Null arguments given.";
 
 	public static final int INDEX_OFFSET = 1; // Difference between the array index and actual line number
 
