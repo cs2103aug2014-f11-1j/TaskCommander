@@ -14,16 +14,10 @@ Examples of commands...
 
 public class TaskCommander {
 	
-	/**
-	 * Static variables
-	 */
-	// Controller
+	//Static variables
 	public static Controller controller;
-	// This list stores the lines of tasks temporary
-	public static Data tasks;
-	// This file stores the lines of tasks permanently  on the computer
-	public static Storage file;
-	// User Interface
+	public static Data tasks; // Temporary storage
+	public static Storage file; // Permanent storage
 	public static UI ui;
 
 	/**
@@ -31,13 +25,13 @@ public class TaskCommander {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// Creation of the components:
+		// Create components
 		ui = new UI();
 		controller = new Controller();
 		tasks = new Data();
 		file = new Storage();
 		
-		controller.readFromStorage();					// read old tasks from storage
+		controller.readFromStorage(); // Read old tasks from storage
 		
 		// Start the user interface
 		UI.open();
