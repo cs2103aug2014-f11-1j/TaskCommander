@@ -17,6 +17,7 @@ public class Task implements Comparable<Task> {
 	private TaskType _taskType;
 	private String _name;
 	private String _id;
+	private boolean _done;
 
 	/*
 	 * Creates a new Task with given name.
@@ -26,6 +27,7 @@ public class Task implements Comparable<Task> {
 		if (name != null) {
 			_name = name;
 			_taskType = taskType;
+			_done = false;
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -46,6 +48,10 @@ public class Task implements Comparable<Task> {
 	public String getId() {
 		return _id;
 	}
+	
+	public boolean isDone() {
+		return _done;
+	}
 
 	public void setName(String name) {
 		_name = name;
@@ -53,6 +59,14 @@ public class Task implements Comparable<Task> {
 
 	public void setId(String id) {
 		_id = id;
+	}
+	
+	public void markDone() {
+		_done = true;
+	}
+	
+	public void markUndone() {
+		_done = false;
 	}
 
 	@Override
