@@ -15,6 +15,11 @@ public class FloatingTask extends Task {
 		super(name, TaskType.FLOATING);
 	}
 	
+	public FloatingTask(String name, String googleID) {
+		super(name, TaskType.FLOATING);
+		this.setID(googleID);
+	}
+	
 	/*
 	 * Compares the name of this task to the given task, using
 	 * alphabetical order of the names.

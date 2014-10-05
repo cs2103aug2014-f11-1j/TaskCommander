@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -47,7 +48,7 @@ public class GoogleAPIHandler {
 	private static Calendar calendar;
 	static final java.util.List<Calendar> addedCalendarsUsingBatch = Lists.newArrayList();
 	private static Tasks tasks;
-	
+
 	/**
 	 * Creates a new GoogleAPIHandler instance.
 	 * Also creates a new LoginManager and attempts
@@ -57,31 +58,66 @@ public class GoogleAPIHandler {
 		loginManager = new LoginManager();
 		getServices();
 	}
-	
+
 	private void getServices() {
 		tasks = loginManager.getTasksService();
 		calendar = loginManager.getCalendarService();
 	}
 
 	/**
-	 * Prints out all tasks.
+	 * Returns all tasks.
 	 * @return       Feedback for user.
 	 */
-	public String getAllTasks() {
+	public ArrayList<com.taskcommander.Task> getAllTasks() {
+		ArrayList<com.taskcommander.Task> result = getAllFloatingTasks();
+		result.addAll(getAllEvents());
+		return result;
+	}
+
+	/**
+	 * Gets all tasks from Tasks API.
+	 * @return   Arraylist of TaskCommander Tasks.
+	 */
+	private ArrayList<com.taskcommander.Task> getAllFloatingTasks() {
 		try {
 			Tasks.TasksOperations.List request = tasks.tasks().list("@default");
 			List<Task> tasks = request.execute().getItems();
 
-			String result = "";
+			ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
 			for (Task task : tasks) {
-				result += task.getTitle() + "\n";
+				taskList.add(toTask(task));
 			}
-			return result;
+			return taskList;
 		} catch (IOException e) {
-			return Global.MESSAGE_EXCEPTION_IO;
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			return null;
 		}
 	}
-	
+
+	/**
+	 * Gets all events from Calendar API starting from
+	 * current system time.
+	 * @return   Arraylist of TaskCommander Tasks.
+	 */
+	private ArrayList<com.taskcommander.Task> getAllEvents() {
+		try {
+			// Gets events from current time onwards
+			List<Event> events = calendar.events().list(PRIMARY_CALENDAR_ID)
+					.setTimeMin(new DateTime(System.currentTimeMillis())) 
+					.execute().getItems();
+
+			ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
+			for (Event event : events){
+				taskList.add(toTask(event));
+			}
+			return taskList;
+		} catch (IOException e) {
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			return null;
+		}
+	}
+
+
 	/**
 	 * Adds a task given a FloatingTask object.
 	 * Returns the task name if successful.
@@ -105,6 +141,7 @@ public class GoogleAPIHandler {
 		}
 	}
 
+	// @author Sean Saito
 	/**
 	 * Adds a task given a DatedTask object.
 	 * Returns the task name if successful.
@@ -113,23 +150,10 @@ public class GoogleAPIHandler {
 	 * @return       Feedback for user.
 	 */
 	public String addTask(DeadlineTask task) {
-		if (task == null) {
-			return Global.MESSAGE_ARGUMENTS_NULL;
-		} else {
-			Task taskToAdd = new Task();
-			taskToAdd.setTitle(task.getName());
-			taskToAdd.setDue(toDateTime(task.getEndDate()));	
-			try {
-				Tasks.TasksOperations.Insert request = tasks.tasks().insert("@default", taskToAdd);
-				Task result = request.execute();
-				return result.getTitle();
-			} catch (IOException e) {
-				return Global.MESSAGE_EXCEPTION_IO;
-			}
-		}
+		//TODO @Sean
+		return "";
 	}
 
-	// @author Sean Saito
 	/**
 	 * Adds an Event to the primary calendar given a TimedTask object.
 	 * Returns the name of the task if successful. 
@@ -155,31 +179,32 @@ public class GoogleAPIHandler {
 		}
 	}
 
-	/**
-	 * Returns a list of all events starting from current system time.
-	 * @return List of all events
-	 */
-	public String getAllEvents(){
-		try {
-			// Gets events from current time onwards
-			List<Event> events = calendar.events().list(PRIMARY_CALENDAR_ID)
-					.setTimeMin(new DateTime(System.currentTimeMillis())) 
-					.execute().getItems();
-
-			String result = "";
-			for (Event event : events){
-				result += event.getSummary() + "\n";
-			}
-			return result;
-		} catch (IOException e){
-			return Global.MESSAGE_EXCEPTION_IO;
-		}
-	}
-
 	//@author A0112828H
 	// Changes a Date to a DateTime object.
 	private DateTime toDateTime(Date date) {
 		return new DateTime(date);
+	}
+	
+	// Changes a Date to a DateTime object.
+	private Date toDate(DateTime dateTime) {
+		return new Date(dateTime.getValue());
+	}
+
+	// Changes a Google Task to a TaskCommander Task.
+	private com.taskcommander.Task toTask(Task task) {
+		return new FloatingTask(task.getTitle(), task.getId());
+	}
+
+	// Changes a Google Calendar Event to a TaskCommander Task.
+	private com.taskcommander.Task toTask(Event event) {
+		if (event.containsKey("start")) {
+			return new TimedTask(event.getSummary(), 
+					toDate(event.getStart().getDateTime()), 
+					toDate(event.getEnd().getDateTime()));
+		} else {
+			return new DeadlineTask(event.getSummary(), 
+					toDate(event.getEnd().getDateTime()));
+		}
 	}
 
 }
