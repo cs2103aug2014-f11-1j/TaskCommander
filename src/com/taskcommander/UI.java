@@ -60,7 +60,7 @@ public class UI {
 						String command = input.getText();
 						output.setText(TaskCommander.controller.executeCommand(command));
 						input.setText("");
-						TaskCommander.controller.safeToStorage();		// write new tasks in storage
+						TaskCommander.data.save();		// write new tasks in storage
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
