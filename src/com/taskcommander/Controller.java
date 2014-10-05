@@ -97,11 +97,11 @@ public class Controller {
 			// TaskDateTime (3 cases depending on taskType)
 			List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
 			if (taskDateTime == null) { 			// case 1: FloatingTask
-				return TaskCommander.data.addTask(Global.TaskType.FLOATING, taskName, null, null);
+				return TaskCommander.data.addTask(TaskType.FLOATING, taskName, null, null);
 			} else if (taskDateTime.size() ==1 ) { 	// case 2: DeadlineTask
-				return TaskCommander.data.addTask(Global.TaskType.DEADLINE, taskName,null, taskDateTime.get(0));
+				return TaskCommander.data.addTask(TaskType.DEADLINE, taskName,null, taskDateTime.get(0));
 			} else if (taskDateTime.size() == 2) { 	// case 3: TimedTask
-				return TaskCommander.data.addTask(Global.TaskType.TIMED, taskName, taskDateTime.get(0), taskDateTime.get(1));
+				return TaskCommander.data.addTask(TaskType.TIMED, taskName, taskDateTime.get(0), taskDateTime.get(1));
 			} else {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			}
@@ -154,11 +154,11 @@ public class Controller {
 	 * Read and write from storage to temporary data
 	 */
 	public void readFromStorage() {
-		TaskCommander.data.readStorage(TaskCommander.storage);
+		//TaskCommander.data.readStorage(TaskCommander.storage);
 	}
 	
 	public void safeToStorage() {
-		TaskCommander.data.writeStorage(TaskCommander.storage);
+		//TaskCommander.data.writeStorage(TaskCommander.storage);
 	}
 	
 	/**

@@ -30,12 +30,25 @@ public class Data {
 	 */
 	public ArrayList<Task> tasksHistory;
 	
+	private Storage storage;
+	
 	/**
 	 * Returns a Data object.
 	 */
 	public Data() {
 		tasks = new ArrayList<Task>();
+		tasksHistory = new ArrayList<Task>();
+		storage = new Storage();
+		load();
 	}
+	
+	public void save() {
+		storage.writeToFile(tasks);
+	}
+	
+	public void load() {
+		tasks = storage.readFromFile();
+	}	
 	
 	/**
 	 * Adds a task with given name.

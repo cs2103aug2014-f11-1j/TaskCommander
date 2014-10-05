@@ -44,16 +44,11 @@ public class Storage {
 				Task task = gson.fromJson(line, Task.class);
 				tasks.add(task);
 			}
+			reader.close();
 			return tasks;
 		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				reader.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+		} 
 		return null;
 	}
 	
@@ -71,7 +66,7 @@ public class Storage {
 		  }
 		  bw.close();
 		} catch (Exception e) {
-		  e.printStackTrace();
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
 		}
 	}
 }
