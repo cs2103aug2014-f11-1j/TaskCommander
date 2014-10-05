@@ -87,10 +87,15 @@ public class Task implements Comparable<Task> {
 		_done = false;
 	}
 
-	//@author Sean Saito
-	@Override
-	public int compareTo(Task arg0) {
-		// TODO @Sean
+	public int compareTo(DeadlineTask otherTask) {
+		return 0;
+	}
+	
+	public int compareTo(FloatingTask otherTask) {
+		return 0;
+	}
+	
+	public int compareTo(TimedTask otherTask) {
 		return 0;
 	}
 }
