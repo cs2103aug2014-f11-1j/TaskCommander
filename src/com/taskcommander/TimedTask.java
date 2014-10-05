@@ -53,6 +53,8 @@ public class TimedTask extends Task {
 	 */
 	@Override
 	public int compareTo(Task otherTask) {
-		return (_startDate.compareTo(otherTask.getStartDate()));
+		//return (_startDate.compareTo(otherTask.getStartDate()));
+		// TODO @Sean
+		return 0;
 	}
 }

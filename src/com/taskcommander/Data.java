@@ -23,15 +23,15 @@ import com.taskcommander.Task.TaskType;
 public class Data {
 
 	public ArrayList<Task> tasks; // Array containing a list of task objects
-	
+
 	/*
 	 * Array containing the history of the commands used since program start.
 	 * This array is needed for the undo-feature.
 	 */
 	public ArrayList<Task> tasksHistory;
-	
+
 	private Storage storage;
-	
+
 	/**
 	 * Returns a Data object.
 	 * Creates a new Storage and loads data from it.
@@ -42,16 +42,16 @@ public class Data {
 		storage = new Storage();
 		load();
 	}
-	
+
 	//@author A0112828H
 	public void save() {
 		storage.writeToFile(tasks);
 	}
-	
+
 	public void load() {
 		tasks = storage.readFromFile();
 	}	
-	
+
 	//@author Andreas Christian Mayr
 	/**
 	 * Adds a task with given name.
@@ -67,24 +67,26 @@ public class Data {
 		SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
 
 		switch (taskType) {
-			case DEADLINE:
-				DeadlineTask deadlineTask;
-				deadlineTask= new DeadlineTask(taskName,endDate);
-				tasks.add(deadlineTask);
-				return String.format(Global.MESSAGE_ADDED,"[by "+dayFormat.format(endDate)+" "+timeFormat.format(endDate)+"]"+" \""+taskName+"\"");
-			case TIMED:
-				TimedTask timedTask;
-				timedTask = new TimedTask(taskName,startDate,endDate);
-				tasks.add(timedTask);
-				return String.format(Global.MESSAGE_ADDED,"["+dayFormat.format(endDate)+" "+timeFormat.format(startDate)+"-"+timeFormat.format(endDate)+"]"+" \""+taskName+"\"");				
-			default:
-				FloatingTask floatingTask;
-				floatingTask = new FloatingTask(taskName);
-				tasks.add(floatingTask);
-				return String.format(Global.MESSAGE_ADDED,"\""+taskName+"\"");
+		case DEADLINE:
+			DeadlineTask deadlineTask;
+			deadlineTask= new DeadlineTask(taskName,endDate);
+			tasks.add(deadlineTask);
+			return String.format(Global.MESSAGE_ADDED,"[by "+dayFormat.format(endDate)+" "+timeFormat.format(endDate)+"]"+" \""+taskName+"\"");
+		case TIMED:
+			TimedTask timedTask;
+			timedTask = new TimedTask(taskName,startDate,endDate);
+			tasks.add(timedTask);
+			return String.format(Global.MESSAGE_ADDED,"["+dayFormat.format(endDate)+" "+timeFormat.format(startDate)+"-"+timeFormat.format(endDate)+"]"+" \""+taskName+"\"");				
+		case FLOATING:
+			FloatingTask floatingTask;
+			floatingTask = new FloatingTask(taskName);
+			tasks.add(floatingTask);
+			return String.format(Global.MESSAGE_ADDED,"\""+taskName+"\"");
+		default:
+			return null;
 		}
 	}
-	
+
 	/**
 	 * Updates the task with the given index (as shown with 'display' command) and
 	 * replaces the old task description by the new one.
@@ -96,7 +98,7 @@ public class Data {
 	 * @return             Feedback for user.
 	 */
 	public String updateTask(String index, String taskName) {	// implementation needs to be adjusted to new parser
-	/*
+		/*
 		if (tasks.isEmpty()) {
 			return String.format(Global.MESSAGE_EMPTY);
 		} else if (index == null) {
@@ -118,7 +120,7 @@ public class Data {
 
 			return String.format(Global.MESSAGE_UPDATED, taskName);
 		}
-		*/
+		 */
 		return "out of order";
 	}
 
@@ -134,36 +136,36 @@ public class Data {
 			return String.format(Global.MESSAGE_EMPTY);
 		}
 
-			String[][] result = new String[tasks.size()][3]; // first [] represents line, second [] represents row of the array
-			SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy");
-			SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
-			
-			for (int i = 0; i < tasks.size(); i++) {
+		String[][] result = new String[tasks.size()][3]; // first [] represents line, second [] represents row of the array
+		SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy");
+		SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
 
-				TaskType taskType = tasks.get(i).getType();
-				if (taskType == TaskType.TIMED) {
-					TimedTask timedTask = (TimedTask) tasks.get(i);
-					result[i][0] = dayFormat.format(timedTask.getStartDate());
-					result[i][1] = timeFormat.format(timedTask.getStartDate()) + "-"
-							+ timeFormat.format(timedTask.getEndDate());
-					result[i][2] = tasks.get(i).getName();
+		for (int i = 0; i < tasks.size(); i++) {
 
-				} else if (taskType == TaskType.DEADLINE) {
-					DeadlineTask deadlineTask = (DeadlineTask) tasks.get(i);
-					result[i][0] = dayFormat.format(deadlineTask.getEndDate());
-					result[i][1] = timeFormat.format(deadlineTask.getEndDate());
-					result[i][2] = deadlineTask.getName();
+			TaskType taskType = tasks.get(i).getType();
+			if (taskType == TaskType.TIMED) {
+				TimedTask timedTask = (TimedTask) tasks.get(i);
+				result[i][0] = dayFormat.format(timedTask.getStartDate());
+				result[i][1] = timeFormat.format(timedTask.getStartDate()) + "-"
+						+ timeFormat.format(timedTask.getEndDate());
+				result[i][2] = tasks.get(i).getName();
 
-				} else {
-					FloatingTask floatingTask = (FloatingTask) tasks.get(i);
-					result[i][0] = null;
-					result[i][1] = null;
-					result[i][2] = floatingTask.getName();
-				}
+			} else if (taskType == TaskType.DEADLINE) {
+				DeadlineTask deadlineTask = (DeadlineTask) tasks.get(i);
+				result[i][0] = dayFormat.format(deadlineTask.getEndDate());
+				result[i][1] = timeFormat.format(deadlineTask.getEndDate());
+				result[i][2] = deadlineTask.getName();
 
-				TaskCommander.controller.setDisplayedTasks(result);
+			} else {
+				FloatingTask floatingTask = (FloatingTask) tasks.get(i);
+				result[i][0] = null;
+				result[i][1] = null;
+				result[i][2] = floatingTask.getName();
 			}
-			return "Internal Message: String Array for the UI was created, see also console output";
+
+			TaskCommander.controller.setDisplayedTasks(result);
+		}
+		return "Internal Message: String Array for the UI was created, see also console output";
 
 	}
 

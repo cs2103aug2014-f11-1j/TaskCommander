@@ -27,6 +27,6 @@ public class FloatingTask extends Task {
 	 */
 	@Override
 	public int compareTo(Task otherTask) {
-		return (_name.compareTo(otherTask.getName()));
+		return (getName().compareTo(otherTask.getName()));
 	}
 }
