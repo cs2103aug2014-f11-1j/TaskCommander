@@ -234,4 +234,8 @@ public class Data {
 	public ArrayList<Task> getAllTasks() {
 		return tasks;
 	}
+	
+	public ArrayList<Task> getDeletedTasks() {
+		return deletedTasks;
+	}
 }
