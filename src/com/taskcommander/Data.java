@@ -49,7 +49,7 @@ public class Data {
 	}
 
 	public void load() {
-		tasks = storage.readFromFile();
+		// tasks = storage.readFromFile(); //TODO: Michelle, always returns a NULL wich results in an error within the other mehtods
 	}	
 
 	//@author Andreas Christian Mayr
@@ -60,7 +60,7 @@ public class Data {
 	 * @return             Feedback for user.
 	 */
 	public String addTask(TaskType taskType, String taskName, Date startDate, Date endDate) {
-		if (taskName == null || taskType == null) {
+		if (taskName == null || taskName == " ") {
 			return Global.MESSAGE_NO_TASK;
 		}
 		SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy");
@@ -70,6 +70,7 @@ public class Data {
 		case DEADLINE:
 			DeadlineTask deadlineTask;
 			deadlineTask= new DeadlineTask(taskName,endDate);
+			System.out.println(tasks);
 			tasks.add(deadlineTask);
 			return String.format(Global.MESSAGE_ADDED,"[by "+dayFormat.format(endDate)+" "+timeFormat.format(endDate)+"]"+" \""+taskName+"\"");
 		case TIMED:
