@@ -94,6 +94,7 @@ public class GoogleAPIHandler {
 		}
 	}
 
+	//@author Sean Saito
 	/**
 	 * Gets all events from Calendar API starting from
 	 * current system time.
@@ -117,15 +118,81 @@ public class GoogleAPIHandler {
 		}
 	}
 
-
+	//@author A0112828H
 	/**
-	 * Adds a task given a FloatingTask object.
-	 * Returns the task name if successful.
+	 * Adds a task to the Tasks API, given a FloatingTask object.
+	 * Returns true if successful.
 	 * 
 	 * @param task   Custom FloatingTask object
-	 * @return       Feedback for user.
+	 * @return       Success of action
 	 */
-	public String addTask(FloatingTask task) {
+	public boolean addTask(FloatingTask task) {
+		if (task == null) {
+			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			return false;
+		} else {
+			Task taskToAdd = new Task();
+			taskToAdd.setTitle(task.getName());
+			try {
+				Tasks.TasksOperations.Insert request = tasks.tasks().insert("@default", taskToAdd);
+				Task result = request.execute();
+				return result != null;
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				return false;
+			}
+		}
+	}
+
+	// @author Sean Saito
+	/**
+	 * Adds an Event to the Calendar API, given a DeadlineTask object.
+	 * Returns true if successful.
+	 * 
+	 * @param task   Custom DeadlineTask object
+	 * @return       Success of action
+	 */
+	public boolean addTask(DeadlineTask task) {
+		//TODO @Sean
+		return false;
+	}
+
+	/**
+	 * Adds an Event to the Calendar API, given a TimedTask object.
+	 * Returns true if successful. 
+	 * 
+	 * @param task   Custom TimedTask object
+	 * @return	     Success of action
+	 */
+	public boolean addTask(TimedTask task) {
+		if (task == null){
+			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			return false;
+		} else {
+			Event event = new Event();
+			event.setSummary(task.getName());
+			event.setStart(new EventDateTime().setDateTime(toDateTime(task.getStartDate())));			
+			event.setEnd(new EventDateTime().setDateTime(toDateTime(task.getEndDate())));		
+
+			try {
+				Event createdEvent = calendar.events().insert(PRIMARY_CALENDAR_ID, event).execute();
+				return createdEvent != null;
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				return false;
+			}
+		}
+	}
+	
+	/**
+	 * Deletes a task from the Tasks API, given a FloatingTask object.
+	 * The given task must have a Google ID.
+	 * Returns the name of the task if successful. 
+	 * 
+	 * @param task   Custom FloatingTask object
+	 * @return	Feedback for user
+	 */
+	public String deleteTask(FloatingTask task) {
 		if (task == null) {
 			return Global.MESSAGE_ARGUMENTS_NULL;
 		} else {
@@ -140,43 +207,31 @@ public class GoogleAPIHandler {
 			}
 		}
 	}
-
-	// @author Sean Saito
+	
 	/**
-	 * Adds a task given a DatedTask object.
-	 * Returns the task name if successful.
-	 * 
-	 * @param task   Custom DatedTask object
-	 * @return       Feedback for user.
-	 */
-	public String addTask(DeadlineTask task) {
-		//TODO @Sean
-		return "";
-	}
-
-	/**
-	 * Adds an Event to the primary calendar given a TimedTask object.
+	 * Deletes an event from the Calendar API, given a DeadlineTask object.
+	 * The given task must have a Google ID.
 	 * Returns the name of the task if successful. 
 	 * 
-	 * @param task   Custom TimedTask object
-	 * @return	Title of the event
+	 * @param task   Custom FloatingTask object
+	 * @return	Feedback for user
 	 */
-	public String addEvent(TimedTask task) {
-		if (task == null){
-			return Global.MESSAGE_ARGUMENTS_NULL;
-		} else {
-			Event event = new Event();
-			event.setSummary(task.getName());
-			event.setStart(new EventDateTime().setDateTime(toDateTime(task.getStartDate())));			
-			event.setEnd(new EventDateTime().setDateTime(toDateTime(task.getEndDate())));		
-
-			try {
-				Event createdEvent = calendar.events().insert(PRIMARY_CALENDAR_ID, event).execute();
-				return createdEvent.getSummary();
-			} catch (IOException e) {
-				return Global.MESSAGE_EXCEPTION_IO;
-			}
-		}
+	public String deleteTask(DeadlineTask task) {
+		//TODO @Sean
+		return null;
+	}
+	
+	/**
+	 * Deletes an event from the Calendar API, given a TimedTask object.
+	 * The given task must have a Google ID.
+	 * Returns the name of the task if successful. 
+	 * 
+	 * @param task   Custom FloatingTask object
+	 * @return	Feedback for user
+	 */
+	public String deleteTask(TimedTask task) {
+		//TODO @Sean
+		return null;
 	}
 
 	//@author A0112828H
