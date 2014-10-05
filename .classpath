@@ -5,7 +5,7 @@
 	<classpathentry kind="lib" path="lib/google-api-client-gson-1.18.0-rc.jar"/>
 	<classpathentry kind="lib" path="lib/google-api-client-xml-1.18.0-rc.jar"/>
 	<classpathentry kind="lib" path="lib/google-api-services-calendar-v3-rev99-1.18.0-rc.jar"/>
-	<classpathentry kind="lib" path="lib/google-api-services-tasks-v1-rev36-1.19.0.jar"/>
+	<classpathentry kind="lib" path="lib/google-api-services-tasks-v1-rev36-1.19.0.jar" sourcepath="C:/Users/Mishie/.m2/repository/com/google/apis/google-api-services-tasks/v1-rev36-1.19.0/google-api-services-tasks-v1-rev36-1.19.0-sources.jar"/>
 	<classpathentry kind="lib" path="lib/google-http-client-1.18.0-rc.jar"/>
 	<classpathentry kind="lib" path="lib/google-http-client-jackson2-1.18.0-rc.jar"/>
 	<classpathentry kind="lib" path="lib/google-oauth-client-1.18.0-rc.jar"/>

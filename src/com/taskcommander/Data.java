@@ -52,7 +52,7 @@ public class Data {
 	}
 
 	public void load() {
-		// tasks = storage.readFromFile(); //TODO: Michelle, always returns a NULL wich results in an error within the other mehtods
+		tasks = storage.readFromFile(); 
 	}	
 
 	//@author Andreas Christian Mayr

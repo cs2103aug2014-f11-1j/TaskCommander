@@ -40,7 +40,6 @@ public class TaskAdapter implements JsonSerializer<Task>, JsonDeserializer<Task>
 	public Task deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
 			throws JsonParseException {
 		JsonObject jsonObject = json.getAsJsonObject();
-		System.out.println(jsonObject.toString());
 		int type = Integer.parseInt(jsonObject.get("taskType").getAsString());
 		try {
 			switch (type) {
