@@ -22,16 +22,12 @@ public class TaskCommander {
 	 * (Please note: All components except for the framework class "TaskCommander" are  instantiated. 
 	 * In other words, instances instead of classes are used.)
 	 */
-	// Controller
 	public static Controller controller;
-	// Parser
 	public static Parser parser;
-	// Data (temporary memory containing a list of task objects)
-	public static Data data;
-	// Storage (permanent memory consisting of a local .txt-file)
-	public static Storage storage;
-	// User Interface
-	public static UI ui;
+	public static Data data; // temporary memory containing a list of task objects
+	public static Storage storage; 	// (permanent memory consisting of a local .txt-file
+	public static UI ui; // User Interface
+	public static GoogleAPIHandler googleHandler;
 
 	/**
 	 * Launch the application
@@ -48,5 +44,17 @@ public class TaskCommander {
 		
 		// Start of the user interface
 		UI.open();
+	}
+	
+	//Note: only call this when the sync command is used
+	//as user should not be asked to login until they
+	//execute a sync command
+	/**
+	 * Sets a new GoogleAPIHandler instance.
+	 * May start a login process if user is not
+	 * already logged in.
+	 */
+	public static void getGoogleAPIHandler() {
+		googleHandler = new GoogleAPIHandler();
 	}
 }

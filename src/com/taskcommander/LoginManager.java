@@ -58,11 +58,11 @@ public class LoginManager {
 	}
 
 	/**
-	 * Connects to Google and initialises Tasks service.
+	 * Connects to Google and builds a new Tasks service.
 	 * Requests can be sent once this method is successfully
 	 * executed.
 	 */
-	public Tasks createTasksService(){
+	public Tasks getTasksService(){
 		if (isLoggedIn()) {
 			return new Tasks.Builder(httpTransport, jsonFactory, credential)
 			.setApplicationName(APPLICATION_NAME).build();
@@ -72,11 +72,11 @@ public class LoginManager {
 	}
 
 	/**
-	 * Connects to Google and initialises Calendar service.
+	 * Connects to Google and builds a new Calendar service.
 	 * Requests can be sent once this method is successfully
 	 * executed.
 	 */
-	public Calendar createCalendarService(){
+	public Calendar getCalendarService(){
 		if (isLoggedIn()) {
 			return new Calendar.Builder(httpTransport, jsonFactory, credential)
 			.setApplicationName(APPLICATION_NAME).build();

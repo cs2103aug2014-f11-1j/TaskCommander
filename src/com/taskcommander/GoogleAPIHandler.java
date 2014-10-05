@@ -41,20 +41,35 @@ import com.google.api.services.tasks.model.Task;
 public class GoogleAPIHandler {
 
 	private static final String PRIMARY_CALENDAR_ID = "primary";
+	private static LoginManager loginManager;
 
 	//Global instances
 	private static Calendar calendar;
 	static final java.util.List<Calendar> addedCalendarsUsingBatch = Lists.newArrayList();
-	private static Tasks taskService;
-
+	private static Tasks tasks;
 	
+	/**
+	 * Creates a new GoogleAPIHandler instance.
+	 * Also creates a new LoginManager and attempts
+	 * to get the Tasks and Calendar services.
+	 */
+	public GoogleAPIHandler() {
+		loginManager = new LoginManager();
+		getServices();
+	}
+	
+	private void getServices() {
+		tasks = loginManager.getTasksService();
+		calendar = loginManager.getCalendarService();
+	}
+
 	/**
 	 * Prints out all tasks.
 	 * @return       Feedback for user.
 	 */
 	public String getAllTasks() {
 		try {
-			Tasks.TasksOperations.List request = taskService.tasks().list("@default");
+			Tasks.TasksOperations.List request = tasks.tasks().list("@default");
 			List<Task> tasks = request.execute().getItems();
 
 			String result = "";
@@ -63,7 +78,7 @@ public class GoogleAPIHandler {
 			}
 			return result;
 		} catch (IOException e) {
-			return MESSAGE_EXCEPTION_IO;
+			return Global.MESSAGE_EXCEPTION_IO;
 		}
 	}
 	
@@ -76,16 +91,16 @@ public class GoogleAPIHandler {
 	 */
 	public String addTask(FloatingTask task) {
 		if (task == null) {
-			return MESSAGE_ARGUMENTS_NULL;
+			return Global.MESSAGE_ARGUMENTS_NULL;
 		} else {
 			Task taskToAdd = new Task();
 			taskToAdd.setTitle(task.getName());
 			try {
-				Tasks.TasksOperations.Insert request = taskService.tasks().insert("@default", taskToAdd);
+				Tasks.TasksOperations.Insert request = tasks.tasks().insert("@default", taskToAdd);
 				Task result = request.execute();
 				return result.getTitle();
 			} catch (IOException e) {
-				return MESSAGE_EXCEPTION_IO;
+				return Global.MESSAGE_EXCEPTION_IO;
 			}
 		}
 	}
@@ -99,17 +114,17 @@ public class GoogleAPIHandler {
 	 */
 	public String addTask(DeadlineTask task) {
 		if (task == null) {
-			return MESSAGE_ARGUMENTS_NULL;
+			return Global.MESSAGE_ARGUMENTS_NULL;
 		} else {
 			Task taskToAdd = new Task();
 			taskToAdd.setTitle(task.getName());
 			taskToAdd.setDue(toDateTime(task.getEndDate()));	
 			try {
-				Tasks.TasksOperations.Insert request = taskService.tasks().insert("@default", taskToAdd);
+				Tasks.TasksOperations.Insert request = tasks.tasks().insert("@default", taskToAdd);
 				Task result = request.execute();
 				return result.getTitle();
 			} catch (IOException e) {
-				return MESSAGE_EXCEPTION_IO;
+				return Global.MESSAGE_EXCEPTION_IO;
 			}
 		}
 	}
@@ -124,7 +139,7 @@ public class GoogleAPIHandler {
 	 */
 	public String addEvent(TimedTask task) {
 		if (task == null){
-			return MESSAGE_ARGUMENTS_NULL;
+			return Global.MESSAGE_ARGUMENTS_NULL;
 		} else {
 			Event event = new Event();
 			event.setSummary(task.getName());
@@ -135,7 +150,7 @@ public class GoogleAPIHandler {
 				Event createdEvent = calendar.events().insert(PRIMARY_CALENDAR_ID, event).execute();
 				return createdEvent.getSummary();
 			} catch (IOException e) {
-				return MESSAGE_EXCEPTION_IO;
+				return Global.MESSAGE_EXCEPTION_IO;
 			}
 		}
 	}
@@ -157,7 +172,7 @@ public class GoogleAPIHandler {
 			}
 			return result;
 		} catch (IOException e){
-			return MESSAGE_EXCEPTION_IO;
+			return Global.MESSAGE_EXCEPTION_IO;
 		}
 	}
 
