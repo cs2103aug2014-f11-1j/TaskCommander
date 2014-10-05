@@ -50,7 +50,7 @@ public class Storage {
 		} catch (IOException e) {
 			System.out.println(Global.MESSAGE_EXCEPTION_IO);
 		} 
-		return null;
+		return new ArrayList<Task>();
 	}
 	
 	/**
