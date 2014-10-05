@@ -16,5 +16,6 @@
 	<classpathentry kind="var" path="JRE_LIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.swt"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/natty-master"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
