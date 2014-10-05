@@ -29,6 +29,8 @@ public class Data {
 	 * This array is needed for the undo-feature.
 	 */
 	public ArrayList<Task> tasksHistory;
+	
+	public ArrayList<Task> deletedTasks;
 
 	private Storage storage;
 
@@ -39,6 +41,7 @@ public class Data {
 	public Data() {
 		tasks = new ArrayList<Task>();
 		tasksHistory = new ArrayList<Task>();
+		deletedTasks = new ArrayList<Task>();
 		storage = new Storage();
 		load();
 	}
@@ -196,7 +199,7 @@ public class Data {
 			return String.format(Global.MESSAGE_NO_INDEX, index);
 		} else {
 			Task taskToRemove = tasks.get(indexToRemove);
-
+			deletedTasks.add(taskToRemove);
 			tasks.remove(indexToRemove);
 
 			return String.format(Global.MESSAGE_DELETED, taskToRemove.getName());
@@ -210,6 +213,7 @@ public class Data {
 	 * @return             Feedback for user.
 	 */
 	public String clearTasks() {
+		deletedTasks.addAll(tasks);
 		tasks.clear();
 		return String.format(Global.MESSAGE_CLEARED);
 	}
