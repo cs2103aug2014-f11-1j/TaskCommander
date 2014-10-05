@@ -226,4 +226,8 @@ public class Data {
 			return String.format(Global.MESSAGE_SORTED);
 		}
 	}	
+	
+	public ArrayList<Task> getAllTasks() {
+		return tasks;
+	}
 }
