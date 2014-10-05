@@ -7,7 +7,9 @@ import com.google.gson.*;
 //@author A0112828H
 /**
  * Adapter class for serializing and deserializing JSON objects into
- * Task objects using GSON.
+ * Task objects using GSON. 
+ * 
+ * Creates Task subclass objects based on the enum TaskType's string values.
  * 
  * Code adapted from: http://ovaraksin.blogspot.com.es/2011/05/json-with-gson-and-abstract-classes.html
  */
@@ -18,7 +20,7 @@ public class TaskAdapter implements JsonSerializer<Task>, JsonDeserializer<Task>
 	@Override
     public JsonElement serialize(Task src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject result = new JsonObject();
-        result.add("type", new JsonPrimitive(src.getClass().getSimpleName()));
+        result.add("type", new JsonPrimitive(src.getType().toString()));
         result.add("properties", context.serialize(src, src.getClass()));
  
         return result;
