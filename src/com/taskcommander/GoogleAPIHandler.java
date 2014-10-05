@@ -183,6 +183,7 @@ public class GoogleAPIHandler {
 		return false;
 	}
 	
+	//@author A0112828H
 	/**
 	 * Gets a task from the Tasks API, given a FloatingTask object.
 	 * The given task must have a Google ID.
@@ -207,13 +208,14 @@ public class GoogleAPIHandler {
 		return null;
 	}
 	
+	//@author Sean Saito
 	/**
 	 * Gets an event from the Calendar API, given a DeadlineTask object.
 	 * The given task must have a Google ID.
 	 * Returns the name of the task if successful. 
 	 * 
-	 * @param task   Custom FloatingTask object
-	 * @return	Feedback for user
+	 * @param task   Custom DeadlineTask object
+	 * @return	     Success of action
 	 */
 	public String getTask(DeadlineTask task) {
 		//TODO @Sean
@@ -225,14 +227,15 @@ public class GoogleAPIHandler {
 	 * The given task must have a Google ID.
 	 * Returns the name of the task if successful. 
 	 * 
-	 * @param task   Custom FloatingTask object
-	 * @return	Feedback for user
+	 * @param task   Custom TimedTask object
+	 * @return	     Success of action
 	 */
 	public String getTask(TimedTask task) {
 		//TODO @Sean
 		return null;
 	}
 	
+	//@author A0112828H
 	/**
 	 * Deletes a task from the Tasks API, given a FloatingTask object.
 	 * The given task must have a Google ID.
@@ -259,13 +262,14 @@ public class GoogleAPIHandler {
 		return false;
 	}
 	
+	//@author Sean Saito
 	/**
 	 * Deletes an event from the Calendar API, given a DeadlineTask object.
 	 * The given task must have a Google ID.
 	 * Returns the name of the task if successful. 
 	 * 
-	 * @param task   Custom FloatingTask object
-	 * @return	Feedback for user
+	 * @param task   Custom DeadlineTask object
+	 * @return	     Success of action
 	 */
 	public String deleteTask(DeadlineTask task) {
 		//TODO @Sean
@@ -277,10 +281,62 @@ public class GoogleAPIHandler {
 	 * The given task must have a Google ID.
 	 * Returns the name of the task if successful. 
 	 * 
-	 * @param task   Custom FloatingTask object
-	 * @return	Feedback for user
+	 * @param task   Custom TimedTask object
+	 * @return	     Success of action
 	 */
 	public String deleteTask(TimedTask task) {
+		//TODO @Sean
+		return null;
+	}
+	
+	//@author A0112828H
+	/**
+	 * Updates a task from the Tasks API, given a FloatingTask object.
+	 * The given task must have a Google ID.
+	 * Returns the name of the task if successful. 
+	 * 
+	 * @param task   Custom FloatingTask object
+	 * @return	     Success of action
+	 */
+	public boolean updateTask(FloatingTask task) {
+		if (task == null) {
+			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+		} else if (task.getId() == null) {
+			System.out.println(MESSAGE_NO_ID);
+		} else {
+			try {
+				Task result = tasks.tasks().update("@default", task.getId(), toGoogleTask(task)).execute();
+				return result != null;
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			}
+		}
+		return false;
+	}
+
+	//@author Sean Saito
+	/**
+	 * Updates an event from the Calendar API, given a DeadlineTask object.
+	 * The given task must have a Google ID.
+	 * Returns the name of the task if successful. 
+	 * 
+	 * @param task   Custom DeadlineTask object
+	 * @return	     Success of action
+	 */
+	public String updateTask(DeadlineTask task) {
+		//TODO @Sean
+		return null;
+	}
+	
+	/**
+	 * Updates an event from the Calendar API, given a TimedTask object.
+	 * The given task must have a Google ID.
+	 * Returns the name of the task if successful. 
+	 * 
+	 * @param task   Custom TimedTask object
+	 * @return	     Success of action
+	 */
+	public String updateTask(TimedTask task) {
 		//TODO @Sean
 		return null;
 	}
@@ -310,6 +366,31 @@ public class GoogleAPIHandler {
 		} else {
 			return new DeadlineTask(event.getSummary(), 
 					toDate(event.getEnd().getDateTime()));
+		}
+	}
+	
+	private Task toGoogleTask(FloatingTask task) {
+		Task newTask = new Task();
+		newTask.setTitle(task.getName());
+		setStatusFromTask(newTask, task);
+		return newTask;
+	}
+	
+	private Event toGoogleTask(DeadlineTask task) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private Event toGoogleTask(TimedTask task) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private void setStatusFromTask(Task newTask, com.taskcommander.Task task) {
+		if (task.isDone()) {
+			newTask.setStatus("completed");
+		} else {
+			newTask.setStatus("needsAction");
 		}
 	}
 
