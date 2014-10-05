@@ -17,7 +17,7 @@ public class FloatingTask extends Task {
 	
 	public FloatingTask(String name, String googleID) {
 		super(name, TaskType.FLOATING);
-		this.setID(googleID);
+		this.setId(googleID);
 	}
 	
 	/*

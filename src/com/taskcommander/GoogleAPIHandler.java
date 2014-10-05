@@ -41,6 +41,7 @@ import com.google.api.services.tasks.model.Task;
  */
 public class GoogleAPIHandler {
 
+	private static final String MESSAGE_NO_ID = "Task has not been synced to Google API.";
 	private static final String PRIMARY_CALENDAR_ID = "primary";
 	private static LoginManager loginManager;
 
@@ -185,25 +186,83 @@ public class GoogleAPIHandler {
 	}
 	
 	/**
-	 * Deletes a task from the Tasks API, given a FloatingTask object.
+	 * Gets a task from the Tasks API, given a FloatingTask object.
+	 * The given task must have a Google ID.
+	 * Returns the name of the task if successful. 
+	 * 
+	 * @param task   Custom FloatingTask object
+	 * @return	     Success of action
+	 */
+	public boolean getTask(FloatingTask task) {
+		if (task == null) {
+			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			return false;
+		} else if (task.getId() == null) {
+			System.out.println(MESSAGE_NO_ID);
+			return false;
+		} else {
+			try {
+				Tasks.TasksOperations.Delete request = tasks.tasks().delete("@default", task.getId());
+				request.execute();
+				Task check = tasks.tasks().get("@default", task.getId()).execute();
+				return check == null;
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				return false;
+			}
+		}
+	}
+	
+	/**
+	 * Gets an event from the Calendar API, given a DeadlineTask object.
 	 * The given task must have a Google ID.
 	 * Returns the name of the task if successful. 
 	 * 
 	 * @param task   Custom FloatingTask object
 	 * @return	Feedback for user
 	 */
-	public String deleteTask(FloatingTask task) {
+	public String getTask(DeadlineTask task) {
+		//TODO @Sean
+		return null;
+	}
+	
+	/**
+	 * Gets an event from the Calendar API, given a TimedTask object.
+	 * The given task must have a Google ID.
+	 * Returns the name of the task if successful. 
+	 * 
+	 * @param task   Custom FloatingTask object
+	 * @return	Feedback for user
+	 */
+	public String getTask(TimedTask task) {
+		//TODO @Sean
+		return null;
+	}
+	
+	/**
+	 * Deletes a task from the Tasks API, given a FloatingTask object.
+	 * The given task must have a Google ID.
+	 * Returns the name of the task if successful. 
+	 * 
+	 * @param task   Custom FloatingTask object
+	 * @return	     Success of action
+	 */
+	public boolean deleteTask(FloatingTask task) {
 		if (task == null) {
-			return Global.MESSAGE_ARGUMENTS_NULL;
+			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			return false;
+		} else if (task.getId() == null) {
+			System.out.println(MESSAGE_NO_ID);
+			return false;
 		} else {
-			Task taskToAdd = new Task();
-			taskToAdd.setTitle(task.getName());
 			try {
-				Tasks.TasksOperations.Insert request = tasks.tasks().insert("@default", taskToAdd);
-				Task result = request.execute();
-				return result.getTitle();
+				Tasks.TasksOperations.Delete request = tasks.tasks().delete("@default", task.getId());
+				request.execute();
+				Task check = tasks.tasks().get("@default", task.getId()).execute();
+				return check == null;
 			} catch (IOException e) {
-				return Global.MESSAGE_EXCEPTION_IO;
+				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				return false;
 			}
 		}
 	}

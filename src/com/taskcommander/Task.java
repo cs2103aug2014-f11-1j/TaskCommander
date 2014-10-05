@@ -42,12 +42,22 @@ public class Task implements Comparable<Task> {
 	public String getName() {
 		return _name;
 	}
+	
+	public String getId() {
+		return _id;
+	}
 
 	public void setName(String name) {
 		_name = name;
 	}
 
-	public void setID(String id) {
+	public void setId(String id) {
 		_id = id;
+	}
+
+	@Override
+	public int compareTo(Task arg0) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }
