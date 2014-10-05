@@ -3,7 +3,8 @@ import java.util.List;
 import java.util.Date;
 
 import com.google.api.client.util.DateTime;
-import com.taskcommander.Global.TaskType;
+import com.google.gson.annotations.SerializedName;
+//import com.taskcommander.Global.TaskType;
 
 /*
  * A basic task object.
@@ -14,10 +15,21 @@ import com.taskcommander.Global.TaskType;
  */
 
 public class Task implements Comparable<Task> {
+	@SerializedName("type") // For use with GSON
 	private TaskType _taskType;
 	private String _name;
 	private String _id;
 	private boolean _done;
+	
+	// Possible task types
+	public enum TaskType {
+		@SerializedName("0")
+		FLOATING, 
+		@SerializedName("1")
+		TIMED, 
+		@SerializedName("2")
+		DEADLINE
+	}
 
 	/*
 	 * Creates a new Task with given name.

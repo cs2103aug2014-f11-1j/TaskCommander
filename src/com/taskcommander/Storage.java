@@ -4,51 +4,35 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * This class stores the data permanently in a local file on the computer.
- * 
- * @author Andreas Christian Mayr
  */
 
+//@author Andreas Christian Mayr
 public class Storage {
 	
-	// This string stores the name of the file being used
-	private static String fileName;
+	private static String _fileName = "tasks.json";
 	
 	/**
-	 * Constructor
+	 * Returns a Storage object.
 	 */
 	public Storage(){
-		setFileName("tasks.txt");
+		
 	}
 	
 	/**
-	 * Writes the content of the given data array into the file.
+	 * Reads the content of the file into the data array.
 	 */
-	public void getData(Data data){
-
-		try {
-			BufferedWriter myBufferedWriter = new BufferedWriter(
-					new FileWriter(new File(fileName)));
-			
-			for(Task task: data.tasks) {
-				myBufferedWriter.write(task.getName());
-				myBufferedWriter.newLine();
-			}
-			
-			myBufferedWriter.close();
-
-		} catch (IOException e) {
-			System.err.println(Global.MESSAGE_FILE_COULD_NOT_BE_WRITTEN);
-		}
+	public void readFromFile(){	// has to be updated for the use of different taskTypes
+		
 	}
-
-	public static String getFileName() {
-		return fileName;
-	}
-
-	public static void setFileName(String fileName) {
-		Storage.fileName = fileName;
+	
+	/**
+	 * Writes the content of the data array into the given storage.
+	 */
+	public void writeToFile(ArrayList<Task> tasks){
+		
 	}
 }

@@ -14,75 +14,27 @@ import java.util.Collections;
 import com.taskcommander.Global.TaskType;
 
 /**
- * This class stores the data temporary.
- * 
- * @author Andreas Christian Mayr
+ * This class stores temporary data to be manipulated in
+ * the Logic component. The data will be pulled from the
+ * permanent storage.
  */
 
-
+//@author Andreas Christian Mayr
 public class Data {
 
-	/**
-	 * Array containing a list of task objects
-	 */
-	public ArrayList<Task> tasks;
+	public ArrayList<Task> tasks; // Array containing a list of task objects
 	
-	/**
-	 * History array containing a list of task objects before the last execution of a add, update, delete, clear command.
+	/*
+	 * Array containing the history of the commands used since program start.
 	 * This array is needed for the undo-feature.
-	 * 
 	 */
 	public ArrayList<Task> tasksHistory;
 	
 	/**
-	 * Constructor
+	 * Returns a Data object.
 	 */
 	public Data() {
 		tasks = new ArrayList<Task>();
-	}
-	
-	/**
-	 * Reads the content of the file into the data array.
-	 */
-	public void readStorage(Storage storage){	// has to be updated for the use of different taskTypes
-
-		/*
-		try {
-			BufferedReader myBufferedReader = new BufferedReader(
-					new FileReader(new File(Storage.getFileName())));
-			String line;
-
-			while ((line = myBufferedReader.readLine()) != null) {
-				tasks.add(new Task(line));
-			}
-
-			myBufferedReader.close();
-
-		} catch (IOException e) {
-			System.err.println(Global.MESSAGE_FILE_COULD_NOT_BE_LOADED);
-		}
-		*/
-	}
-	
-	/**
-	 * Writes the content of the data array into the given storage.
-	 */
-	public void writeStorage(Storage storage ){
-
-		try {
-			BufferedWriter myBufferedWriter = new BufferedWriter(
-					new FileWriter(new File(Storage.getFileName())));
-			
-			for(Task task: tasks) {
-				myBufferedWriter.write(task.getName());
-				myBufferedWriter.newLine();
-			}
-			
-			myBufferedWriter.close();
-
-		} catch (IOException e) {
-			System.err.println(Global.MESSAGE_FILE_COULD_NOT_BE_WRITTEN);
-		}
 	}
 	
 	/**
@@ -159,7 +111,7 @@ public class Data {
 	 * within the desired time period in the right order.
 	 * See also description for Controller.displayedTasks
 	 * 
-	 * @return  Internal Message, will be hided by the UI
+	 * @return  Internal Message, will be hidden by the UI
 	 */
 	public String displayTasks() {
 		if (tasks.isEmpty()) {

@@ -46,11 +46,6 @@ public class Global {
 		EXIT
 	};
 	
-	// Possible task types
-	public enum TaskType {
-		FLOATING, TIMED, DEADLINE
-	}
-	
 	// Name of Storage File
 	public static String fileName;
 }
