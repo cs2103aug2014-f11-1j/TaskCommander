@@ -23,11 +23,11 @@ public class Task implements Comparable<Task> {
 	
 	// Possible task types
 	public enum TaskType {
-		@SerializedName("0")
+		@SerializedName("FloatingTask")
 		FLOATING, 
-		@SerializedName("1")
+		@SerializedName("TimedTask")
 		TIMED, 
-		@SerializedName("2")
+		@SerializedName("DeadlineTask")
 		DEADLINE
 	}
 

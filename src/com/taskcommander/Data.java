@@ -124,15 +124,15 @@ public class Data {
 			
 			for (int i = 0; i < tasks.size(); i++) {
 
-				Global.TaskType taskType = tasks.get(i).getType();
-				if (taskType == Global.TaskType.TIMED) {
+				TaskType taskType = tasks.get(i).getType();
+				if (taskType == TaskType.TIMED) {
 					TimedTask timedTask = (TimedTask) tasks.get(i);
 					result[i][0] = dayFormat.format(timedTask.getStartDate());
 					result[i][1] = timeFormat.format(timedTask.getStartDate()) + "-"
 							+ timeFormat.format(timedTask.getEndDate());
 					result[i][2] = tasks.get(i).getName();
 
-				} else if (taskType == Global.TaskType.DEADLINE) {
+				} else if (taskType == TaskType.DEADLINE) {
 					DeadlineTask deadlineTask = (DeadlineTask) tasks.get(i);
 					result[i][0] = dayFormat.format(deadlineTask.getEndDate());
 					result[i][1] = timeFormat.format(deadlineTask.getEndDate());
