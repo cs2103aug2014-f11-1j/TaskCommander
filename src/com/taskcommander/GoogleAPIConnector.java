@@ -343,8 +343,7 @@ public class GoogleAPIConnector {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
 			try {
-				Calendar.CalendarOperations.Delete request = calendar.events().delete("@default", task.getId());
-				request.execute();
+				calendar.events().delete(PRIMARY_CALENDAR_ID, "eventId").execute();
 				Event check = calendar.events().get("@default", task.getId()).execute();
 				return check == null;
 			} catch (IOException e) {
@@ -493,7 +492,7 @@ public class GoogleAPIConnector {
 		}
 	}
 	
-	private String addTask(com.taskcommander.Task task) {
+	public String addTask(com.taskcommander.Task task) {
 		switch (task.getType()) {
 		case FLOATING:
 			return addTask((FloatingTask) task);
@@ -505,7 +504,7 @@ public class GoogleAPIConnector {
 		return null;
 	}
 	
-	private com.taskcommander.Task getTask(com.taskcommander.Task task) {
+	public com.taskcommander.Task getTask(com.taskcommander.Task task) {
 		switch (task.getType()) {
 		case FLOATING:
 			return getTask((FloatingTask) task);
@@ -517,7 +516,7 @@ public class GoogleAPIConnector {
 		return null;
 	}
 	
-	private boolean updateTask(com.taskcommander.Task task) {
+	public boolean updateTask(com.taskcommander.Task task) {
 		switch (task.getType()) {
 		case FLOATING:
 			return updateTask((FloatingTask) task);
@@ -529,7 +528,7 @@ public class GoogleAPIConnector {
 		return false;
 	}
 	
-	private boolean deleteTask(com.taskcommander.Task task) {
+	public boolean deleteTask(com.taskcommander.Task task) {
 		switch (task.getType()) {
 		case FLOATING:
 			return deleteTask((FloatingTask) task);
