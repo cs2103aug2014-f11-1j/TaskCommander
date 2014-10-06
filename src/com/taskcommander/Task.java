@@ -109,4 +109,11 @@ public class Task implements Comparable<Task> {
 	public int compareTo(TimedTask otherTask) {
 		return 0;
 	}
+
+	@Override
+	public int compareTo(Task o) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }
