@@ -2,7 +2,9 @@ package com.taskcommander;
 
 import java.util.ArrayList;
 
-//@author A0112828H
+import com.taskcommander.Task.TaskType;
+
+//@author A0112828H and A0109194A
 public class SyncHandler {
 
 	private static GoogleAPIConnector con = null;
@@ -21,7 +23,12 @@ public class SyncHandler {
 		if (con == null) {
 			con = new GoogleAPIConnector();
 		}
-
+		push();
+		pull();
+		return Global.MESSAGE_SYNC_SUCCESS;
+	}
+	
+	private void push() {
 		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
 		for (Task t : tasks) {
 			if (!t.isSynced()) {
@@ -43,7 +50,42 @@ public class SyncHandler {
 				con.deleteTask(t);
 			}
 		}
-
-		return Global.MESSAGE_SYNC_SUCCESS;
+	}
+	
+	private void pull(){
+		//Handle Added Cases
+		ArrayList<com.taskcommander.Task> toSync = con.getAllTasks();
+		ArrayList<String> idList = TaskCommander.data.getAllIds();
+		for (Task task : toSync) {
+			if (!containsId(task.getId(), idList)) {
+				if (task.getType() == TaskType.DEADLINE) {
+					TaskCommander.data.addTask(task.getType(), task.getName(),
+							null, ((DeadlineTask) task).getEndDate());
+				} else if (task.getType() == TaskType.FLOATING) {
+					TaskCommander.data.addTask(task.getType(), task.getName(), 
+							null, null);
+				} else {
+					TaskCommander.data.addTask(task.getType(), task.getName(), 
+							((TimedTask) task).getStartDate(), ((TimedTask) task).getEndDate());
+				}
+			}
+		}
+		
+		//Deleted Cases
+		ArrayList<String> googleIdList = con.getAllIds();
+		for (com.taskcommander.Task task : TaskCommander.data.tasks){
+			if (!containsId(task.getId(), googleIdList)) {
+				TaskCommander.data.deleteTask(task);
+			}
+		}
+		
+	}
+	
+	private boolean containsId(String id, ArrayList<String> idList) {
+		if (idList.contains(id)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
