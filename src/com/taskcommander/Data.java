@@ -238,4 +238,13 @@ public class Data {
 	public ArrayList<Task> getDeletedTasks() {
 		return deletedTasks;
 	}
+	
+	public ArrayList<String> getAllIds() {
+		ArrayList<String> idList = new ArrayList<String>();
+		for (Task t : tasks) {
+			idList.add(t.getId());
+		}
+		
+		return idList;
+	}
 }
