@@ -433,7 +433,7 @@ public class GoogleAPIConnector {
 		return new DateTime(date);
 	}
 	
-	// Changes a Date to a DateTime object.
+	// Changes a DateTime to a Date object.
 	private Date toDate(DateTime dateTime) {
 		return new Date(dateTime.getValue());
 	}
@@ -443,7 +443,13 @@ public class GoogleAPIConnector {
 		if (task == null) {
 			return null;
 		}
-		return new FloatingTask(task.getTitle(), task.getId());
+		if (task.containsKey("due")) {
+			DeadlineTask deadlineTask = new DeadlineTask(task.getTitle(), toDate(task.getDue()));
+			deadlineTask.setId(task.getId());
+			return deadlineTask;
+		} else {
+			return new FloatingTask(task.getTitle(), task.getId());	
+		}
 	}
 
 	// Changes a Google Calendar Event to a TaskCommander Task.
@@ -451,16 +457,13 @@ public class GoogleAPIConnector {
 		if (event == null) {
 			return null;
 		}
-		if (event.containsKey("start")) {
-			return new TimedTask(event.getSummary(), 
-					toDate(event.getStart().getDateTime()), 
-					toDate(event.getEnd().getDateTime()));
-		} else {
-			return new DeadlineTask(event.getSummary(), 
-					toDate(event.getEnd().getDateTime()));
-		}
+		TimedTask timedTask = new TimedTask(event.getSummary(),
+				toDate(event.getStart().getDateTime()),
+				toDate(event.getEnd().getDateTime()));
+		timedTask.setId(event.getId());
+		return timedTask;
 	}
-	
+				
 	private Task toGoogleTask(FloatingTask task) {
 		Task newTask = new Task();
 		newTask.setTitle(task.getName());

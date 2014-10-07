@@ -1,4 +1,0 @@
-TaskCommander
-=============
-
-Main project code
