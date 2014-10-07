@@ -205,7 +205,24 @@ public class Data {
 			return String.format(Global.MESSAGE_DELETED, taskToRemove.getName());
 		}
 	}
-
+	
+	/**@author A0109194A
+	 * Deletes the task directly from the tasks list without the index
+	 * Used to delete tasks when syncing
+	 * 
+	 * @param 			task
+	 * @return 			boolean value on whether the delete was successful.
+	 */
+	public boolean deleteTask(Task task) {
+		if (tasks.isEmpty()) {
+			return false;
+		} else {
+			deletedTasks.add(task);
+			tasks.remove(task);
+			return true;
+		}
+	}
+	
 	/**
 	 * Clears all tasks from memory.
 	 * 
