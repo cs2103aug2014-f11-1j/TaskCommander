@@ -543,4 +543,13 @@ public class GoogleAPIConnector {
 		return false;
 	}
 
+	public ArrayList<String> getAllIds() {
+		ArrayList<com.taskcommander.Task> tasks = getAllTasks();
+		ArrayList<String> idList = new ArrayList<String>();
+		for (com.taskcommander.Task t : tasks) {
+			idList.add(t.getId());
+		}
+		return idList;
+	}
+	
 }
