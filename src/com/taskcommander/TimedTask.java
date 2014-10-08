@@ -1,9 +1,6 @@
 package com.taskcommander;
 import java.util.Date;
 
-import com.google.api.client.util.DateTime;
-import com.taskcommander.Task.TaskType;
-
 /*
  * A task that has a name, a start date and an end date.
  * May also hold a Google API ID.

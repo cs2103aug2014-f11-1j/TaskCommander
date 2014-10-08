@@ -1,42 +1,32 @@
 package com.taskcommander;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import com.taskcommander.Task.TaskType;
 
 /**
- * This class stores temporary data to be manipulated in
- * the Logic component. The data will be pulled from the
- * permanent storage.
+ * This class represents the data component and stores the data temporary for manipulation reasons. 
+ * At the beginning the content of the permanent storage is pulled to the temporary one. 
+ * After each command the data will be pushed to the permanent storage.
+ * 
+ * @author A0128620M
  */
 
-//@author Andreas Christian Mayr
 public class Data {
 
-	public ArrayList<Task> tasks; // Array containing a list of task objects
-
-	/*
-	 * Array containing the history of the commands used since program start.
-	 * This array is needed for the undo-feature.
+	/** 
+	 * One array containing a list of task objects, one containing the state before
+	 * the execution of the last command (needed for the undo-feature) and one containing
+	 * all the deleted tasks.
 	 */
+	public ArrayList<Task> tasks;
 	public ArrayList<Task> tasksHistory;
-	
 	public ArrayList<Task> deletedTasks;
 
 	private Storage storage;
 
 	/**
-	 * Returns a Data object.
-	 * Creates a new Storage and loads data from it.
+	 * Constructor: Creates all necessary objects, including the Storage and loads data from it.
 	 */
 	public Data() {
 		tasks = new ArrayList<Task>();
@@ -46,74 +36,73 @@ public class Data {
 		load();
 	}
 
-	//@author A0112828H
+	/**
+	 * Saves to and loads from storage.
+	 * @author A0112828H
+	 */
 	public void save() {
 		storage.writeToFile(tasks);
 	}
-
+	
 	public void load() {
 		tasks = storage.readFromFile(); 
 	}	
 
-	//@author Andreas Christian Mayr
 	/**
-	 * Adds a task with given name.
+	 * Adds a TimedTask, DeadlineTask or FloatingTask to the task ArrayList.
 	 * 
-	 * @param taskName     
-	 * @return             Feedback for user.
+	 * @param 	taskName     
+	 * @return 	feedback for UI
 	 */
-	public String addTask(TaskType taskType, String taskName, Date startDate, Date endDate) {
-		if (taskName == null || taskName == " ") {
-			return Global.MESSAGE_NO_TASK;
-		}
-		SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy");
-		SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
-
-		switch (taskType) {
-		case DEADLINE:
-			DeadlineTask deadlineTask;
-			deadlineTask= new DeadlineTask(taskName,endDate);
-			System.out.println(tasks);
-			tasks.add(deadlineTask);
-			return String.format(Global.MESSAGE_ADDED,"[by "+dayFormat.format(endDate)+" "+timeFormat.format(endDate)+"]"+" \""+taskName+"\"");
-		case TIMED:
-			TimedTask timedTask;
-			timedTask = new TimedTask(taskName,startDate,endDate);
-			tasks.add(timedTask);
-			return String.format(Global.MESSAGE_ADDED,"["+dayFormat.format(endDate)+" "+timeFormat.format(startDate)+"-"+timeFormat.format(endDate)+"]"+" \""+taskName+"\"");				
-		case FLOATING:
-			FloatingTask floatingTask;
-			floatingTask = new FloatingTask(taskName);
-			tasks.add(floatingTask);
-			return String.format(Global.MESSAGE_ADDED,"\""+taskName+"\"");
-		default:
-			return null;
-		}
+	public Feedback addTimedTask(String taskName, Date startDate, Date endDate) {
+		TimedTask timedTask = new TimedTask(taskName,startDate,endDate);
+		tasks.add(timedTask);
+		return new Feedback(true, Global.CommandType.ADD, timedTask);
+	}
+	
+	public Feedback addDeadlineTask(String taskName, Date endDate) {
+		DeadlineTask deadlineTask= new DeadlineTask(taskName,endDate);
+		tasks.add(deadlineTask);
+		return new Feedback(true, Global.CommandType.ADD, deadlineTask);
+	}
+	
+	public Feedback addFloatingTask(String taskName) {
+		FloatingTask floatingTask = new FloatingTask(taskName);
+		tasks.add(floatingTask);
+		return new Feedback(true, Global.CommandType.ADD, floatingTask);
 	}
 
 	/**
-	 * Updates the task with the given index (as shown with 'display' command) and
-	 * replaces the old task description by the new one.
-	 * Does not execute if there are no lines and if a wrong index is given.
-	 * Eg: Index out of bounds or given a char instead of int.
+	 * Displays the tasks by forwarding all the needed information to the UI.
 	 * 
-	 * @param index        Index of the task to delete, as a string. 
-	 * @param taskName     Description of task. 
-	 * @return             Feedback for user.
+	 * @param 	taskName     
+	 * @return 	feedback for UI
 	 */
-	public String updateTask(String index, String taskName) {	// implementation needs to be adjusted to new parser
+	public Feedback displayTasks() {
+		return new Feedback(true, Global.CommandType.DISPLAY, tasks);
+	}
+	
+	
+	
+	/**
+	 * Updates the task with the given index (as shown by 'display' command) and
+	 * replaces the old task description by the new one.
+	 * 
+	 * @param index        index of the task to delete, as a string
+	 * @param taskName     description of task
+	 * @return             feedback for UI
+	 */
+	public Feedback updateTask(String index, String taskName) {	//TODO: implementation needs to be adjusted to different types of tasks
 		/*
 		if (tasks.isEmpty()) {
-			return String.format(Global.MESSAGE_EMPTY);
-		} else if (index == null) {
-			return Global.MESSAGE_NO_TASK;
-		}
+			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
+		} 
 
 		int indexToUpdate;
 		try {
 			indexToUpdate = Integer.parseInt(index) - Global.INDEX_OFFSET; // Change the line number to an array index
 		} catch (NumberFormatException e) {
-			return String.format(Global.MESSAGE_INVALID_FORMAT, "update " + index + taskName);
+			return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, "update " + index + taskName);
 		} 
 
 		if (indexToUpdate > tasks.size() - Global.INDEX_OFFSET) {
@@ -124,60 +113,8 @@ public class Data {
 
 			return String.format(Global.MESSAGE_UPDATED, taskName);
 		}
-		 */
-		return "out of order";
-	}
-
-	/**
-	 * Creates an array which only contains the desired types of tasks 
-	 * within the desired time period in the right order.
-	 * See also description for Controller.displayedTasks
-	 * 
-	 * @return  Internal Message, will be hidden by the UI
-	 */
-	public String displayTasks() {
-		if (tasks.isEmpty()) {
-			return String.format(Global.MESSAGE_EMPTY);
-		}
-
-		String[][] displayedTasks = new String[tasks.size()][3]; // first [] represents line, second [] represents row of the array
-		SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy");
-		SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
-
-		for (int i = 0; i < tasks.size(); i++) {
-
-			TaskType taskType = tasks.get(i).getType();
-			if (taskType == TaskType.TIMED) {
-				TimedTask timedTask = (TimedTask) tasks.get(i);
-				displayedTasks[i][0] = dayFormat.format(timedTask.getStartDate());
-				displayedTasks[i][1] = timeFormat.format(timedTask.getStartDate()) + "-"
-						+ timeFormat.format(timedTask.getEndDate());
-				displayedTasks[i][2] = tasks.get(i).getName();
-
-			} else if (taskType == TaskType.DEADLINE) {
-				DeadlineTask deadlineTask = (DeadlineTask) tasks.get(i);
-				displayedTasks[i][0] = dayFormat.format(deadlineTask.getEndDate());
-				displayedTasks[i][1] = timeFormat.format(deadlineTask.getEndDate());
-				displayedTasks[i][2] = deadlineTask.getName();
-
-			} else {
-				FloatingTask floatingTask = (FloatingTask) tasks.get(i);
-				displayedTasks[i][0] = null;
-				displayedTasks[i][1] = null;
-				displayedTasks[i][2] = floatingTask.getName();
-			}
-		}
-		
-		// convert displayTasks-Array to one string for UI feedback
-		String result = "";
-
-		if (!(displayedTasks == null)) {
-			for (int i = 0; i < displayedTasks.length; i++) {
-				result += displayedTasks[i][0] + "\t" + displayedTasks[i][1] + "\t" + displayedTasks[i][2] + "\n";
-			}
-		}
-		return result;
-
+		*/
+		return new Feedback(false,"out of order");
 	}
 
 	/**
@@ -188,28 +125,26 @@ public class Data {
 	 * @param index        Index of the task to delete, as a string. 
 	 * @return             Feedback for user.
 	 */
-	public String deleteTask(String index) {
+	public Feedback deleteTask(String index) {
 		if (tasks.isEmpty()) {
-			return String.format(Global.MESSAGE_EMPTY);
-		} else if (index == null) {
-			return Global.MESSAGE_NO_TASK;
-		}
+			return new Feedback(false,String.format(Global.MESSAGE_EMPTY));
+		} 
 
 		int indexToRemove;
 		try {
 			indexToRemove = Integer.parseInt(index) - Global.INDEX_OFFSET; // Change the line number to an array index
 		} catch (NumberFormatException e) {
-			return String.format(Global.MESSAGE_INVALID_FORMAT, "delete " + index);
+			return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, "delete " + index));
 		} 
 
 		if (indexToRemove > tasks.size() - Global.INDEX_OFFSET) {
-			return String.format(Global.MESSAGE_NO_INDEX, index);
+			return new Feedback(false,String.format(Global.MESSAGE_NO_INDEX, index));
 		} else {
 			Task taskToRemove = tasks.get(indexToRemove);
 			deletedTasks.add(taskToRemove);
 			tasks.remove(indexToRemove);
 
-			return String.format(Global.MESSAGE_DELETED, taskToRemove.getName());
+			return new Feedback(false,String.format(Global.MESSAGE_DELETED, taskToRemove.getName()));
 		}
 	}
 	
@@ -236,22 +171,22 @@ public class Data {
 	 * @param userCommand 
 	 * @return             Feedback for user.
 	 */
-	public String clearTasks() {
+	public Feedback clearTasks() {
 		deletedTasks.addAll(tasks);
 		tasks.clear();
-		return String.format(Global.MESSAGE_CLEARED);
+		return new Feedback(true,Global.CommandType.CLEAR);
 	}
 
 	/**
 	 * Sorts the tasks in memory in alphabetical order.
 	 * @return   Feedback for user.
 	 */
-	public String sort() {
+	public Feedback sort() {
 		if (tasks.isEmpty()) {
-			return String.format(Global.MESSAGE_EMPTY);
+			return new Feedback(false,String.format(Global.MESSAGE_EMPTY));
 		} else {
 			Collections.sort(tasks);
-			return String.format(Global.MESSAGE_SORTED);
+			return new Feedback(false,String.format(Global.MESSAGE_SORTED));
 		}
 	}	
 	

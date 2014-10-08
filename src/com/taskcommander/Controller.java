@@ -2,12 +2,11 @@ package com.taskcommander;
 import java.util.Date;
 import java.util.List;
 
-import com.taskcommander.Task.TaskType;
-
 /**
- * This class represents the Controller, which decides the execution depending on the command.
+ * This class represents the Controller component, which calls the respective execution method
+ * depending on the user command.
  * 
- * @author Andreas Christian Mayr
+ * @author A0128620M
  */
 
 public class Controller {
@@ -16,103 +15,135 @@ public class Controller {
 	 * Constructor
 	 */
 	public Controller(){
-		
 	}
 
 	/**
-	 * Parses command from user and executes it if valid. Writes to file after each command.
-	 * Returns feedback to show to user.
+	 * Parses command from user and executes it if valid. Returns feedback to UI.
 	 * 
-	 * @param  userCommand  Command given by user.
-	 * @return              Feedback to show to user.
+	 * @param  userCommand  command given by user
+	 * @return              feedback for to the UI
 	 */
-	public String executeCommand(String userCommand) {	// made static for testing reasons
+	public Feedback executeCommand(String userCommand) {	
 		if (userCommand == null) {
-			return Global.MESSAGE_NO_COMMAND;
+			return new Feedback(false,Global.MESSAGE_NO_COMMAND);
 		}
 
 		Global.CommandType commandType= TaskCommander.parser.determineCommandType(userCommand);
 		
+		String restOfUserCommand = removeFirstWord(userCommand);
+		
 		switch (commandType) {
-		case HELP:
-			if (isSingleWord(userCommand)) {
-				return Global.MESSAGE_HELP;
-			} else {
-				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-			}
-			
-		case ADD:
-			if (isSingleWord(userCommand)) {
-				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-			}
-			
-			// TaskName
-			String taskName = null;
-			try {
-				taskName = TaskCommander.parser.determineTaskName(userCommand);
-			} catch (StringIndexOutOfBoundsException e) {
-				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-			}
-			
-			// TaskDateTime (3 cases depending on taskType)
-			List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
-			if (taskDateTime == null) { 			// case 1: FloatingTask
-				return TaskCommander.data.addTask(TaskType.FLOATING, taskName, null, null);
-			} else if (taskDateTime.size() ==1 ) { 	// case 2: DeadlineTask
-				return TaskCommander.data.addTask(TaskType.DEADLINE, taskName,null, taskDateTime.get(0));
-			} else if (taskDateTime.size() == 2) { 	// case 3: TimedTask
-				return TaskCommander.data.addTask(TaskType.TIMED, taskName, taskDateTime.get(0), taskDateTime.get(1));
-			} else {
-				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-			}
-			
-		case UPDATE:	// implementation needs to be adjusted to new parser
-			
+			case ADD:
+				
+				String taskName;
+				try {
+					taskName = TaskCommander.parser.determineTaskName(restOfUserCommand);
+				} catch (StringIndexOutOfBoundsException e) {
+					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+				}
+				
+				restOfUserCommand = removeTaskName(restOfUserCommand, taskName);
+				
+				// taskDateTime (3 cases depending on taskType)
+				List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(restOfUserCommand);
+				// case 1: FloatingTask
+				if (taskDateTime == null) { 			
+					return TaskCommander.data.addFloatingTask(taskName);
+				// case 2: DeadlineTask
+				} else if (taskDateTime.size() == 1 ) { 	
+					return TaskCommander.data.addDeadlineTask(taskName, taskDateTime.get(0));
+				// case 3: TimedTask
+				} else if (taskDateTime.size() == 2) { 
+					return TaskCommander.data.addTimedTask(taskName, taskDateTime.get(0), taskDateTime.get(1));
+				} else {
+					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+				}
+				
+			case UPDATE:	//TODO: implementation needs to be adjusted to different types of tasks
+				
+				/*
+				String newtaskName = "";
+				try {
+					newtaskName = TaskCommander.parser.determineTaskName(restOfUserCommand);
+				} catch (StringIndexOutOfBoundsException e) {
+				}
+				
+				if (!newtaskName.equals("")) {
+					restOfUserCommand = removeTaskName(restOfUserCommand, newtaskName);
+				}
+				
+				// new taskDateTime (3 cases depending on taskType)
+				List<Date> newTaskDateTime = TaskCommander.parser.determineTaskDateTime(restOfUserCommand);
+				// case 1: FloatingTask
+				if (taskDateTime == null) { 			
+					return TaskCommander.data.updateToFloatingTask(taskName);
+				// case 2: DeadlineTask
+				} else if (taskDateTime.size() == 1 ) { 	
+					return TaskCommander.data.addDeadlineTask(taskName, taskDateTime.get(0));
+				// case 3: TimedTask
+				} else if (taskDateTime.size() == 2) { 
+					return TaskCommander.data.addTimedTask(taskName, taskDateTime.get(0), taskDateTime.get(1));
+				} else {
+					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+				}
+				*/
+				
+				/*
+				if (getNumberOfWords(userCommand) >= 3) {
+					return TaskCommander.data.updateTask(getNthWord(userCommand,1),removeFirstWord(removeFirstWord(userCommand)));
+				} else {
+					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+				}
+				*/
+				
+			case DISPLAY:
+				if (isSingleWord(userCommand)) {
+					return TaskCommander.data.displayTasks();
+				} else {
+					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+				}
+				
+			case DELETE:
+				return TaskCommander.data.deleteTask(removeFirstWord(userCommand));
+				
+			case CLEAR:
+				if (isSingleWord(userCommand)) {
+					return TaskCommander.data.clearTasks();
+				} else {
+					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+				}
+				
+			case HELP:
+				if (isSingleWord(userCommand)) {
+					return new Feedback(false,Global.MESSAGE_HELP);
+				} else {
+					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+				}
+			case SORT:
+				return TaskCommander.data.sort();
+				
+			case SYNC:
 			/*
-			if (getNumberOfWords(userCommand) >= 3) {
-				return TaskCommander.data.updateTask(getNthWord(userCommand,1),removeFirstWord(removeFirstWord(userCommand)));
-			} else {
-				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-			}
+				if (TaskCommander.syncHandler == null) {
+					TaskCommander.getSyncHandler();
+				}
+				return TaskCommander.syncHandler.sync();
 			*/
-			
-		case DISPLAY:
-			if (!isSingleWord(userCommand)) {
-				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-			} else {
-				return TaskCommander.data.displayTasks();
-			}
-			
-		case DELETE:
-			return TaskCommander.data.deleteTask(removeFirstWord(userCommand));
-		case CLEAR:
-			if (isSingleWord(userCommand)) {
-				return TaskCommander.data.clearTasks();
-			} else {
-				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-			}
-		case SORT:
-			return TaskCommander.data.sort();
-		case SYNC:
-			if (TaskCommander.syncHandler == null) {
-				TaskCommander.getSyncHandler();
-			}
-			return TaskCommander.syncHandler.sync();
-		case INVALID:
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-		case EXIT:
-			System.exit(0);
-		default:
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+				return new Feedback(false,"out of order");
+				
+			case INVALID:
+				return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+				
+			case EXIT:
+				System.exit(0);
+				
+			default:
+				return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 		}
 	}
 	
 	/**
-	 * Checks if the given String is made up of only one word.
-	 * Used to validate commands.
-	 * 
-	 * @param  userCommand 
-	 * @return             Whether the given string is only one word.
+	 * Helper methods
 	 */
 	private static boolean isSingleWord(String userCommand) {
 		return getNumberOfWords(userCommand) == 1;
@@ -123,6 +154,7 @@ public class Controller {
 		return allWords.length;
 	}
 	
+	/* not used at the moment
 	private static String getNthWord(String userCommand, int position) {
 		String[] allWords = userCommand.trim().split("\\s+");
 		if (position > allWords.length-1) {
@@ -131,9 +163,14 @@ public class Controller {
 		String nthWord = userCommand.trim().split("\\s+")[position];
 		return nthWord;
 	}
+	*/
 
 	private static String removeFirstWord(String userCommand) {
 		return userCommand.replace(getFirstWord(userCommand), "").trim();
+	}
+	
+	private static String removeTaskName(String userCommand,String taskName) {
+		return userCommand.replace("\""+taskName+"\"", "").trim();
 	}
 
 	private static String getFirstWord(String userCommand) {
