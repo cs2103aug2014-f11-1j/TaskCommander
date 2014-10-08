@@ -40,7 +40,7 @@ public class Global {
 	 *  @author A0128620M
 	 */
 	public static final SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy");
-	public static final SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+	public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
 	// Possible command types
 	public static enum CommandType {
