@@ -42,9 +42,7 @@ public class DeadlineTask extends Task {
 	 * Edit by Sean Saito
 	 */
 	@Override
-	public int compareTo(Task otherTask) {
-		//return (_endDate.compareTo(otherTask.getEndDate));
-		// TODO @Sean
-		return 0;
+	public int compareTo(DeadlineTask otherTask) {
+		return (_endDate.compareTo(otherTask.getEndDate()));
 	}
 }

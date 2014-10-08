@@ -25,6 +25,8 @@ public class Global {
 	public static final String MESSAGE_LINE_FOUND = "Found \"%1$s\".";
 	public static final String MESSAGE_LINE_NOT_FOUND = "The line \"%1$s\" does not exist.";
 	public static final String MESSAGE_SORTED = "Tasks has been sorted.";
+	public static final String MESSAGE_SYNC_SUCCESS = "Successfully synced to Google!";
+	
 	public static final String MESSAGE_FILE_COULD_NOT_BE_WRITTEN = "Error: The File could not be written.";
 	public static final String MESSAGE_FILE_COULD_NOT_BE_LOADED = "Error: The File could not be loaded.";
 	public static final String MESSAGE_EXCEPTION_IO = "Unable to read the data retrieved.";

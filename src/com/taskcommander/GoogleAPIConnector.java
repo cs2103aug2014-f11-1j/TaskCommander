@@ -39,7 +39,7 @@ import com.google.api.services.tasks.model.Task;
  * This class can create, read, update or delete tasks
  * and calendar events for the given Google account.
  */
-public class GoogleAPIHandler {
+public class GoogleAPIConnector {
 
 	private static final String MESSAGE_NO_ID = "Task has not been synced to Google API.";
 	private static final String PRIMARY_CALENDAR_ID = "primary";
@@ -55,7 +55,7 @@ public class GoogleAPIHandler {
 	 * Also creates a new LoginManager and attempts
 	 * to get the Tasks and Calendar services.
 	 */
-	public GoogleAPIHandler() {
+	public GoogleAPIConnector() {
 		loginManager = new LoginManager();
 		getServices();
 	}
@@ -122,12 +122,12 @@ public class GoogleAPIHandler {
 	//@author A0112828H
 	/**
 	 * Adds a task to the Tasks API, given a FloatingTask object.
-	 * Returns true if successful.
+	 * Returns the Google ID if successful.
 	 * 
 	 * @param task   Custom FloatingTask object
-	 * @return       Success of action
+	 * @return       Google ID of task
 	 */
-	public boolean addTask(FloatingTask task) {
+	public String addTask(FloatingTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else {
@@ -136,35 +136,52 @@ public class GoogleAPIHandler {
 			try {
 				Tasks.TasksOperations.Insert request = tasks.tasks().insert("@default", taskToAdd);
 				Task result = request.execute();
-				return result != null;
+				if (result != null) {
+					return result.getId();
+				}
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
 			}
 		}
-		return false;
+		return null;
 	}
 
-	// @author Sean Saito
 	/**
-	 * Adds an Event to the Calendar API, given a DeadlineTask object.
-	 * Returns true if successful.
+	 * Adds a Task to the Task API, given a DeadlineTask object.
+	 * Returns the Google ID if successful.
 	 * 
 	 * @param task   Custom DeadlineTask object
-	 * @return       Success of action
+	 * @return       Google ID of task
 	 */
-	public boolean addTask(DeadlineTask task) {
-		//TODO @Sean
-		return false;
+	public String addTask(DeadlineTask task) {
+		if (task == null) {
+			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+		} else {
+			Task taskToAdd = new Task();
+			taskToAdd.setTitle(task.getName());
+			taskToAdd.setDue(toDateTime(task.getEndDate()));
+			try {
+				Tasks.TasksOperations.Insert request = tasks.tasks().insert("@default", taskToAdd);
+				Task result = request.execute();
+				if (result != null) {
+					return result.getId();
+				}
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			}
+		}
+		return null;
 	}
-
+	
+	//@author Sean Saito A0109194A
 	/**
 	 * Adds an Event to the Calendar API, given a TimedTask object.
-	 * Returns true if successful. 
+	 * Returns the Google ID if successful.
 	 * 
 	 * @param task   Custom TimedTask object
-	 * @return	     Success of action
+	 * @return       Google ID of task
 	 */
-	public boolean addTask(TimedTask task) {
+	public String addTask(TimedTask task) {
 		if (task == null){
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else {
@@ -175,32 +192,9 @@ public class GoogleAPIHandler {
 
 			try {
 				Event createdEvent = calendar.events().insert(PRIMARY_CALENDAR_ID, event).execute();
-				return createdEvent != null;
-			} catch (IOException e) {
-				System.out.println(Global.MESSAGE_EXCEPTION_IO);
-			}
-		}
-		return false;
-	}
-	
-	//@author A0112828H
-	/**
-	 * Gets a task from the Tasks API, given a FloatingTask object.
-	 * The given task must have a Google ID.
-	 * Returns the name of the task if successful. 
-	 * 
-	 * @param task   Custom FloatingTask object
-	 * @return	     Success of action
-	 */
-	public Task getTask(FloatingTask task) {
-		if (task == null) {
-			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
-		} else if (task.getId() == null) {
-			System.out.println(MESSAGE_NO_ID);
-		} else {
-			try {
-				Task check = tasks.tasks().get("@default", task.getId()).execute();
-				return check;
+				if (createdEvent != null) {
+					return createdEvent.getId();
+				}
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
 			}
@@ -208,17 +202,52 @@ public class GoogleAPIHandler {
 		return null;
 	}
 	
-	//@author Sean Saito
+	//@author A0112828H
 	/**
-	 * Gets an event from the Calendar API, given a DeadlineTask object.
+	 * Gets a task from the Tasks API, given a FloatingTask object.
 	 * The given task must have a Google ID.
-	 * Returns the name of the task if successful. 
+	 * Returns the TaskCommander Task if successful. 
+	 * 
+	 * @param task   Custom FloatingTask object
+	 * @return	     TaskCommander Task object
+	 */
+	public com.taskcommander.Task getTask(FloatingTask task) {
+		if (task == null) {
+			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+		} else if (task.getId() == null) {
+			System.out.println(MESSAGE_NO_ID);
+		} else {
+			try {
+				Task check = tasks.tasks().get("@default", task.getId()).execute();
+				return toTask(check);
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Gets a task from the Tasks API, given a DeadlineTask object.
+	 * The given task must have a Google ID.
+	 * Returns the TaskCommander Task if successful. 
 	 * 
 	 * @param task   Custom DeadlineTask object
-	 * @return	     Success of action
+	 * @return	     TaskCommander Task object
 	 */
-	public String getTask(DeadlineTask task) {
-		//TODO @Sean
+	public com.taskcommander.Task getTask(DeadlineTask task) {
+		if (task == null) {
+			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+		} else if (task.getId() == null) {
+			System.out.println(MESSAGE_NO_ID);
+		} else {
+			try {
+				Task check = tasks.tasks().get("@default", task.getId()).execute();
+				return toTask(check);
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			}
+		}
 		return null;
 	}
 	
@@ -228,10 +257,21 @@ public class GoogleAPIHandler {
 	 * Returns the name of the task if successful. 
 	 * 
 	 * @param task   Custom TimedTask object
-	 * @return	     Success of action
+	 * @return	     TaskCommander Task object
 	 */
-	public String getTask(TimedTask task) {
-		//TODO @Sean
+	public com.taskcommander.Task getTask(TimedTask task) {
+		if (task == null) {
+			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+		} else if (task.getId() == null) {
+			System.out.println(MESSAGE_NO_ID);
+		} else {
+			try {
+				Event check = calendar.events().get("@default", task.getId()).execute();
+				return toTask(check);
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			}
+		}
 		return null;
 	}
 	
@@ -239,7 +279,7 @@ public class GoogleAPIHandler {
 	/**
 	 * Deletes a task from the Tasks API, given a FloatingTask object.
 	 * The given task must have a Google ID.
-	 * Returns the name of the task if successful. 
+	 * Returns true if successful. 
 	 * 
 	 * @param task   Custom FloatingTask object
 	 * @return	     Success of action
@@ -262,38 +302,62 @@ public class GoogleAPIHandler {
 		return false;
 	}
 	
-	//@author Sean Saito
 	/**
 	 * Deletes an event from the Calendar API, given a DeadlineTask object.
 	 * The given task must have a Google ID.
-	 * Returns the name of the task if successful. 
+	 * Returns true if successful. 
 	 * 
 	 * @param task   Custom DeadlineTask object
 	 * @return	     Success of action
 	 */
-	public String deleteTask(DeadlineTask task) {
-		//TODO @Sean
-		return null;
+	public boolean deleteTask(DeadlineTask task) {
+		if (task == null) {
+			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+		} else if (task.getId() == null) {
+			System.out.println(MESSAGE_NO_ID);
+		} else {
+			try {
+				Tasks.TasksOperations.Delete request = tasks.tasks().delete("@default", task.getId());
+				request.execute();
+				Task check = tasks.tasks().get("@default", task.getId()).execute();
+				return check == null;
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			}
+		}
+		return false;
 	}
 	
-	/**
+	/**@author Sean Saito A0109194A
 	 * Deletes an event from the Calendar API, given a TimedTask object.
 	 * The given task must have a Google ID.
-	 * Returns the name of the task if successful. 
+	 * Returns true if successful. 
 	 * 
 	 * @param task   Custom TimedTask object
 	 * @return	     Success of action
 	 */
-	public String deleteTask(TimedTask task) {
-		//TODO @Sean
-		return null;
+	public boolean deleteTask(TimedTask task) {
+		if (task == null) {
+			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+		} else if (task.getId() == null) {
+			System.out.println(MESSAGE_NO_ID);
+		} else {
+			try {
+				calendar.events().delete(PRIMARY_CALENDAR_ID, "eventId").execute();
+				Event check = calendar.events().get("@default", task.getId()).execute();
+				return check == null;
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			}
+		}
+		return false;
 	}
 	
 	//@author A0112828H
 	/**
 	 * Updates a task from the Tasks API, given a FloatingTask object.
 	 * The given task must have a Google ID.
-	 * Returns the name of the task if successful. 
+	 * Returns true if successful.  
 	 * 
 	 * @param task   Custom FloatingTask object
 	 * @return	     Success of action
@@ -314,31 +378,53 @@ public class GoogleAPIHandler {
 		return false;
 	}
 
-	//@author Sean Saito
+	//@author Michelle
 	/**
-	 * Updates an event from the Calendar API, given a DeadlineTask object.
+	 * Updates a task from the Tasks API, given a DeadlineTask object.
 	 * The given task must have a Google ID.
-	 * Returns the name of the task if successful. 
+	 * Returns true if successful.  
 	 * 
 	 * @param task   Custom DeadlineTask object
 	 * @return	     Success of action
 	 */
-	public String updateTask(DeadlineTask task) {
-		//TODO @Sean
-		return null;
+	public boolean updateTask(DeadlineTask task) {
+		if (task == null) {
+			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+		} else if (task.getId() == null) {
+			System.out.println(MESSAGE_NO_ID);
+		} else {
+			try {
+				Task result = tasks.tasks().update("@default", task.getId(), toGoogleTask(task)).execute();
+				return result != null;
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			}
+		}
+		return false;
 	}
 	
-	/**
+	/**@author SeanSaito
 	 * Updates an event from the Calendar API, given a TimedTask object.
 	 * The given task must have a Google ID.
-	 * Returns the name of the task if successful. 
+	 * Returns true if successful.  
 	 * 
 	 * @param task   Custom TimedTask object
 	 * @return	     Success of action
 	 */
-	public String updateTask(TimedTask task) {
-		//TODO @Sean
-		return null;
+	public boolean updateTask(TimedTask task) {
+		if (task == null) {
+			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+		} else if (task.getId() == null) {
+			System.out.println(MESSAGE_NO_ID);
+		} else {
+			try {
+				Event result = calendar.events().update("@default", task.getId(), toGoogleTask(task)).execute();
+				return result != null;
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			}
+		}
+		return false;
 	}
 
 	//@author A0112828H
@@ -347,28 +433,37 @@ public class GoogleAPIHandler {
 		return new DateTime(date);
 	}
 	
-	// Changes a Date to a DateTime object.
+	// Changes a DateTime to a Date object.
 	private Date toDate(DateTime dateTime) {
 		return new Date(dateTime.getValue());
 	}
 
 	// Changes a Google Task to a TaskCommander Task.
 	private com.taskcommander.Task toTask(Task task) {
-		return new FloatingTask(task.getTitle(), task.getId());
+		if (task == null) {
+			return null;
+		}
+		if (task.containsKey("due")) {
+			DeadlineTask deadlineTask = new DeadlineTask(task.getTitle(), toDate(task.getDue()));
+			deadlineTask.setId(task.getId());
+			return deadlineTask;
+		} else {
+			return new FloatingTask(task.getTitle(), task.getId());	
+		}
 	}
 
 	// Changes a Google Calendar Event to a TaskCommander Task.
 	private com.taskcommander.Task toTask(Event event) {
-		if (event.containsKey("start")) {
-			return new TimedTask(event.getSummary(), 
-					toDate(event.getStart().getDateTime()), 
-					toDate(event.getEnd().getDateTime()));
-		} else {
-			return new DeadlineTask(event.getSummary(), 
-					toDate(event.getEnd().getDateTime()));
+		if (event == null) {
+			return null;
 		}
+		TimedTask timedTask = new TimedTask(event.getSummary(),
+				toDate(event.getStart().getDateTime()),
+				toDate(event.getEnd().getDateTime()));
+		timedTask.setId(event.getId());
+		return timedTask;
 	}
-	
+				
 	private Task toGoogleTask(FloatingTask task) {
 		Task newTask = new Task();
 		newTask.setTitle(task.getName());
@@ -376,14 +471,20 @@ public class GoogleAPIHandler {
 		return newTask;
 	}
 	
-	private Event toGoogleTask(DeadlineTask task) {
-		// TODO Auto-generated method stub
-		return null;
+	private Task toGoogleTask(DeadlineTask task) {
+		Task newTask = new Task();
+		newTask.setTitle(task.getName());
+		newTask.setDue(toDateTime(task.getEndDate()));
+		setStatusFromTask(newTask, task);
+		return newTask;
 	}
 	
 	private Event toGoogleTask(TimedTask task) {
-		// TODO Auto-generated method stub
-		return null;
+		Event newEvent = new Event();
+		newEvent.setSummary(task.getName());
+		newEvent.setStart(new EventDateTime().setDateTime(toDateTime(task.getStartDate())));			
+		newEvent.setEnd(new EventDateTime().setDateTime(toDateTime(task.getEndDate())));		
+		return newEvent;
 	}
 	
 	private void setStatusFromTask(Task newTask, com.taskcommander.Task task) {
@@ -393,5 +494,62 @@ public class GoogleAPIHandler {
 			newTask.setStatus("needsAction");
 		}
 	}
+	
+	public String addTask(com.taskcommander.Task task) {
+		switch (task.getType()) {
+		case FLOATING:
+			return addTask((FloatingTask) task);
+		case TIMED:
+			return addTask((TimedTask) task);
+		case DEADLINE:
+			return addTask((DeadlineTask) task);
+		}
+		return null;
+	}
+	
+	public com.taskcommander.Task getTask(com.taskcommander.Task task) {
+		switch (task.getType()) {
+		case FLOATING:
+			return getTask((FloatingTask) task);
+		case TIMED:
+			return getTask((TimedTask) task);
+		case DEADLINE:
+			return getTask((DeadlineTask) task);
+		}
+		return null;
+	}
+	
+	public boolean updateTask(com.taskcommander.Task task) {
+		switch (task.getType()) {
+		case FLOATING:
+			return updateTask((FloatingTask) task);
+		case TIMED:
+			return updateTask((TimedTask) task);
+		case DEADLINE:
+			return updateTask((DeadlineTask) task);
+		}
+		return false;
+	}
+	
+	public boolean deleteTask(com.taskcommander.Task task) {
+		switch (task.getType()) {
+		case FLOATING:
+			return deleteTask((FloatingTask) task);
+		case TIMED:
+			return deleteTask((TimedTask) task);
+		case DEADLINE:
+			return deleteTask((DeadlineTask) task);
+		}
+		return false;
+	}
 
+	public ArrayList<String> getAllIds() {
+		ArrayList<com.taskcommander.Task> tasks = getAllTasks();
+		ArrayList<String> idList = new ArrayList<String>();
+		for (com.taskcommander.Task t : tasks) {
+			idList.add(t.getId());
+		}
+		return idList;
+	}
+	
 }

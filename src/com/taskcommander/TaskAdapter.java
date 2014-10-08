@@ -21,7 +21,6 @@ public class TaskAdapter implements JsonSerializer<Task>, JsonDeserializer<Task>
 	@Override
 	public JsonElement serialize(Task src, Type typeOfSrc, JsonSerializationContext context) {
 		JsonObject result = new JsonObject();
-		//result.add("type", new JsonPrimitive(src.getType().toString()));
 		switch (src.getType()) {
 		case FLOATING:
 			result.add("properties", context.serialize(src, FloatingTask.class));
@@ -41,17 +40,15 @@ public class TaskAdapter implements JsonSerializer<Task>, JsonDeserializer<Task>
 	public Task deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
 			throws JsonParseException {
 		JsonObject jsonObject = json.getAsJsonObject();
-		System.out.println(jsonObject.toString());
 		int type = Integer.parseInt(jsonObject.get("taskType").getAsString());
-		JsonElement element = jsonObject.get("properties");
 		try {
 			switch (type) {
-			case 0:
-				return context.deserialize(element, FloatingTask.class);
-			case 1:
-				return context.deserialize(element, TimedTask.class);
-			case 2:
-				return context.deserialize(element, DeadlineTask.class);
+			case 0: //FloatingTask
+				return context.deserialize(jsonObject, FloatingTask.class);
+			case 1: //TimedTask
+				return context.deserialize(jsonObject, TimedTask.class);
+			case 2: //DeadlineTask
+				return context.deserialize(jsonObject, DeadlineTask.class);
 			default:
 				return null;
 			}

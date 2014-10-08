@@ -29,6 +29,8 @@ public class Data {
 	 * This array is needed for the undo-feature.
 	 */
 	public ArrayList<Task> tasksHistory;
+	
+	public ArrayList<Task> deletedTasks;
 
 	private Storage storage;
 
@@ -39,6 +41,7 @@ public class Data {
 	public Data() {
 		tasks = new ArrayList<Task>();
 		tasksHistory = new ArrayList<Task>();
+		deletedTasks = new ArrayList<Task>();
 		storage = new Storage();
 		load();
 	}
@@ -49,7 +52,7 @@ public class Data {
 	}
 
 	public void load() {
-		// tasks = storage.readFromFile(); //TODO: Michelle, always returns a NULL wich results in an error within the other mehtods
+		tasks = storage.readFromFile(); 
 	}	
 
 	//@author Andreas Christian Mayr
@@ -196,13 +199,30 @@ public class Data {
 			return String.format(Global.MESSAGE_NO_INDEX, index);
 		} else {
 			Task taskToRemove = tasks.get(indexToRemove);
-
+			deletedTasks.add(taskToRemove);
 			tasks.remove(indexToRemove);
 
 			return String.format(Global.MESSAGE_DELETED, taskToRemove.getName());
 		}
 	}
-
+	
+	/**@author A0109194A
+	 * Deletes the task directly from the tasks list without the index
+	 * Used to delete tasks when syncing
+	 * 
+	 * @param 			task
+	 * @return 			boolean value on whether the delete was successful.
+	 */
+	public boolean deleteTask(Task task) {
+		if (tasks.isEmpty()) {
+			return false;
+		} else {
+			deletedTasks.add(task);
+			tasks.remove(task);
+			return true;
+		}
+	}
+	
 	/**
 	 * Clears all tasks from memory.
 	 * 
@@ -210,6 +230,7 @@ public class Data {
 	 * @return             Feedback for user.
 	 */
 	public String clearTasks() {
+		deletedTasks.addAll(tasks);
 		tasks.clear();
 		return String.format(Global.MESSAGE_CLEARED);
 	}
@@ -226,4 +247,21 @@ public class Data {
 			return String.format(Global.MESSAGE_SORTED);
 		}
 	}	
+	
+	public ArrayList<Task> getAllTasks() {
+		return tasks;
+	}
+	
+	public ArrayList<Task> getDeletedTasks() {
+		return deletedTasks;
+	}
+	
+	public ArrayList<String> getAllIds() {
+		ArrayList<String> idList = new ArrayList<String>();
+		for (Task t : tasks) {
+			idList.add(t.getId());
+		}
+		
+		return idList;
+	}
 }
