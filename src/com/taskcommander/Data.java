@@ -140,7 +140,7 @@ public class Data {
 			return String.format(Global.MESSAGE_EMPTY);
 		}
 
-		String[][] result = new String[tasks.size()][3]; // first [] represents line, second [] represents row of the array
+		String[][] displayedTasks = new String[tasks.size()][3]; // first [] represents line, second [] represents row of the array
 		SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy");
 		SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
 
@@ -149,27 +149,36 @@ public class Data {
 			TaskType taskType = tasks.get(i).getType();
 			if (taskType == TaskType.TIMED) {
 				TimedTask timedTask = (TimedTask) tasks.get(i);
-				result[i][0] = dayFormat.format(timedTask.getStartDate());
-				result[i][1] = timeFormat.format(timedTask.getStartDate()) + "-"
+				displayedTasks[i][0] = dayFormat.format(timedTask.getStartDate());
+				displayedTasks[i][1] = timeFormat.format(timedTask.getStartDate()) + "-"
 						+ timeFormat.format(timedTask.getEndDate());
-				result[i][2] = tasks.get(i).getName();
+				displayedTasks[i][2] = tasks.get(i).getName();
 
 			} else if (taskType == TaskType.DEADLINE) {
 				DeadlineTask deadlineTask = (DeadlineTask) tasks.get(i);
-				result[i][0] = dayFormat.format(deadlineTask.getEndDate());
-				result[i][1] = timeFormat.format(deadlineTask.getEndDate());
-				result[i][2] = deadlineTask.getName();
+				displayedTasks[i][0] = dayFormat.format(deadlineTask.getEndDate());
+				displayedTasks[i][1] = timeFormat.format(deadlineTask.getEndDate());
+				displayedTasks[i][2] = deadlineTask.getName();
 
 			} else {
 				FloatingTask floatingTask = (FloatingTask) tasks.get(i);
-				result[i][0] = null;
-				result[i][1] = null;
-				result[i][2] = floatingTask.getName();
+				displayedTasks[i][0] = null;
+				displayedTasks[i][1] = null;
+				displayedTasks[i][2] = floatingTask.getName();
 			}
 
-			TaskCommander.controller.setDisplayedTasks(result);
+			TaskCommander.controller.setDisplayedTasks(displayedTasks);
 		}
-		return "Internal Message: String Array for the UI was created, see also console output";
+		
+		// convert displayTasks-Array to one string for UI feedback
+		String result = "";
+
+		if (!(displayedTasks == null)) {
+			for (int i = 0; i < displayedTasks.length; i++) {
+				result += displayedTasks[i][0] + "\t" + displayedTasks[i][1] + "\t" + displayedTasks[i][2] + "\n";
+			}
+		}
+		return result;
 
 	}
 

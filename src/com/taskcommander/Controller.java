@@ -50,10 +50,6 @@ public class Controller {
 	 * 
 	 */
 	private String[][] displayedTasks;
-	
-	public String[][] getDisplayedTasks() {
-		return displayedTasks;
-	}
 
 	public void setDisplayedTasks(String[][] displayedTasks) {
 		this.displayedTasks = displayedTasks;
@@ -121,14 +117,7 @@ public class Controller {
 			if (!isSingleWord(userCommand)) {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			} else {
-				feedback = TaskCommander.data.displayTasks();
-				// temporary output of the displayTasks Array in the console
-				if (!(displayedTasks == null)) {
-				for (int i = 0; i < displayedTasks.length; i++) {
-					System.out.println(displayedTasks[i][0]+"\t"+displayedTasks[i][1]+"\t"+displayedTasks[i][2]);
-				};
-				}
-				return feedback;
+				return TaskCommander.data.displayTasks();
 			}
 			
 		case DELETE:
