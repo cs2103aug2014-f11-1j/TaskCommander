@@ -166,8 +166,6 @@ public class Data {
 				displayedTasks[i][1] = null;
 				displayedTasks[i][2] = floatingTask.getName();
 			}
-
-			TaskCommander.controller.setDisplayedTasks(displayedTasks);
 		}
 		
 		// convert displayTasks-Array to one string for UI feedback

@@ -18,42 +18,6 @@ public class Controller {
 	public Controller(){
 		
 	}
-	
-	/**
-	 * Additional feedback array for the display command, which only contains the desired types of tasks 
-	 * within the desired time period in the right order. This array is set by the Data.display method and
-	 * accessed by the UI.
-	 * 
-	 * The array will have the following format.
-	 * 
-	 * Day			Time				Name			|
-	 * --------------------------------------------------				
-	 * null			null				FloatingTask1   |5
-	 * null			null				FloatingTask2   |12
-	 * null			null				FloatingTask3   |6
-	 * ....			....				.............   |
-	 * ..			..					............    |
-	 * .			.					.......         |
-	 * Sat Oct 04	10:00-11:00			TimedTask1      |
-	 * Sat Oct 04	by 12:00			DeadlineTask1
-	 * Sat Oct 04	12:00-13:00			TimedTask2
-	 * Sat Oct 04	14:00-15:00			TimedTask3
-	 * Sat Oct 04	by 18:00			DeadlineTask2
-	 * ....			....				.................
-	 * ..			..					............
-	 * .			.					.......
-	 * Sun Oct 04	10:00-11:00			TimedTask4
-	 * Sun Oct 04	by 12:00			DeadlineTask3
-	 * ....			....				.................
-	 * ..			..					............
-	 * .			.					.......
-	 * 
-	 */
-	private String[][] displayedTasks;
-
-	public void setDisplayedTasks(String[][] displayedTasks) {
-		this.displayedTasks = displayedTasks;
-	}
 
 	/**
 	 * Parses command from user and executes it if valid. Writes to file after each command.
@@ -113,7 +77,6 @@ public class Controller {
 			*/
 			
 		case DISPLAY:
-			String feedback;
 			if (!isSingleWord(userCommand)) {
 				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 			} else {
