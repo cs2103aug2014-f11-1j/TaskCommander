@@ -1,17 +1,10 @@
 package com.taskcommander;
-import java.awt.Event;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-
+import java.util.ArrayList;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 
 public class UI {
 
@@ -33,6 +26,7 @@ public class UI {
 			}
 		}
 	}
+	
 	/**
 	 * Constructor
 	 */
@@ -58,7 +52,162 @@ public class UI {
 					try {
 						output.setText("");
 						String command = input.getText();
-						output.setText(TaskCommander.controller.executeCommand(command));
+						
+						/*
+						 *  Code Suggestion regarding the usage of the new return class Feedback;
+						 *  Just a draft until the real, more sophisticated, multi-coloured code is written by you, Chenwei ;-)
+						 *  @author A0128620M
+						 */
+						Feedback feedback = TaskCommander.controller.executeCommand(command);
+					
+						String text = "";
+						Task task = null;
+						String taskName = "";
+						if (feedback.wasSuccesfullyExecuted()) {
+							Global.CommandType commandtype = feedback.getCommandType();
+							switch (commandtype) {
+							case ADD:
+								// Output example: added [3 Oct '14 18:00-19:00] "Call the boss"
+								task = feedback.getCommandRelatedTask();
+
+								taskName = task.getName();
+
+								switch (task.getType()) {
+									case TIMED:
+										TimedTask timedTask = (TimedTask) task;
+										text = String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+										break;
+									case DEADLINE:
+										DeadlineTask deadlineTask = (DeadlineTask) task;
+										text = String.format(Global.MESSAGE_ADDED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+										break;
+									case FLOATING:
+										text = String.format(Global.MESSAGE_ADDED,"\"" + taskName + "\"");
+								}
+								break;
+								
+							case UPDATE:
+								// Desired Output example: updated [3 Oct '14 18:00-19:00] "Call the boss"
+								task = feedback.getCommandRelatedTask();
+
+								taskName = task.getName();
+
+								switch (task.getType()) {
+									case TIMED:
+										TimedTask timedTask = (TimedTask) task;
+										text = String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+										break;
+									case DEADLINE:
+										DeadlineTask deadlineTask = (DeadlineTask) task;
+										text = String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+										break;
+									case FLOATING:
+										text = String.format(Global.MESSAGE_UPDATED,"\"" + taskName + "\"");
+								}
+								break;
+								
+							case DELETE:
+								// DesiredOutput example: deleted [3 Oct '14 18:00-19:00] "Call the boss"
+								task = feedback.getCommandRelatedTask();
+
+								taskName = task.getName();
+
+								switch (task.getType()) {
+									case TIMED:
+										TimedTask timedTask = (TimedTask) task;
+										text = String.format(Global.MESSAGE_DELETED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+										break;
+									case DEADLINE:
+										DeadlineTask deadlineTask = (DeadlineTask) task;
+										text = String.format(Global.MESSAGE_DELETED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+										break;
+									case FLOATING:
+										text = String.format(Global.MESSAGE_DELETED,"\"" + taskName + "\"");
+								}
+								break;
+								
+							case CLEAR:
+								text = String.format(Global.MESSAGE_CLEARED);
+								break;
+								
+							case DISPLAY:
+								/* Desired Output example (not yet implemented!!)
+								 * 
+								 * [floatingTasks] ================================================
+								 * 1. "adfsdfsgsxfgf"
+								 * 2. "sgsxfgsfgsfgdfhdgfghdg"
+								 * 3. "sdgsfgfdgdfgfdgd"
+								 * 
+								 * [Today: 3 Oct '14] ================================================
+								 * 4. [11:00-12:00] 	"afadfsdfsdf"
+								 * 5. [18:00-19:00] 	"asdfasdfasdfsadf"
+								 * 6. [by 19:30   ] 	"asdfasdfsadf"
+								 * 7. [20:00-22:00] 	"asdfsadfasdfsad"
+								 * 
+								 * [Tomorrow: 4 Oct '14] ================================================
+								 * 8. [10:00-12:00] 	"fgjhgjkjh"
+								 * 9. [18:00-18:30] 	"gjkgjghj"
+								 * 10. [by 19:30   ] 	"fghdfjhf"
+								 * 11. [20:00-22:00] 	"dfhfghjkjhkfhjk"
+								 * 
+								 * [5 Oct '14] ================================================
+								 * 12. [10:00-12:00] 	"fgjhgjkjh"
+								 * 13. [by 19:30   ] 	"fghdfjhf"
+								 * 14. [20:00-22:00] 	"dfhfghjkjhkfhjk"
+								 * 
+								*/
+								
+								ArrayList<Task> tasks = feedback.getCommandRelatedTasks();
+
+								for (int i = 0; i < tasks.size(); i++) {
+									
+									task = tasks.get(i);
+									taskName = tasks.get(i).getName();
+									
+									switch (tasks.get(i).getType()) {
+										case TIMED:
+											TimedTask timedTask = (TimedTask) task;
+											text += (i+1)+".  "+"["+ Global.dayFormat.format(timedTask.getStartDate())+ "  "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + taskName + "\"" + "\n";
+											break;
+										case DEADLINE:
+											DeadlineTask deadlineTask = (DeadlineTask) task;
+											text += (i+1)+".  "+"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ "  "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + taskName + "\"" + "\n";
+											break;
+										case FLOATING:
+											text += (i+1)+".  "+ "\"" + taskName + "\"" + "\n";	
+											break;
+									}
+								}
+								break;
+								
+							case HELP:
+								// Desired Output has to be discussed, but low priority anyway
+								break;
+								
+							case SORT:
+								// Desired Output has to be discussed
+								break;
+								
+							case SYNC:
+								// Desired Output has to be discussed
+								break;
+								
+							case EXIT:
+								break;
+								
+							case INVALID:
+								break;
+								
+							default:
+								break;
+							}
+							
+						} else {
+							text = feedback.getErrorMessage();
+						}
+						// End of Code Suggestion	
+						
+						output.setText(text);
 						input.setText("");
 						TaskCommander.data.save();		// write new tasks in storage
 					} catch (Exception e1) {
@@ -67,7 +216,6 @@ public class UI {
 			}
 	    });
 		
-
 		output = new Text(shell, SWT.BORDER|SWT.WRAP);
 		output.setText(Global.MESSAGE_WELCOME);
 		output.setBounds(47, 91, 292, 132);
@@ -93,6 +241,5 @@ public class UI {
 		
 		btnEnter.setBounds(272, 31, 65, 27);
 		btnEnter.setText("enter");*/
-
 	}
 }

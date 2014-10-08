@@ -70,17 +70,15 @@ public class Parser {
 	 */
 	public List<Date> determineTaskDateTime(String userCommand) {
 		List<Date> dates = null;
-		String dateTime = userCommand.substring(userCommand.lastIndexOf("\"")+1).trim();
-		
+
 		com.joestelmach.natty.Parser nattyParser = new com.joestelmach.natty.Parser();
-		List<DateGroup> groups = nattyParser.parse(dateTime);
+		List<DateGroup> groups = nattyParser.parse(userCommand);  //Old, instead of userCommand: String dateTime = userCommand.substring(userCommand.lastIndexOf("\"")+1).trim();
 		
 		for(DateGroup group:groups) {
 			dates = group.getDates();
 		}
 		return dates;
 	}
-	
 	
 	// Helper methods
 	private static String getFirstWord(String userCommand) {

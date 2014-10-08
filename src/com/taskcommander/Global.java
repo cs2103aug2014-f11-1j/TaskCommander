@@ -1,4 +1,7 @@
 package com.taskcommander;
+
+import java.text.SimpleDateFormat;
+
 /**
  * This class stores global variables for use in the program.
  * 
@@ -15,10 +18,8 @@ public class Global {
 	public static final String MESSAGE_UPDATED = "Updated: \"%1$s\"";
 	public static final String MESSAGE_DELETED = "Deleted: \"%1$s\"";
 	public static final String MESSAGE_CLEARED = "All content deleted.";
-	public static final String MESSAGE_INVALID_FORMAT = "Invalid command format: %1$s. " + 
-			"Type 'help' to see the list of commands.";
+	public static final String MESSAGE_INVALID_FORMAT = "Invalid command format: %1$s. " + "Type 'help' to see the list of commands.";
 	public static final String MESSAGE_NO_COMMAND = "No command given.";
-	public static final String MESSAGE_NO_TASK = "No task given.";
 	public static final String MESSAGE_NO_INDEX = "Index %1$s does not exist. Please type a valid index.";
 	public static final String MESSAGE_EMPTY = "No tasks available";
 	public static final String MESSAGE_HELP = "Commands: add <string>, display, delete <index of string>, clear, sort, exit.";
@@ -33,6 +34,13 @@ public class Global {
 	public static final String MESSAGE_ARGUMENTS_NULL = "Null arguments given.";
 
 	public static final int INDEX_OFFSET = 1; // Difference between the array index and actual line number
+
+	/**
+	 *  Global Date Format
+	 *  @author A0128620M
+	 */
+	public static final SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy");
+	public static final SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
 
 	// Possible command types
 	public static enum CommandType {

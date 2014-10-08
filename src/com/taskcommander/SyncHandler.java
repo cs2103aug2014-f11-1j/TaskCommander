@@ -59,13 +59,12 @@ public class SyncHandler {
 		for (Task task : toSync) {
 			if (!containsId(task.getId(), idList)) {
 				if (task.getType() == TaskType.DEADLINE) {
-					TaskCommander.data.addTask(task.getType(), task.getName(),
-							null, ((DeadlineTask) task).getEndDate());
+					TaskCommander.data.addDeadlineTask(task.getName(),
+							((DeadlineTask) task).getEndDate());
 				} else if (task.getType() == TaskType.FLOATING) {
-					TaskCommander.data.addTask(task.getType(), task.getName(), 
-							null, null);
+					TaskCommander.data.addFloatingTask(task.getName());
 				} else {
-					TaskCommander.data.addTask(task.getType(), task.getName(), 
+					TaskCommander.data.addTimedTask(task.getName(), 
 							((TimedTask) task).getStartDate(), ((TimedTask) task).getEndDate());
 				}
 			}

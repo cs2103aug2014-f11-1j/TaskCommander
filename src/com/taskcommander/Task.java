@@ -1,8 +1,4 @@
 package com.taskcommander;
-import java.util.List;
-import java.util.Date;
-
-import com.google.api.client.util.DateTime;
 import com.google.gson.annotations.SerializedName;
 //import com.taskcommander.Global.TaskType;
 
