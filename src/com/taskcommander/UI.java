@@ -21,6 +21,7 @@ public class UI {
 
 	/**
 	 * Open the window.
+	 * @wbp.parser.entryPoint
 	 */
 	public static void open() {
 		Display display = Display.getDefault();
@@ -35,6 +36,7 @@ public class UI {
 	}
 	/**
 	 * Constructor
+	 * @wbp.parser.entryPoint
 	 */
 	public UI() {
 	}
@@ -46,8 +48,8 @@ public class UI {
 		shell = new Shell();
 		shell.setSize(450, 300);
 		shell.setText(Global.APPLICATION_NAME);
-		input = new Text(shell, SWT.BORDER);
-		input.setBounds(47, 33, 292, 23);
+		input = new Text(shell, SWT.NONE);
+		input.setBounds(0, 0, 434, 23);
 		//This event triggered on enter key
 		input.addListener(SWT.Traverse, new Listener()
 	    {
@@ -68,9 +70,9 @@ public class UI {
 	    });
 		
 
-		output = new Text(shell, SWT.BORDER|SWT.WRAP);
+		output = new Text(shell, SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL);
 		output.setText(Global.MESSAGE_WELCOME);
-		output.setBounds(47, 91, 292, 132);
+		output.setBounds(0, 29, 434, 233);
 
 		/*Button btnEnter = new Button(shell, SWT.NONE);
 		// This one triggered on btn pressed.
