@@ -1,5 +1,8 @@
 package com.taskcommander;
 import java.util.ArrayList;
+
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -10,14 +13,14 @@ public class UI {
 
 	protected static Shell shell;
 	private static Text input;
-	private static Text output;
+	private static StyledText output;
+	private static Display display = Display.getDefault();
 
 	/**
 	 * Open the window.
 	 * @wbp.parser.entryPoint
 	 */
 	public static void open() {
-		Display display = Display.getDefault();
 		createContents();
 		shell.open();
 		shell.layout();
@@ -73,18 +76,18 @@ public class UI {
 								task = feedback.getCommandRelatedTask();
 
 								taskName = task.getName();
-
+						
 								switch (task.getType()) {
-									case TIMED:
-										TimedTask timedTask = (TimedTask) task;
-										text = String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
-										break;
-									case DEADLINE:
-										DeadlineTask deadlineTask = (DeadlineTask) task;
-										text = String.format(Global.MESSAGE_ADDED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
-										break;
-									case FLOATING:
-										text = String.format(Global.MESSAGE_ADDED,"\"" + taskName + "\"");
+								case TIMED:
+									TimedTask timedTask = (TimedTask) task;
+									text = String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+									break;
+								case DEADLINE:
+									DeadlineTask deadlineTask = (DeadlineTask) task;
+									text = String.format(Global.MESSAGE_ADDED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+									break;
+								case FLOATING:
+									text = String.format(Global.MESSAGE_ADDED,"\"" + taskName + "\"");
 								}
 								break;
 								
@@ -176,7 +179,7 @@ public class UI {
 											text += (i+1)+". "+"\t"+"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ "  "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+"\t"+"\t"+ " \"" + taskName + "\"" + "\n";
 											break;
 										case FLOATING:
-											text += (i+1)+". "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+" "+"\""+ taskName + "\"" + "\n";	
+											text += (i+1)+". "+"\t"+"\t"+"\t"+"\t"+"   "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	
 											break;
 									}
 								}
@@ -210,6 +213,12 @@ public class UI {
 						// End of Code Suggestion	
 						
 						output.setText(text);
+						StyleRange styleRange = new StyleRange();
+						styleRange.start = 0;
+						styleRange.length = text.length();
+						styleRange.fontStyle = SWT.BOLD;
+						styleRange.foreground = display.getSystemColor(SWT.COLOR_BLUE);
+						output.setStyleRange(styleRange);
 						input.setText("");
 						TaskCommander.data.save();		// write new tasks in storage
 					} catch (Exception e1) {
@@ -218,7 +227,7 @@ public class UI {
 			}
 	    });
 		
-		output = new Text(shell, SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL);
+		output = new StyledText(shell, SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL);
 		output.setText(Global.MESSAGE_WELCOME);
 		output.setBounds(0, 29, 434, 233);
 
