@@ -24,28 +24,28 @@ public class Controller {
 	 * @return              feedback for to the UI
 	 */
 	public Feedback executeCommand(String userCommand) {	
-		if (userCommand == null) {
+		if (userCommand == null | userCommand == "") {
 			return new Feedback(false,Global.MESSAGE_NO_COMMAND);
 		}
 
-		Global.CommandType commandType= TaskCommander.parser.determineCommandType(userCommand);
-		
-		String restOfUserCommand = removeFirstWord(userCommand);
+		String commandTypeString = getFirstWord(userCommand);
+		Global.CommandType commandType= TaskCommander.parser.determineCommandType(commandTypeString);
+		String residualUserCommand = removeFirstWord(userCommand);
 		
 		switch (commandType) {
 			case ADD:
 				
 				String taskName;
 				try {
-					taskName = TaskCommander.parser.determineTaskName(restOfUserCommand);
+					taskName = TaskCommander.parser.determineTaskName(residualUserCommand);
 				} catch (StringIndexOutOfBoundsException e) {
 					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				}
 				
-				restOfUserCommand = removeTaskName(restOfUserCommand, taskName);
+				residualUserCommand = removeTaskName(residualUserCommand, taskName);
 				
 				// taskDateTime (3 cases depending on taskType)
-				List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(restOfUserCommand);
+				List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(residualUserCommand);
 				// case 1: FloatingTask
 				if (taskDateTime == null) { 			
 					return TaskCommander.data.addFloatingTask(taskName);
@@ -60,6 +60,16 @@ public class Controller {
 				}
 				
 			case UPDATE:	//TODO: implementation needs to be adjusted to different types of tasks
+				
+				String indexString = getFirstWord(residualUserCommand);
+				residualUserCommand = removeFirstWord(userCommand);
+				
+				int indexInteger;
+				try {
+					indexInteger = Integer.parseInt(indexString) - Global.INDEX_OFFSET; // Change the line number to an array index
+				} catch (NumberFormatException e) {
+					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+				} 
 				
 				/*
 				String newtaskName = "";
@@ -154,7 +164,7 @@ public class Controller {
 		return allWords.length;
 	}
 	
-	/* not used at the moment
+	/* not used
 	private static String getNthWord(String userCommand, int position) {
 		String[] allWords = userCommand.trim().split("\\s+");
 		if (position > allWords.length-1) {

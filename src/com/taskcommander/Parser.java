@@ -25,12 +25,10 @@ public class Parser {
 	 * 
 	 * @param userCommand  user command
 	 */
-	public Global.CommandType determineCommandType(String userCommand) {
-		
-		String commandTypeString = getFirstWord(userCommand);
+	public Global.CommandType determineCommandType(String commandTypeString) {
 		
 		if (commandTypeString == null) {
-			throw new Error("command type string cannot be null!");
+			throw new Error("Error: CommandTypeString must not be null!");
 		}
 
 		if (commandTypeString.equalsIgnoreCase("help")) {

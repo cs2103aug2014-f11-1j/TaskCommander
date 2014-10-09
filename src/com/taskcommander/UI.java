@@ -55,7 +55,7 @@ public class UI {
 						output.setText("");
 						String command = input.getText();
 						
-						/*
+						/**
 						 *  Code Suggestion regarding the usage of the new return class Feedback;
 						 *  Just a draft until the real, more sophisticated, multi-coloured code is written by you, Chenwei ;-)
 						 *  @author A0128620M
@@ -169,14 +169,14 @@ public class UI {
 									switch (tasks.get(i).getType()) {
 										case TIMED:
 											TimedTask timedTask = (TimedTask) task;
-											text += (i+1)+".  "+"["+ Global.dayFormat.format(timedTask.getStartDate())+ "  "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + taskName + "\"" + "\n";
+											text += (i+1)+". "+"\t"+"["+ Global.dayFormat.format(timedTask.getStartDate())+ "  "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+"\t"+ " \"" + taskName + "\"" + "\n";
 											break;
 										case DEADLINE:
 											DeadlineTask deadlineTask = (DeadlineTask) task;
-											text += (i+1)+".  "+"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ "  "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + taskName + "\"" + "\n";
+											text += (i+1)+". "+"\t"+"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ "  "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+"\t"+"\t"+ " \"" + taskName + "\"" + "\n";
 											break;
 										case FLOATING:
-											text += (i+1)+".  "+ "\"" + taskName + "\"" + "\n";	
+											text += (i+1)+". "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	
 											break;
 									}
 								}

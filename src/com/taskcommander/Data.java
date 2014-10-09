@@ -92,17 +92,10 @@ public class Data {
 	 * @param taskName     description of task
 	 * @return             feedback for UI
 	 */
-	public Feedback updateTask(String index, String taskName) {	//TODO: implementation needs to be adjusted to different types of tasks
+	public Feedback updateTask(int index, String taskName) {	//TODO: implementation needs to be adjusted to different types of tasks
 		/*
 		if (tasks.isEmpty()) {
 			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
-		} 
-
-		int indexToUpdate;
-		try {
-			indexToUpdate = Integer.parseInt(index) - Global.INDEX_OFFSET; // Change the line number to an array index
-		} catch (NumberFormatException e) {
-			return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, "update " + index + taskName);
 		} 
 
 		if (indexToUpdate > tasks.size() - Global.INDEX_OFFSET) {
