@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
  * Related Google API: Tasks
  */
 
-public class Task implements Comparable<Task> {
+public class Task {
 	@SerializedName("taskType") // For use with GSON
 	private TaskType _taskType;
 	private String _name;
@@ -94,20 +94,7 @@ public class Task implements Comparable<Task> {
 		_edited = false;
 	}
 
-	public int compareTo(DeadlineTask otherTask) {
-		return 0;
-	}
-	
-	public int compareTo(FloatingTask otherTask) {
-		return 0;
-	}
-	
 	public int compareTo(TimedTask otherTask) {
-		return 0;
-	}
-
-	@Override
-	public int compareTo(Task o) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

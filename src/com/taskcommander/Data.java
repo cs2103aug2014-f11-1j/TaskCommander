@@ -175,14 +175,16 @@ public class Data {
 	 * @return   Feedback for user.
 	 */
 	public Feedback sort() {
+	/*
 		if (tasks.isEmpty()) {
 			return new Feedback(false,String.format(Global.MESSAGE_EMPTY));
 		} else {
 			Collections.sort(tasks);
 			return new Feedback(false,String.format(Global.MESSAGE_SORTED));
 		}
+	*/
+		return new Feedback(false,"Out of order");
 	}	
-	
 	public ArrayList<Task> getAllTasks() {
 		return tasks;
 	}

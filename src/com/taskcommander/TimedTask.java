@@ -9,7 +9,7 @@ import java.util.Date;
  * @author Michelle Tan, ANDREAS, Sean Saito
  */
 
-public class TimedTask extends Task {
+public class TimedTask extends DatedTask {
 	private Date _startDate;
 	private Date _endDate;
 	
@@ -18,7 +18,7 @@ public class TimedTask extends Task {
 	 * Throws IllegalArgumentException if null arguments are given.
 	 */
 	public TimedTask(String name, Date startTime, Date endTime){
-		super(name, TaskType.TIMED);
+		super(name, TaskType.TIMED, startTime );
 		if (startTime != null && endTime !=null) {
 			_startDate = startTime;
 			_endDate = endTime;
@@ -43,11 +43,7 @@ public class TimedTask extends Task {
 		_endDate = endDate;
 	}
 	
-	/*
-	 * Compares the starting time of this task to the given task 
-	 * in a chronological manner.
-	 * Edit by Sean Saito
-	 */
+
 	@Override
 	public int compareTo(TimedTask otherTask) {
 		return (_startDate.compareTo(otherTask.getStartDate()));

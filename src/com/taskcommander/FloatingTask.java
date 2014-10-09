@@ -1,6 +1,4 @@
 package com.taskcommander;
-import com.google.api.client.util.DateTime;
-import com.taskcommander.Task.TaskType;
 
 /*
  * A floating task that has no deadline. 
@@ -18,15 +16,5 @@ public class FloatingTask extends Task {
 	public FloatingTask(String name, String googleID) {
 		super(name, TaskType.FLOATING);
 		this.setId(googleID);
-	}
-	
-	/*
-	 * Compares the name of this task to the given task, using
-	 * alphabetical order of the names.
-	 * Edit by Sean Saito
-	 */
-	@Override
-	public int compareTo(Task otherTask) {
-		return (getName().compareTo(otherTask.getName()));
 	}
 }

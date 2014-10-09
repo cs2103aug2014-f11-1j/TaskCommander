@@ -60,7 +60,7 @@ public class Controller {
 				}
 				
 			case UPDATE:	//TODO: implementation needs to be adjusted to different types of tasks
-				
+				/*
 				String indexString = getFirstWord(residualUserCommand);
 				residualUserCommand = removeFirstWord(userCommand);
 				
@@ -70,7 +70,7 @@ public class Controller {
 				} catch (NumberFormatException e) {
 					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				} 
-				
+				*/
 				/*
 				String newtaskName = "";
 				try {
