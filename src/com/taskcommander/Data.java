@@ -20,6 +20,7 @@ public class Data {
 	 * all the deleted tasks.
 	 */
 	public ArrayList<Task> tasks;
+
 	public ArrayList<Task> tasksHistory;
 	public ArrayList<Task> deletedTasks;
 
@@ -51,7 +52,9 @@ public class Data {
 	/**
 	 * Adds a TimedTask, DeadlineTask or FloatingTask to the task ArrayList.
 	 * 
-	 * @param 	taskName     
+	 * @param 	taskName  
+	 * @param 	startDate    
+	 * @param 	endDate       
 	 * @return 	feedback for UI
 	 */
 	public Feedback addTimedTask(String taskName, Date startDate, Date endDate) {
@@ -82,33 +85,101 @@ public class Data {
 		return new Feedback(true, Global.CommandType.DISPLAY, tasks);
 	}
 	
-	
-	
 	/**
-	 * Updates the task with the given index (as shown by 'display' command) and
-	 * replaces the old task description by the new one.
+	 * Updates a TimedTask, DeadlineTask or FloatingTask with the given index 
+	 * and replaces the old taskName, startDate or endDate respectively and 
+	 * changes the taskType if needed.
+	 * If a given date or name parameter equals null, the old value remains.
 	 * 
 	 * @param index        index of the task to delete, as a string
 	 * @param taskName     description of task
+	 * @param startDate    
+	 * @param endDate      
 	 * @return             feedback for UI
 	 */
-	public Feedback updateTask(int index, String taskName) {	//TODO: implementation needs to be adjusted to different types of tasks
-		/*
+	public Feedback updateToTimedTask(int index, String name, Date startDate, Date endDate) {
 		if (tasks.isEmpty()) {
 			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
 		} 
 
-		if (indexToUpdate > tasks.size() - Global.INDEX_OFFSET) {
-			return String.format(Global.MESSAGE_NO_INDEX, index);
-		} else {
-			tasks.remove(indexToUpdate);
-			tasks.add(indexToUpdate, new Task(taskName));
-
-			return String.format(Global.MESSAGE_UPDATED, taskName);
+		if (index > tasks.size() - Global.INDEX_OFFSET) {
+			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index));
 		}
-		*/
-		return new Feedback(false,"out of order");
+		if  (tasks.get(index).getType() != Task.TaskType.TIMED) {
+			deleteTask(index);
+			TimedTask timedTask = new TimedTask(name,startDate,endDate);
+			tasks.add(index, timedTask);
+			return new Feedback(true, Global.CommandType.UPDATE, timedTask);
+		} else {
+			TimedTask timedTask = (TimedTask) tasks.get(index);
+			if (name != null) {
+				timedTask.setName(name);
+			}
+			if (startDate != null) {
+				timedTask.setStartDate(startDate);
+			}
+			if (endDate != null) {
+				timedTask.setEndDate(endDate);
+			}
+			return new Feedback(true, Global.CommandType.UPDATE, timedTask);
+		}
+		
 	}
+	
+	public Feedback updateToDeadlineTask(int index, String name, Date endDate) {
+		if (tasks.isEmpty()) {
+			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
+		} 
+
+		if (index > tasks.size() - Global.INDEX_OFFSET) {
+			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index));
+		}
+
+		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
+			deleteTask(index);
+			DeadlineTask deadlineTask = new DeadlineTask(name,endDate);
+			tasks.add(index, deadlineTask);
+			return new Feedback(true, Global.CommandType.UPDATE, deadlineTask);
+		} else {
+			DeadlineTask deadlineTask = (DeadlineTask) tasks.get(index);
+			if (name != null) {
+				deadlineTask.setName(name);
+			}
+			if (endDate != null) {
+				deadlineTask.setEndDate(endDate);
+			}
+			return new Feedback(true, Global.CommandType.UPDATE, deadlineTask);
+		}
+	}
+	
+	public Feedback updateToFloatingTask(int index, String name) {
+		if (tasks.isEmpty()) {
+			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
+		} 
+
+		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
+			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index));
+		}
+		
+		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
+			deleteTask(index);
+			FloatingTask floatingTask = new FloatingTask(name);
+			tasks.add(index, floatingTask);
+			return new Feedback(true, Global.CommandType.UPDATE, floatingTask);
+		} else {
+			FloatingTask floatingTask = (FloatingTask) tasks.get(index);
+			if (name != null) {
+				floatingTask.setName(name);
+			}
+			return new Feedback(true, Global.CommandType.UPDATE, floatingTask);
+		}
+	}
+	
+	
+	/* TODO: to replace:
+	 * 			tasks.remove(indexToUpdate);
+			tasks.add(indexToUpdate, new Task(taskName));
+			*/
 
 	/**
 	 * Deletes the task with the given index (as shown with 'display' command).
@@ -118,26 +189,19 @@ public class Data {
 	 * @param index        Index of the task to delete, as a string. 
 	 * @return             Feedback for user.
 	 */
-	public Feedback deleteTask(String index) {
+	public Feedback deleteTask(int index) {
 		if (tasks.isEmpty()) {
 			return new Feedback(false,String.format(Global.MESSAGE_EMPTY));
 		} 
 
-		int indexToRemove;
-		try {
-			indexToRemove = Integer.parseInt(index) - Global.INDEX_OFFSET; // Change the line number to an array index
-		} catch (NumberFormatException e) {
-			return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, "delete " + index));
-		} 
-
-		if (indexToRemove > tasks.size() - Global.INDEX_OFFSET) {
+		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
 			return new Feedback(false,String.format(Global.MESSAGE_NO_INDEX, index));
 		} else {
-			Task taskToRemove = tasks.get(indexToRemove);
-			deletedTasks.add(taskToRemove);
-			tasks.remove(indexToRemove);
+			Task deletedTask = tasks.get(index);
+			deletedTasks.add(deletedTask);
+			tasks.remove(index);
 
-			return new Feedback(false,String.format(Global.MESSAGE_DELETED, taskToRemove.getName()));
+			return new Feedback(true, Global.CommandType.DELETE, deletedTask);
 		}
 	}
 	
@@ -200,5 +264,13 @@ public class Data {
 		}
 		
 		return idList;
+	}
+	
+	/**
+	 * Returns index of the given task object within the tasks ArrayList.
+	 * @return  index
+	 */
+	public int getIndexOf(Task task) {
+		return tasks.indexOf(task);
 	}
 }

@@ -57,8 +57,12 @@ public class Parser {
 	 * 
 	 * @param userCommand  user command
 	 */
-	public String determineTaskName(String userCommand) throws StringIndexOutOfBoundsException{
-		return userCommand.substring(userCommand.indexOf("\"") + 1,userCommand.lastIndexOf("\""));  // possible exception because of substring() when no " is found
+	public String determineTaskName(String userCommand) {
+		try {
+			return userCommand.substring(userCommand.indexOf("\"") + 1,userCommand.lastIndexOf("\""));// possible exception because of substring() when no " is found
+		} catch (StringIndexOutOfBoundsException e) {
+			return null;
+		}
 	}
 
 	/**
