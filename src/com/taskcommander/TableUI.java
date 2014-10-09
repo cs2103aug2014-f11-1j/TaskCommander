@@ -162,7 +162,7 @@ public class TableUI {
 						column3.pack();
 
 						shell.pack();
-						
+						input.setText("");
 					}catch (Exception e1) {
 						e1.printStackTrace();
 					}
