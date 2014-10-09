@@ -105,8 +105,7 @@ public class TableUI {
 		column3.pack();
 
 		shell.pack();
-		new Label(shell, SWT.NONE);
-		new Label(shell, SWT.NONE);
+	
 		input.addListener(SWT.Traverse, new Listener(){
 			
 			@Override
@@ -163,8 +162,6 @@ public class TableUI {
 						column3.pack();
 
 						shell.pack();
-						new Label(shell, SWT.NONE);
-						new Label(shell, SWT.NONE);
 						
 					}catch (Exception e1) {
 						e1.printStackTrace();
