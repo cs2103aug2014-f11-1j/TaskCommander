@@ -9,6 +9,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.SWT;
 
+import com.taskcommander.Task.TaskType;
+
 public class UI {
 
 	protected static Shell shell;
@@ -163,6 +165,18 @@ public class UI {
 								*/
 								
 								ArrayList<Task> tasks = feedback.getCommandRelatedTasks();
+								int j = 0;
+								for (int i = 0; i < tasks.size(); i++) {
+									
+									task = tasks.get(i);
+									taskName = tasks.get(i).getName();
+									
+									if (tasks.get(i).getType()==TaskType.FLOATING) {
+											text += (j+1)+". "+"\t"+"\t"+"\t"+"\t"+"   "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	
+											j++;
+											break;
+									}
+								}
 
 								for (int i = 0; i < tasks.size(); i++) {
 									
@@ -172,14 +186,16 @@ public class UI {
 									switch (tasks.get(i).getType()) {
 										case TIMED:
 											TimedTask timedTask = (TimedTask) task;
-											text += (i+1)+". "+"\t"+"["+ Global.dayFormat.format(timedTask.getStartDate())+ "  "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+"\t"+ " \"" + taskName + "\"" + "\n";
+											text += (j+1)+". "+"\t"+"["+ Global.dayFormat.format(timedTask.getStartDate())+ "  "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+"\t"+ " \"" + taskName + "\"" + "\n";
+											j++;
 											break;
 										case DEADLINE:
 											DeadlineTask deadlineTask = (DeadlineTask) task;
-											text += (i+1)+". "+"\t"+"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ "  "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+"\t"+"\t"+ " \"" + taskName + "\"" + "\n";
+											text += (j+1)+". "+"\t"+"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ "  "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+"\t"+"\t"+ " \"" + taskName + "\"" + "\n";
+											j++;
 											break;
 										case FLOATING:
-											text += (i+1)+". "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	
+											/*text += (i+1)+". "+"\t"+"\t"+"\t"+"\t"+"   "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	*/
 											break;
 									}
 								}
