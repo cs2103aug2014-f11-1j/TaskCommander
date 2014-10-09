@@ -22,6 +22,7 @@ public class UI {
 	 * Open the window.
 	 * @wbp.parser.entryPoint
 	 */
+	
 	public static void open() {
 		createContents();
 		shell.open();

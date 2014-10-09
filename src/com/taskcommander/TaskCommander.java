@@ -28,6 +28,9 @@ public class TaskCommander {
 	public static Storage storage; 	// (permanent memory consisting of a local .txt-file
 	public static UI ui; // User Interface
 	public static SyncHandler syncHandler;
+	
+	// Uncomment to run TableUI! 
+	//public static TableUI tableui;
 
 	/**
 	 * Launch the application
@@ -41,6 +44,11 @@ public class TaskCommander {
 		controller = new Controller();
 		parser = new Parser();
 		ui = new UI();
+		
+		// Uncomment to run TableUI! 
+		// Comment out 'UI.open()' before running this
+		//tableui = new TableUI();
+		//tableui.open();
 		
 		// Start of the user interface
 		UI.open();

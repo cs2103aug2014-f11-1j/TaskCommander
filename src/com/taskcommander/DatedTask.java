@@ -33,7 +33,6 @@ public class DatedTask extends Task implements Comparable<DatedTask>{
 	 * Compares the date of this task to the given task 
 	 * in a chronological manner.
 	 */
-	
 	@Override
 	public int compareTo(DatedTask otherTask) {
 		return (_date.compareTo(otherTask.getDate()));
