@@ -123,7 +123,7 @@ public class Controller {
 					}
 				}
 				
-				// Case 0: no changes at all, that is, no new DateTime, Name, or "none" given
+				// No changes at all, that is, no new DateTime, Name, or "none" given
 				if ((newTaskDateTime == null) && (newtaskName == null) && (oldTaskType == newTaskType)) {
 					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				}

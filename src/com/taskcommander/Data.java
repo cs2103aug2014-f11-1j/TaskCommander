@@ -21,7 +21,14 @@ public class Data {
 	 */
 	public ArrayList<Task> tasks;
 
+	/**
+	 * Array contains the state of the tasks ArrayList before the last execution of a user command.
+	 */
 	public ArrayList<Task> tasksHistory;
+	
+	/**
+	 * Array contains all the deleted tasks, needed by the GoogleAPI.
+	 */
 	public ArrayList<Task> deletedTasks;
 
 	private Storage storage;
@@ -106,8 +113,10 @@ public class Data {
 			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index));
 		}
 		if  (tasks.get(index).getType() != Task.TaskType.TIMED) {
-			deleteTask(index);
 			TimedTask timedTask = new TimedTask(name,startDate,endDate);
+			timedTask.setEdited(tasks.get(index).getEdited());
+			timedTask.setDone(tasks.get(index).isDone());
+			deleteTask(index);
 			tasks.add(index, timedTask);
 			return new Feedback(true, Global.CommandType.UPDATE, timedTask);
 		} else {
@@ -121,6 +130,7 @@ public class Data {
 			if (endDate != null) {
 				timedTask.setEndDate(endDate);
 			}
+			timedTask.setEdited(true);
 			return new Feedback(true, Global.CommandType.UPDATE, timedTask);
 		}
 		
@@ -136,8 +146,10 @@ public class Data {
 		}
 
 		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
-			deleteTask(index);
 			DeadlineTask deadlineTask = new DeadlineTask(name,endDate);
+			deadlineTask.setEdited(tasks.get(index).getEdited());
+			deadlineTask.setDone(tasks.get(index).isDone());
+			deleteTask(index);
 			tasks.add(index, deadlineTask);
 			return new Feedback(true, Global.CommandType.UPDATE, deadlineTask);
 		} else {
@@ -148,6 +160,7 @@ public class Data {
 			if (endDate != null) {
 				deadlineTask.setEndDate(endDate);
 			}
+			deadlineTask.setEdited(true);
 			return new Feedback(true, Global.CommandType.UPDATE, deadlineTask);
 		}
 	}
@@ -162,8 +175,10 @@ public class Data {
 		}
 		
 		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
-			deleteTask(index);
 			FloatingTask floatingTask = new FloatingTask(name);
+			floatingTask.setEdited(tasks.get(index).getEdited());
+			floatingTask.setDone(tasks.get(index).isDone());
+			deleteTask(index);
 			tasks.add(index, floatingTask);
 			return new Feedback(true, Global.CommandType.UPDATE, floatingTask);
 		} else {
@@ -171,15 +186,10 @@ public class Data {
 			if (name != null) {
 				floatingTask.setName(name);
 			}
+			floatingTask.setEdited(true);
 			return new Feedback(true, Global.CommandType.UPDATE, floatingTask);
 		}
 	}
-	
-	
-	/* TODO: to replace:
-	 * 			tasks.remove(indexToUpdate);
-			tasks.add(indexToUpdate, new Task(taskName));
-			*/
 
 	/**
 	 * Deletes the task with the given index (as shown with 'display' command).

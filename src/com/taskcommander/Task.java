@@ -17,6 +17,7 @@ public class Task {
 	private boolean _done;
 	private boolean _edited;
 	
+	
 	// Possible task types
 	public enum TaskType {
 		@SerializedName("0") FLOATING("FloatingTask"), 
@@ -69,6 +70,10 @@ public class Task {
 		return _done;
 	}
 	
+	public void setDone(boolean done) {
+		_done = done;
+	}
+	
 	// Returns true if task has a google id and has not been edited since last sync
 	public boolean isSynced() {
 		return _id != null && !_edited; 
@@ -92,6 +97,14 @@ public class Task {
 	
 	public void setSynced() {
 		_edited = false;
+	}
+	
+	public boolean getEdited() {
+		return _edited;
+	}
+	
+	public void setEdited(boolean edited) {
+		this._edited = edited;
 	}
 
 	public int compareTo(TimedTask otherTask) {

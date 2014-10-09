@@ -172,7 +172,7 @@ public class UI {
 									taskName = tasks.get(i).getName();
 									
 									if (tasks.get(i).getType()==TaskType.FLOATING) {
-											text += (j+1)+". "+"\t"+"\t"+"\t"+"\t"+"   "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	
+											text += (j+1)+". "+"\t"+"\t"+"\t"+"\t"+"\t"+"   "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	
 											j++;
 											break;
 									}
