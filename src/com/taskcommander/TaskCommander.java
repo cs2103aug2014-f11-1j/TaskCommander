@@ -1,20 +1,5 @@
 package com.taskcommander;
 
-
-/**
- * In general the application “Task Commander” is a uncomplicated, command-line based “todo” list app for PC. 
- * In doing so, it represents a scaled-down version of a “Siri for keyboards” which manages command related 
- * “todo” tasks. Although these tasks are not truly formulated in natural language, the command format is still 
- * flexible yet comfortable to use.
-
-Examples of commands:
-...
-..
-.
-
- * @author Group F11-1J
- */
-
 public class TaskCommander {
 	
 	/**
@@ -30,7 +15,7 @@ public class TaskCommander {
 	public static SyncHandler syncHandler;
 	
 	// Uncomment to run TableUI! 
-	//public static TableUI tableui;
+	public static TableUI tableui;
 
 	/**
 	 * Launch the application
@@ -47,11 +32,11 @@ public class TaskCommander {
 		
 		// Uncomment to run TableUI! 
 		// Comment out 'UI.open()' before running this
-		//tableui = new TableUI();
-		//tableui.open();
+		tableui = new TableUI();
+		tableui.open();
 		
 		// Start of the user interface
-		UI.open();
+		/*UI.open();*/
 	}
 	
 	//Note: only call this when the sync command is used
