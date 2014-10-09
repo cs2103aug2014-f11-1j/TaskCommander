@@ -167,21 +167,7 @@ public class UI {
 								
 								
 								ArrayList<Task> tasks = feedback.getCommandRelatedTasks();
-								
-								/*
-								int j = 0;
-								for (int i = 0; i < tasks.size(); i++) {
-									
-									task = tasks.get(i);
-									taskName = tasks.get(i).getName();
-									
-									if (tasks.get(i).getType()==TaskType.FLOATING) {
-											text += (j+1)+". "+"\t"+"\t"+"\t"+"\t"+"\t"+"   "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	
-											j++;
-											break;
-									}
-								}
-								*/
+
 
 								for (int i = 0; i < tasks.size(); i++) {
 									
@@ -252,26 +238,5 @@ public class UI {
 		output.setText(Global.MESSAGE_WELCOME);
 		output.setBounds(0, 29, 434, 233);
 
-		/*Button btnEnter = new Button(shell, SWT.NONE);
-		// This one triggered on btn pressed.
-		btnEnter.addSelectionListener(new SelectionAdapter() {
-			TextBuddy tb = new TextBuddy();
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				try {
-					tb.content = tb.readFileToList();
-					output.setText("Welcome to TextBuddy."+tb.fileName+" is ready for use. ");
-					String command = input.getText();
-					output.setText(tb.executeCommand(command));
-					tb.writeIntoFile();
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-
-			}
-		});
-		
-		btnEnter.setBounds(272, 31, 65, 27);
-		btnEnter.setText("enter");*/
 	}
 }
