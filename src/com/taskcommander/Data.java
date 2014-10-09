@@ -67,19 +67,19 @@ public class Data {
 	public Feedback addTimedTask(String taskName, Date startDate, Date endDate) {
 		TimedTask timedTask = new TimedTask(taskName,startDate,endDate);
 		tasks.add(timedTask);
-		return new Feedback(true, Global.CommandType.ADD, timedTask);
+		return new Feedback(true, Global.CommandType.ADD, new TimedTask(timedTask));
 	}
 	
 	public Feedback addDeadlineTask(String taskName, Date endDate) {
 		DeadlineTask deadlineTask= new DeadlineTask(taskName,endDate);
 		tasks.add(deadlineTask);
-		return new Feedback(true, Global.CommandType.ADD, deadlineTask);
+		return new Feedback(true, Global.CommandType.ADD, new DeadlineTask(deadlineTask));
 	}
 	
 	public Feedback addFloatingTask(String taskName) {
 		FloatingTask floatingTask = new FloatingTask(taskName);
 		tasks.add(floatingTask);
-		return new Feedback(true, Global.CommandType.ADD, floatingTask);
+		return new Feedback(true, Global.CommandType.ADD, new FloatingTask(floatingTask));
 	}
 
 	/**
@@ -89,6 +89,7 @@ public class Data {
 	 * @return 	feedback for UI
 	 */
 	public Feedback displayTasks() {
+		/* New cloning approach
 		ArrayList<Task> displayedTasks = new ArrayList<Task>();
 		
 		ArrayList<FloatingTask> displayedFloatingTasks = new ArrayList<FloatingTask>();
@@ -110,8 +111,10 @@ public class Data {
 			Collections.sort(displayedDatedTasks);
 		}
 		displayedTasks.addAll(displayedDatedTasks);
-		
 		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
+		*/
+		
+		return new Feedback(true, Global.CommandType.DISPLAY, tasks);
 	}
 	
 	/**
@@ -183,7 +186,7 @@ public class Data {
 				deadlineTask.setEndDate(endDate);
 			}
 			deadlineTask.setEdited(true);
-			return new Feedback(true, Global.CommandType.UPDATE, deadlineTask);
+			return new Feedback(true, Global.CommandType.UPDATE, deadlineTask); // New cloning approach: new DeadlineTask(deadlineTask) for less coupling, but then issues in update feature with equals-method
 		}
 	}
 	

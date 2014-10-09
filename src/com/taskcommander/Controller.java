@@ -91,6 +91,7 @@ public class Controller {
 				
 				// Index in ArrayList tasks of the Data class
 				int indexTasks = TaskCommander.data.getIndexOf(oldTask);
+				System.out.println("Index"+indexTasks);
 				
 				// New taskName, if stated
 				String newTaskName = null;
