@@ -24,9 +24,9 @@ import org.eclipse.swt.events.TraverseEvent;
 public class TableUI {
 	private Text input;
 	public TableUI() {
-		
+
 	}
-	
+
 	/**
 	 * @wbp.parser.entryPoint
 	 */
@@ -35,9 +35,9 @@ public class TableUI {
 		final Shell shell = new Shell(display);
 		shell.setLayout(new GridLayout(3, false));
 		shell.setText("Task Commander");
-		
+
 		input = new Text(shell, SWT.BORDER);
-		
+
 		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_text.widthHint = 500;
 		input.setLayoutData(gd_text);
@@ -73,8 +73,8 @@ public class TableUI {
 			switch(task.getType()) {
 			case FLOATING:
 				item.setText(new String[] { " ", 
-											task.getName(),
-											done });
+						task.getName(),
+						done });
 				item.setForeground(0, blue);
 				item.setForeground(1, gray);
 				item.setForeground(2, doneColor);
@@ -82,8 +82,8 @@ public class TableUI {
 			case DEADLINE:
 				DeadlineTask deadlineTask = (DeadlineTask) task;
 				item.setText(new String[] { "[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]", 
-											task.getName(),
-											done });
+						task.getName(),
+						done });
 				item.setForeground(0, blue);
 				item.setForeground(1, gray);
 				item.setForeground(2, doneColor);
@@ -91,8 +91,8 @@ public class TableUI {
 			case TIMED:
 				TimedTask timedTask = (TimedTask) task;
 				item.setText(new String[] { "["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]", 
-											task.getName(),
-											done });
+						task.getName(),
+						done });
 				item.setForeground(0, blue);
 				item.setForeground(1, gray);
 				item.setForeground(2, doneColor);
@@ -105,18 +105,46 @@ public class TableUI {
 		column3.pack();
 
 		shell.pack();
-	
+
 		input.addListener(SWT.Traverse, new Listener(){
-			
+
 			@Override
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				if(event.detail == SWT.TRAVERSE_RETURN)
 					try {
 						table.removeAll();
 						String command = input.getText();
-						ArrayList<Task> tasks = TaskCommander.controller.executeCommand(command).getCommandRelatedTasks();
-						for (Task task : tasks)
-						{ 
+						Feedback fb = TaskCommander.controller.executeCommand(command);
+
+						ArrayList<Task> tasks = new ArrayList<Task>();
+						switch(fb.getCommandType()){
+						case DISPLAY: 
+							tasks = TaskCommander.controller.executeCommand(command).getCommandRelatedTasks();
+							break;
+						case ADD:case DELETE: case UPDATE:
+							tasks.add(TaskCommander.controller.executeCommand(command).getCommandRelatedTask());
+						case HELP:
+							// Desired Output has to be discussed, but low priority anyway
+							break;
+
+						case SORT:
+							// Desired Output has to be discussed
+							break;
+
+						case SYNC:
+							// Desired Output has to be discussed
+							break;
+
+						case EXIT:
+							break;
+
+						case INVALID:
+							break;
+
+						default:
+							break;
+						}
+						for (Task task : tasks){ 
 							TableItem item = new TableItem(table, SWT.NONE);
 							String done;
 							Color doneColor;
@@ -130,8 +158,8 @@ public class TableUI {
 							switch(task.getType()) {
 							case FLOATING:
 								item.setText(new String[] { " ", 
-															task.getName(),
-															done });
+										task.getName(),
+										done });
 								item.setForeground(0, blue);
 								item.setForeground(1, gray);
 								item.setForeground(2, doneColor);
@@ -139,8 +167,8 @@ public class TableUI {
 							case DEADLINE:
 								DeadlineTask deadlineTask = (DeadlineTask) task;
 								item.setText(new String[] { "[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]", 
-															task.getName(),
-															done });
+										task.getName(),
+										done });
 								item.setForeground(0, blue);
 								item.setForeground(1, gray);
 								item.setForeground(2, doneColor);
@@ -148,14 +176,15 @@ public class TableUI {
 							case TIMED:
 								TimedTask timedTask = (TimedTask) task;
 								item.setText(new String[] { "["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]", 
-															task.getName(),
-															done });
+										task.getName(),
+										done });
 								item.setForeground(0, blue);
 								item.setForeground(1, gray);
 								item.setForeground(2, doneColor);
 								break;
 							}
 						}
+
 
 						column1.pack();
 						column2.pack();
