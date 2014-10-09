@@ -1,4 +1,5 @@
 package com.taskcommander;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -18,6 +19,14 @@ public class Controller {
 	}
 
 	/**
+	 * This ArrayList contains all tasks which were recently displayed by the UI. It equals to the 
+	 * ArrayList which was returned to the UI within the Feedback object in respond to the latest 
+	 * display command. Memorizing the tasks which have been displayed recently by the UI is needed 
+	 * by the update and delete feature.
+	 */
+	private ArrayList<Task> tasksRecentlyDisplayed;
+
+	/**
 	 * Parses command from user and executes it if valid. Returns feedback to UI.
 	 * 
 	 * @param  userCommand  command given by user
@@ -32,13 +41,15 @@ public class Controller {
 		Global.CommandType commandType= TaskCommander.parser.determineCommandType(commandTypeString);
 		String residualUserCommand = removeFirstWord(userCommand);
 		
+		String indexTasksRecentlyDisplayedString;
+		int indexTasksRecentlyDisplayed;
+		
 		switch (commandType) {
 			case ADD:
 				
-				String taskName;
-				try {
-					taskName = TaskCommander.parser.determineTaskName(residualUserCommand);
-				} catch (StringIndexOutOfBoundsException e) {
+				// taskName
+				String taskName = TaskCommander.parser.determineTaskName(residualUserCommand);
+				if (taskName == null) {
 					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				}
 				
@@ -59,62 +70,97 @@ public class Controller {
 					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				}
 				
-			case UPDATE:	//TODO: implementation needs to be adjusted to different types of tasks
-				/*
-				String indexString = getFirstWord(residualUserCommand);
-				residualUserCommand = removeFirstWord(userCommand);
+			case UPDATE:
 				
-				int indexInteger;
+				// Index in ArrayList tasksRecentlyDisplayed
+				indexTasksRecentlyDisplayedString = getFirstWord(residualUserCommand);
 				try {
-					indexInteger = Integer.parseInt(indexString) - Global.INDEX_OFFSET; // Change the line number to an array index
+					indexTasksRecentlyDisplayed = Integer.parseInt(indexTasksRecentlyDisplayedString) - Global.INDEX_OFFSET; // Change the line number to an array index
 				} catch (NumberFormatException e) {
 					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				} 
-				*/
-				/*
-				String newtaskName = "";
-				try {
-					newtaskName = TaskCommander.parser.determineTaskName(restOfUserCommand);
-				} catch (StringIndexOutOfBoundsException e) {
+				if (indexTasksRecentlyDisplayed > tasksRecentlyDisplayed.size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
+					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed + Global.INDEX_OFFSET));
+				}
+				residualUserCommand = removeFirstWord(residualUserCommand);
+				
+				// Task to be updated
+				Task oldTask = tasksRecentlyDisplayed.get(indexTasksRecentlyDisplayed);
+				Task.TaskType oldTaskType = oldTask.getType();
+				
+				// Index in ArrayList tasks of the Data class
+				int indexTasks = TaskCommander.data.getIndexOf(oldTask);
+				
+				// New taskName, if stated
+				String newtaskName = null;
+				newtaskName = TaskCommander.parser.determineTaskName(residualUserCommand);
+
+				if (!newtaskName.equals(null)) {
+					residualUserCommand = removeTaskName(residualUserCommand, newtaskName);
 				}
 				
-				if (!newtaskName.equals("")) {
-					restOfUserCommand = removeTaskName(restOfUserCommand, newtaskName);
+				// New taskDateTime and taskType, if stated
+				List<Date> newTaskDateTime = TaskCommander.parser.determineTaskDateTime(residualUserCommand);	// returns null if no date found in given String
+				if (newTaskDateTime != null) {	// more than two DateTimes given
+					if (newTaskDateTime.size() > 2) {
+						return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed));
+					}
+				}
+
+				Task.TaskType newTaskType = oldTaskType;
+				Date newStartDate = null;
+				Date newEndDate = null;
+				if ((newTaskDateTime == null) && (residualUserCommand.contains("none"))) {	// "none" is a keyword used by the user to indicate, that he wants to change a DatedTask to a FloatingTask
+					newTaskType = Task.TaskType.FLOATING;
+				} else if (newTaskDateTime != null) {
+					if (newTaskDateTime.size() == 1) {
+						newTaskType = Task.TaskType.DEADLINE;
+						newEndDate = newTaskDateTime.get(0);
+					} else if (newTaskDateTime.size() == 2) {
+						newTaskType = Task.TaskType.TIMED;
+						newStartDate = newTaskDateTime.get(0);
+						newEndDate = newTaskDateTime.get(1);
+					}
 				}
 				
-				// new taskDateTime (3 cases depending on taskType)
-				List<Date> newTaskDateTime = TaskCommander.parser.determineTaskDateTime(restOfUserCommand);
-				// case 1: FloatingTask
-				if (taskDateTime == null) { 			
-					return TaskCommander.data.updateToFloatingTask(taskName);
-				// case 2: DeadlineTask
-				} else if (taskDateTime.size() == 1 ) { 	
-					return TaskCommander.data.addDeadlineTask(taskName, taskDateTime.get(0));
-				// case 3: TimedTask
-				} else if (taskDateTime.size() == 2) { 
-					return TaskCommander.data.addTimedTask(taskName, taskDateTime.get(0), taskDateTime.get(1));
-				} else {
+				// Case 0: no changes at all, that is, no new DateTime, Name, or "none" given
+				if ((newTaskDateTime == null) && (newtaskName == null) && (oldTaskType == newTaskType)) {
 					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				}
-				*/
 				
-				/*
-				if (getNumberOfWords(userCommand) >= 3) {
-					return TaskCommander.data.updateTask(getNthWord(userCommand,1),removeFirstWord(removeFirstWord(userCommand)));
-				} else {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-				}
-				*/
+				// Update including change of taskType if necessary
+				switch (newTaskType) {
+					case FLOATING:
+						return TaskCommander.data.updateToFloatingTask(indexTasks, newtaskName);
+					case DEADLINE:
+						return TaskCommander.data.updateToDeadlineTask(indexTasks, newtaskName, newEndDate);
+					case TIMED:
+						return TaskCommander.data.updateToTimedTask(indexTasks, newtaskName, newStartDate, newEndDate);
+					}
 				
 			case DISPLAY:
 				if (isSingleWord(userCommand)) {
-					return TaskCommander.data.displayTasks();
+					Feedback feedback = TaskCommander.data.displayTasks();
+					tasksRecentlyDisplayed = feedback.getCommandRelatedTasks();
+					return feedback;
 				} else {
 					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				}
 				
 			case DELETE:
-				return TaskCommander.data.deleteTask(removeFirstWord(userCommand));
+				
+				// Index in ArrayList tasksRecentlyDisplayed
+				indexTasksRecentlyDisplayedString = getFirstWord(residualUserCommand);
+				try {
+					indexTasksRecentlyDisplayed = Integer.parseInt(indexTasksRecentlyDisplayedString) - Global.INDEX_OFFSET; // Change the line number to an array index
+				} catch (NumberFormatException e) {
+					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+				} 
+				if (indexTasksRecentlyDisplayed > tasksRecentlyDisplayed.size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
+					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed + Global.INDEX_OFFSET));
+				}
+				
+				return TaskCommander.data.deleteTask(indexTasksRecentlyDisplayed);
 				
 			case CLEAR:
 				if (isSingleWord(userCommand)) {
