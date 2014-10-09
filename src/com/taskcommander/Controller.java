@@ -95,7 +95,7 @@ public class Controller {
 				String newtaskName = null;
 				newtaskName = TaskCommander.parser.determineTaskName(residualUserCommand);
 
-				if (!newtaskName.equals(null)) {
+				if (newtaskName != null) {
 					residualUserCommand = removeTaskName(residualUserCommand, newtaskName);
 				}
 				

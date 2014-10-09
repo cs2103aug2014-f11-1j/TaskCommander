@@ -165,7 +165,10 @@ public class UI {
 								 * 
 								*/
 								
+								
 								ArrayList<Task> tasks = feedback.getCommandRelatedTasks();
+								
+								/*
 								int j = 0;
 								for (int i = 0; i < tasks.size(); i++) {
 									
@@ -178,6 +181,7 @@ public class UI {
 											break;
 									}
 								}
+								*/
 
 								for (int i = 0; i < tasks.size(); i++) {
 									
@@ -187,16 +191,16 @@ public class UI {
 									switch (tasks.get(i).getType()) {
 										case TIMED:
 											TimedTask timedTask = (TimedTask) task;
-											text += (j+1)+". "+"\t"+"["+ Global.dayFormat.format(timedTask.getStartDate())+ "  "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+"\t"+ " \"" + taskName + "\"" + "\n";
-											j++;
+											text += (i+1)+". "+"\t"+"["+ Global.dayFormat.format(timedTask.getStartDate())+ "  "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+"\t"+ " \"" + taskName + "\"" + "\n";
+											//j++;
 											break;
 										case DEADLINE:
 											DeadlineTask deadlineTask = (DeadlineTask) task;
-											text += (j+1)+". "+"\t"+"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ "  "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+"\t"+"\t"+ " \"" + taskName + "\"" + "\n";
-											j++;
+											text += (i+1)+". "+"\t"+"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ "  "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+"\t"+"\t"+ " \"" + taskName + "\"" + "\n";
+											//j++;
 											break;
 										case FLOATING:
-											/*text += (i+1)+". "+"\t"+"\t"+"\t"+"\t"+"   "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	*/
+											text += (i+1)+". "+"\t"+"\t"+"\t"+"\t"+"   "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	
 											break;
 									}
 								}
