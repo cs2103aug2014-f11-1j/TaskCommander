@@ -24,6 +24,12 @@ public class DeadlineTask extends DatedTask {
 			throw new IllegalArgumentException();
 		}
 	}
+	
+	// Constructor for Cloning
+	public DeadlineTask(DeadlineTask otherDeadlineTask){
+		super(otherDeadlineTask.getName(),TaskType.DEADLINE, otherDeadlineTask.getEndDate());
+		_endDate = otherDeadlineTask.getEndDate();
+	}
 
 	public Date getEndDate() {
 		return _endDate;

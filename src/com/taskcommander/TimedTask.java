@@ -27,6 +27,13 @@ public class TimedTask extends DatedTask {
 		}
 	}
 	
+	// Constructor for Cloning
+	public TimedTask(TimedTask otherTimedTask){
+		super(otherTimedTask.getName(), TaskType.TIMED, otherTimedTask.getStartDate() );
+			_startDate = otherTimedTask.getStartDate();
+			_endDate = otherTimedTask.getEndDate();
+	}
+	
 	public Date getStartDate() {
 		return _startDate;
 	}

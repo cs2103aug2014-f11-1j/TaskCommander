@@ -89,7 +89,29 @@ public class Data {
 	 * @return 	feedback for UI
 	 */
 	public Feedback displayTasks() {
-		return new Feedback(true, Global.CommandType.DISPLAY, tasks);
+		ArrayList<Task> displayedTasks = new ArrayList<Task>();
+		
+		ArrayList<FloatingTask> displayedFloatingTasks = new ArrayList<FloatingTask>();
+		 for(Task task: tasks) {
+			 if(task.getType() == Task.TaskType.FLOATING) {
+				 displayedFloatingTasks.add(new FloatingTask((FloatingTask) task));	// adds copy of the respective task, not the original
+				 Collections.sort(displayedFloatingTasks);
+			 }
+		 }
+		 displayedTasks.addAll(displayedFloatingTasks);
+		 
+		ArrayList<DatedTask> displayedDatedTasks = new ArrayList<DatedTask>();
+		for (Task task : tasks) {
+			if (task.getType() == Task.TaskType.DEADLINE) {
+				displayedDatedTasks.add(new DeadlineTask((DeadlineTask) task));
+			} else if (task.getType() == Task.TaskType.TIMED) {
+				displayedDatedTasks.add(new TimedTask((TimedTask) task));
+			}
+			Collections.sort(displayedDatedTasks);
+		}
+		displayedTasks.addAll(displayedDatedTasks);
+		
+		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
 	}
 	
 	/**
