@@ -86,17 +86,20 @@ public class Controller {
 				
 				// Task to be updated
 				Task oldTask = tasksRecentlyDisplayed.get(indexTasksRecentlyDisplayed);
+				String oldTaskName = oldTask.getName();
 				Task.TaskType oldTaskType = oldTask.getType();
 				
 				// Index in ArrayList tasks of the Data class
 				int indexTasks = TaskCommander.data.getIndexOf(oldTask);
 				
 				// New taskName, if stated
-				String newtaskName = null;
-				newtaskName = TaskCommander.parser.determineTaskName(residualUserCommand);
+				String newTaskName = null;
+				newTaskName = TaskCommander.parser.determineTaskName(residualUserCommand);
 
-				if (newtaskName != null) {
-					residualUserCommand = removeTaskName(residualUserCommand, newtaskName);
+				if (newTaskName != null) {
+					residualUserCommand = removeTaskName(residualUserCommand, newTaskName);
+				} else {
+					newTaskName = oldTaskName;
 				}
 				
 				// New taskDateTime and taskType, if stated
@@ -124,18 +127,18 @@ public class Controller {
 				}
 				
 				// No changes at all, that is, no new DateTime, Name, or "none" given
-				if ((newTaskDateTime == null) && (newtaskName == null) && (oldTaskType == newTaskType)) {
+				if ((newTaskDateTime == null) && (newTaskName == oldTaskName) && (oldTaskType == newTaskType)) {
 					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				}
 				
 				// Update including change of taskType if necessary
 				switch (newTaskType) {
 					case FLOATING:
-						return TaskCommander.data.updateToFloatingTask(indexTasks, newtaskName);
+						return TaskCommander.data.updateToFloatingTask(indexTasks, newTaskName);
 					case DEADLINE:
-						return TaskCommander.data.updateToDeadlineTask(indexTasks, newtaskName, newEndDate);
+						return TaskCommander.data.updateToDeadlineTask(indexTasks, newTaskName, newEndDate);
 					case TIMED:
-						return TaskCommander.data.updateToTimedTask(indexTasks, newtaskName, newStartDate, newEndDate);
+						return TaskCommander.data.updateToTimedTask(indexTasks, newTaskName, newStartDate, newEndDate);
 					}
 				
 			case DISPLAY:

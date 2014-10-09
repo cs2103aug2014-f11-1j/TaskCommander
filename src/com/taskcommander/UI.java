@@ -200,7 +200,7 @@ public class UI {
 											//j++;
 											break;
 										case FLOATING:
-											text += (i+1)+". "+"\t"+"\t"+"\t"+"\t"+"   "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	
+											text += (i+1)+". "+"\t"+"\t"+"\t"+"\t"+"\t"+"   "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	
 											break;
 									}
 								}
