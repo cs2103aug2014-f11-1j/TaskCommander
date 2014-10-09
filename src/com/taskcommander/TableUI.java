@@ -113,7 +113,7 @@ public class TableUI {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				if(event.detail == SWT.TRAVERSE_RETURN)
 					try {
-						table.clearAll();
+						table.removeAll();
 						String command = input.getText();
 						ArrayList<Task> tasks = TaskCommander.controller.executeCommand(command).getCommandRelatedTasks();
 						for (Task task : tasks)
