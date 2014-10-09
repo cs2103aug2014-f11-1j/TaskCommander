@@ -176,7 +176,7 @@ public class UI {
 											text += (i+1)+". "+"\t"+"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ "  "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+"\t"+"\t"+ " \"" + taskName + "\"" + "\n";
 											break;
 										case FLOATING:
-											text += (i+1)+". "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	
+											text += (i+1)+". "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+" "+"\""+ taskName + "\"" + "\n";	
 											break;
 									}
 								}
