@@ -179,8 +179,6 @@ public class Controller {
 				} else {
 					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				}
-			case SORT:
-				return TaskCommander.data.sort();
 				
 			case SYNC:
 			/*

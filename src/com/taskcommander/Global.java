@@ -51,7 +51,6 @@ public class Global {
 		DISPLAY, 
 		DELETE,
 		CLEAR,
-		SORT,
 		INVALID,
 		SYNC,
 		EXIT

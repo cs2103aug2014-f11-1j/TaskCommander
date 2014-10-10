@@ -67,18 +67,21 @@ public class Data {
 	public Feedback addTimedTask(String taskName, Date startDate, Date endDate) {
 		TimedTask timedTask = new TimedTask(taskName,startDate,endDate);
 		tasks.add(timedTask);
+		save();
 		return new Feedback(true, Global.CommandType.ADD, new TimedTask(timedTask));
 	}
 	
 	public Feedback addDeadlineTask(String taskName, Date endDate) {
 		DeadlineTask deadlineTask= new DeadlineTask(taskName,endDate);
 		tasks.add(deadlineTask);
+		save();
 		return new Feedback(true, Global.CommandType.ADD, new DeadlineTask(deadlineTask));
 	}
 	
 	public Feedback addFloatingTask(String taskName) {
 		FloatingTask floatingTask = new FloatingTask(taskName);
 		tasks.add(floatingTask);
+		save();
 		return new Feedback(true, Global.CommandType.ADD, new FloatingTask(floatingTask));
 	}
 
@@ -140,6 +143,7 @@ public class Data {
 			timedTask.setDone(tasks.get(index).isDone());
 			deleteTask(index);
 			tasks.add(index, timedTask);
+			save();
 			return new Feedback(true, Global.CommandType.UPDATE, timedTask);
 		} else {
 			TimedTask timedTask = (TimedTask) tasks.get(index);
@@ -153,6 +157,7 @@ public class Data {
 				timedTask.setEndDate(endDate);
 			}
 			timedTask.setEdited(true);
+			save();
 			return new Feedback(true, Global.CommandType.UPDATE, timedTask);
 		}
 		
@@ -173,6 +178,7 @@ public class Data {
 			deadlineTask.setDone(tasks.get(index).isDone());
 			deleteTask(index);
 			tasks.add(index, deadlineTask);
+			save();
 			return new Feedback(true, Global.CommandType.UPDATE, deadlineTask);
 		} else {
 			DeadlineTask deadlineTask = (DeadlineTask) tasks.get(index);
@@ -183,6 +189,7 @@ public class Data {
 				deadlineTask.setEndDate(endDate);
 			}
 			deadlineTask.setEdited(true);
+			save();
 			return new Feedback(true, Global.CommandType.UPDATE, deadlineTask); // New cloning approach: new DeadlineTask(deadlineTask) for less coupling, but then issues in update feature with equals-method
 		}
 	}
@@ -202,6 +209,7 @@ public class Data {
 			floatingTask.setDone(tasks.get(index).isDone());
 			deleteTask(index);
 			tasks.add(index, floatingTask);
+			save();
 			return new Feedback(true, Global.CommandType.UPDATE, floatingTask);
 		} else {
 			FloatingTask floatingTask = (FloatingTask) tasks.get(index);
@@ -209,6 +217,7 @@ public class Data {
 				floatingTask.setName(name);
 			}
 			floatingTask.setEdited(true);
+			save();
 			return new Feedback(true, Global.CommandType.UPDATE, floatingTask);
 		}
 	}
@@ -232,7 +241,7 @@ public class Data {
 			Task deletedTask = tasks.get(index);
 			deletedTasks.add(deletedTask);
 			tasks.remove(index);
-
+			save();
 			return new Feedback(true, Global.CommandType.DELETE, deletedTask);
 		}
 	}
@@ -263,24 +272,10 @@ public class Data {
 	public Feedback clearTasks() {
 		deletedTasks.addAll(tasks);
 		tasks.clear();
+		save();
 		return new Feedback(true,Global.CommandType.CLEAR);
 	}
-
-	/**
-	 * Sorts the tasks in memory in alphabetical order.
-	 * @return   Feedback for user.
-	 */
-	public Feedback sort() {
-	/*
-		if (tasks.isEmpty()) {
-			return new Feedback(false,String.format(Global.MESSAGE_EMPTY));
-		} else {
-			Collections.sort(tasks);
-			return new Feedback(false,String.format(Global.MESSAGE_SORTED));
-		}
-	*/
-		return new Feedback(false,"Out of order");
-	}	
+	
 	public ArrayList<Task> getAllTasks() {
 		return tasks;
 	}
