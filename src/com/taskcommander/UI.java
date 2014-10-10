@@ -227,8 +227,8 @@ public class UI {
 						styleRange.foreground = display.getSystemColor(SWT.COLOR_BLUE);
 						output.setStyleRange(styleRange);
 						input.setText("");
-						TaskCommander.data.save();		// write new tasks in storage
-					} catch (Exception e1) {
+					/*	TaskCommander.data.save();		// write new tasks in storage
+*/					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
 			}
