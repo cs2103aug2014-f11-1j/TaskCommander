@@ -159,12 +159,9 @@ public class Controller {
 				
 				// Task to be marked as done
 				Task doneTask = tasksRecentlyDisplayed.get(indexTasksRecentlyDisplayed);
-				System.out.println("indexTasksRecentlyDisplayed "+indexTasksRecentlyDisplayed);
-				System.out.println("doneTask "+doneTask.getName());
 				
 				// Index in ArrayList tasks of the Data class
 				indexTasks = TaskCommander.data.getIndexOf(doneTask);
-				System.out.println("Index in ArrayList "+doneTask.getName());
 				
 				return TaskCommander.data.done(indexTasks);
 				

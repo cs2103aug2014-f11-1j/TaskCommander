@@ -57,7 +57,28 @@ public class Data {
 	}	
 
 	/**
-	 * Adds a TimedTask, DeadlineTask or FloatingTask to the task ArrayList.
+	 * Adds a Task to the tasks ArrayList.
+	 * 
+	 * @param 	task     
+	 * @return 	feedback for UI
+	 */
+	public Feedback addTask(Task task) {
+		switch ( task.getType()) {
+		case FLOATING:
+			FloatingTask floatingTask = (FloatingTask) task;
+			return addFloatingTask(floatingTask.getName());
+		case DEADLINE:
+			DeadlineTask deadlineTask = (DeadlineTask) task;
+			return addDeadlineTask(deadlineTask.getName(), deadlineTask.getEndDate());
+		default:
+			TimedTask timedTask = (TimedTask) task;
+			return addTimedTask(timedTask.getName(), timedTask.getStartDate(), timedTask.getEndDate());
+		}
+	}
+	
+	
+	/**
+	 * Adds a TimedTask, DeadlineTask or FloatingTask to the tasks ArrayList.
 	 * 
 	 * @param 	taskName  
 	 * @param 	startDate    
@@ -66,6 +87,7 @@ public class Data {
 	 */
 	public Feedback addTimedTask(String taskName, Date startDate, Date endDate) {
 		TimedTask timedTask = new TimedTask(taskName,startDate,endDate);
+		saveToHistory();
 		tasks.add(timedTask);
 		save();
 		return new Feedback(true, Global.CommandType.ADD, new TimedTask(timedTask));
@@ -73,6 +95,7 @@ public class Data {
 	
 	public Feedback addDeadlineTask(String taskName, Date endDate) {
 		DeadlineTask deadlineTask= new DeadlineTask(taskName,endDate);
+		saveToHistory();
 		tasks.add(deadlineTask);
 		save();
 		return new Feedback(true, Global.CommandType.ADD, new DeadlineTask(deadlineTask));
@@ -80,6 +103,7 @@ public class Data {
 	
 	public Feedback addFloatingTask(String taskName) {
 		FloatingTask floatingTask = new FloatingTask(taskName);
+		saveToHistory();
 		tasks.add(floatingTask);
 		save();
 		return new Feedback(true, Global.CommandType.ADD, new FloatingTask(floatingTask));
@@ -191,11 +215,13 @@ public class Data {
 			TimedTask timedTask = new TimedTask(name,startDate,endDate);
 			timedTask.setEdited(tasks.get(index).getEdited());
 			timedTask.setDone(tasks.get(index).isDone());
+			saveToHistory();
 			deleteTask(index);
 			tasks.add(index, timedTask);
 			save();
 			return new Feedback(true, Global.CommandType.UPDATE, new TimedTask(timedTask));
 		} else {
+			saveToHistory();
 			TimedTask timedTask = (TimedTask) tasks.get(index);
 			if (name != null) {
 				timedTask.setName(name);
@@ -226,11 +252,13 @@ public class Data {
 			DeadlineTask deadlineTask = new DeadlineTask(name,endDate);
 			deadlineTask.setEdited(tasks.get(index).getEdited());
 			deadlineTask.setDone(tasks.get(index).isDone());
+			saveToHistory();
 			deleteTask(index);
 			tasks.add(index, deadlineTask);
 			save();
 			return new Feedback(true, Global.CommandType.UPDATE, new DeadlineTask(deadlineTask));
 		} else {
+			saveToHistory();
 			DeadlineTask deadlineTask = (DeadlineTask) tasks.get(index);
 			if (name != null) {
 				deadlineTask.setName(name);
@@ -257,11 +285,13 @@ public class Data {
 			FloatingTask floatingTask = new FloatingTask(name);
 			floatingTask.setEdited(tasks.get(index).getEdited());
 			floatingTask.setDone(tasks.get(index).isDone());
+			saveToHistory();
 			deleteTask(index);
 			tasks.add(index, floatingTask);
 			save();
 			return new Feedback(true, Global.CommandType.UPDATE, new FloatingTask(floatingTask));
 		} else {
+			saveToHistory();
 			FloatingTask floatingTask = (FloatingTask) tasks.get(index);
 			if (name != null) {
 				floatingTask.setName(name);
@@ -291,6 +321,7 @@ public class Data {
 		if (doneTask.getDone()) {
 			return new Feedback(false, String.format(Global.MESSAGE_ALREADY_DONE));
 		} else {
+			saveToHistory();
 			doneTask.markDone();
 			save();
 			switch ( doneTask.getType()) {
@@ -323,6 +354,7 @@ public class Data {
 		if (!openTask.getDone()) {
 			return new Feedback(false, String.format(Global.MESSAGE_ALREADY_OPEN));
 		} else {
+			saveToHistory();
 			openTask.markOpen();
 			save();
 			switch ( openTask.getType()) {
@@ -353,6 +385,7 @@ public class Data {
 			return new Feedback(false,String.format(Global.MESSAGE_NO_INDEX, index));
 		} else {
 			Task deletedTask = tasks.get(index);
+			saveToHistory();
 			deletedTasks.add(deletedTask);
 			tasks.remove(index);
 			save();
@@ -383,6 +416,30 @@ public class Data {
 			return true;
 		}
 	}
+	
+	/**
+	 * Saves backup of current tasks ArrayList.
+	 * 
+	 * @param userCommand 
+	 * @return             Feedback for user.
+	 */
+	public void saveToHistory() {
+		tasksHistory.clear();
+		for(Task task: tasks) {
+			switch ( task.getType()) {
+			case FLOATING:
+				tasksHistory.add( new FloatingTask((FloatingTask) task));
+				break;
+			case DEADLINE:
+				tasksHistory.add( new DeadlineTask((DeadlineTask) task));
+				break;
+			default:
+				tasksHistory.add(new TimedTask((TimedTask) task));
+			}
+		}
+	}	
+	
+	
 	
 	/**
 	 * Clears all tasks from memory.
@@ -419,7 +476,6 @@ public class Data {
 	 * @return  index
 	 */
 	public int getIndexOf(Task task) {
-		System.out.println("getIndexOf "+task.getName());
 		return tasks.indexOf(task);
 	}
 }
