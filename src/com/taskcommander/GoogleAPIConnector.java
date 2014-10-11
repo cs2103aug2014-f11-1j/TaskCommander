@@ -98,8 +98,6 @@ public class GoogleAPIConnector {
 		}
 	}
 	
-	
-	
 	/**
 	 * Gets all tasks from Tasks API.
 	 * @return   Arraylist of TaskCommander Tasks.
@@ -120,6 +118,16 @@ public class GoogleAPIConnector {
 		}
 	}
 
+	public Tasks.TasksOperations.List getListTasksRequest() {
+		try {
+			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_CALENDAR_ID);
+			return request;
+		} catch (IOException e) {
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			return null;
+		}
+	}
+	
 	//@author A0109194A
 	/**
 	 * Gets all events from Calendar API starting from

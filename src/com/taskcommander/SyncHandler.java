@@ -3,6 +3,8 @@ package com.taskcommander;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.Events;
+import com.google.api.services.tasks.Tasks;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,7 +70,7 @@ public class SyncHandler {
 	
 	private void pull() throws IOException{
 		//Construct the Calendar.Events.List request, but don't execute yet		
-		Calendar.Events.List request = con.getListEventRequest();
+		Calendar.Events.List eventRequest = con.getListEventRequest();
 		String syncToken = null;
 		
 		try {
@@ -78,21 +80,21 @@ public class SyncHandler {
 		}
 		
 		if (syncToken == null) {
-			System.out.println("Performing full sync.");
+			System.out.println(Global.MESSAGE_FULL_SYNC);
 		} else {
-			System.out.println("Performing incremental sync.");
-			request.setSyncToken(syncToken);
+			System.out.println();
+			eventRequest.setSyncToken(syncToken);
 		}
 		
 		//Retrieve the events, one page at a time.
 		String pageToken = null;
-		com.google.api.services.calendar.model.Events events = null;
+		Events events = null;
 		do {
-			request.setTimeMin(new DateTime(System.currentTimeMillis())); 
-			request.setPageToken(pageToken);
+			eventRequest.setTimeMin(new DateTime(System.currentTimeMillis())); 
+			eventRequest.setPageToken(pageToken);
 			
 			try {
-				events = request.execute();
+				events = eventRequest.execute();
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_INVALID_SYNC_TOKEN);
 				con.getSyncSettingsDataStore().delete(SYNC_TOKEN_KEY);
@@ -102,47 +104,19 @@ public class SyncHandler {
 			
 			List<Event> items = events.getItems();
 			if (items.size() == 0) {
-				System.out.println("No new events to sync.");
+				System.out.println(Global.MESSAGE_NO_NEW_SYNC);
 			} else {
 				for (Event event : items) {
 					syncEvent(event);
 				}
 			}
-			
-			
 		} while (pageToken != null);
 		
 		/**Store the sync token from the last request to be used during the
 		next execution**/
 		con.getSyncSettingsDataStore().set(SYNC_TOKEN_KEY, events.getNextSyncToken());
 		
-		
-		
-		//Handle Added Cases
-		ArrayList<com.taskcommander.Task> toSync = con.getAllTasks();
-		ArrayList<String> idList = TaskCommander.data.getAllIds();
-		for (Task task : toSync) {
-			if (!containsId(task.getId(), idList)) {
-				if (task.getType() == TaskType.DEADLINE) {
-					TaskCommander.data.addDeadlineTask(task.getName(),
-							((DeadlineTask) task).getEndDate());
-				} else if (task.getType() == TaskType.FLOATING) {
-					TaskCommander.data.addFloatingTask(task.getName());
-				} else {
-					TaskCommander.data.addTimedTask(task.getName(), 
-							((TimedTask) task).getStartDate(), ((TimedTask) task).getEndDate());
-				}
-			}
-		}
-		
-		//Deleted Cases
-		ArrayList<String> googleIdList = con.getAllIds();
-		for (com.taskcommander.Task task : TaskCommander.data.tasks){
-			if (!containsId(task.getId(), googleIdList)) {
-				TaskCommander.data.deleteTask(task);
-			}
-		}
-		
+		System.out.println(Global.MESSAGE_COMPLETED_SYNC);		
 	}
 	
 	private void syncEvent(Event event) throws IOException {
@@ -151,14 +125,7 @@ public class SyncHandler {
 			TaskCommander.data.deleteTask(con.toTask(event));
 		} else {
 			con.getEventDataStore().set(event.getId(), event.toString());
-		}
-	}
-
-	private boolean containsId(String id, ArrayList<String> idList) {
-		if (idList.contains(id)) {
-			return true;
-		} else {
-			return false;
+			TaskCommander.data.addTask(con.toTask(event));
 		}
 	}
 }
