@@ -25,11 +25,14 @@ public class Parser {
 	 * 
 	 * @param userCommand  user command
 	 */
-	public Global.CommandType determineCommandType(String commandTypeString) {
-		
-		if (commandTypeString == null) {
-			throw new Error("Error: CommandTypeString must not be null!");
+	public Global.CommandType determineCommandType(String userCommand) {
+		if (userCommand == null) {
+			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
 		}
+		
+		String commandTypeString = getFirstWord(userCommand);
+		
+
 
 		if (commandTypeString.equalsIgnoreCase("help")) {
 			return Global.CommandType.HELP;
@@ -37,6 +40,10 @@ public class Parser {
 			return Global.CommandType.ADD;
 		} else if (commandTypeString.equalsIgnoreCase("update")) {
 			return Global.CommandType.UPDATE;
+		} else if (commandTypeString.equalsIgnoreCase("done")) {
+			return Global.CommandType.DONE;
+		} else if (commandTypeString.equalsIgnoreCase("open")) {
+			return Global.CommandType.OPEN;
 		} else if (commandTypeString.equalsIgnoreCase("display")) {
 			return Global.CommandType.DISPLAY;
 		} else if (commandTypeString.equalsIgnoreCase("delete")) {

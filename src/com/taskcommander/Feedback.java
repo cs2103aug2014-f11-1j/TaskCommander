@@ -2,53 +2,92 @@ package com.taskcommander;
 import java.util.ArrayList;
 
 /**
- * This class is used as a return type to the UI. It provides the UI with all the needed information 
- * depending on the type of command.
+ * This class is used as a return type of the Logic to the UI. If the command was executed successfully, 
+ * the Feedback contains the related Task (in case of the add, update, delete, done, open command),
+ * tasks (in case of a display command) or nothing else (in case of the clear command). If the command 
+ * wasn't executed successfully, the Feedback contains the respective error message instead.
  * 
  * @author A0128620M
+ * 
+ * TODO: might create subclasses for each case instead of using several constructors
  */
 
 public class Feedback {
+	
 	private boolean _wasSuccesfullyExecuted;
-	private String _errorMessage;
 	private Global.CommandType _commandType;
 	private Task _commandRelatedTask;
-	private ArrayList<Task> _commandRelatedTasks;
+	private ArrayList<Task> _commandRelatedTasks;	
+	private String _errorMessage;
 	
-	// Feedback of add, update, delete command
-	public Feedback(boolean wasSuccesfullyExecuted, Global.CommandType commandType, Task commandRelatedTask) { // TODO: handle wrong input parameter
-		_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
-		_commandType = commandType;
-		_commandRelatedTask = commandRelatedTask;
+	/**
+	 * Constructor for the add, update, delete, done and open command.
+	 * 
+	 * @param	wasSuccesfullyExecuted
+	 * @param	commandType			added, updated, deleted, done or open
+	 * @param	commandRelatedTask	task which was added, updated, deleted, marked as done or open
+	 */
+	public Feedback(boolean wasSuccesfullyExecuted, Global.CommandType commandType, Task commandRelatedTask) {
+		if (commandType == null || commandRelatedTask == null) {
+			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
+		} else {
+			_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
+			_commandType = commandType;
+			_commandRelatedTask = commandRelatedTask;
+		}
 	}
 	
-	// Feedback of display command
-	public Feedback(boolean wasSuccesfullyExecuted, Global.CommandType commandType, ArrayList<Task> commandRelatedTasks) { // TODO: handle wrong input parameter
-		_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
-		_commandType = commandType;
-		_commandRelatedTasks = commandRelatedTasks;
+	/**
+	 * Constructor for the display command
+	 * 
+	 * @param	wasSuccesfullyExecuted
+	 * @param	commandType			display
+	 * @param	commandRelatedTasks	tasks to be displayed
+	 */
+	public Feedback(boolean wasSuccesfullyExecuted, Global.CommandType commandType, ArrayList<Task> commandRelatedTasks) {
+		if (commandType == null || commandRelatedTasks == null) {
+			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
+		} else {
+			_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
+			_commandType = commandType;
+			_commandRelatedTasks = commandRelatedTasks;
+		}
 	}
 	
-	// Feedback of clear command
-	public Feedback(boolean wasSuccesfullyExecuted, Global.CommandType commandType) { // TODO: handle wrong input parameter
-		_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
-		_commandType = commandType;
+	/**
+	 * Constructor for clear command.
+	 * 
+	 * @param	wasSuccesfullyExecuted
+	 * @param	commandType			clear
+	 */
+	public Feedback(boolean wasSuccesfullyExecuted, Global.CommandType commandType) { 
+		if (commandType == null) {
+			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
+		} else {
+			_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
+			_commandType = commandType;
+		}
 	}
 	
-	// Feedback in case of an error
-	public Feedback(boolean wasSuccesfullyExecuted, String errorMessage ) { // TODO: handle wrong input parameter
-		_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
-		_errorMessage = errorMessage;
+	/**
+	 * Constructor for error messages.
+	 * 
+	 * @param	wasSuccesfullyExecuted
+	 * @param	errorMessage
+	 */
+	public Feedback(boolean wasSuccesfullyExecuted, String errorMessage ) {
+		if (errorMessage == null) {
+			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
+		} else {
+			_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
+			_errorMessage = errorMessage;
+		}
 	}
 	
 	public boolean wasSuccesfullyExecuted() {
 		return _wasSuccesfullyExecuted;
 	}	
-	
-		public String getErrorMessage() {
-		return _errorMessage;
-	}
-	
+
 	public Global.CommandType getCommandType() {
 		return _commandType;
 	}	
@@ -60,5 +99,8 @@ public class Feedback {
 	public ArrayList<Task> getCommandRelatedTasks() {
 		return _commandRelatedTasks;
 	}
-	
+		
+	public String getErrorMessage() {
+		return _errorMessage;
+	}
 }
