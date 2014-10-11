@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
  * Related Google API: Tasks
  */
 
-public class Task {
+public abstract class Task {
 	@SerializedName("taskType") // For use with GSON
 	private TaskType _taskType;
 	private String _name;
@@ -114,6 +114,11 @@ public class Task {
 	public int compareTo(TimedTask otherTask) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	public boolean equals(Object otherObject) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

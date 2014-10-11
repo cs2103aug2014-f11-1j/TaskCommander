@@ -55,4 +55,21 @@ public class TimedTask extends DatedTask {
 	public int compareTo(TimedTask otherTask) {
 		return (_startDate.compareTo(otherTask.getStartDate()));
 	}
+	
+	@Override
+	public boolean equals(Object otherObject) {
+		if (otherObject == null) {
+			return false;
+		}
+		if (!(otherObject instanceof TimedTask)) {
+			return false;
+		}
+		TimedTask otherTimedTask = (TimedTask) otherObject;
+
+		if (this.getType().equals(otherTimedTask.getType()) && this.getName().equals(otherTimedTask.getName()) && this.getId().equals(otherTimedTask.getId()) && this.getDone() == otherTimedTask.getDone() && this.getEdited() == otherTimedTask.getEdited() && this.getStartDate().equals(otherTimedTask.getStartDate()) && this.getEndDate().equals(otherTimedTask.getEndDate())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

@@ -1,5 +1,6 @@
 package com.taskcommander;
 
+
 /*
  * A floating task that has no deadline. 
  * Has a name. May also hold a Google API ID.
@@ -30,5 +31,22 @@ public class FloatingTask extends Task implements Comparable<FloatingTask>{
 	@Override
 	public int compareTo(FloatingTask otherTask) {
 		return (getName().compareTo(otherTask.getName()));
+	}
+	
+	@Override
+	public boolean equals(Object otherObject) {
+		if (otherObject == null) {
+			return false;
+		}
+		if (!(otherObject instanceof FloatingTask)) {
+			return false;
+		}
+		FloatingTask otherFloatingTask = (FloatingTask) otherObject;
+
+		if (this.getType().equals(otherFloatingTask.getType()) && this.getName().equals(otherFloatingTask.getName()) && this.getId().equals(otherFloatingTask.getId()) && this.getDone() == otherFloatingTask.getDone() && this.getEdited() == otherFloatingTask.getEdited()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

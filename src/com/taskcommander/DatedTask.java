@@ -9,7 +9,7 @@ import java.util.Date;
  * @author A0128620M
  */
 
-public class DatedTask extends Task implements Comparable<DatedTask>{
+public abstract class DatedTask extends Task implements Comparable<DatedTask>{
 	private Date _date;
 	
 	public DatedTask(String name, TaskType taskType, Date date) {

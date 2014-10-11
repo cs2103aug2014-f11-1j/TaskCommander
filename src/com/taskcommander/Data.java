@@ -97,7 +97,7 @@ public class Data {
 		ArrayList<FloatingTask> displayedFloatingTasks = new ArrayList<FloatingTask>();
 		 for(Task task: tasks) {
 			 if(task.getType() == Task.TaskType.FLOATING) {
-				 displayedFloatingTasks.add((FloatingTask) task);	// TODO: use cloned task with "new FloatingTask((FloatingTask)" to  add a copy of the respective task, not the original
+				 displayedFloatingTasks.add(new FloatingTask((FloatingTask) task));	// TODO: use cloned task with "new FloatingTask((FloatingTask)" to  add a copy of the respective task, not the original
 				 Collections.sort(displayedFloatingTasks);
 			 }
 		 }
@@ -106,9 +106,9 @@ public class Data {
 		ArrayList<DatedTask> displayedDatedTasks = new ArrayList<DatedTask>();
 		for (Task task : tasks) {
 			if (task.getType() == Task.TaskType.DEADLINE) {
-				displayedDatedTasks.add((DeadlineTask) task);
+				displayedDatedTasks.add(new DeadlineTask((DeadlineTask) task));
 			} else if (task.getType() == Task.TaskType.TIMED) {
-				displayedDatedTasks.add((TimedTask) task);
+				displayedDatedTasks.add(new TimedTask((TimedTask) task));
 			}
 			Collections.sort(displayedDatedTasks);
 		}
