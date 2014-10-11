@@ -17,7 +17,9 @@ public class Global {
 	public static final String MESSAGE_ADDED = "Added: %1$s";
 	public static final String MESSAGE_UPDATED = "Updated: %1$s";
 	public static final String MESSAGE_DONE = "Done: %1$s";
-	public static final String MESSAGE_UNDONE = "Undone: %1$s";
+	public static final String MESSAGE_ALREADY_DONE = "Already done.";
+	public static final String MESSAGE_OPEN = "Opened: %1$s";
+	public static final String MESSAGE_ALREADY_OPEN = "Already opened.";
 	public static final String MESSAGE_DELETED = "Deleted: %1$s";
 	public static final String MESSAGE_CLEARED = "All content deleted.";
 	public static final String MESSAGE_INVALID_FORMAT = "Invalid command format: %1$s. " + "Type 'help' to see the list of commands.";
@@ -51,12 +53,13 @@ public class Global {
 		ADD, 
 		UPDATE,
 		DONE,
-		UNDONE,
+		OPEN,
 		DELETE,
 		DISPLAY, 
 		CLEAR,
 		INVALID,
 		SYNC,
+		UNDO,
 		EXIT
 	};
 	

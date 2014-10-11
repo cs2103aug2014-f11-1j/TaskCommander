@@ -159,13 +159,16 @@ public class Controller {
 				
 				// Task to be marked as done
 				Task doneTask = tasksRecentlyDisplayed.get(indexTasksRecentlyDisplayed);
+				System.out.println("indexTasksRecentlyDisplayed "+indexTasksRecentlyDisplayed);
+				System.out.println("doneTask "+doneTask.getName());
 				
 				// Index in ArrayList tasks of the Data class
 				indexTasks = TaskCommander.data.getIndexOf(doneTask);
+				System.out.println("Index in ArrayList "+doneTask.getName());
 				
 				return TaskCommander.data.done(indexTasks);
 				
-			case UNDONE:
+			case OPEN:
 				
 				// Index in ArrayList tasksRecentlyDisplayed
 				indexTasksRecentlyDisplayedString = getFirstWord(residualUserCommand);
@@ -185,7 +188,7 @@ public class Controller {
 				// Index in ArrayList tasks of the Data class
 				indexTasks = TaskCommander.data.getIndexOf(undoneTask);
 				
-				return TaskCommander.data.undone(indexTasks);
+				return TaskCommander.data.open(indexTasks);
 				
 				
 			case DISPLAY:
@@ -221,16 +224,17 @@ public class Controller {
 				
 				// Status to be displayed
 				boolean isStatusRestricted = false;
+				boolean done = false; // false = open, true = done
 				boolean shownDone = Arrays.asList(userCommand.split(" ")).contains("done");
-				boolean shownUndone = Arrays.asList(userCommand.split(" ")).contains("undone");
-				if ((!shownDone && shownUndone) || (shownDone && shownUndone) ) {
+				boolean shownOpen = Arrays.asList(userCommand.split(" ")).contains("open");
+				if ((!shownDone && !shownOpen) || (shownDone && shownOpen) ) {
 					isStatusRestricted = false;
 				} else {
 					isStatusRestricted = true;
 					if(shownDone) {
-						shownDone = true;
+						done = true;
 					} else {
-						shownDone = false;
+						done = false;
 					}
 				}
 				
@@ -241,7 +245,7 @@ public class Controller {
 					return feedback;
 				// Case 2: With restrictions of display
 				} else {
-					Feedback feedback = TaskCommander.data.displayTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, shownDone);
+					Feedback feedback = TaskCommander.data.displayTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, done);
 					tasksRecentlyDisplayed = feedback.getCommandRelatedTasks();
 					return feedback;
 				}
@@ -259,7 +263,13 @@ public class Controller {
 					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed + Global.INDEX_OFFSET));
 				}
 				
-				return TaskCommander.data.deleteTask(indexTasksRecentlyDisplayed);
+				// Task to be deleted
+				Task deletedTask = tasksRecentlyDisplayed.get(indexTasksRecentlyDisplayed);
+				
+				// Index in ArrayList tasks of the Data class
+				indexTasks = TaskCommander.data.getIndexOf(deletedTask);
+				
+				return TaskCommander.data.deleteTask(indexTasks);
 				
 			case CLEAR:
 				if (isSingleWord(userCommand)) {
@@ -275,14 +285,17 @@ public class Controller {
 					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				}
 				
-			case SYNC:
-			/*
+			case SYNC: 
+			/* TODO
 				if (TaskCommander.syncHandler == null) {
 					TaskCommander.getSyncHandler();
 				}
 				return TaskCommander.syncHandler.sync();
 			*/
 				return new Feedback(false,"out of order");
+				
+			case UNDO: 
+				
 				
 			case INVALID:
 				return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
@@ -307,7 +320,7 @@ public class Controller {
 		return allWords.length;
 	}
 	
-	/* not used
+	/* TODO not used anymore
 	private static String getNthWord(String userCommand, int position) {
 		String[] allWords = userCommand.trim().split("\\s+");
 		if (position > allWords.length-1) {

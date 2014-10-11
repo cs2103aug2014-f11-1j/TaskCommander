@@ -131,29 +131,29 @@ public class Data {
 	 * @param done
 	 * @return 	feedback for UI
 	 */
-	public Feedback displayTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean done) {
+	public Feedback displayTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean status) {
 		ArrayList<Task> displayedTasks = new ArrayList<Task>();
 		ArrayList<FloatingTask> displayedFloatingTasks = new ArrayList<FloatingTask>();
 		ArrayList<DatedTask> displayedDatedTasks = new ArrayList<DatedTask>();
 		
 		for(Task task: tasks) {
 			// Step 1: Check Status
-			if (!isStatusRestricted || (isStatusRestricted && done == task.getDone() )) {
+			if (!isStatusRestricted || (isStatusRestricted && status == task.getDone() )) {
 				// Step 2: Check Type
 				if(task.getType() == Task.TaskType.FLOATING && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownFloatingTask))) {	
 					// Step 3: Check DatePeriod
 					if (!isDateTimeRestricted) {
-						displayedFloatingTasks.add((FloatingTask) task);
+						displayedFloatingTasks.add(new FloatingTask((FloatingTask) task));
 					}
 				} else if (task.getType() == Task.TaskType.DEADLINE && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownDeadlineTask))) {
 					DeadlineTask deadlineTask = (DeadlineTask) task;
 					if (!isDateTimeRestricted || (isDateTimeRestricted && (deadlineTask.getEndDate().compareTo(endDate) < 0) || deadlineTask.getEndDate().compareTo(endDate) == 0) ) { //TODO: Refactor Date Comparison methods
-						displayedDatedTasks.add((DeadlineTask) task);
+						displayedDatedTasks.add(new DeadlineTask((DeadlineTask) task));
 					}
 				} else if (task.getType() == Task.TaskType.TIMED && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownTimedTask))) {
 					TimedTask timedTask = (TimedTask) task;
 					if (!isDateTimeRestricted || (isDateTimeRestricted && (timedTask.getStartDate().compareTo(startDate) > 0 || timedTask.getStartDate().compareTo(startDate) == 0) && (timedTask.getEndDate().compareTo(endDate) < 0) || timedTask.getEndDate().compareTo(endDate) == 0) ){
-						displayedDatedTasks.add((TimedTask) task);
+						displayedDatedTasks.add(new TimedTask((TimedTask) task));
 					}
 				}		 
 			}		 
@@ -194,7 +194,7 @@ public class Data {
 			deleteTask(index);
 			tasks.add(index, timedTask);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, timedTask);
+			return new Feedback(true, Global.CommandType.UPDATE, new TimedTask(timedTask));
 		} else {
 			TimedTask timedTask = (TimedTask) tasks.get(index);
 			if (name != null) {
@@ -208,7 +208,7 @@ public class Data {
 			}
 			timedTask.setEdited(true);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, timedTask);
+			return new Feedback(true, Global.CommandType.UPDATE, new TimedTask(timedTask));
 		}
 		
 	}
@@ -229,7 +229,7 @@ public class Data {
 			deleteTask(index);
 			tasks.add(index, deadlineTask);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, deadlineTask);
+			return new Feedback(true, Global.CommandType.UPDATE, new DeadlineTask(deadlineTask));
 		} else {
 			DeadlineTask deadlineTask = (DeadlineTask) tasks.get(index);
 			if (name != null) {
@@ -240,8 +240,8 @@ public class Data {
 			}
 			deadlineTask.setEdited(true);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, deadlineTask); // New cloning approach: new DeadlineTask(deadlineTask) for less coupling, but then issues in update feature with equals-method
-		}
+			return new Feedback(true, Global.CommandType.UPDATE, new DeadlineTask(deadlineTask)); 
+			}
 	}
 	
 	public Feedback updateToFloatingTask(int index, String name) {
@@ -260,7 +260,7 @@ public class Data {
 			deleteTask(index);
 			tasks.add(index, floatingTask);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, floatingTask);
+			return new Feedback(true, Global.CommandType.UPDATE, new FloatingTask(floatingTask));
 		} else {
 			FloatingTask floatingTask = (FloatingTask) tasks.get(index);
 			if (name != null) {
@@ -268,7 +268,7 @@ public class Data {
 			}
 			floatingTask.setEdited(true);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, floatingTask);
+			return new Feedback(true, Global.CommandType.UPDATE, new FloatingTask(floatingTask));
 		}
 	}
 
@@ -283,14 +283,25 @@ public class Data {
 			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
 		} 
 
-		if (index > tasks.size() - Global.INDEX_OFFSET) {
+		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
 			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index));
 		}
 		
 		Task doneTask = tasks.get(index);
-		doneTask.markDone();
-		
-		return new Feedback(true, Global.CommandType.DONE, doneTask);
+		if (doneTask.getDone()) {
+			return new Feedback(false, String.format(Global.MESSAGE_ALREADY_DONE));
+		} else {
+			doneTask.markDone();
+			save();
+			switch ( doneTask.getType()) {
+			case FLOATING:
+				return new Feedback(true, Global.CommandType.DONE, (FloatingTask) doneTask);
+			case DEADLINE:
+				return new Feedback(true, Global.CommandType.DONE, (DeadlineTask) doneTask);
+			default:																				// TODO: find better solution than default
+				return new Feedback(true, Global.CommandType.DONE,(TimedTask) doneTask);
+			}
+		}
 	}
 	
 	/**
@@ -299,19 +310,30 @@ public class Data {
 	 * @param index        index of the undone tasks   
 	 * @return             feedback for UI
 	 */
-	public Feedback undone(int index) {
+	public Feedback open(int index) {
 		if (tasks.isEmpty()) {
 			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
 		} 
 
-		if (index > tasks.size() - Global.INDEX_OFFSET) {
+		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
 			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index));
 		}
 		
-		Task undoneTask = tasks.get(index);
-		undoneTask.markUndone();
-		
-		return new Feedback(true, Global.CommandType.DONE, undoneTask);
+		Task openTask = tasks.get(index);
+		if (!openTask.getDone()) {
+			return new Feedback(false, String.format(Global.MESSAGE_ALREADY_OPEN));
+		} else {
+			openTask.markOpen();
+			save();
+			switch ( openTask.getType()) {
+			case FLOATING:
+				return new Feedback(true, Global.CommandType.OPEN, new FloatingTask((FloatingTask) openTask));
+			case DEADLINE:
+				return new Feedback(true, Global.CommandType.OPEN, new DeadlineTask((DeadlineTask) openTask));
+			default:
+				return new Feedback(true, Global.CommandType.OPEN, new TimedTask((TimedTask) openTask));
+			}
+		}
 	}
 	
 	/**
@@ -334,7 +356,14 @@ public class Data {
 			deletedTasks.add(deletedTask);
 			tasks.remove(index);
 			save();
-			return new Feedback(true, Global.CommandType.DELETE, deletedTask);
+			switch ( deletedTask.getType()) {
+			case FLOATING:
+				return new Feedback(true, Global.CommandType.DELETE, new FloatingTask((FloatingTask) deletedTask));
+			case DEADLINE:
+				return new Feedback(true, Global.CommandType.DELETE, new DeadlineTask((DeadlineTask) deletedTask));
+			default:
+				return new Feedback(true, Global.CommandType.DELETE, new TimedTask((TimedTask) deletedTask));
+			}
 		}
 	}
 	
@@ -390,6 +419,7 @@ public class Data {
 	 * @return  index
 	 */
 	public int getIndexOf(Task task) {
+		System.out.println("getIndexOf "+task.getName());
 		return tasks.indexOf(task);
 	}
 }

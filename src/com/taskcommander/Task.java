@@ -95,7 +95,7 @@ public abstract class Task {
 		_done = true;
 	}
 	
-	public void markUndone() {
+	public void markOpen() {
 		_done = false;
 	}
 	
@@ -116,9 +116,23 @@ public abstract class Task {
 		return 0;
 	}
 
+	@Override
 	public boolean equals(Object otherObject) {
-		// TODO Auto-generated method stub
-		return false;
+		if (otherObject == null) {
+			return false;
+		}
+		if (!(otherObject instanceof Task)) {
+			return false;
+		}
+		switch ( this.getType()) {
+			case FLOATING:
+				return ((FloatingTask) this).equals(otherObject);
+			case DEADLINE:
+				return ((DeadlineTask) this).equals(otherObject);
+			case TIMED:
+				return ((TimedTask) this).equals(otherObject);
+			default:
+				return false;
+		}
 	}
-
 }

@@ -45,4 +45,22 @@ public abstract class DatedTask extends Task implements Comparable<DatedTask>{
 	public int compareTo(DeadlineTask otherTask) {
 		return 0;
 	}
+	
+	@Override
+	public boolean equals(Object otherObject) {
+		if (otherObject == null) {
+			return false;
+		}
+		if (!(otherObject instanceof DatedTask)) {
+			return false;
+		}
+		switch ( this.getType()) {
+			case DEADLINE:
+				return ((DeadlineTask) this).equals(otherObject);
+			case TIMED:
+				return ((TimedTask) this).equals(otherObject);
+			default:
+				return false;
+		}
+	}
 }

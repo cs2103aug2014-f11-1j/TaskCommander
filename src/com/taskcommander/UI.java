@@ -131,7 +131,7 @@ public class UI {
 								}
 								break;
 							
-							case UNDONE:
+							case OPEN:
 								// Desired Output example: undone: [3 Oct '14 18:00-19:00] "Call the boss"
 								task = feedback.getCommandRelatedTask();
 								taskName = task.getName();
@@ -139,14 +139,14 @@ public class UI {
 								switch (task.getType()) {
 								case TIMED:
 									TimedTask timedTask = (TimedTask) task;
-									text = String.format(Global.MESSAGE_UNDONE,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+									text = String.format(Global.MESSAGE_OPEN,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
 									break;
 								case DEADLINE:
 									DeadlineTask deadlineTask = (DeadlineTask) task;
-									text = String.format(Global.MESSAGE_UNDONE,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+									text = String.format(Global.MESSAGE_OPEN,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
 									break;
 								case FLOATING:
-									text = String.format(Global.MESSAGE_UNDONE,"\"" + taskName + "\"");
+									text = String.format(Global.MESSAGE_OPEN,"\"" + taskName + "\"");
 								}
 								break;
 								
@@ -218,7 +218,7 @@ public class UI {
 											break;
 										case DEADLINE:
 											DeadlineTask deadlineTask = (DeadlineTask) task;
-											text += (i+1)+". "+"\t"+"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ "  "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+"\t"+"\t"+ " \"" + taskName + "\"" + "\n";
+											text += (i+1)+". "+"\t"+"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ "  "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+"\t"+"\t"+"\t"+ " \"" + taskName + "\"" + "\n";
 											//j++;
 											break;
 										case FLOATING:
@@ -237,6 +237,10 @@ public class UI {
 								// Desired Output has to be discussed
 								break;
 								
+							case UNDO:
+								// DesiredOutput example: deleted [3 Oct '14 18:00-19:00] "Call the boss"
+								
+								break;
 							case EXIT:
 								break;
 								

@@ -42,8 +42,10 @@ public class FloatingTask extends Task implements Comparable<FloatingTask>{
 			return false;
 		}
 		FloatingTask otherFloatingTask = (FloatingTask) otherObject;
-
-		if (this.getType().equals(otherFloatingTask.getType()) && this.getName().equals(otherFloatingTask.getName()) && this.getId().equals(otherFloatingTask.getId()) && this.getDone() == otherFloatingTask.getDone() && this.getEdited() == otherFloatingTask.getEdited()) {
+		System.out.println(this);
+		System.out.println(otherFloatingTask);
+		System.out.println("vor Abfrage");
+		if (this.getType().equals(otherFloatingTask.getType()) && this.getName().equals(otherFloatingTask.getName()) && this.getId() == otherFloatingTask.getId()) {	
 			return true;
 		} else {
 			return false;

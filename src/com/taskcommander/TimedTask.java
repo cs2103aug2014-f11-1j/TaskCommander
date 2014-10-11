@@ -66,7 +66,7 @@ public class TimedTask extends DatedTask {
 		}
 		TimedTask otherTimedTask = (TimedTask) otherObject;
 
-		if (this.getType().equals(otherTimedTask.getType()) && this.getName().equals(otherTimedTask.getName()) && this.getId().equals(otherTimedTask.getId()) && this.getDone() == otherTimedTask.getDone() && this.getEdited() == otherTimedTask.getEdited() && this.getStartDate().equals(otherTimedTask.getStartDate()) && this.getEndDate().equals(otherTimedTask.getEndDate())) {
+		if (this.getType().equals(otherTimedTask.getType()) && this.getName().equals(otherTimedTask.getName()) && this.getId() == otherTimedTask.getId() && this.getStartDate().equals(otherTimedTask.getStartDate()) && this.getEndDate().equals(otherTimedTask.getEndDate())) {
 			return true;
 		} else {
 			return false;

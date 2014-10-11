@@ -39,8 +39,8 @@ public class Parser {
 			return Global.CommandType.UPDATE;
 		} else if (commandTypeString.equalsIgnoreCase("done")) {
 			return Global.CommandType.DONE;
-		} else if (commandTypeString.equalsIgnoreCase("undone")) {
-			return Global.CommandType.UNDONE;
+		} else if (commandTypeString.equalsIgnoreCase("open")) {
+			return Global.CommandType.OPEN;
 		} else if (commandTypeString.equalsIgnoreCase("display")) {
 			return Global.CommandType.DISPLAY;
 		} else if (commandTypeString.equalsIgnoreCase("delete")) {

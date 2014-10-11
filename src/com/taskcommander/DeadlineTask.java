@@ -49,12 +49,12 @@ public class DeadlineTask extends DatedTask {
 		if (otherObject == null) {
 			return false;
 		}
-		if (!(otherObject instanceof TimedTask)) {
+		if (!(otherObject instanceof DeadlineTask)) {
 			return false;
 		}
 		DeadlineTask otherDeadlineTask = (DeadlineTask) otherObject;
 
-		if (this.getType().equals(otherDeadlineTask.getType()) && this.getName().equals(otherDeadlineTask.getName()) && this.getId().equals(otherDeadlineTask.getId()) && this.getDone() == otherDeadlineTask.getDone() && this.getEdited() == otherDeadlineTask.getEdited() && this.getEndDate().equals(otherDeadlineTask.getEndDate())) {
+		if (this.getType().equals(otherDeadlineTask.getType()) && this.getName().equals(otherDeadlineTask.getName()) && this.getId() == otherDeadlineTask.getId() && this.getEndDate().equals(otherDeadlineTask.getEndDate())) {
 			return true;
 		} else {
 			return false;
