@@ -33,10 +33,10 @@ public class TaskCommander {
 		// Uncomment to run TableUI! 
 		// Comment out 'UI.open()' before running this
 		tableui = new TableUI();
-		/*tableui.open();*/
+		tableui.open();
 		
 		// Start of the user interface
-		UI.open();
+		/*UI.open();*/
 	}
 	
 	//Note: only call this when the sync command is used
