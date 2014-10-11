@@ -75,9 +75,8 @@ public class UI {
 							Global.CommandType commandtype = feedback.getCommandType();
 							switch (commandtype) {
 							case ADD:
-								// Output example: added [3 Oct '14 18:00-19:00] "Call the boss"
+								// Output example: added: [3 Oct '14 18:00-19:00] "Call the boss"
 								task = feedback.getCommandRelatedTask();
-
 								taskName = task.getName();
 						
 								switch (task.getType()) {
@@ -95,9 +94,8 @@ public class UI {
 								break;
 								
 							case UPDATE:
-								// Desired Output example: updated [3 Oct '14 18:00-19:00] "Call the boss"
+								// Desired Output example: updated: [3 Oct '14 18:00-19:00] "Call the boss"
 								task = feedback.getCommandRelatedTask();
-
 								taskName = task.getName();
 
 								switch (task.getType()) {
@@ -111,6 +109,44 @@ public class UI {
 										break;
 									case FLOATING:
 										text = String.format(Global.MESSAGE_UPDATED,"\"" + taskName + "\"");
+								}
+								break;
+								
+							case DONE:
+								// Desired Output example: done: [3 Oct '14 18:00-19:00] "Call the boss"
+								task = feedback.getCommandRelatedTask();
+								taskName = task.getName();
+								
+								switch (task.getType()) {
+								case TIMED:
+									TimedTask timedTask = (TimedTask) task;
+									text = String.format(Global.MESSAGE_DONE,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+									break;
+								case DEADLINE:
+									DeadlineTask deadlineTask = (DeadlineTask) task;
+									text = String.format(Global.MESSAGE_DONE,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+									break;
+								case FLOATING:
+									text = String.format(Global.MESSAGE_DONE,"\"" + taskName + "\"");
+								}
+								break;
+							
+							case OPEN:
+								// Desired Output example: undone: [3 Oct '14 18:00-19:00] "Call the boss"
+								task = feedback.getCommandRelatedTask();
+								taskName = task.getName();
+								
+								switch (task.getType()) {
+								case TIMED:
+									TimedTask timedTask = (TimedTask) task;
+									text = String.format(Global.MESSAGE_OPEN,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+									break;
+								case DEADLINE:
+									DeadlineTask deadlineTask = (DeadlineTask) task;
+									text = String.format(Global.MESSAGE_OPEN,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + taskName + "\"");
+									break;
+								case FLOATING:
+									text = String.format(Global.MESSAGE_OPEN,"\"" + taskName + "\"");
 								}
 								break;
 								
@@ -182,11 +218,11 @@ public class UI {
 											break;
 										case DEADLINE:
 											DeadlineTask deadlineTask = (DeadlineTask) task;
-											text += (i+1)+". "+"\t"+"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ "  "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+"\t"+"\t"+ " \"" + taskName + "\"" + "\n";
+											text += (i+1)+". "+"\t"+"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ "  "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+"\t"+"\t"+"\t"+ " \"" + taskName + "\"" + "\n";
 											//j++;
 											break;
 										case FLOATING:
-											text += (i+1)+". "+"\t"+"\t"+"\t"+"\t"+"\t"+"   "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	
+											text += (i+1)+". "+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\t"+"\""+ taskName + "\"" + "\n";	
 											break;
 									}
 								}
@@ -196,14 +232,15 @@ public class UI {
 								// Desired Output has to be discussed, but low priority anyway
 								break;
 								
-							case SORT:
-								// Desired Output has to be discussed
-								break;
 								
 							case SYNC:
 								// Desired Output has to be discussed
 								break;
 								
+							case UNDO:
+								// DesiredOutput example: deleted [3 Oct '14 18:00-19:00] "Call the boss"
+								
+								break;
 							case EXIT:
 								break;
 								

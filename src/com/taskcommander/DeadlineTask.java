@@ -43,4 +43,21 @@ public class DeadlineTask extends DatedTask {
 	public int compareTo(DeadlineTask otherTask) {
 		return (_endDate.compareTo(otherTask.getEndDate()));
 	}
+	
+	@Override
+	public boolean equals(Object otherObject) {
+		if (otherObject == null) {
+			return false;
+		}
+		if (!(otherObject instanceof DeadlineTask)) {
+			return false;
+		}
+		DeadlineTask otherDeadlineTask = (DeadlineTask) otherObject;
+
+		if (this.getType().equals(otherDeadlineTask.getType()) && this.getName().equals(otherDeadlineTask.getName()) && this.getId() == otherDeadlineTask.getId() && this.getEndDate().equals(otherDeadlineTask.getEndDate())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
