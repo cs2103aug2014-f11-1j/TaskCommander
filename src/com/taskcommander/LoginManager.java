@@ -47,8 +47,6 @@ public class LoginManager {
 	private DataStore<StoredCredential> dataStore;
 	private GoogleCredential credential;
 
-	private boolean loggedIn = false;
-
 	/**
 	 * Returns a LoginManager instance.
 	 */
@@ -176,7 +174,7 @@ public class LoginManager {
 	/**
 	 * Saves given credential in the datastore.
 	 */
-	public void saveCredential(GoogleCredential credential){
+	private void saveCredential(GoogleCredential credential){
 		StoredCredential storedCredential = new StoredCredential();
 		storedCredential.setAccessToken(credential.getAccessToken());
 		storedCredential.setRefreshToken(credential.getRefreshToken());

@@ -16,8 +16,6 @@ import com.taskcommander.Task.TaskType;
  */
 
 public class TaskAdapter implements JsonSerializer<Task>, JsonDeserializer<Task> {
-	private static final String PACKAGE_NAME = "com.taskcommander.";
-
 	@Override
 	public JsonElement serialize(Task src, Type typeOfSrc, JsonSerializationContext context) {
 		JsonObject result = new JsonObject();
