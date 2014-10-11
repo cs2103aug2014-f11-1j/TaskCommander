@@ -3,7 +3,6 @@ package com.taskcommander;
 import java.lang.reflect.Type;
 
 import com.google.gson.*;
-import com.taskcommander.Task.TaskType;
 
 //@author A0112828H
 /**
