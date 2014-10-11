@@ -238,22 +238,15 @@ public class LoginManager {
 
 	/**
 	 * Creates the authorisation code flow needed for the authorisation URL.
-	 * 
-	 * @param httpTransport
-	 * @param jsonFactory
-	 * @param fdsf           FileDataStoreFactory
 	 * @return               GoogleAuthorizationCodeFlow object
 	 * @throws IOException
 	 */
-	private GoogleAuthorizationCodeFlow buildAuthorisationCodeFlow(
-			HttpTransport httpTransport, 
-			JsonFactory jsonFactory,
-			FileDataStoreFactory fdsf) throws IOException {
+	private GoogleAuthorizationCodeFlow buildAuthorisationCodeFlow() throws IOException {
 		return new GoogleAuthorizationCodeFlow.Builder(
 				httpTransport, jsonFactory, CLIENT_ID, CLIENT_SECRET, Arrays.asList(TasksScopes.TASKS))
 		.setAccessType(FLOW_ACCESS_TYPE)
 		.setApprovalPrompt(FLOW_APPROVAL_PROMPT)
-		.setDataStoreFactory(fdsf).build();
+		.setDataStoreFactory(dataStoreFactory).build();
 	}
 
 	/**
