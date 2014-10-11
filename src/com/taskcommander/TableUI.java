@@ -53,7 +53,7 @@ public class TableUI {
 		final Color red = display.getSystemColor(SWT.COLOR_RED);
 		final Color gray = display.getSystemColor(SWT.COLOR_GRAY);
 		final Color blue = display.getSystemColor(SWT.COLOR_BLUE);
-		final Color black = display.getSystemColor(SWT.COLOR_BLACK);
+		final Color cyan = display.getSystemColor(SWT.COLOR_CYAN);
 
 		final TableColumn column1 = new TableColumn(table, SWT.NONE);
 		final TableColumn column2 = new TableColumn(table, SWT.NONE);
@@ -61,7 +61,7 @@ public class TableUI {
 		
 		//display welcome tasks
 		ArrayList<Task> tasks = TaskCommander.controller.executeCommand("display").getCommandRelatedTasks();
-		displayTasks(shell, table, red, black, blue, black, column1, column2, column3, tasks);
+		displayTasks(shell, table, red, gray, blue, cyan, column1, column2, column3, tasks);
 
 		input.addListener(SWT.Traverse, new Listener(){
 
@@ -74,7 +74,7 @@ public class TableUI {
 						Feedback fb = TaskCommander.controller.executeCommand(command);
 						if(fb.wasSuccesfullyExecuted()){
 							ArrayList<Task> tasks = getTasks(fb);
-							displayTasks(shell, table, red, gray, blue, black, column1, column2, column3,
+							displayTasks(shell, table, red, gray, blue, cyan, column1, column2, column3,
 									tasks);
 						}
 						else{
@@ -126,7 +126,7 @@ public class TableUI {
 		return tasks;
 	}
 	public void displayTasks(final Shell shell, final Table table,
-			final Color red, final Color gray, final Color blue, final Color black,
+			final Color red, final Color gray, final Color blue, final Color cyan,
 			final TableColumn column1, final TableColumn column2,
 			final TableColumn column3, ArrayList<Task> tasks) {
 		for (Task task : tasks)
@@ -147,7 +147,7 @@ public class TableUI {
 						task.getName(),
 						done });
 				item.setForeground(0, blue);
-				item.setForeground(1, black);
+				item.setForeground(1, cyan);
 				item.setForeground(2, doneColor);
 				break;
 			case DEADLINE:
@@ -156,7 +156,7 @@ public class TableUI {
 						task.getName(),
 						done });
 				item.setForeground(0, blue);
-				item.setForeground(1, black);
+				item.setForeground(1, cyan);
 				item.setForeground(2, doneColor);
 				break;
 			case TIMED:
@@ -165,7 +165,7 @@ public class TableUI {
 						task.getName(),
 						done });
 				item.setForeground(0, blue);
-				item.setForeground(1, black);
+				item.setForeground(1, cyan);
 				item.setForeground(2, doneColor);
 				break;
 			}
