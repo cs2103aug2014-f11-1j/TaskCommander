@@ -87,6 +87,10 @@ public class Task {
 		_id = id;
 	}
 	
+	public boolean getDone() {
+		return _done;
+	}
+	
 	public void markDone() {
 		_done = true;
 	}

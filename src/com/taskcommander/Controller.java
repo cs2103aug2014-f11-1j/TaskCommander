@@ -1,5 +1,6 @@
 package com.taskcommander;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -143,12 +144,61 @@ public class Controller {
 					}
 				
 			case DISPLAY:
-				if (isSingleWord(userCommand)) {
+				
+				// DateTime period to be displayed
+				boolean isDatePeriodRestricted = false;
+				Date startDate = null;
+				Date endDate = null;
+				List<Date> DatePeriod = TaskCommander.parser.determineTaskDateTime(residualUserCommand);	// returns null if no date found in given String
+				if (DatePeriod != null) { // DatePeriod given
+					isDatePeriodRestricted = true;
+					if (DatePeriod.size() == 2) {
+						startDate = DatePeriod.get(0);
+						endDate = DatePeriod.get(1);
+					} else if (DatePeriod.size() == 1) {
+						startDate = new Date(); // current DateTime
+						endDate = DatePeriod.get(0);
+					} else { // no DateTime period
+						return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+					}
+				}
+
+				// TaskType to be displayed
+				boolean isTaskTypeRestricted;
+				boolean shownFloatingTask = Arrays.asList(userCommand.split(" ")).contains("none");
+				boolean shownDeadlineTask = Arrays.asList(userCommand.split(" ")).contains("deadline");
+				boolean shownTimedTask = Arrays.asList(userCommand.split(" ")).contains("timed");
+				if ((!shownFloatingTask && !shownDeadlineTask && !shownTimedTask) || (shownFloatingTask && shownDeadlineTask && shownTimedTask)) {
+					isTaskTypeRestricted = false;
+				} else {
+					isTaskTypeRestricted = true;
+				}
+				
+				// Status to be displayed
+				boolean isStatusRestricted = false;
+				boolean shownDone = Arrays.asList(userCommand.split(" ")).contains("done");
+				boolean shownUndone = Arrays.asList(userCommand.split(" ")).contains("undone");
+				if ((!shownDone && shownUndone) || (shownDone && shownUndone) ) {
+					isStatusRestricted = false;
+				} else {
+					isStatusRestricted = true;
+					if(shownDone) {
+						shownDone = true;
+					} else {
+						shownDone = false;
+					}
+				}
+				
+				// Case 1: No restrictions of display
+				if (!isDatePeriodRestricted && !isTaskTypeRestricted && !isStatusRestricted) {
 					Feedback feedback = TaskCommander.data.displayTasks();
 					tasksRecentlyDisplayed = feedback.getCommandRelatedTasks();
 					return feedback;
+				// Case 2: With restrictions of display
 				} else {
-					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+					Feedback feedback = TaskCommander.data.displayTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, shownDone);
+					tasksRecentlyDisplayed = feedback.getCommandRelatedTasks();
+					return feedback;
 				}
 				
 			case DELETE:

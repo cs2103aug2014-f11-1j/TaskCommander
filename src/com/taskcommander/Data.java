@@ -118,6 +118,56 @@ public class Data {
 	}
 	
 	/**
+	 * Displays the tasks of the given DatePerid, taskType and status.
+	 * 
+	 * @param isDateTimeRestricted
+	 * @param startDate
+	 * @param endDate
+	 * @param isTaskTypeRestricted
+	 * @param shownFloatingTask
+	 * @param shownDeadlineTask
+	 * @param shownTimedTask
+	 * @param isStatusRestricted
+	 * @param done
+	 * @return 	feedback for UI
+	 */
+	public Feedback displayTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean done) {
+		ArrayList<Task> displayedTasks = new ArrayList<Task>();
+		ArrayList<FloatingTask> displayedFloatingTasks = new ArrayList<FloatingTask>();
+		ArrayList<DatedTask> displayedDatedTasks = new ArrayList<DatedTask>();
+		
+		for(Task task: tasks) {
+			// Step 1: Check Status
+			if (!isStatusRestricted || (isStatusRestricted && done == task.getDone() )) {
+				// Step 2: Check Type
+				if(task.getType() == Task.TaskType.FLOATING && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownFloatingTask))) {	
+					// Step 3: Check DatePeriod
+					if (!isDateTimeRestricted) {
+						displayedFloatingTasks.add((FloatingTask) task);
+					}
+				} else if (task.getType() == Task.TaskType.DEADLINE && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownDeadlineTask))) {
+					DeadlineTask deadlineTask = (DeadlineTask) task;
+					if (!isDateTimeRestricted || (isDateTimeRestricted && (deadlineTask.getEndDate().compareTo(endDate) < 0) || deadlineTask.getEndDate().compareTo(endDate) == 0) ) { //TODO: Refactor Date Comparison methods
+						displayedDatedTasks.add((DeadlineTask) task);
+					}
+				} else if (task.getType() == Task.TaskType.TIMED && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownTimedTask))) {
+					TimedTask timedTask = (TimedTask) task;
+					if (!isDateTimeRestricted || (isDateTimeRestricted && (timedTask.getStartDate().compareTo(startDate) > 0 || timedTask.getStartDate().compareTo(startDate) == 0) && (timedTask.getEndDate().compareTo(endDate) < 0) || timedTask.getEndDate().compareTo(endDate) == 0) ){
+						displayedDatedTasks.add((TimedTask) task);
+					}
+				}		 
+			}		 
+		}
+		
+		Collections.sort(displayedFloatingTasks);
+		displayedTasks.addAll(displayedFloatingTasks);
+		Collections.sort(displayedDatedTasks);
+		displayedTasks.addAll(displayedDatedTasks);
+		
+		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
+	}
+	
+	/**
 	 * Updates a TimedTask, DeadlineTask or FloatingTask with the given index 
 	 * and replaces the old taskName, startDate or endDate respectively and 
 	 * changes the taskType if needed.
