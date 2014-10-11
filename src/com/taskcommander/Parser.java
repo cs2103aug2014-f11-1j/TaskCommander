@@ -5,10 +5,11 @@ import java.util.List;
 import com.joestelmach.natty.*;
 
 /**
- * This class contains methods to extract the commandType, taskName or taskDateTime 
- * of the command entered by the user.
+ * This class represents the Parser component. The Parser contains methods to parse the 
+ * user's command and extract the command type and the related command parameters like index, 
+ * name or dateTime of task.
  * 
- * @author Andreas Christian Mayr
+ * @author A0128620M
  */
 
 public class Parser {
@@ -23,17 +24,15 @@ public class Parser {
 	 * This operation determines which of the supported command types the user
 	 * wants to perform.
 	 * 
-	 * @param userCommand  user command
+	 * @param userCommand
 	 */
 	public Global.CommandType determineCommandType(String userCommand) {
 		if (userCommand == null) {
 			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
 		}
 		
-		String commandTypeString = getFirstWord(userCommand);
+		String commandTypeString = getFirstWort(userCommand);
 		
-
-
 		if (commandTypeString.equalsIgnoreCase("help")) {
 			return Global.CommandType.HELP;
 		} else if (commandTypeString.equalsIgnoreCase("add")) {
@@ -60,28 +59,43 @@ public class Parser {
 	}
 	
 	/**
-	 * This operation determines the name, that is to say the description of the task.
+	 * This operation determines the name of the task, which has to be written in quotation marks.
+	 * Returns null pointer if no name found.
 	 * 
-	 * @param userCommand  user command
+	 * @param userCommand
 	 */
 	public String determineTaskName(String userCommand) {
+
 		try {
-			return userCommand.substring(userCommand.indexOf("\"") + 1,userCommand.lastIndexOf("\""));// possible exception because of substring() when no " is found
+			return userCommand.substring(userCommand.indexOf("\"") + 1,userCommand.lastIndexOf("\""));	// possible exception because of substring() when no " is found
 		} catch (StringIndexOutOfBoundsException e) {
 			return null;
 		}
 	}
 
 	/**
-	 * This operation determines the endTime and/or startTime of the task.
+	 * This operation determines the end date and/or start date of the task. If the user command
+	 * contains a numeric command parameter like an index in second place, it will be removed before
+	 * parsing in order to avoid mixing-up. Returns null pointer if no date found.
 	 * 
-	 * @param userCommand  user command
+	 * @param userCommand 
+	 * @param existsCommandParameter e.g. the index of the command: update 2 "Call Boss" 3pm
 	 */
-	public List<Date> determineTaskDateTime(String userCommand) {
+	public List<Date> determineTaskDateTime(String userCommand, boolean existsCommandParameter) {
+		
+		String residualUserCommand;
+		if (existsCommandParameter) {
+			residualUserCommand = removeFirstWord(removeFirstWord(userCommand));
+		} else {
+			residualUserCommand = removeFirstWord(userCommand);
+		}
+		if (determineTaskName(userCommand) != null) {
+			residualUserCommand = removeQuotedSubstring(residualUserCommand);
+		}
+		
 		List<Date> dates = null;
-
 		com.joestelmach.natty.Parser nattyParser = new com.joestelmach.natty.Parser();
-		List<DateGroup> groups = nattyParser.parse(userCommand);  //Old, instead of userCommand: String dateTime = userCommand.substring(userCommand.lastIndexOf("\"")+1).trim();
+		List<DateGroup> groups = nattyParser.parse(residualUserCommand);
 		
 		for(DateGroup group:groups) {
 			dates = group.getDates();
@@ -89,8 +103,61 @@ public class Parser {
 		return dates;
 	}
 	
-	// Helper methods
-	private static String getFirstWord(String userCommand) {
+	/**
+	 * This operation determines the index which is provided with the update, delete, 
+	 * done or open command and represents the position of the task within the recent display.
+	 * Returns -1 if not found.
+	 * 
+	 * @param userCommand  
+	 */
+	public int determineIndex(String userCommand) {
+		String indexString = getSecondWord(userCommand);
+
+		int index;
+		try {
+			index = Integer.parseInt(indexString) - Global.INDEX_OFFSET; // Change the line number to an array index
+		} catch (NumberFormatException e) {
+			return -1;
+		} 
+		return index;
+	}
+	
+	/**
+	 * This operation determines if the user command contains the given String parameter,
+	 * e.g. "none".
+	 * 
+	 * @param userCommand  
+	 * @param parameter
+	 */
+	public boolean containsParameter(String userCommand, String parameter) {
+
+		String residualUserCommand = userCommand;
+		if (determineTaskName(userCommand) != null) {
+			residualUserCommand = removeQuotedSubstring(residualUserCommand);
+		}
+		return residualUserCommand.contains(parameter);
+	}
+	
+	/**
+	 * Auxiliary String manipulating methods
+	 */
+	private String getFirstWort(String userCommand) {
 		return userCommand.trim().split("\\s+")[0];
+	}
+	
+	private String getSecondWord(String userCommand) {
+		return userCommand.trim().split("\\s+")[1];
+	}
+	
+	private  String removeFirstWord(String userCommand) {
+		return userCommand.replaceFirst(getFirstWort(userCommand), "").trim();
+	}
+	
+	private String removeQuotedSubstring(String userCommand) {
+		if ( determineTaskName(userCommand) != null) {
+			return userCommand.replaceFirst("\""+determineTaskName(userCommand)+"\"", "").trim();
+		} else {
+			return userCommand;
+		}
 	}
 }

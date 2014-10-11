@@ -5,9 +5,10 @@ import java.util.Collections;
 
 
 /**
- * This class represents the data component and stores the data temporary for manipulation reasons. 
- * At the beginning the content of the permanent storage is pulled to the temporary one. 
- * After each command the data will be pushed to the permanent storage.
+ * This class represents the Data component. Besides storing the data temporary, it also contains
+ * all of the methods needed to manipulate the task objects within the ArrayList. At the beginning 
+ * the content of the permanent storage is pulled to the temporary one. After each command the data 
+ * will be pushed to the permanent storage.
  * 
  * @author A0128620M
  */
@@ -15,49 +16,48 @@ import java.util.Collections;
 public class Data {
 
 	/** 
-	 * One array containing a list of task objects, one containing the state before
-	 * the execution of the last command (needed for the undo-feature) and one containing
-	 * all the deleted tasks.
+	 * This Array contains all available task objects.
 	 */
 	public ArrayList<Task> tasks;
 
 	/**
-	 * Array contains the state of the tasks ArrayList before the last execution of a user command.
+	 * This Array contains the state of the tasks ArrayList before the last execution of a user command.
 	 */
 	public ArrayList<Task> tasksHistory;
 	
 	/**
-	 * Array contains all the deleted tasks, needed by the GoogleAPI.
+	 * This Array contains all the deleted tasks, needed by the GoogleAPI.
 	 */
 	public ArrayList<Task> deletedTasks;
 
-	private Storage storage;
-
 	/**
-	 * Constructor: Creates all necessary objects, including the Storage and loads data from it.
+	 * Constructor
 	 */
 	public Data() {
 		tasks = new ArrayList<Task>();
 		tasksHistory = new ArrayList<Task>();
 		deletedTasks = new ArrayList<Task>();
-		storage = new Storage();
 		load();
 	}
 
 	/**
-	 * Saves to and loads from storage.
+	 * This operation saves the temporary tasks ArrayList to the permanent storage.
 	 * @author A0112828H
 	 */
 	public void save() {
-		storage.writeToFile(tasks);
+		TaskCommander.storage.writeToFile(tasks);
 	}
 	
+	/**
+	 * This operation loads the content from the permanent storage to the tasks ArrayList.
+	 * @author A0112828H
+	 */
 	public void load() {
-		tasks = storage.readFromFile(); 
+		tasks = TaskCommander.storage.readFromFile(); 
 	}	
 
 	/**
-	 * Adds a Task to the tasks ArrayList.
+	 * This operation adds a Task to the tasks ArrayList.
 	 * 
 	 * @param 	task     
 	 * @return 	feedback for UI
@@ -76,9 +76,8 @@ public class Data {
 		}
 	}
 	
-	
 	/**
-	 * Adds a TimedTask, DeadlineTask or FloatingTask to the tasks ArrayList.
+	 * This operation adds a TimedTask to the tasks ArrayList.
 	 * 
 	 * @param 	taskName  
 	 * @param 	startDate    
@@ -93,6 +92,13 @@ public class Data {
 		return new Feedback(true, Global.CommandType.ADD, new TimedTask(timedTask));
 	}
 	
+	/**
+	 * This operation adds a DeadlineTask to the tasks ArrayList.
+	 * 
+	 * @param 	taskName     
+	 * @param 	endDate       
+	 * @return 	feedback for UI
+	 */
 	public Feedback addDeadlineTask(String taskName, Date endDate) {
 		DeadlineTask deadlineTask= new DeadlineTask(taskName,endDate);
 		saveToHistory();
@@ -101,6 +107,12 @@ public class Data {
 		return new Feedback(true, Global.CommandType.ADD, new DeadlineTask(deadlineTask));
 	}
 	
+	/**
+	 * This operation adds a FloatingTask to the tasks ArrayList.
+	 * 
+	 * @param 	taskName        
+	 * @return 	feedback for UI
+	 */
 	public Feedback addFloatingTask(String taskName) {
 		FloatingTask floatingTask = new FloatingTask(taskName);
 		saveToHistory();
@@ -110,44 +122,40 @@ public class Data {
 	}
 
 	/**
-	 * Displays the tasks by forwarding all the needed information to the UI.
-	 * 
-	 * @param 	taskName     
+	 * This operation displays all tasks by forwarding all the needed information to the UI.
+	 *  
 	 * @return 	feedback for UI
 	 */
 	public Feedback displayTasks() {
+		ArrayList<FloatingTask> displayedFloatingTasks = new ArrayList<FloatingTask>();
+		ArrayList<DatedTask> displayedDatedTasks = new ArrayList<DatedTask>();
 		ArrayList<Task> displayedTasks = new ArrayList<Task>();
 		
-		ArrayList<FloatingTask> displayedFloatingTasks = new ArrayList<FloatingTask>();
-		 for(Task task: tasks) {
-			 if(task.getType() == Task.TaskType.FLOATING) {
+		for(Task task: tasks) {
+			if(task.getType() == Task.TaskType.FLOATING) {
 				 displayedFloatingTasks.add(new FloatingTask((FloatingTask) task));	// TODO: use cloned task with "new FloatingTask((FloatingTask)" to  add a copy of the respective task, not the original
-				 Collections.sort(displayedFloatingTasks);
-			 }
-		 }
-		 displayedTasks.addAll(displayedFloatingTasks);
-		 
-		ArrayList<DatedTask> displayedDatedTasks = new ArrayList<DatedTask>();
-		for (Task task : tasks) {
-			if (task.getType() == Task.TaskType.DEADLINE) {
+			} else if (task.getType() == Task.TaskType.DEADLINE) {
 				displayedDatedTasks.add(new DeadlineTask((DeadlineTask) task));
 			} else if (task.getType() == Task.TaskType.TIMED) {
 				displayedDatedTasks.add(new TimedTask((TimedTask) task));
 			}
-			Collections.sort(displayedDatedTasks);
 		}
+
+		Collections.sort(displayedFloatingTasks);
+		displayedTasks.addAll(displayedFloatingTasks);
+		Collections.sort(displayedDatedTasks);
 		displayedTasks.addAll(displayedDatedTasks);
 		
-		for(Task dtask: displayedTasks) {
-			System.out.print(dtask.getName());
-			System.out.println(dtask.getDone());
+		for(Task task: displayedTasks) {
+			System.out.print(task.getName());
+			System.out.println(task.getDone());
 		}
 		
 		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
 	}
 	
 	/**
-	 * Displays the tasks of the given DatePerid, taskType and status.
+	 * This operation displays the tasks of the given DatePeriod, taskType and status.
 	 * 
 	 * @param isDateTimeRestricted
 	 * @param startDate
@@ -161,9 +169,9 @@ public class Data {
 	 * @return 	feedback for UI
 	 */
 	public Feedback displayTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean status) {
-		ArrayList<Task> displayedTasks = new ArrayList<Task>();
 		ArrayList<FloatingTask> displayedFloatingTasks = new ArrayList<FloatingTask>();
 		ArrayList<DatedTask> displayedDatedTasks = new ArrayList<DatedTask>();
+		ArrayList<Task> displayedTasks = new ArrayList<Task>();
 		
 		for(Task task: tasks) {
 			// Step 1: Check Status
@@ -193,18 +201,17 @@ public class Data {
 		Collections.sort(displayedDatedTasks);
 		displayedTasks.addAll(displayedDatedTasks);
 		
-		for(Task dtask: displayedTasks) {
-			System.out.print(dtask.getName());
-			System.out.println(dtask.getDone());
+		for(Task task: displayedTasks) {
+			System.out.print(task.getName());
+			System.out.println(task.getDone());
 		}
 		
 		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
 	}
 	
 	/**
-	 * Updates a TimedTask, DeadlineTask or FloatingTask with the given index 
-	 * and replaces the old taskName, startDate or endDate respectively and 
-	 * changes the taskType if needed.
+	 * This operation updates a TimedTask with the given index and replaces the old taskName, 
+	 * startDate or endDate respectively and changes the taskType if needed.
 	 * If a given date or name parameter equals null, the old value remains.
 	 * 
 	 * @param index        index of the task to delete, as a string
@@ -249,6 +256,16 @@ public class Data {
 		
 	}
 	
+	/**
+	 * This operation updates a DeadlineTask with the given index and replaces the old taskName, 
+	 * startDate or endDate respectively and changes the taskType if needed.
+	 * If a given date or name parameter equals null, the old value remains.
+	 * 
+	 * @param index        index of the task to delete, as a string
+	 * @param taskName     description of task   
+	 * @param endDate      
+	 * @return             feedback for UI
+	 */
 	public Feedback updateToDeadlineTask(int index, String name, Date endDate) {
 		if (tasks.isEmpty()) {
 			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
@@ -282,6 +299,15 @@ public class Data {
 			}
 	}
 	
+	/**
+	 * This operation updates a FloatingTask with the given index and replaces the old taskName, 
+	 * startDate or endDate respectively and changes the taskType if needed.
+	 * If a given date or name parameter equals null, the old value remains.
+	 * 
+	 * @param index        index of the task to delete, as a string
+	 * @param taskName     description of task    
+	 * @return             feedback for UI
+	 */
 	public Feedback updateToFloatingTask(int index, String name) {
 		if (tasks.isEmpty()) {
 			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
@@ -313,7 +339,7 @@ public class Data {
 	}
 
 	/**
-	 * Marks a task as done.
+	 * This operation marks a task as done.
 	 * 
 	 * @param index        index of the done task 
 	 * @return             feedback for UI
@@ -346,7 +372,7 @@ public class Data {
 	}
 	
 	/**
-	 * Marks a task as undone.
+	 * This operation marks a task as undone.
 	 * 
 	 * @param index        index of the undone tasks   
 	 * @return             feedback for UI
@@ -379,9 +405,8 @@ public class Data {
 	}
 	
 	/**
-	 * Deletes the task with the given index (as shown with 'display' command).
+	 * This operation deletes the task with the given index (as shown with 'display' command).
 	 * Does not execute if there are no lines and if a wrong index is given.
-	 * Eg: Index out of bounds or given a char instead of int.
 	 * 
 	 * @param index        Index of the task to delete, as a string. 
 	 * @return             Feedback for user.
@@ -411,8 +436,8 @@ public class Data {
 	}
 	
 	/**@author A0109194A
-	 * Deletes the task directly from the tasks list without the index
-	 * Used to delete tasks when syncing
+	 * This operation deletes the task directly from the tasks list without the index.
+	 * Used to delete tasks when syncing.
 	 * 
 	 * @param 			task
 	 * @return 			boolean value on whether the delete was successful.
@@ -428,7 +453,7 @@ public class Data {
 	}
 	
 	/**
-	 * Saves backup to hisory tasks ArrayList.
+	 * This operation saves a backup to history tasks ArrayList.
 	 */
 	public void saveToHistory() {
 		tasksHistory.clear();
@@ -447,7 +472,7 @@ public class Data {
 	}	
 	
 	/**
-	 * Restore from history tasks ArrayList.
+	 * This operation restores from history tasks ArrayList.
 	 */
 	public void restoresFromHistory() {
 		tasks.clear();
@@ -465,10 +490,8 @@ public class Data {
 		}
 	}	
 	
-	
-	
 	/**
-	 * Clears all tasks from memory.
+	 * This operation clears all tasks from memory.
 	 * 
 	 * @param userCommand 
 	 * @return             Feedback for user.
@@ -479,6 +502,15 @@ public class Data {
 		save();
 		return new Feedback(true,Global.CommandType.CLEAR);
 	}
+	
+	/**
+	 * Returns index of the given task object within the tasks ArrayList.
+	 * @return  index
+	 */
+	public int getIndexOf(Task task) {
+		return tasks.indexOf(task);
+	}
+
 	
 	public ArrayList<Task> getAllTasks() {
 		return tasks;
@@ -493,15 +525,6 @@ public class Data {
 		for (Task t : tasks) {
 			idList.add(t.getId());
 		}
-		
 		return idList;
-	}
-	
-	/**
-	 * Returns index of the given task object within the tasks ArrayList.
-	 * @return  index
-	 */
-	public int getIndexOf(Task task) {
-		return tasks.indexOf(task);
 	}
 }

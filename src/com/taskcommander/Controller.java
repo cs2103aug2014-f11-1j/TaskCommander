@@ -1,4 +1,5 @@
 package com.taskcommander;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -48,26 +49,20 @@ public class Controller {
 			return new Feedback(false,Global.MESSAGE_NO_COMMAND);
 		}
 
-		Global.CommandType commandType= TaskCommander.parser.determineCommandType(userCommand);
-		String residualUserCommand = removeFirstWord(userCommand);
-		
-		String indexTasksRecentlyDisplayedString;
-		int indexTasksRecentlyDisplayed;
-		int indexTasks;
+		Global.CommandType commandType = TaskCommander.parser.determineCommandType(userCommand);
 		
 		switch (commandType) {
+		
 			case ADD:
 				
 				// taskName
-				String taskName = TaskCommander.parser.determineTaskName(residualUserCommand);
+				String taskName = TaskCommander.parser.determineTaskName(userCommand);
 				if (taskName == null) {
 					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				}
 				
-				residualUserCommand = removeTaskName(residualUserCommand, taskName);
-				
 				// taskDateTime (3 cases depending on taskType)
-				List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(residualUserCommand);
+				List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand, false);
 				// case 1: FloatingTask
 				if (taskDateTime == null) { 			
 					return TaskCommander.data.addFloatingTask(taskName);
@@ -81,121 +76,79 @@ public class Controller {
 					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				}
 				
-			case UPDATE:
+			case UPDATE: case DONE: case OPEN: case DELETE:
 				
-				// Index in ArrayList tasksRecentlyDisplayed
-				indexTasksRecentlyDisplayedString = getFirstWord(residualUserCommand);
-				try {
-					indexTasksRecentlyDisplayed = Integer.parseInt(indexTasksRecentlyDisplayedString) - Global.INDEX_OFFSET; // Change the line number to an array index
-				} catch (NumberFormatException e) {
-					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
-				} 
-				if (indexTasksRecentlyDisplayed > recentDisplayFeedback.getCommandRelatedTasks().size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
-					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed + Global.INDEX_OFFSET));
+				// Index in recent display of tasks
+				int indexDisplayedTasks = TaskCommander.parser.determineIndex(userCommand);
+				ArrayList<Task> displayedTasks = recentDisplayFeedback.getCommandRelatedTasks();
+				if (indexDisplayedTasks > displayedTasks.size() - Global.INDEX_OFFSET || indexDisplayedTasks < 0) {
+					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexDisplayedTasks + Global.INDEX_OFFSET));
 				}
-				residualUserCommand = removeFirstWord(residualUserCommand);
 				
 				// Task to be updated
-				Task oldTask = recentDisplayFeedback.getCommandRelatedTasks().get(indexTasksRecentlyDisplayed);
-				String oldTaskName = oldTask.getName();
-				Task.TaskType oldTaskType = oldTask.getType();
+				Task displayedTask = displayedTasks.get(indexDisplayedTasks);
 				
-				// Index in ArrayList tasks of the Data class
-				indexTasks = TaskCommander.data.getIndexOf(oldTask);
+				// Index in tasks list of Data
+				int indexTasks = TaskCommander.data.getIndexOf(displayedTask);
 				
-				// New taskName, if stated
-				String newTaskName = null;
-				newTaskName = TaskCommander.parser.determineTaskName(residualUserCommand);
+				if (commandType == Global.CommandType.UPDATE) {
 
-				if (newTaskName != null) {
-					residualUserCommand = removeTaskName(residualUserCommand, newTaskName);
-				} else {
-					newTaskName = oldTaskName;
+						// New taskName, if stated
+						String oldTaskName = displayedTask.getName();
+						String newTaskName = TaskCommander.parser.determineTaskName(userCommand);
+						if (newTaskName == null) {
+							newTaskName = oldTaskName;
+						}
+						
+						// New taskDateTime and taskType, if stated
+						List<Date> newTaskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand, true);	// returns null if no date found in given String
+						Task.TaskType oldTaskType = displayedTask.getType();
+						Task.TaskType newTaskType = oldTaskType;
+						Date newStartDate = null;
+						Date newEndDate = null;
+						if ((newTaskDateTime == null) && (TaskCommander.parser.containsParameter(userCommand, "none"))) {	// "none" is a keyword used by the user to indicate, that he wants to change a DatedTask to a FloatingTask
+							newTaskType = Task.TaskType.FLOATING;
+						} else if (newTaskDateTime != null) {
+							if (newTaskDateTime.size() == 1) {
+								newTaskType = Task.TaskType.DEADLINE;
+								newEndDate = newTaskDateTime.get(0);
+							} else if (newTaskDateTime.size() == 2) {
+								newTaskType = Task.TaskType.TIMED;
+								newStartDate = newTaskDateTime.get(0);
+								newEndDate = newTaskDateTime.get(1);
+							} else {
+								return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+							}
+						}
+						
+						// No changes at all, that is, no new DateTime, Name, or "none" given
+						if ((newTaskDateTime == null) && (newTaskName == oldTaskName) && (oldTaskType == newTaskType)) {	// Invalid Format when input: update 1 none for a floatingTask
+							return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+						}
+						
+						// Update including change of taskType if necessary
+						switch (newTaskType) {
+							case FLOATING:
+								return TaskCommander.data.updateToFloatingTask(indexTasks, newTaskName);
+							case DEADLINE:
+								return TaskCommander.data.updateToDeadlineTask(indexTasks, newTaskName, newEndDate);
+							case TIMED:
+								return TaskCommander.data.updateToTimedTask(indexTasks, newTaskName, newStartDate, newEndDate);
+							}
+						
+				} else if (commandType == Global.CommandType.DONE) {
+					
+					return TaskCommander.data.done(indexTasks);
+					
+				} else if (commandType == Global.CommandType.OPEN) {
+					
+					return TaskCommander.data.open(indexTasks);
+				
+				} else if (commandType == Global.CommandType.DELETE) {
+					
+					return TaskCommander.data.deleteTask(indexTasks);
+					
 				}
-				
-				// New taskDateTime and taskType, if stated
-				List<Date> newTaskDateTime = TaskCommander.parser.determineTaskDateTime(residualUserCommand);	// returns null if no date found in given String
-				if (newTaskDateTime != null) {	// more than two DateTimes given
-					if (newTaskDateTime.size() > 2) {
-						return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed));
-					}
-				}
-
-				Task.TaskType newTaskType = oldTaskType;
-				Date newStartDate = null;
-				Date newEndDate = null;
-				if ((newTaskDateTime == null) && (residualUserCommand.contains("none"))) {	// "none" is a keyword used by the user to indicate, that he wants to change a DatedTask to a FloatingTask
-					newTaskType = Task.TaskType.FLOATING;
-				} else if (newTaskDateTime != null) {
-					if (newTaskDateTime.size() == 1) {
-						newTaskType = Task.TaskType.DEADLINE;
-						newEndDate = newTaskDateTime.get(0);
-					} else if (newTaskDateTime.size() == 2) {
-						newTaskType = Task.TaskType.TIMED;
-						newStartDate = newTaskDateTime.get(0);
-						newEndDate = newTaskDateTime.get(1);
-					}
-				}
-				
-				// No changes at all, that is, no new DateTime, Name, or "none" given
-				if ((newTaskDateTime == null) && (newTaskName == oldTaskName) && (oldTaskType == newTaskType)) {
-					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
-				}
-				
-				// Update including change of taskType if necessary
-				switch (newTaskType) {
-					case FLOATING:
-						return TaskCommander.data.updateToFloatingTask(indexTasks, newTaskName);
-					case DEADLINE:
-						return TaskCommander.data.updateToDeadlineTask(indexTasks, newTaskName, newEndDate);
-					case TIMED:
-						return TaskCommander.data.updateToTimedTask(indexTasks, newTaskName, newStartDate, newEndDate);
-					}
-				
-			case DONE:
-				
-				// Index in ArrayList tasksRecentlyDisplayed
-				indexTasksRecentlyDisplayedString = getFirstWord(residualUserCommand);
-				try {
-					indexTasksRecentlyDisplayed = Integer.parseInt(indexTasksRecentlyDisplayedString) - Global.INDEX_OFFSET; // Change the line number to an array index
-				} catch (NumberFormatException e) {
-					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
-				} 
-				if (indexTasksRecentlyDisplayed > recentDisplayFeedback.getCommandRelatedTasks().size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
-					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed + Global.INDEX_OFFSET));
-				}
-				residualUserCommand = removeFirstWord(residualUserCommand);
-				
-				// Task to be marked as done
-				Task doneTask = recentDisplayFeedback.getCommandRelatedTasks().get(indexTasksRecentlyDisplayed);
-				
-				// Index in ArrayList tasks of the Data class
-				indexTasks = TaskCommander.data.getIndexOf(doneTask);
-				
-				return TaskCommander.data.done(indexTasks);
-				
-			case OPEN:
-				
-				// Index in ArrayList tasksRecentlyDisplayed
-				indexTasksRecentlyDisplayedString = getFirstWord(residualUserCommand);
-				try {
-					indexTasksRecentlyDisplayed = Integer.parseInt(indexTasksRecentlyDisplayedString) - Global.INDEX_OFFSET; // Change the line number to an array index
-				} catch (NumberFormatException e) {
-					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
-				} 
-				if (indexTasksRecentlyDisplayed > recentDisplayFeedback.getCommandRelatedTasks().size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
-					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed + Global.INDEX_OFFSET));
-				}
-				residualUserCommand = removeFirstWord(residualUserCommand);
-				
-				// Task to be marked as done
-				Task undoneTask = recentDisplayFeedback.getCommandRelatedTasks().get(indexTasksRecentlyDisplayed);
-				
-				// Index in ArrayList tasks of the Data class
-				indexTasks = TaskCommander.data.getIndexOf(undoneTask);
-				
-				return TaskCommander.data.open(indexTasks);
-				
 				
 			case DISPLAY:
 				
@@ -203,13 +156,15 @@ public class Controller {
 				boolean isDatePeriodRestricted = false;
 				Date startDate = null;
 				Date endDate = null;
-				List<Date> DatePeriod = TaskCommander.parser.determineTaskDateTime(residualUserCommand);	// returns null if no date found in given String
+				List<Date> DatePeriod = TaskCommander.parser.determineTaskDateTime(userCommand, false);	// returns null if no date found in given String
+		
 				if (DatePeriod != null) { // DatePeriod given
-					isDatePeriodRestricted = true;
 					if (DatePeriod.size() == 2) {
+						isDatePeriodRestricted = true;
 						startDate = DatePeriod.get(0);
 						endDate = DatePeriod.get(1);
 					} else if (DatePeriod.size() == 1) {
+						isDatePeriodRestricted = true;
 						startDate = new Date(); // current DateTime
 						endDate = DatePeriod.get(0);
 					} else { // no DateTime period
@@ -254,27 +209,6 @@ public class Controller {
 					return recentDisplayFeedback;
 				}
 				
-			case DELETE:
-				
-				// Index in ArrayList tasksRecentlyDisplayed
-				indexTasksRecentlyDisplayedString = getFirstWord(residualUserCommand);
-				try {
-					indexTasksRecentlyDisplayed = Integer.parseInt(indexTasksRecentlyDisplayedString) - Global.INDEX_OFFSET; // Change the line number to an array index
-				} catch (NumberFormatException e) {
-					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
-				} 
-				if (indexTasksRecentlyDisplayed > recentDisplayFeedback.getCommandRelatedTasks().size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
-					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed + Global.INDEX_OFFSET));
-				}
-				
-				// Task to be deleted
-				Task deletedTask = recentDisplayFeedback.getCommandRelatedTasks().get(indexTasksRecentlyDisplayed);
-				
-				// Index in ArrayList tasks of the Data class
-				indexTasks = TaskCommander.data.getIndexOf(deletedTask);
-				
-				return TaskCommander.data.deleteTask(indexTasks);
-				
 			case CLEAR:
 				if (isSingleWord(userCommand)) {
 					return TaskCommander.data.clearTasks();
@@ -300,6 +234,7 @@ public class Controller {
 				
 			case UNDO: 
 				
+				return new Feedback(false,"to be implemented");
 				
 			case INVALID:
 				return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
@@ -313,7 +248,7 @@ public class Controller {
 	}
 	
 	/**
-	 * Helper methods
+	 * Auxiliary methods
 	 */
 	private static boolean isSingleWord(String userCommand) {
 		return getNumberOfWords(userCommand) == 1;
@@ -323,28 +258,4 @@ public class Controller {
 		String[] allWords = userCommand.trim().split("\\s+");
 		return allWords.length;
 	}
-	
-	/* TODO not used anymore
-	private static String getNthWord(String userCommand, int position) {
-		String[] allWords = userCommand.trim().split("\\s+");
-		if (position > allWords.length-1) {
-			return "";	// otherwise there would be a java.lang.ArrayIndexOutOfBoundsException
-		} 
-		String nthWord = userCommand.trim().split("\\s+")[position];
-		return nthWord;
-	}
-	*/
-
-	private static String removeFirstWord(String userCommand) {
-		return userCommand.replace(getFirstWord(userCommand), "").trim();
-	}
-	
-	private static String removeTaskName(String userCommand,String taskName) {
-		return userCommand.replace("\""+taskName+"\"", "").trim();
-	}
-
-	private static String getFirstWord(String userCommand) {
-		return userCommand.trim().split("\\s+")[0];
-	}
-
 }
