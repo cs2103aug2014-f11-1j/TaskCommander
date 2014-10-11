@@ -127,10 +127,10 @@ public class TableUI {
 							// Desired Output has to be discussed, but low priority anyway
 							break;
 
-						case SORT:
+/*						case SORT:
 							// Desired Output has to be discussed
 							break;
-
+*/
 						case SYNC:
 							// Desired Output has to be discussed
 							break;
