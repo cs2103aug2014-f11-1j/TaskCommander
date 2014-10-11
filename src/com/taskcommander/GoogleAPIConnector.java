@@ -49,14 +49,25 @@ public class GoogleAPIConnector {
 	private static Calendar calendar;
 	static final java.util.List<Calendar> addedCalendarsUsingBatch = Lists.newArrayList();
 	private static Tasks tasks;
-
+	private static DataStore<String> eventDataStore;
+	private static DataStore<String> taskDataStore;
+	private static DataStore<String> syncSettingsDataStore;
+	
 	/**
 	 * Creates a new GoogleAPIHandler instance.
 	 * Also creates a new LoginManager and attempts
 	 * to get the Tasks and Calendar services.
+	 * @throws IOException 
 	 */
 	public GoogleAPIConnector() {
 		loginManager = new LoginManager();
+		try {
+			eventDataStore = LoginManager.getDataStoreFactory().getDataStore("EventStore");
+			syncSettingsDataStore = LoginManager.getDataStoreFactory().getDataStore("SyncSettings");
+			taskDataStore = LoginManager.getDataStoreFactory().getDataStore("TaskStore");
+		} catch (IOException e) {
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+		}
 		getServices();
 	}
 
@@ -64,24 +75,55 @@ public class GoogleAPIConnector {
 		tasks = loginManager.getTasksService();
 		calendar = loginManager.getCalendarService();
 	}
+	
+	public DataStore<String> getSyncSettingsDataStore() {
+		return syncSettingsDataStore;
+	}
+	
+	public DataStore<String> getTaskDataStore() {
+		return taskDataStore;
+	}
+	
+	public DataStore<String> getEventDataStore() {
+		return eventDataStore;
+	}
 
 	/**
+	 * @author A0109194A
 	 * Returns all tasks.
-	 * @return       Feedback for user.
+	 * @return Feedback for user.
 	 */
 	public ArrayList<com.taskcommander.Task> getAllTasks() {
 		ArrayList<com.taskcommander.Task> result = getAllFloatingTasks();
 		result.addAll(getAllEvents());
 		return result;
 	}
-
+	
+	/**
+	 * @author A0109194A
+	 * Returns all Google Tasks
+	 * @return List of Google Tasks
+	 */
+	public List<Task> getAllGoogleTasks() {
+		try {
+			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_CALENDAR_ID);
+			List<Task> tasks = request.execute().getItems();
+			return tasks;
+		} catch (IOException e) {
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			return null;
+		}
+	}
+	
+	
+	
 	/**
 	 * Gets all tasks from Tasks API.
 	 * @return   Arraylist of TaskCommander Tasks.
 	 */
 	private ArrayList<com.taskcommander.Task> getAllFloatingTasks() {
 		try {
-			Tasks.TasksOperations.List request = tasks.tasks().list("@default");
+			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_CALENDAR_ID);
 			List<Task> tasks = request.execute().getItems();
 
 			ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
@@ -95,7 +137,7 @@ public class GoogleAPIConnector {
 		}
 	}
 
-	//@author Sean Saito
+	//@author A0109194A
 	/**
 	 * Gets all events from Calendar API starting from
 	 * current system time.
@@ -109,7 +151,7 @@ public class GoogleAPIConnector {
 					.execute().getItems();
 
 			ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
-			for (Event event : events){
+			for (Event event : events) {
 				taskList.add(toTask(event));
 			}
 			return taskList;
@@ -118,7 +160,39 @@ public class GoogleAPIConnector {
 			return null;
 		}
 	}
-
+	
+	/**
+	 * @author A0109194A
+	 * Returns all Events
+	 * @return List of Events
+	 */
+	public List<Event> getAllGoogleEvents() {
+		try {
+			List<Event> events = calendar.events().list(PRIMARY_CALENDAR_ID)
+					.setTimeMin(new DateTime(System.currentTimeMillis()))
+					.execute().getItems();
+			return events;
+		} catch (IOException e) {
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			return null;
+		}
+	}
+	
+	/**
+	 * @author A0109194A
+	 * Returns a request for listing all the events from Google Calendar
+	 * @return A Google Calendar request
+	 */
+	public Calendar.Events.List getListEventRequest() {
+		try {
+			Calendar.Events.List request = calendar.events().list(PRIMARY_CALENDAR_ID);
+			return request;
+		} catch (IOException e) {
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			return null;
+		}
+	}
+	
 	//@author A0112828H
 	/**
 	 * Adds a task to the Tasks API, given a FloatingTask object.
@@ -173,7 +247,7 @@ public class GoogleAPIConnector {
 		return null;
 	}
 	
-	//@author Sean Saito A0109194A
+	//@author A0109194A
 	/**
 	 * Adds an Event to the Calendar API, given a TimedTask object.
 	 * Returns the Google ID if successful.
@@ -328,7 +402,7 @@ public class GoogleAPIConnector {
 		return false;
 	}
 	
-	/**@author Sean Saito A0109194A
+	/**@author A0109194A
 	 * Deletes an event from the Calendar API, given a TimedTask object.
 	 * The given task must have a Google ID.
 	 * Returns true if successful. 
@@ -378,7 +452,7 @@ public class GoogleAPIConnector {
 		return false;
 	}
 
-	//@author Michelle
+	//@author A0112828H
 	/**
 	 * Updates a task from the Tasks API, given a DeadlineTask object.
 	 * The given task must have a Google ID.
@@ -403,7 +477,7 @@ public class GoogleAPIConnector {
 		return false;
 	}
 	
-	/**@author SeanSaito
+	/**@author A0109194A
 	 * Updates an event from the Calendar API, given a TimedTask object.
 	 * The given task must have a Google ID.
 	 * Returns true if successful.  
