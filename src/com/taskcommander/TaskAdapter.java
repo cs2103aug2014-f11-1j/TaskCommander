@@ -3,7 +3,6 @@ package com.taskcommander;
 import java.lang.reflect.Type;
 
 import com.google.gson.*;
-import com.taskcommander.Task.TaskType;
 
 //@author A0112828H
 /**
@@ -16,8 +15,6 @@ import com.taskcommander.Task.TaskType;
  */
 
 public class TaskAdapter implements JsonSerializer<Task>, JsonDeserializer<Task> {
-	private static final String PACKAGE_NAME = "com.taskcommander.";
-
 	@Override
 	public JsonElement serialize(Task src, Type typeOfSrc, JsonSerializationContext context) {
 		JsonObject result = new JsonObject();

@@ -138,6 +138,11 @@ public class Data {
 		}
 		displayedTasks.addAll(displayedDatedTasks);
 		
+		for(Task dtask: displayedTasks) {
+			System.out.print(dtask.getName());
+			System.out.println(dtask.getDone());
+		}
+		
 		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
 	}
 	
@@ -187,6 +192,11 @@ public class Data {
 		displayedTasks.addAll(displayedFloatingTasks);
 		Collections.sort(displayedDatedTasks);
 		displayedTasks.addAll(displayedDatedTasks);
+		
+		for(Task dtask: displayedTasks) {
+			System.out.print(dtask.getName());
+			System.out.println(dtask.getDone());
+		}
 		
 		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
 	}
@@ -418,10 +428,7 @@ public class Data {
 	}
 	
 	/**
-	 * Saves backup of current tasks ArrayList.
-	 * 
-	 * @param userCommand 
-	 * @return             Feedback for user.
+	 * Saves backup to hisory tasks ArrayList.
 	 */
 	public void saveToHistory() {
 		tasksHistory.clear();
@@ -435,6 +442,25 @@ public class Data {
 				break;
 			default:
 				tasksHistory.add(new TimedTask((TimedTask) task));
+			}
+		}
+	}	
+	
+	/**
+	 * Restore from history tasks ArrayList.
+	 */
+	public void restoresFromHistory() {
+		tasks.clear();
+		for(Task task: tasksHistory) {
+			switch ( task.getType()) {
+			case FLOATING:
+				tasks.add( new FloatingTask((FloatingTask) task));
+				break;
+			case DEADLINE:
+				tasks.add( new DeadlineTask((DeadlineTask) task));
+				break;
+			default:
+				tasks.add(new TimedTask((TimedTask) task));
 			}
 		}
 	}	

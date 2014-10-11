@@ -32,6 +32,9 @@ public class TimedTask extends DatedTask {
 		super(otherTimedTask.getName(), TaskType.TIMED, otherTimedTask.getStartDate() );
 			_startDate = otherTimedTask.getStartDate();
 			_endDate = otherTimedTask.getEndDate();
+			this.setId(otherTimedTask.getId());
+			this.setDone(otherTimedTask.getDone());
+			this.setEdited(otherTimedTask.getEdited());
 	}
 	
 	public Date getStartDate() {

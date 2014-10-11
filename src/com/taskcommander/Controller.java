@@ -1,12 +1,14 @@
 package com.taskcommander;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 /**
- * This class represents the Controller component, which calls the respective execution method
- * depending on the user command.
+ * This class represents the Controller component. After receiving the user's
+ * input from the UI, the Controller determines the exact type of command and its 
+ * related parameters by means of the Parser. Then the respective method
+ * of the Data component is called to execute the command and the regained feedback
+ * is returned to the UI.
  * 
  * @author A0128620M
  */
@@ -20,26 +22,33 @@ public class Controller {
 	}
 
 	/**
-	 * This ArrayList contains all tasks which were recently displayed by the UI. It equals to the 
-	 * ArrayList which was returned to the UI within the Feedback object in respond to the latest 
-	 * display command. Memorizing the tasks which have been displayed recently by the UI is needed 
-	 * by the update and delete feature.
+	 * This feedback object of the latest display command contains all tasks which were 
+	 * recently displayed by the UI. Memorizing the tasks which have been displayed recently 
+	 * by the UI is needed by the update, delete, done and open methods.
 	 */
-	private ArrayList<Task> tasksRecentlyDisplayed;
+	private Feedback recentDisplayFeedback;	
+	
+	/**
+	 * This feedback object represent the feedback of the latest add/update/done/open/delete command.
+	 * Memorizing the commands which have been executed recently is needed by the undo method.
+	 * 
+	 * TODO
+	 */
+	private Feedback recentAddUpdateMarkDeleteClearFeedback;
 
 	/**
-	 * Parses command from user and executes it if valid. Returns feedback to UI.
+	 * This operation parses the command from the user and executes it if valid. Afterwards a 
+	 * feedback is returned.
 	 * 
 	 * @param  userCommand  command given by user
-	 * @return              feedback for to the UI
+	 * @return              feedback to the UI
 	 */
 	public Feedback executeCommand(String userCommand) {	
 		if (userCommand == null | userCommand == "") {
 			return new Feedback(false,Global.MESSAGE_NO_COMMAND);
 		}
 
-		String commandTypeString = getFirstWord(userCommand);
-		Global.CommandType commandType= TaskCommander.parser.determineCommandType(commandTypeString);
+		Global.CommandType commandType= TaskCommander.parser.determineCommandType(userCommand);
 		String residualUserCommand = removeFirstWord(userCommand);
 		
 		String indexTasksRecentlyDisplayedString;
@@ -81,13 +90,13 @@ public class Controller {
 				} catch (NumberFormatException e) {
 					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				} 
-				if (indexTasksRecentlyDisplayed > tasksRecentlyDisplayed.size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
+				if (indexTasksRecentlyDisplayed > recentDisplayFeedback.getCommandRelatedTasks().size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
 					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed + Global.INDEX_OFFSET));
 				}
 				residualUserCommand = removeFirstWord(residualUserCommand);
 				
 				// Task to be updated
-				Task oldTask = tasksRecentlyDisplayed.get(indexTasksRecentlyDisplayed);
+				Task oldTask = recentDisplayFeedback.getCommandRelatedTasks().get(indexTasksRecentlyDisplayed);
 				String oldTaskName = oldTask.getName();
 				Task.TaskType oldTaskType = oldTask.getType();
 				
@@ -152,13 +161,13 @@ public class Controller {
 				} catch (NumberFormatException e) {
 					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				} 
-				if (indexTasksRecentlyDisplayed > tasksRecentlyDisplayed.size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
+				if (indexTasksRecentlyDisplayed > recentDisplayFeedback.getCommandRelatedTasks().size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
 					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed + Global.INDEX_OFFSET));
 				}
 				residualUserCommand = removeFirstWord(residualUserCommand);
 				
 				// Task to be marked as done
-				Task doneTask = tasksRecentlyDisplayed.get(indexTasksRecentlyDisplayed);
+				Task doneTask = recentDisplayFeedback.getCommandRelatedTasks().get(indexTasksRecentlyDisplayed);
 				
 				// Index in ArrayList tasks of the Data class
 				indexTasks = TaskCommander.data.getIndexOf(doneTask);
@@ -174,13 +183,13 @@ public class Controller {
 				} catch (NumberFormatException e) {
 					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				} 
-				if (indexTasksRecentlyDisplayed > tasksRecentlyDisplayed.size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
+				if (indexTasksRecentlyDisplayed > recentDisplayFeedback.getCommandRelatedTasks().size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
 					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed + Global.INDEX_OFFSET));
 				}
 				residualUserCommand = removeFirstWord(residualUserCommand);
 				
 				// Task to be marked as done
-				Task undoneTask = tasksRecentlyDisplayed.get(indexTasksRecentlyDisplayed);
+				Task undoneTask = recentDisplayFeedback.getCommandRelatedTasks().get(indexTasksRecentlyDisplayed);
 				
 				// Index in ArrayList tasks of the Data class
 				indexTasks = TaskCommander.data.getIndexOf(undoneTask);
@@ -237,14 +246,12 @@ public class Controller {
 				
 				// Case 1: No restrictions of display
 				if (!isDatePeriodRestricted && !isTaskTypeRestricted && !isStatusRestricted) {
-					Feedback feedback = TaskCommander.data.displayTasks();
-					tasksRecentlyDisplayed = feedback.getCommandRelatedTasks();
-					return feedback;
+					recentDisplayFeedback = TaskCommander.data.displayTasks();
+					return recentDisplayFeedback;
 				// Case 2: With restrictions of display
 				} else {
-					Feedback feedback = TaskCommander.data.displayTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, done);
-					tasksRecentlyDisplayed = feedback.getCommandRelatedTasks();
-					return feedback;
+					recentDisplayFeedback = TaskCommander.data.displayTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, done);
+					return recentDisplayFeedback;
 				}
 				
 			case DELETE:
@@ -256,12 +263,12 @@ public class Controller {
 				} catch (NumberFormatException e) {
 					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
 				} 
-				if (indexTasksRecentlyDisplayed > tasksRecentlyDisplayed.size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
+				if (indexTasksRecentlyDisplayed > recentDisplayFeedback.getCommandRelatedTasks().size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
 					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed + Global.INDEX_OFFSET));
 				}
 				
 				// Task to be deleted
-				Task deletedTask = tasksRecentlyDisplayed.get(indexTasksRecentlyDisplayed);
+				Task deletedTask = recentDisplayFeedback.getCommandRelatedTasks().get(indexTasksRecentlyDisplayed);
 				
 				// Index in ArrayList tasks of the Data class
 				indexTasks = TaskCommander.data.getIndexOf(deletedTask);
