@@ -121,16 +121,12 @@ public class TableUI {
 						case DISPLAY: 
 							tasks = fb.getCommandRelatedTasks();
 							break;
-						case ADD:case DELETE: case UPDATE:
+						case ADD:case DELETE: case UPDATE:case DONE: case OPEN:
 							tasks.add(fb.getCommandRelatedTask());
 						case HELP:
 							// Desired Output has to be discussed, but low priority anyway
 							break;
 
-/*						case SORT:
-							// Desired Output has to be discussed
-							break;
-*/
 						case SYNC:
 							// Desired Output has to be discussed
 							break;
