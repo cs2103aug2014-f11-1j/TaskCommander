@@ -16,6 +16,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.DataStore;
+import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.tasks.Tasks;
@@ -91,6 +92,15 @@ public class LoginManager {
 		} else {
 			return null;
 		}
+	}
+	
+	
+	/**
+	 * Gets the datastore factory used
+	 * @return			dataStoreFactory
+	 */
+	public static DataStoreFactory getDataStoreFactory() {
+		return dataStoreFactory;
 	}
 	
 	/**
