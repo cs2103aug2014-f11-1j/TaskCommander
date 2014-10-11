@@ -273,6 +273,48 @@ public class Data {
 	}
 
 	/**
+	 * Marks a task as done.
+	 * 
+	 * @param index        index of the done task 
+	 * @return             feedback for UI
+	 */
+	public Feedback done(int index) {
+		if (tasks.isEmpty()) {
+			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
+		} 
+
+		if (index > tasks.size() - Global.INDEX_OFFSET) {
+			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index));
+		}
+		
+		Task doneTask = tasks.get(index);
+		doneTask.markDone();
+		
+		return new Feedback(true, Global.CommandType.DONE, doneTask);
+	}
+	
+	/**
+	 * Marks a task as undone.
+	 * 
+	 * @param index        index of the undone tasks   
+	 * @return             feedback for UI
+	 */
+	public Feedback undone(int index) {
+		if (tasks.isEmpty()) {
+			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
+		} 
+
+		if (index > tasks.size() - Global.INDEX_OFFSET) {
+			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index));
+		}
+		
+		Task undoneTask = tasks.get(index);
+		undoneTask.markUndone();
+		
+		return new Feedback(true, Global.CommandType.DONE, undoneTask);
+	}
+	
+	/**
 	 * Deletes the task with the given index (as shown with 'display' command).
 	 * Does not execute if there are no lines and if a wrong index is given.
 	 * Eg: Index out of bounds or given a char instead of int.

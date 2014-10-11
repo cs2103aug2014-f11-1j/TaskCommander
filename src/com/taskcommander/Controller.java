@@ -44,6 +44,7 @@ public class Controller {
 		
 		String indexTasksRecentlyDisplayedString;
 		int indexTasksRecentlyDisplayed;
+		int indexTasks;
 		
 		switch (commandType) {
 			case ADD:
@@ -91,8 +92,7 @@ public class Controller {
 				Task.TaskType oldTaskType = oldTask.getType();
 				
 				// Index in ArrayList tasks of the Data class
-				int indexTasks = TaskCommander.data.getIndexOf(oldTask);
-				System.out.println("Index"+indexTasks);
+				indexTasks = TaskCommander.data.getIndexOf(oldTask);
 				
 				// New taskName, if stated
 				String newTaskName = null;
@@ -142,6 +142,51 @@ public class Controller {
 					case TIMED:
 						return TaskCommander.data.updateToTimedTask(indexTasks, newTaskName, newStartDate, newEndDate);
 					}
+				
+			case DONE:
+				
+				// Index in ArrayList tasksRecentlyDisplayed
+				indexTasksRecentlyDisplayedString = getFirstWord(residualUserCommand);
+				try {
+					indexTasksRecentlyDisplayed = Integer.parseInt(indexTasksRecentlyDisplayedString) - Global.INDEX_OFFSET; // Change the line number to an array index
+				} catch (NumberFormatException e) {
+					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+				} 
+				if (indexTasksRecentlyDisplayed > tasksRecentlyDisplayed.size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
+					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed + Global.INDEX_OFFSET));
+				}
+				residualUserCommand = removeFirstWord(residualUserCommand);
+				
+				// Task to be marked as done
+				Task doneTask = tasksRecentlyDisplayed.get(indexTasksRecentlyDisplayed);
+				
+				// Index in ArrayList tasks of the Data class
+				indexTasks = TaskCommander.data.getIndexOf(doneTask);
+				
+				return TaskCommander.data.done(indexTasks);
+				
+			case UNDONE:
+				
+				// Index in ArrayList tasksRecentlyDisplayed
+				indexTasksRecentlyDisplayedString = getFirstWord(residualUserCommand);
+				try {
+					indexTasksRecentlyDisplayed = Integer.parseInt(indexTasksRecentlyDisplayedString) - Global.INDEX_OFFSET; // Change the line number to an array index
+				} catch (NumberFormatException e) {
+					return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+				} 
+				if (indexTasksRecentlyDisplayed > tasksRecentlyDisplayed.size() - Global.INDEX_OFFSET || indexTasksRecentlyDisplayed < 0) {
+					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexTasksRecentlyDisplayed + Global.INDEX_OFFSET));
+				}
+				residualUserCommand = removeFirstWord(residualUserCommand);
+				
+				// Task to be marked as done
+				Task undoneTask = tasksRecentlyDisplayed.get(indexTasksRecentlyDisplayed);
+				
+				// Index in ArrayList tasks of the Data class
+				indexTasks = TaskCommander.data.getIndexOf(undoneTask);
+				
+				return TaskCommander.data.undone(indexTasks);
+				
 				
 			case DISPLAY:
 				
