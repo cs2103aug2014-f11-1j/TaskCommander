@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
  * @author Michelle, Andreas, Sean Saito
  */
 public class Global {
-	
+		
 	public static final String APPLICATION_NAME = "Task Commander";
 	
 	public static final String MESSAGE_FILE_NOT_GIVEN = "File not given. Please enter a valid file name.";
@@ -37,7 +37,12 @@ public class Global {
 	public static final String MESSAGE_EXCEPTION_IO = "Unable to read the data retrieved.";
 	public static final String MESSAGE_ARGUMENTS_NULL = "Null arguments given.";
 	public static final String MESSAGE_ARGUMENTS_INVALID = "Invalid arguments given.";
-
+	public static final String MESSAGE_INVALID_SYNC_TOKEN = "Invalid sync token, clearing event store and re-syncing.";
+	public static final String MESSAGE_NO_NEW_SYNC = "No new events to sync.";
+	public static final String MESSAGE_FULL_SYNC = "Peforming full sync.";
+	public static final String MESSAGE_INCREMENTAL_SYNC = "Performing incremental sync.";
+	public static final String MESSAGE_COMPLETED_SYNC = "Sync complete.";
+	
 	public static final int INDEX_OFFSET = 1; // Difference between the array index and actual line number
 
 	/**
