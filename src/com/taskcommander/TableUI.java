@@ -59,6 +59,8 @@ public class TableUI {
 		final TableColumn column2 = new TableColumn(table, SWT.NONE);
 		final TableColumn column3 = new TableColumn(table, SWT.NONE);
 		table.setBounds(0, 57, 434, 400);
+		
+		//display welcome tasks
 		ArrayList<Task> tasks = TaskCommander.controller.executeCommand("display").getCommandRelatedTasks();
 		displayTasks(shell, table, red, black, blue, black, column1, column2, column3, tasks);
 
