@@ -1,12 +1,14 @@
 package com.taskcommander;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 /**
- * This class represents the Controller component, which calls the respective execution method
- * depending on the user command.
+ * This class represents the Controller component. After receiving the user's
+ * input from the UI, the Controller determines the exact type of command and its 
+ * related parameters by means of the Parser. Then the respective method
+ * of the Data component is called to execute the command and the regained feedback
+ * is returned to the UI.
  * 
  * @author A0128620M
  */
@@ -20,31 +22,33 @@ public class Controller {
 	}
 
 	/**
-	 * This last feedback of the display command contains all tasks which were recently displayed by the UI. 
-	 * It equals to the ArrayList which was returned to the UI within the Feedback object in respond to the latest 
-	 * display command. Memorizing the tasks which have been displayed recently by the UI is needed 
-	 * by the update and delete feature.
+	 * This feedback object of the latest display command contains all tasks which were 
+	 * recently displayed by the UI. Memorizing the tasks which have been displayed recently 
+	 * by the UI is needed by the update, delete, done and open methods.
 	 */
 	private Feedback recentDisplayFeedback;	
 	
 	/**
-	 * Last feedback of a Add/Update/Mark/Delete/Clear command.
+	 * This feedback object represent the feedback of the latest add/update/done/open/delete command.
+	 * Memorizing the commands which have been executed recently is needed by the undo method.
+	 * 
+	 * TODO
 	 */
 	private Feedback recentAddUpdateMarkDeleteClearFeedback;
 
 	/**
-	 * Parses command from user and executes it if valid. Returns feedback to UI.
+	 * This operation parses the command from the user and executes it if valid. Afterwards a 
+	 * feedback is returned.
 	 * 
 	 * @param  userCommand  command given by user
-	 * @return              feedback for to the UI
+	 * @return              feedback to the UI
 	 */
 	public Feedback executeCommand(String userCommand) {	
 		if (userCommand == null | userCommand == "") {
 			return new Feedback(false,Global.MESSAGE_NO_COMMAND);
 		}
 
-		String commandTypeString = getFirstWord(userCommand);
-		Global.CommandType commandType= TaskCommander.parser.determineCommandType(commandTypeString);
+		Global.CommandType commandType= TaskCommander.parser.determineCommandType(userCommand);
 		String residualUserCommand = removeFirstWord(userCommand);
 		
 		String indexTasksRecentlyDisplayedString;

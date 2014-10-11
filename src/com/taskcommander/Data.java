@@ -138,6 +138,11 @@ public class Data {
 		}
 		displayedTasks.addAll(displayedDatedTasks);
 		
+		for(Task dtask: displayedTasks) {
+			System.out.print(dtask.getName());
+			System.out.println(dtask.getDone());
+		}
+		
 		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
 	}
 	
@@ -187,6 +192,11 @@ public class Data {
 		displayedTasks.addAll(displayedFloatingTasks);
 		Collections.sort(displayedDatedTasks);
 		displayedTasks.addAll(displayedDatedTasks);
+		
+		for(Task dtask: displayedTasks) {
+			System.out.print(dtask.getName());
+			System.out.println(dtask.getDone());
+		}
 		
 		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
 	}

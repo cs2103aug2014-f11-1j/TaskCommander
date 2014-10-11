@@ -22,6 +22,9 @@ public class FloatingTask extends Task implements Comparable<FloatingTask>{
 	// Constructor for Cloning
 	public FloatingTask(FloatingTask otherFloatingTask) {
 		super(otherFloatingTask.getName(), TaskType.FLOATING);
+		this.setId(otherFloatingTask.getId());
+		this.setDone(otherFloatingTask.getDone());
+		this.setEdited(otherFloatingTask.getEdited());
 	}
 	
 	/*
