@@ -206,26 +206,25 @@ public class LoginManager {
 	 */
 	private GoogleTokenResponse requestAuthorisation() {
 		try {
-			flow = buildAuthorisationCodeFlow(httpTransport, jsonFactory, dataStoreFactory);
+			flow = buildAuthorisationCodeFlow();
 		} catch (IOException e) {
 			System.out.println(Global.MESSAGE_EXCEPTION_IO);
 		}
 
-		askUserForAuthorisationCode(flow);
+		askUserForAuthorisationCode();
 		String code = getUserInput();
 
-		return getTokenResponse(flow, code);
+		return getTokenResponse(code);
 	}
 
 	/**
 	 * Sends a token request to get a GoogleTokenResponse.
 	 * If an IOException occurs, returns null.
 	 * 
-	 * @param flow
 	 * @param code
 	 * @return      Token response
 	 */
-	private GoogleTokenResponse getTokenResponse(GoogleAuthorizationCodeFlow flow, String code) {
+	private GoogleTokenResponse getTokenResponse(String code) {
 		try {
 			GoogleTokenResponse response = flow.newTokenRequest(code)
 					.setRedirectUri(REDIRECT_URI).execute();
@@ -252,9 +251,8 @@ public class LoginManager {
 	/**
 	 * Creates the authorisation URL, asks the user to open the URL and sign in, then type in the
 	 * authorisation code from Google.
-	 * @param flow
 	 */
-	private void askUserForAuthorisationCode(GoogleAuthorizationCodeFlow flow) {
+	private void askUserForAuthorisationCode() {
 		String url = flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build();
 		System.out.println("Please open the following URL in your browser then type the authorization code:");
 		System.out.println("  " + url);
