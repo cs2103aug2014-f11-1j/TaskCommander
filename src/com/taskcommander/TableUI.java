@@ -57,7 +57,7 @@ public class TableUI {
 		final TableColumn column2 = new TableColumn(table, SWT.NONE);
 		final TableColumn column3 = new TableColumn(table, SWT.NONE);
 		table.setBounds(0, 57, 434, 195);
-		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
+		ArrayList<Task> tasks = TaskCommander.controller.executeCommand("display").getCommandRelatedTasks();
 		for (Task task : tasks)
 		{ 
 			TableItem item = new TableItem(table, SWT.NONE);
