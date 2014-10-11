@@ -119,10 +119,10 @@ public class TableUI {
 						ArrayList<Task> tasks = new ArrayList<Task>();
 						switch(fb.getCommandType()){
 						case DISPLAY: 
-							tasks = TaskCommander.controller.executeCommand(command).getCommandRelatedTasks();
+							tasks = fb.getCommandRelatedTasks();
 							break;
 						case ADD:case DELETE: case UPDATE:
-							tasks.add(TaskCommander.controller.executeCommand(command).getCommandRelatedTask());
+							tasks.add(fb.getCommandRelatedTask());
 						case HELP:
 							// Desired Output has to be discussed, but low priority anyway
 							break;
