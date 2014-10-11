@@ -76,6 +76,11 @@ public class TableUI {
 							displayTasks(shell, table, red, gray, blue, black, column1, column2, column3,
 									tasks);
 						}
+						else{
+							TableItem item = new TableItem(table, SWT.NONE);
+							item.setText(fb.getErrorMessage());
+							item.setForeground(red);
+						}
 						input.setText("");
 					}catch (Exception e1) {
 						e1.printStackTrace();
@@ -91,6 +96,7 @@ public class TableUI {
 		}
 		display.dispose();
 	}
+	
 	public ArrayList<Task> getTasks(Feedback fb) {
 		ArrayList<Task> tasks = new ArrayList<Task>();
 		switch(fb.getCommandType()){
