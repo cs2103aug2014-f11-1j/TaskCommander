@@ -513,7 +513,7 @@ public class GoogleAPIConnector {
 	}
 
 	// Changes a Google Task to a TaskCommander Task.
-	private com.taskcommander.Task toTask(Task task) {
+	public com.taskcommander.Task toTask(Task task) {
 		if (task == null) {
 			return null;
 		}
@@ -527,7 +527,7 @@ public class GoogleAPIConnector {
 	}
 
 	// Changes a Google Calendar Event to a TaskCommander Task.
-	private com.taskcommander.Task toTask(Event event) {
+	public com.taskcommander.Task toTask(Event event) {
 		if (event == null) {
 			return null;
 		}
