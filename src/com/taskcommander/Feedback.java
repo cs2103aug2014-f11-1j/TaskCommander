@@ -17,7 +17,7 @@ public class Feedback {
 	private boolean _wasSuccesfullyExecuted;
 	private Global.CommandType _commandType;
 	private Task _commandRelatedTask;
-	private ArrayList<Task> _commandRelatedTasks;	
+	private ArrayList<Task> _displayedTasks;	
 	private String _errorMessage;
 	
 	public enum FeedbackType {
@@ -32,47 +32,34 @@ public class Feedback {
 	 * @param	commandType			added, updated, deleted, done or open
 	 * @param	commandRelatedTask	task which was added, updated, deleted, marked as done or open
 	 */
-	public Feedback(boolean wasSuccesfullyExecuted, Global.CommandType commandType, Task commandRelatedTask) {
+	public Feedback(boolean wasSuccesfullyExecuted, Global.CommandType commandType, Task commandRelatedTask, ArrayList<Task> displayedTasks) {
 		if (commandType == null || commandRelatedTask == null) {
 			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
 		} else {
 			_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
 			_commandType = commandType;
 			_commandRelatedTask = commandRelatedTask;
+			_displayedTasks = displayedTasks;
 		}
 	}
 	
 	/**
-	 * Constructor for the display command
+	 * Constructor for the display and clear command
 	 * 
 	 * @param	wasSuccesfullyExecuted
 	 * @param	commandType			display
 	 * @param	commandRelatedTasks	tasks to be displayed
 	 */
-	public Feedback(boolean wasSuccesfullyExecuted, Global.CommandType commandType, ArrayList<Task> commandRelatedTasks) {
-		if (commandType == null || commandRelatedTasks == null) {
+	public Feedback(boolean wasSuccesfullyExecuted, Global.CommandType commandType, ArrayList<Task> displayedTasks) {
+		if (commandType == null || displayedTasks == null) {
 			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
 		} else {
 			_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
 			_commandType = commandType;
-			_commandRelatedTasks = commandRelatedTasks;
+			_displayedTasks = displayedTasks;
 		}
 	}
 	
-	/**
-	 * Constructor for clear command.
-	 * 
-	 * @param	wasSuccesfullyExecuted
-	 * @param	commandType			clear
-	 */
-	public Feedback(boolean wasSuccesfullyExecuted, Global.CommandType commandType) { 
-		if (commandType == null) {
-			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
-		} else {
-			_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
-			_commandType = commandType;
-		}
-	}
 	
 	/**
 	 * Constructor for error messages.
@@ -80,12 +67,13 @@ public class Feedback {
 	 * @param	wasSuccesfullyExecuted
 	 * @param	errorMessage
 	 */
-	public Feedback(boolean wasSuccesfullyExecuted, String errorMessage ) {
+	public Feedback(boolean wasSuccesfullyExecuted, String errorMessage, ArrayList<Task> displayedTasks) {
 		if (errorMessage == null) {
 			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
 		} else {
 			_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
 			_errorMessage = errorMessage;
+			_displayedTasks = displayedTasks;
 		}
 	}
 	
@@ -97,12 +85,12 @@ public class Feedback {
 		return _commandType;
 	}	
 	
-	public Task getCommandRelatedTask() {
+	public Task getCommandRelatedTask() {	
 		return _commandRelatedTask;
 	}	
 	
-	public ArrayList<Task> getCommandRelatedTasks() {
-		return _commandRelatedTasks;
+	public ArrayList<Task> getCommandRelatedTasks() {	// to be changed
+		return _displayedTasks;
 	}
 		
 	public String getErrorMessage() {
