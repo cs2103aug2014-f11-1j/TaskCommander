@@ -1,9 +1,13 @@
 package com.taskcommander;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.Events;
 import com.joestelmach.natty.*;
 
 /**
@@ -50,5 +54,50 @@ public class Playground {
 	
 	}
 
-	*/
+	String syncToken = null;
+		
+		try {
+			syncToken = con.getSyncSettingsDataStore().get(SYNC_TOKEN_KEY);
+		} catch (IOException e) {
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+		}
+		
+		if (syncToken == null) {
+			System.out.println(Global.MESSAGE_FULL_SYNC);
+		} else {
+			System.out.println();
+			eventRequest.setSyncToken(syncToken);
+		}
+		
+		//Retrieve the events, one page at a time.
+		String pageToken = null;
+		Events events = null;
+		do {
+			eventRequest.setTimeMin(new DateTime(System.currentTimeMillis())); 
+			eventRequest.setPageToken(pageToken);
+			
+			try {
+				events = eventRequest.execute();
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_INVALID_SYNC_TOKEN);
+				con.getSyncSettingsDataStore().delete(SYNC_TOKEN_KEY);
+				con.getEventDataStore().clear();
+				pull();
+			}
+			
+			List<Event> items = events.getItems();
+			if (items.size() == 0) {
+				System.out.println(Global.MESSAGE_NO_NEW_SYNC);
+			} else {
+				for (Event event : items) {
+					syncEvent(event);
+				}
+			}
+		} while (pageToken != null);
+		
+		
+		con.getSyncSettingsDataStore().set(SYNC_TOKEN_KEY, events.getNextSyncToken());
+		
+		System.out.println(Global.MESSAGE_COMPLETED_SYNC);
+	**/
 }
