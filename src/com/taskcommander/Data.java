@@ -146,11 +146,6 @@ public class Data {
 		Collections.sort(displayedDatedTasks);
 		displayedTasks.addAll(displayedDatedTasks);
 		
-		for(Task task: displayedTasks) {
-			System.out.print(task.getName());
-			System.out.println(task.isDone());
-		}
-		
 		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
 	}
 	

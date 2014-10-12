@@ -26,7 +26,7 @@ public class TableUI {
 	private static final int SHELL_MIN_HEIGHT = 500;
 	private static final int SHELL_MIN_WIDTH = 200;
 
-	private static final int GRID_COLUMNS_NUM = 1;
+	private static final int GRID_COLUMNS_NUM = 2;
 	private static final boolean GRID_COLUMNS_EQUAL_SIZE = false;
 
 	private static final boolean INPUT_FIT_HORIZONTAL = true;
@@ -37,14 +37,16 @@ public class TableUI {
 	
 	private static final boolean OUTPUT_FIT_HORIZONTAL = true;
 	private static final boolean OUTPUT_FIT_VERTICAL = false;
-	private static final int OUTPUT_COLUMNS_NUM = 1;
-	private static final int OUTPUT_ROWS_NUM = 2;
+	private static final int OUTPUT_COLUMNS_NUM = 2;
+	private static final int OUTPUT_ROWS_NUM = 1;
 	private static final int OUTPUT_PREFERRED_WIDTH = 500;
 	private static final int OUTPUT_PREFERRED_HEIGHT = 50;
 
 	private static final int TABLE_STYLE = SWT.NONE;
 	private static final boolean TABLE_FIT_HORIZONTAL = true;
 	private static final boolean TABLE_FIT_VERTICAL = true;
+	private static final int TABLE_COLUMNS_NUM = 2;
+	private static final int TABLE_ROWS_NUM = 1;
 	private static final int TABLE_PREFERRED_WIDTH = 500;
 	private static final int TABLE_PREFERRED_HEIGHT = 200;
 
@@ -75,6 +77,7 @@ public class TableUI {
 		shell.setLayout(new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE));
 		shell.setText(Global.APPLICATION_NAME);
 		shell.setMinimumSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
+		
 		new Label(shell, SWT.NONE).setText("Enter command: ");
 		input = new Text(shell, SWT.BORDER);
 		output = new Text(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
@@ -89,10 +92,11 @@ public class TableUI {
 		outputGridData.widthHint = OUTPUT_PREFERRED_WIDTH;
 		outputGridData.heightHint = OUTPUT_PREFERRED_HEIGHT;
 		output.setLayoutData(outputGridData);
-		
-		output.setMessage(Global.MESSAGE_WELCOME);
+		output.setText(Global.MESSAGE_WELCOME);
+		output.setEditable(false);
 
-		GridData tableGridData = new GridData(SWT.FILL, SWT.FILL, TABLE_FIT_HORIZONTAL, TABLE_FIT_VERTICAL);
+		GridData tableGridData = new GridData(SWT.FILL, SWT.FILL, TABLE_FIT_HORIZONTAL, TABLE_FIT_VERTICAL, 
+				TABLE_COLUMNS_NUM, TABLE_ROWS_NUM);
 		tableGridData.widthHint = TABLE_PREFERRED_WIDTH;
 		tableGridData.heightHint = TABLE_PREFERRED_HEIGHT;
 		table.setLayoutData(tableGridData);
