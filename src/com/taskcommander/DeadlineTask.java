@@ -31,8 +31,8 @@ public class DeadlineTask extends DatedTask {
 		super(otherDeadlineTask.getName(),TaskType.DEADLINE, otherDeadlineTask.getEndDate());
 		_endDate = otherDeadlineTask.getEndDate();
 		this.setId(otherDeadlineTask.getId());
-		this.setDone(otherDeadlineTask.getDone());
-		this.setEdited(otherDeadlineTask.getEdited());
+		this.setDone(otherDeadlineTask.isDone());
+		this.setEdited(otherDeadlineTask.isEdited());
 	}
 
 	public Date getEndDate() {

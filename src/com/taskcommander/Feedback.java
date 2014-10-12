@@ -20,6 +20,11 @@ public class Feedback {
 	private ArrayList<Task> _commandRelatedTasks;	
 	private String _errorMessage;
 	
+	public enum FeedbackType {
+		STRING,
+		TASKS
+	}
+	
 	/**
 	 * Constructor for the add, update, delete, done and open command.
 	 * 

@@ -22,7 +22,52 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.events.TraverseEvent;
 
 public class TableUI {
+
+	private static final int SHELL_MIN_HEIGHT = 500;
+	private static final int SHELL_MIN_WIDTH = 200;
+
+	private static final int GRID_COLUMNS_SPAN = 2;
+	private static final boolean GRID_COLUMNS_EQUAL_SIZE = false;
+
+	private static final boolean INPUT_FIT_HORIZONTAL = true;
+	private static final boolean INPUT_FIT_VERTICAL = false;
+	private static final int INPUT_COLUMNS_SPAN = 1;
+	private static final int INPUT_ROWS_SPAN = 1;
+	private static final int INPUT_PREFERRED_WIDTH = 500;
+
+	private static final boolean OUTPUT_FIT_HORIZONTAL = true;
+	private static final boolean OUTPUT_FIT_VERTICAL = false;
+	private static final int OUTPUT_COLUMNS_SPAN = 2;
+	private static final int OUTPUT_ROWS_SPAN = 1;
+	private static final int OUTPUT_PREFERRED_WIDTH = 500;
+	private static final int OUTPUT_PREFERRED_HEIGHT = 50;
+
+	private static final int TABLE_STYLE = SWT.NONE;
+	private static final boolean TABLE_FIT_HORIZONTAL = true;
+	private static final boolean TABLE_FIT_VERTICAL = true;
+	private static final int TABLE_COLUMNS_SPAN = 2;
+	private static final int TABLE_ROWS_SPAN = 1;
+	private static final int TABLE_PREFERRED_WIDTH = 500;
+	private static final int TABLE_PREFERRED_HEIGHT = 100;
+	private static final int TABLE_COLUMNS_NUM = 4;
+	private static final String[] TABLE_COLUMNS_NAMES = {"No.", "Date", "Task", "Done"};
+
+	private final Display display = Display.getDefault();
+	private final Shell shell = new Shell(display);
+	private final Table table = new Table(shell, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+
+	private final Color red = display.getSystemColor(SWT.COLOR_RED);
+	private final Color gray = display.getSystemColor(SWT.COLOR_GRAY);
+	private final Color blue = display.getSystemColor(SWT.COLOR_BLUE);
+	private final Color cyan = display.getSystemColor(SWT.COLOR_CYAN);
+	
+	private final Color COLOR_COL_FIRST = gray;
+	private final Color COLOR_COL_SECOND = blue;
+	private final Color COLOR_COL_THIRD = cyan;
+
 	private Text input;
+	private Text output;
+
 	public TableUI() {
 
 	}
@@ -31,73 +76,95 @@ public class TableUI {
 	 * @wbp.parser.entryPoint
 	 */
 	public void open() {
-		final Display display = Display.getDefault();
-		final Shell shell = new Shell(display);
-		shell.setLayout(new GridLayout(3, false));
-		shell.setText("Task Commander");
+		shell.setLayout(new GridLayout(GRID_COLUMNS_SPAN, GRID_COLUMNS_EQUAL_SIZE));
+		shell.setText(Global.APPLICATION_NAME);
+		shell.setMinimumSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
 
+		output = new Text(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		new Label(shell, SWT.NONE).setText("Enter command: ");
 		input = new Text(shell, SWT.BORDER);
 
-		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_text.widthHint = 500;
-		input.setLayoutData(gd_text);
-		new Label(shell, SWT.NONE);
-		new Label(shell, SWT.NONE);
 
-		final Table table = new Table(shell, SWT.BORDER | SWT.MULTI);
-		GridData gd_table = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd_table.widthHint = 500;
-		gd_table.heightHint = 200;
-		table.setLayoutData(gd_table);
+		GridData inputGridData = new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
+				INPUT_COLUMNS_SPAN, INPUT_ROWS_SPAN);
+		inputGridData.widthHint = INPUT_PREFERRED_WIDTH;
+		input.setLayoutData(inputGridData);
 
-		final Color red = display.getSystemColor(SWT.COLOR_RED);
-		final Color gray = display.getSystemColor(SWT.COLOR_GRAY);
-		final Color blue = display.getSystemColor(SWT.COLOR_BLUE);
-		final Color cyan = display.getSystemColor(SWT.COLOR_CYAN);
+		GridData outputGridData = new GridData(SWT.FILL, SWT.CENTER, OUTPUT_FIT_HORIZONTAL, OUTPUT_FIT_VERTICAL, 
+				OUTPUT_COLUMNS_SPAN, OUTPUT_ROWS_SPAN);
+		outputGridData.widthHint = OUTPUT_PREFERRED_WIDTH;
+		outputGridData.heightHint = OUTPUT_PREFERRED_HEIGHT;
+		output.setLayoutData(outputGridData);
+		output.setText(Global.MESSAGE_WELCOME);
+		output.setEditable(false);
 
-		final TableColumn column1 = new TableColumn(table, SWT.NONE);
-		final TableColumn column2 = new TableColumn(table, SWT.NONE);
-		final TableColumn column3 = new TableColumn(table, SWT.NONE);
-		
-		//display welcome tasks
-		ArrayList<Task> tasks = TaskCommander.controller.executeCommand("display").getCommandRelatedTasks();
-		displayTasks(shell, table, red, gray, blue, cyan, column1, column2, column3, tasks);
+		GridData tableGridData = new GridData(SWT.FILL, SWT.FILL, TABLE_FIT_HORIZONTAL, TABLE_FIT_VERTICAL, 
+				TABLE_COLUMNS_SPAN, TABLE_ROWS_SPAN);
+		tableGridData.widthHint = TABLE_PREFERRED_WIDTH;
+		tableGridData.heightHint = TABLE_PREFERRED_HEIGHT;
+		table.setLayoutData(tableGridData);
+		table.setHeaderVisible(true);
+		for (int i = 0; i < TABLE_COLUMNS_NUM; i++) {
+			TableColumn column = new TableColumn(table, TABLE_STYLE);
+	        column.setText(TABLE_COLUMNS_NAMES[i]);
+		}
+
+		displayTasksUponOpening();
 
 		input.addListener(SWT.Traverse, new Listener(){
-
 			@Override
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				if(event.detail == SWT.TRAVERSE_RETURN)
 					try {
-						table.removeAll();
+						clearTableItems();
 						String command = input.getText();
 						Feedback fb = TaskCommander.controller.executeCommand(command);
+						// Uncomment this line after Controller implements new parts
+						// displayFeedback(fb);
+						
+						// Delete this part after Controller implements new parts
+						// ---- START DELETE ----- 
 						if(fb.wasSuccesfullyExecuted()){
 							ArrayList<Task> tasks = getTasks(fb);
-							displayTasks(shell, table, red, gray, blue, cyan, column1, column2, column3,
-									tasks);
+							displayTasks(tasks);
+							// Add this line after Controller implements new parts
+							// output.setText(fb.getMessage());
+							// output.setForeground(blue);
+						} else{
+							output.setText(fb.getErrorMessage());
+							output.setForeground(red);
 						}
-						else{
-							TableItem item = new TableItem(table, SWT.NONE);
-							item.setText(fb.getErrorMessage());
-							item.setForeground(red);
-						}
+						// ---- END DELETE ----- 
 						input.setText("");
 					}catch (Exception e1) {
-						e1.printStackTrace();
+						output.setText(e1.getMessage());
+						output.setForeground(red);
 					}
 			}
-
 		});
-		shell.open();
-		while (!shell.isDisposed())
-		{
-			if (!display.readAndDispatch())
-				display.sleep();
-		}
-		display.dispose();
+
+		runUntilWindowClosed();
+	}
+
+	private void displayTasksUponOpening() {
+		// Switch to this line after Controller implements new parts
+		// ArrayList<Task> tasks = TaskCommander.controller.getTasks().getCommandRelatedTasks();
+		ArrayList<Task> tasks = TaskCommander.controller.executeCommand("display").getCommandRelatedTasks();
+		displayTasks(tasks);
 	}
 	
+	private void displayFeedback(Feedback fb) {
+		if (fb.wasSuccesfullyExecuted()) {
+			displayTasks(fb.getCommandRelatedTasks());
+			// Uncomment this line after Controller implements new parts
+			//output.setText(fb.getMessage());
+			//output.setForeground(blue);
+		} else {
+			output.setText(fb.getErrorMessage());
+			output.setForeground(red);
+		}
+	}
+
 	public ArrayList<Task> getTasks(Feedback fb) {
 		ArrayList<Task> tasks = new ArrayList<Task>();
 		switch(fb.getCommandType()){
@@ -125,13 +192,11 @@ public class TableUI {
 		}
 		return tasks;
 	}
-	public void displayTasks(final Shell shell, final Table table,
-			final Color red, final Color gray, final Color blue, final Color cyan,
-			final TableColumn column1, final TableColumn column2,
-			final TableColumn column3, ArrayList<Task> tasks) {
-		for (Task task : tasks)
-		{ 
-			TableItem item = new TableItem(table, SWT.NONE);
+
+	public void displayTasks(ArrayList<Task> tasks) {
+		int index = 1;
+		for (Task task : tasks) { 
+			TableItem item = new TableItem(table, TABLE_STYLE);
 			String done;
 			Color doneColor;
 			if (task.isDone()) {
@@ -143,39 +208,66 @@ public class TableUI {
 			}
 			switch(task.getType()) {
 			case FLOATING:
-				item.setText(new String[] { " ", 
+				item.setText(new String[] {Integer.toString(index),
+						" ", 
 						task.getName(),
 						done });
-				item.setForeground(0, blue);
-				item.setForeground(1, cyan);
-				item.setForeground(2, doneColor);
 				break;
 			case DEADLINE:
 				DeadlineTask deadlineTask = (DeadlineTask) task;
-				item.setText(new String[] { "[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]", 
+				item.setText(new String[] {Integer.toString(index),
+						"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]", 
 						task.getName(),
 						done });
-				item.setForeground(0, blue);
-				item.setForeground(1, cyan);
-				item.setForeground(2, doneColor);
 				break;
 			case TIMED:
 				TimedTask timedTask = (TimedTask) task;
-				item.setText(new String[] { "["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]", 
+				item.setText(new String[] { Integer.toString(index),
+						"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]", 
 						task.getName(),
 						done });
-				item.setForeground(0, blue);
-				item.setForeground(1, cyan);
-				item.setForeground(2, doneColor);
 				break;
 			}
+			setColorsForTableItem(item, doneColor);
+			index++;
 		}
+		packUI();
+	}
+	
+	/**
+	 * Opens the shell and runs until the shell is closed.
+	 * Disposes of the display.
+	 */
+	private void runUntilWindowClosed() {
+		shell.open();
+		while (!shell.isDisposed())
+		{
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
+		display.dispose();
+	}
 
-		column1.pack();
-		column2.pack();
-		column3.pack();
+	private void setColorsForTableItem(TableItem item, Color doneColor) {
+		item.setForeground(0, COLOR_COL_FIRST);
+		item.setForeground(1, COLOR_COL_SECOND);
+		item.setForeground(2, COLOR_COL_THIRD);
+		item.setForeground(3, doneColor);
+	}
 
+	/**
+	 * Calls pack() for UI elements.
+	 */
+	private void packUI() {
+		for (TableColumn t : table.getColumns()) {
+			t.pack();
+		}
 		shell.pack();
+	}
+
+	private void clearTableItems() {
+		table.removeAll();
 	}
 
 }

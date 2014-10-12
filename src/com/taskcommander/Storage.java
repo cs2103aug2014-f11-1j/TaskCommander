@@ -41,7 +41,6 @@ public class Storage {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				Task task = gson.fromJson(line, Task.class);
-				System.out.println(task.getName());
 				tasks.add(task);
 			}
 			reader.close();

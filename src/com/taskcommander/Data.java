@@ -146,11 +146,6 @@ public class Data {
 		Collections.sort(displayedDatedTasks);
 		displayedTasks.addAll(displayedDatedTasks);
 		
-		for(Task task: displayedTasks) {
-			System.out.print(task.getName());
-			System.out.println(task.getDone());
-		}
-		
 		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
 	}
 	
@@ -175,7 +170,7 @@ public class Data {
 		
 		for(Task task: tasks) {
 			// Step 1: Check Status
-			if (!isStatusRestricted || (isStatusRestricted && status == task.getDone() )) {
+			if (!isStatusRestricted || (isStatusRestricted && status == task.isDone() )) {
 				// Step 2: Check Type
 				if(task.getType() == Task.TaskType.FLOATING && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownFloatingTask))) {	
 					// Step 3: Check DatePeriod
@@ -203,7 +198,7 @@ public class Data {
 		
 		for(Task task: displayedTasks) {
 			System.out.print(task.getName());
-			System.out.println(task.getDone());
+			System.out.println(task.isDone());
 		}
 		
 		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
@@ -230,7 +225,7 @@ public class Data {
 		}
 		if  (tasks.get(index).getType() != Task.TaskType.TIMED) {
 			TimedTask timedTask = new TimedTask(name,startDate,endDate);
-			timedTask.setEdited(tasks.get(index).getEdited());
+			timedTask.setEdited(tasks.get(index).isEdited());
 			timedTask.setDone(tasks.get(index).isDone());
 			saveToHistory();
 			deleteTask(index);
@@ -277,7 +272,7 @@ public class Data {
 
 		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
 			DeadlineTask deadlineTask = new DeadlineTask(name,endDate);
-			deadlineTask.setEdited(tasks.get(index).getEdited());
+			deadlineTask.setEdited(tasks.get(index).isEdited());
 			deadlineTask.setDone(tasks.get(index).isDone());
 			saveToHistory();
 			deleteTask(index);
@@ -319,7 +314,7 @@ public class Data {
 		
 		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
 			FloatingTask floatingTask = new FloatingTask(name);
-			floatingTask.setEdited(tasks.get(index).getEdited());
+			floatingTask.setEdited(tasks.get(index).isEdited());
 			floatingTask.setDone(tasks.get(index).isDone());
 			saveToHistory();
 			deleteTask(index);
@@ -354,7 +349,7 @@ public class Data {
 		}
 		
 		Task doneTask = tasks.get(index);
-		if (doneTask.getDone()) {
+		if (doneTask.isDone()) {
 			return new Feedback(false, String.format(Global.MESSAGE_ALREADY_DONE));
 		} else {
 			saveToHistory();
@@ -387,7 +382,7 @@ public class Data {
 		}
 		
 		Task openTask = tasks.get(index);
-		if (!openTask.getDone()) {
+		if (!openTask.isDone()) {
 			return new Feedback(false, String.format(Global.MESSAGE_ALREADY_OPEN));
 		} else {
 			saveToHistory();

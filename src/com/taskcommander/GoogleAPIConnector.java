@@ -98,8 +98,6 @@ public class GoogleAPIConnector {
 		}
 	}
 	
-	
-	
 	/**
 	 * Gets all tasks from Tasks API.
 	 * @return   Arraylist of TaskCommander Tasks.
@@ -120,6 +118,16 @@ public class GoogleAPIConnector {
 		}
 	}
 
+	public Tasks.TasksOperations.List getListTasksRequest() {
+		try {
+			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_CALENDAR_ID);
+			return request;
+		} catch (IOException e) {
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			return null;
+		}
+	}
+	
 	//@author A0109194A
 	/**
 	 * Gets all events from Calendar API starting from
@@ -184,7 +192,7 @@ public class GoogleAPIConnector {
 	 * @param task   Custom FloatingTask object
 	 * @return       Google ID of task
 	 */
-	public String addTask(FloatingTask task) {
+	private String addTask(FloatingTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else {
@@ -210,7 +218,7 @@ public class GoogleAPIConnector {
 	 * @param task   Custom DeadlineTask object
 	 * @return       Google ID of task
 	 */
-	public String addTask(DeadlineTask task) {
+	private String addTask(DeadlineTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else {
@@ -238,7 +246,7 @@ public class GoogleAPIConnector {
 	 * @param task   Custom TimedTask object
 	 * @return       Google ID of task
 	 */
-	public String addTask(TimedTask task) {
+	private String addTask(TimedTask task) {
 		if (task == null){
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else {
@@ -268,7 +276,7 @@ public class GoogleAPIConnector {
 	 * @param task   Custom FloatingTask object
 	 * @return	     TaskCommander Task object
 	 */
-	public com.taskcommander.Task getTask(FloatingTask task) {
+	private com.taskcommander.Task getTask(FloatingTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else if (task.getId() == null) {
@@ -292,7 +300,7 @@ public class GoogleAPIConnector {
 	 * @param task   Custom DeadlineTask object
 	 * @return	     TaskCommander Task object
 	 */
-	public com.taskcommander.Task getTask(DeadlineTask task) {
+	private com.taskcommander.Task getTask(DeadlineTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else if (task.getId() == null) {
@@ -316,7 +324,7 @@ public class GoogleAPIConnector {
 	 * @param task   Custom TimedTask object
 	 * @return	     TaskCommander Task object
 	 */
-	public com.taskcommander.Task getTask(TimedTask task) {
+	private com.taskcommander.Task getTask(TimedTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else if (task.getId() == null) {
@@ -341,7 +349,7 @@ public class GoogleAPIConnector {
 	 * @param task   Custom FloatingTask object
 	 * @return	     Success of action
 	 */
-	public boolean deleteTask(FloatingTask task) {
+	private boolean deleteTask(FloatingTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else if (task.getId() == null) {
@@ -367,7 +375,7 @@ public class GoogleAPIConnector {
 	 * @param task   Custom DeadlineTask object
 	 * @return	     Success of action
 	 */
-	public boolean deleteTask(DeadlineTask task) {
+	private boolean deleteTask(DeadlineTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else if (task.getId() == null) {
@@ -393,7 +401,7 @@ public class GoogleAPIConnector {
 	 * @param task   Custom TimedTask object
 	 * @return	     Success of action
 	 */
-	public boolean deleteTask(TimedTask task) {
+	private boolean deleteTask(TimedTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else if (task.getId() == null) {
@@ -419,7 +427,7 @@ public class GoogleAPIConnector {
 	 * @param task   Custom FloatingTask object
 	 * @return	     Success of action
 	 */
-	public boolean updateTask(FloatingTask task) {
+	private boolean updateTask(FloatingTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else if (task.getId() == null) {
@@ -444,7 +452,7 @@ public class GoogleAPIConnector {
 	 * @param task   Custom DeadlineTask object
 	 * @return	     Success of action
 	 */
-	public boolean updateTask(DeadlineTask task) {
+	private boolean updateTask(DeadlineTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else if (task.getId() == null) {
@@ -468,7 +476,7 @@ public class GoogleAPIConnector {
 	 * @param task   Custom TimedTask object
 	 * @return	     Success of action
 	 */
-	public boolean updateTask(TimedTask task) {
+	private boolean updateTask(TimedTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 		} else if (task.getId() == null) {
