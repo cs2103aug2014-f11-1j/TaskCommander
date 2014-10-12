@@ -101,6 +101,10 @@ public abstract class Task {
 	public void setEdited(boolean edited) {
 		this._edited = edited;
 	}
+	
+	public void setUpdated(Date updated) {
+		_updated = updated;
+	}
 
 	public void markDone() {
 		_done = true;
