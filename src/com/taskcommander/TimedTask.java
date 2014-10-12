@@ -28,6 +28,7 @@ public class TimedTask extends DatedTask {
 	}
 	
 	// Constructor for Cloning
+	// A0128620M
 	public TimedTask(TimedTask otherTimedTask){
 		super(otherTimedTask.getName(), TaskType.TIMED, otherTimedTask.getStartDate() );
 			_startDate = otherTimedTask.getStartDate();
@@ -55,11 +56,13 @@ public class TimedTask extends DatedTask {
 	
 
 	@Override
+	// A0128620M
 	public int compareTo(TimedTask otherTask) {
 		return (_startDate.compareTo(otherTask.getStartDate()));
 	}
 	
 	@Override
+	// A0128620M
 	public boolean equals(Object otherObject) {
 		if (otherObject == null) {
 			return false;

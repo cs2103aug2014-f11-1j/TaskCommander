@@ -32,11 +32,13 @@ public class FloatingTask extends Task implements Comparable<FloatingTask>{
 	 * in a alphabetically manner.
 	 */
 	@Override
+	// A0128620M
 	public int compareTo(FloatingTask otherTask) {
 		return (getName().compareTo(otherTask.getName()));
 	}
 	
 	@Override
+	// A0128620M
 	public boolean equals(Object otherObject) {
 		if (otherObject == null) {
 			return false;
