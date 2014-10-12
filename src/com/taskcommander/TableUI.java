@@ -83,9 +83,10 @@ public class TableUI {
 		shell.setText(Global.APPLICATION_NAME);
 		shell.setMinimumSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
 
+		output = new Text(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		new Label(shell, SWT.NONE).setText("Enter command: ");
 		input = new Text(shell, SWT.BORDER);
-		output = new Text(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+
 
 		GridData inputGridData = new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
 				INPUT_COLUMNS_NUM, INPUT_ROWS_NUM);
@@ -135,21 +136,6 @@ public class TableUI {
 		runUntilWindowClosed();
 	}
 
-	/**
-	 * Opens the shell and runs until the shell is closed.
-	 * Disposes of the display.
-	 */
-	private void runUntilWindowClosed() {
-		shell.open();
-		while (!shell.isDisposed())
-		{
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-		display.dispose();
-	}
-
 	public ArrayList<Task> getTasks(Feedback fb) {
 		ArrayList<Task> tasks = new ArrayList<Task>();
 		switch(fb.getCommandType()){
@@ -179,6 +165,7 @@ public class TableUI {
 	}
 
 	public void displayTasks(ArrayList<Task> tasks) {
+		int index = 1;
 		for (Task task : tasks) { 
 			TableItem item = new TableItem(table, TABLE_STYLE);
 			String done;
@@ -190,8 +177,6 @@ public class TableUI {
 				done = "not done";
 				doneColor = red;
 			}
-			
-			int index = 0;
 			switch(task.getType()) {
 			case FLOATING:
 				item.setText(new String[] {Integer.toString(index),
@@ -217,8 +202,22 @@ public class TableUI {
 			setColorsForTableItem(item, doneColor);
 			index++;
 		}
-
 		packUI();
+	}
+	
+	/**
+	 * Opens the shell and runs until the shell is closed.
+	 * Disposes of the display.
+	 */
+	private void runUntilWindowClosed() {
+		shell.open();
+		while (!shell.isDisposed())
+		{
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
+		display.dispose();
 	}
 
 	private void setColorsForTableItem(TableItem item, Color doneColor) {
