@@ -10,7 +10,7 @@ import java.util.Collections;
  * the content of the permanent storage is pulled to the temporary one. After each command the data 
  * will be pushed to the permanent storage.
  * 
- * @author A0128620M
+ * @author A0128620M, A0109194A
  */
 
 public class Data {
@@ -58,6 +58,7 @@ public class Data {
 
 	/**
 	 * This operation adds a Task to the tasks ArrayList.
+	 * It is usually called by the SyncHandler class.
 	 * 
 	 * @param 	task     
 	 * @return 	feedback for UI
@@ -66,13 +67,13 @@ public class Data {
 		switch ( task.getType()) {
 		case FLOATING:
 			FloatingTask floatingTask = (FloatingTask) task;
-			return addFloatingTask(floatingTask.getName());
+			return addFloatingTask(floatingTask.getName(), task.getId());
 		case DEADLINE:
 			DeadlineTask deadlineTask = (DeadlineTask) task;
-			return addDeadlineTask(deadlineTask.getName(), deadlineTask.getEndDate());
+			return addDeadlineTask(deadlineTask.getName(), deadlineTask.getEndDate(), task.getId());
 		default:
 			TimedTask timedTask = (TimedTask) task;
-			return addTimedTask(timedTask.getName(), timedTask.getStartDate(), timedTask.getEndDate());
+			return addTimedTask(timedTask.getName(), timedTask.getStartDate(), timedTask.getEndDate(), task.getId());
 		}
 	}
 	
@@ -93,6 +94,23 @@ public class Data {
 	}
 	
 	/**
+	 * This operation adds a TimedTask, and sets an ID to it
+	 * 
+	 * @param 	taskName
+	 * @param 	startDate
+	 * @param 	endDate
+	 * @param 	id
+	 * @return 	feedback for UI
+	 */
+	public Feedback addTimedTask(String taskName, Date startDate, Date endDate, String googleID) {
+		TimedTask timedTask = new TimedTask(taskName,startDate,endDate, googleID);
+		saveToHistory();
+		tasks.add(timedTask);
+		save();
+		return new Feedback(true, Global.CommandType.ADD, new TimedTask(timedTask), getAllTasks());
+	}
+	
+	/**
 	 * This operation adds a DeadlineTask to the tasks ArrayList.
 	 * 
 	 * @param 	taskName     
@@ -108,6 +126,22 @@ public class Data {
 	}
 	
 	/**
+	 * This operation adds a DeadlineTask and sets a GoogleID to it.
+	 * 
+	 * @param taskName
+	 * @param endDate
+	 * @param googleID
+	 * @return
+	 */
+	public Feedback addDeadlineTask(String taskName, Date endDate, String googleID) {
+		DeadlineTask deadlineTask= new DeadlineTask(taskName, endDate, googleID);
+		saveToHistory();
+		tasks.add(deadlineTask);
+		save();
+		return new Feedback(true, Global.CommandType.ADD, new DeadlineTask(deadlineTask), getAllTasks());
+	}
+	
+	/**
 	 * This operation adds a FloatingTask to the tasks ArrayList.
 	 * 
 	 * @param 	taskName        
@@ -119,6 +153,21 @@ public class Data {
 		tasks.add(floatingTask);
 		save();
 		return String.format(Global.MESSAGE_ADDED,"\"" + floatingTask.getName() + "\"");
+	}
+	
+	/**
+	 * This operation adds a FloatingTask and sets a GoogleID to it.
+	 * 
+	 * @param taskName
+	 * @param googleID
+	 * @return
+	 */
+	public Feedback addFloatingTask(String taskName, String googleID) {
+		FloatingTask floatingTask = new FloatingTask(taskName, googleID);
+		saveToHistory();
+		tasks.add(floatingTask);
+		save();
+		return new Feedback(true, Global.CommandType.ADD, new FloatingTask(floatingTask), getAllTasks());
 	}
 
 	/**
@@ -444,8 +493,8 @@ public class Data {
 	 * This operation deletes the task directly from the tasks list without the index.
 	 * Used to delete tasks when syncing.
 	 * 
-	 * @param 			task
-	 * @return 			boolean value on whether the delete was successful.
+	 * @param 	task
+	 * @return 	boolean value on whether the delete was successful.
 	 */
 	public boolean deleteTask(Task task) {
 		if (tasks.isEmpty()) {

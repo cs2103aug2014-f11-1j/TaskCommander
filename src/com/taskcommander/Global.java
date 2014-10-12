@@ -43,6 +43,7 @@ public class Global {
 	public static final String MESSAGE_FULL_SYNC = "Peforming full sync.";
 	public static final String MESSAGE_INCREMENTAL_SYNC = "Performing incremental sync.";
 	public static final String MESSAGE_COMPLETED_SYNC = "Sync complete.";
+	public static final String MESSAGE_FAILED_PULL = "Could not pull data";
 	
 	public static final int INDEX_OFFSET = 1; // Difference between the array index and actual line number
 
@@ -52,6 +53,7 @@ public class Global {
 	 */
 	public static final SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy");
 	public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
 
 	// Possible command types
 	public static enum CommandType {

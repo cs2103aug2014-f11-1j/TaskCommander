@@ -17,9 +17,6 @@ public class SyncHandler {
 
 	private static GoogleAPIConnector con = null;
 	
-	// The key in the sync settings datastore that holds the current sync token.
-	private static final String SYNC_TOKEN_KEY = "syncToken";
-
 	public SyncHandler() {
 
 	}
@@ -38,8 +35,7 @@ public class SyncHandler {
 		try {
 			pull();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(Global.MESSAGE_FAILED_PULL);
 		}
 		return Global.MESSAGE_SYNC_SUCCESS;
 	}
@@ -68,19 +64,36 @@ public class SyncHandler {
 		}
 	}
 	
-	private void pull() throws IOException{
-		//Construct the Calendar.Events.List request, but don't execute yet		
-		Calendar.Events.List eventRequest = con.getListEventRequest();
-				
-	}
-	
-	private void syncEvent(Event event) throws IOException {
-		if ("cancelled".equals(event.getStatus()) && con.getEventDataStore().containsKey(event.getId())) {
-			con.getEventDataStore().delete(event.getId());
-			TaskCommander.data.deleteTask(con.toTask(event));
-		} else {
-			con.getEventDataStore().set(event.getId(), event.toString());
-			TaskCommander.data.addTask(con.toTask(event));
+	private void pull() throws IOException {
+		//Get all Tasks
+		ArrayList<Task> tasks = con.getAllTasks();
+		
+		//Added case
+		ArrayList<String> taskIds = TaskCommander.data.getAllIds();
+		for (Task t: tasks) {
+			if (!taskIds.contains(t.getId())) {
+				TaskCommander.data.addTask(t);
+			}
 		}
+		
+		//TODO Updated cases
+		
+		
+		//Deleted case
+		//For Tasks
+		List<com.google.api.services.tasks.model.Task> googleTasks = con.getAllGoogleTasks();
+		for (com.google.api.services.tasks.model.Task task : googleTasks) {
+			if (task.getDeleted()) {
+				TaskCommander.data.deleteTask(con.toTask(task));
+			}
+		}
+		
+		//For Events
+		List<Event> googleEvents = con.getAllGoogleEvents();
+		for (Event event : googleEvents) {
+			if ("cancelled".equals(event.getStatus())) {
+				TaskCommander.data.deleteTask(con.toTask(event));
+			}
+		}	
 	}
 }

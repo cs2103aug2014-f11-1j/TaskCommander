@@ -104,5 +104,19 @@ public class Playground {
 		con.getSyncSettingsDataStore().set(SYNC_TOKEN_KEY, events.getNextSyncToken());
 		
 		System.out.println(Global.MESSAGE_COMPLETED_SYNC);
+		
+		
+		
+	private void syncEvent(Event event) throws IOException {
+		//Deleted case
+		if ("cancelled".equals(event.getStatus()) && con.getEventDataStore().containsKey(event.getId())) {
+			con.getEventDataStore().delete(event.getId());
+			TaskCommander.data.deleteTask(con.toTask(event));
+		} else {
+			con.getEventDataStore().set(event.getId(), event.toString());
+			TaskCommander.data.addTask(con.toTask(event));
+		}
+	}
+	
 	**/
 }
