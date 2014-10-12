@@ -22,7 +22,24 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.events.TraverseEvent;
 
 public class TableUI {
+	
+	private final Display display = Display.getDefault();
 	private Text input;
+	
+	private static final int GRID_COLUMNS_NUM = 3;
+	private static final boolean GRID_COLUMNS_EQUAL_SIZE = false;
+	
+	private static final boolean INPUT_FIT_HORIZONTAL = true;
+	private static final boolean INPUT_FIT_VERTICAL = false;
+	private static final int INPUT_COLUMNS_NUM = 1;
+	private static final int INPUT_ROWS_NUM = 1;
+	private static final int INPUT_PREFERRED_WIDTH = 500;
+	
+	private static final boolean TABLE_FIT_HORIZONTAL = true;
+	private static final boolean TABLE_FIT_VERTICAL = true;
+	private static final int TABLE_PREFERRED_WIDTH = 500;
+	private static final int TABLE_PREFERRED_HEIGHT = 200;
+	
 	public TableUI() {
 
 	}
@@ -31,29 +48,29 @@ public class TableUI {
 	 * @wbp.parser.entryPoint
 	 */
 	public void open() {
-		final Display display = Display.getDefault();
 		final Shell shell = new Shell(display);
-		shell.setLayout(new GridLayout(3, false));
-		shell.setText("Task Commander");
-
-		input = new Text(shell, SWT.BORDER);
-
-		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_text.widthHint = 500;
-		input.setLayoutData(gd_text);
-		new Label(shell, SWT.NONE);
-		new Label(shell, SWT.NONE);
-
-		final Table table = new Table(shell, SWT.BORDER | SWT.MULTI);
-		GridData gd_table = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd_table.widthHint = 500;
-		gd_table.heightHint = 200;
-		table.setLayoutData(gd_table);
-
+		shell.setLayout(new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE));
+		shell.setText(Global.APPLICATION_NAME);
+		
 		final Color red = display.getSystemColor(SWT.COLOR_RED);
 		final Color gray = display.getSystemColor(SWT.COLOR_GRAY);
 		final Color blue = display.getSystemColor(SWT.COLOR_BLUE);
 		final Color cyan = display.getSystemColor(SWT.COLOR_CYAN);
+
+		input = new Text(shell, SWT.BORDER);
+
+		GridData inputGridData = new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
+												INPUT_COLUMNS_NUM, INPUT_ROWS_NUM);
+		inputGridData.widthHint = INPUT_PREFERRED_WIDTH;
+		input.setLayoutData(inputGridData);
+		//new Label(shell, SWT.NONE);
+		//new Label(shell, SWT.NONE);
+
+		final Table table = new Table(shell, SWT.BORDER | SWT.MULTI);
+		GridData tableGridData = new GridData(SWT.FILL, SWT.FILL, TABLE_FIT_HORIZONTAL, TABLE_FIT_VERTICAL);
+		tableGridData.widthHint = TABLE_PREFERRED_WIDTH;
+		tableGridData.heightHint = TABLE_PREFERRED_HEIGHT;
+		table.setLayoutData(tableGridData);
 
 		final TableColumn column1 = new TableColumn(table, SWT.NONE);
 		final TableColumn column2 = new TableColumn(table, SWT.NONE);
