@@ -72,6 +72,7 @@ public class TableUI {
 
 	}
 
+	//@author Chenwei
 	/**
 	 * @wbp.parser.entryPoint
 	 */
@@ -119,23 +120,8 @@ public class TableUI {
 						clearTableItems();
 						String command = input.getText();
 						Feedback fb = TaskCommander.controller.executeCommand(command);
-						// Uncomment this line after Controller implements new parts
-						// displayFeedback(fb);
-						
-						// Delete this part after Controller implements new parts
-						// ---- START DELETE ----- 
-						if(fb.wasSuccesfullyExecuted()){
-							ArrayList<Task> tasks = getTasks(fb);
-							displayTasks(tasks);
-							// Add this line after Controller implements new parts
-							// output.setText(fb.getMessage());
-							// output.setForeground(blue);
-						} else{
-							output.setText(fb.getErrorMessage());
-							output.setForeground(red);
-						}
-						// ---- END DELETE ----- 
-						input.setText("");
+						displayFeedback(fb);
+						clearInput();
 					}catch (Exception e1) {
 						output.setText(e1.getMessage());
 						output.setForeground(red);
@@ -147,50 +133,19 @@ public class TableUI {
 	}
 
 	private void displayTasksUponOpening() {
-		// Switch to this line after Controller implements new parts
-		// ArrayList<Task> tasks = TaskCommander.controller.getTasks().getCommandRelatedTasks();
 		ArrayList<Task> tasks = TaskCommander.controller.executeCommand("display").getCommandRelatedTasks();
 		displayTasks(tasks);
 	}
 	
+	//@author A0112828H
 	private void displayFeedback(Feedback fb) {
 		if (fb.wasSuccesfullyExecuted()) {
 			displayTasks(fb.getCommandRelatedTasks());
-			// Uncomment this line after Controller implements new parts
-			//output.setText(fb.getMessage());
-			//output.setForeground(blue);
-		} else {
 			output.setText(fb.getErrorMessage());
-			output.setForeground(red);
+			output.setForeground(blue);
+		} else {
+			displayErrorMessage(fb.getErrorMessage());
 		}
-	}
-
-	public ArrayList<Task> getTasks(Feedback fb) {
-		ArrayList<Task> tasks = new ArrayList<Task>();
-		switch(fb.getCommandType()){
-		case DISPLAY: 
-			tasks = fb.getCommandRelatedTasks();
-			break;
-		case ADD:case DELETE: case UPDATE:case DONE: case OPEN:
-			tasks.add(fb.getCommandRelatedTask());
-		case HELP:
-			// Desired Output has to be discussed, but low priority anyway
-			break;
-
-		case SYNC:
-			// Desired Output has to be discussed
-			break;
-
-		case EXIT:
-			break;
-
-		case INVALID:
-			break;
-
-		default:
-			break;
-		}
-		return tasks;
 	}
 
 	public void displayTasks(ArrayList<Task> tasks) {
@@ -256,9 +211,7 @@ public class TableUI {
 		item.setForeground(3, doneColor);
 	}
 
-	/**
-	 * Calls pack() for UI elements.
-	 */
+	// Calls pack() for UI elements.
 	private void packUI() {
 		for (TableColumn t : table.getColumns()) {
 			t.pack();
@@ -268,6 +221,44 @@ public class TableUI {
 
 	private void clearTableItems() {
 		table.removeAll();
+	}
+	
+	private void clearInput() {
+		input.setText("");
+	}
+	
+	private void displayErrorMessage(String s) {
+		output.setText(s);
+		output.setForeground(red);
+	}
+	
+	//@author Chenwei-unused
+	public ArrayList<Task> getTasks(Feedback fb) {
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		switch(fb.getCommandType()){
+		case DISPLAY: 
+			tasks = fb.getCommandRelatedTasks();
+			break;
+		case ADD:case DELETE: case UPDATE:case DONE: case OPEN:
+			tasks.add(fb.getCommandRelatedTask());
+		case HELP:
+			// Desired Output has to be discussed, but low priority anyway
+			break;
+
+		case SYNC:
+			// Desired Output has to be discussed
+			break;
+
+		case EXIT:
+			break;
+
+		case INVALID:
+			break;
+
+		default:
+			break;
+		}
+		return tasks;
 	}
 
 }

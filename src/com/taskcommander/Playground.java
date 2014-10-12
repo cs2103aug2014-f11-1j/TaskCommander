@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 import com.joestelmach.natty.*;
@@ -53,7 +54,11 @@ public class Playground {
 	}
 	
 	}
-
+	
+	
+	
+	//Construct the Calendar.Events.List request, but don't execute yet		
+	Calendar.Events.List eventRequest = con.getListEventRequest();	
 	String syncToken = null;
 		
 		try {

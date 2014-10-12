@@ -18,7 +18,7 @@ public class TimedTask extends DatedTask {
 	 * Throws IllegalArgumentException if null arguments are given.
 	 */
 	public TimedTask(String name, Date startTime, Date endTime){
-		super(name, TaskType.TIMED, startTime );
+		super(name, TaskType.TIMED, startTime);
 		if (startTime != null && endTime !=null) {
 			_startDate = startTime;
 			_endDate = endTime;
@@ -27,8 +27,26 @@ public class TimedTask extends DatedTask {
 		}
 	}
 	
+	/**
+	 * Overload of the constructor. Allows for GoogleID to be passed.
+	 * 
+	 * @param name
+	 * @param startTime
+	 * @param endTime
+	 * @param googleID
+	 */
+	public TimedTask(String name, Date startTime, Date endTime, String googleID) {
+		super(name, TaskType.TIMED, startTime);
+		this.setId(googleID);
+		if (startTime != null && endTime != null) {
+			_startDate = startTime;
+			_endDate = endTime;
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
 	// Constructor for Cloning
-	// A0128620M
 	public TimedTask(TimedTask otherTimedTask){
 		super(otherTimedTask.getName(), TaskType.TIMED, otherTimedTask.getStartDate() );
 			_startDate = otherTimedTask.getStartDate();
@@ -56,13 +74,11 @@ public class TimedTask extends DatedTask {
 	
 
 	@Override
-	// A0128620M
 	public int compareTo(TimedTask otherTask) {
 		return (_startDate.compareTo(otherTask.getStartDate()));
 	}
 	
 	@Override
-	// A0128620M
 	public boolean equals(Object otherObject) {
 		if (otherObject == null) {
 			return false;
