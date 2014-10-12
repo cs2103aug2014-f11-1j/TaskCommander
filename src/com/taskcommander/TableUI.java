@@ -24,6 +24,18 @@ import org.eclipse.swt.events.TraverseEvent;
 public class TableUI {
 	
 	private final Display display = Display.getDefault();
+	private final Shell shell = new Shell(display);
+	private final Table table = new Table(shell, SWT.BORDER | SWT.MULTI);
+	
+	private final TableColumn tableColumn1 = new TableColumn(table, SWT.NONE);
+	private final TableColumn tableColumn2 = new TableColumn(table, SWT.NONE);
+	private final TableColumn tableColumn3 = new TableColumn(table, SWT.NONE);
+	
+	private final Color red = display.getSystemColor(SWT.COLOR_RED);
+	private final Color gray = display.getSystemColor(SWT.COLOR_GRAY);
+	private final Color blue = display.getSystemColor(SWT.COLOR_BLUE);
+	private final Color cyan = display.getSystemColor(SWT.COLOR_CYAN);
+	
 	private Text input;
 	
 	private static final int GRID_COLUMNS_NUM = 3;
@@ -48,15 +60,9 @@ public class TableUI {
 	 * @wbp.parser.entryPoint
 	 */
 	public void open() {
-		final Shell shell = new Shell(display);
 		shell.setLayout(new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE));
 		shell.setText(Global.APPLICATION_NAME);
 		
-		final Color red = display.getSystemColor(SWT.COLOR_RED);
-		final Color gray = display.getSystemColor(SWT.COLOR_GRAY);
-		final Color blue = display.getSystemColor(SWT.COLOR_BLUE);
-		final Color cyan = display.getSystemColor(SWT.COLOR_CYAN);
-
 		input = new Text(shell, SWT.BORDER);
 
 		GridData inputGridData = new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
@@ -66,19 +72,14 @@ public class TableUI {
 		//new Label(shell, SWT.NONE);
 		//new Label(shell, SWT.NONE);
 
-		final Table table = new Table(shell, SWT.BORDER | SWT.MULTI);
 		GridData tableGridData = new GridData(SWT.FILL, SWT.FILL, TABLE_FIT_HORIZONTAL, TABLE_FIT_VERTICAL);
 		tableGridData.widthHint = TABLE_PREFERRED_WIDTH;
 		tableGridData.heightHint = TABLE_PREFERRED_HEIGHT;
 		table.setLayoutData(tableGridData);
 
-		final TableColumn column1 = new TableColumn(table, SWT.NONE);
-		final TableColumn column2 = new TableColumn(table, SWT.NONE);
-		final TableColumn column3 = new TableColumn(table, SWT.NONE);
-		
 		//display welcome tasks
 		ArrayList<Task> tasks = TaskCommander.controller.executeCommand("display").getCommandRelatedTasks();
-		displayTasks(shell, table, red, gray, blue, cyan, column1, column2, column3, tasks);
+		displayTasks(tasks);
 
 		input.addListener(SWT.Traverse, new Listener(){
 
@@ -91,8 +92,7 @@ public class TableUI {
 						Feedback fb = TaskCommander.controller.executeCommand(command);
 						if(fb.wasSuccesfullyExecuted()){
 							ArrayList<Task> tasks = getTasks(fb);
-							displayTasks(shell, table, red, gray, blue, cyan, column1, column2, column3,
-									tasks);
+							displayTasks(tasks);
 						}
 						else{
 							TableItem item = new TableItem(table, SWT.NONE);
@@ -142,10 +142,8 @@ public class TableUI {
 		}
 		return tasks;
 	}
-	public void displayTasks(final Shell shell, final Table table,
-			final Color red, final Color gray, final Color blue, final Color cyan,
-			final TableColumn column1, final TableColumn column2,
-			final TableColumn column3, ArrayList<Task> tasks) {
+	
+	public void displayTasks(ArrayList<Task> tasks) {
 		for (Task task : tasks)
 		{ 
 			TableItem item = new TableItem(table, SWT.NONE);
@@ -188,10 +186,16 @@ public class TableUI {
 			}
 		}
 
-		column1.pack();
-		column2.pack();
-		column3.pack();
+		packUI();
+	}
 
+	/**
+	 * Calls pack() for UI elements.
+	 */
+	private void packUI() {
+		tableColumn1.pack();
+		tableColumn2.pack();
+		tableColumn3.pack();
 		shell.pack();
 	}
 
