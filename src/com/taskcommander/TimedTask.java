@@ -18,8 +18,27 @@ public class TimedTask extends DatedTask {
 	 * Throws IllegalArgumentException if null arguments are given.
 	 */
 	public TimedTask(String name, Date startTime, Date endTime){
-		super(name, TaskType.TIMED, startTime );
+		super(name, TaskType.TIMED, startTime);
 		if (startTime != null && endTime !=null) {
+			_startDate = startTime;
+			_endDate = endTime;
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	/**
+	 * Overload of the constructor. Allows for GoogleID to be passed.
+	 * 
+	 * @param name
+	 * @param startTime
+	 * @param endTime
+	 * @param googleID
+	 */
+	public TimedTask(String name, Date startTime, Date endTime, String googleID) {
+		super(name, TaskType.TIMED, startTime);
+		this.setId(googleID);
+		if (startTime != null && endTime != null) {
 			_startDate = startTime;
 			_endDate = endTime;
 		} else {
