@@ -49,10 +49,6 @@ public abstract class Task {
 			throw new IllegalArgumentException();
 		}
 	}
-
-	public void setType(TaskType taskType) {
-		_taskType = taskType;
-	}
 	
 	public TaskType getType() {
 		return _taskType;
@@ -70,27 +66,35 @@ public abstract class Task {
 		return _done;
 	}
 	
-	public void setDone(boolean done) {
-		_done = done;
+	public boolean isEdited() {
+		return _edited;
 	}
 	
 	// Returns true if task has a google id and has not been edited since last sync
 	public boolean isSynced() {
 		return _id != null && !_edited; 
 	}
-
+	
+	public void setType(TaskType taskType) {
+		_taskType = taskType;
+	}
+	
 	public void setName(String name) {
 		_name = name;
 	}
-
+	
 	public void setId(String id) {
 		_id = id;
 	}
 	
-	public boolean getDone() {
-		return _done;
+	public void setDone(boolean done) {
+		_done = done;
 	}
 	
+	public void setEdited(boolean edited) {
+		this._edited = edited;
+	}
+
 	public void markDone() {
 		_done = true;
 	}
@@ -99,21 +103,8 @@ public abstract class Task {
 		_done = false;
 	}
 	
-	public void setSynced() {
+	public void markSynced() {
 		_edited = false;
-	}
-	
-	public boolean getEdited() {
-		return _edited;
-	}
-	
-	public void setEdited(boolean edited) {
-		this._edited = edited;
-	}
-
-	public int compareTo(TimedTask otherTask) {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 	@Override

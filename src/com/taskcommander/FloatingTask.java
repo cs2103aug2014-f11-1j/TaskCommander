@@ -23,8 +23,8 @@ public class FloatingTask extends Task implements Comparable<FloatingTask>{
 	public FloatingTask(FloatingTask otherFloatingTask) {
 		super(otherFloatingTask.getName(), TaskType.FLOATING);
 		this.setId(otherFloatingTask.getId());
-		this.setDone(otherFloatingTask.getDone());
-		this.setEdited(otherFloatingTask.getEdited());
+		this.setDone(otherFloatingTask.isDone());
+		this.setEdited(otherFloatingTask.isEdited());
 	}
 	
 	/*
