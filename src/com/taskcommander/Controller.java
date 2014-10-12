@@ -23,30 +23,29 @@ public class Controller {
 	}
 
 	/**
-	 * This feedback object of the latest display command contains all tasks which were 
-	 * recently displayed by the UI. Memorizing the tasks which have been displayed recently 
-	 * by the UI is needed by the update, delete, done and open methods.
+	 * This list contains all tasks which were recently displayed by the UI. Memorizing the 
+	 * tasks which have been displayed recently by the UI is needed by the update, delete, done and open methods.
 	 */
-	private Feedback recentDisplayFeedback;	
+	private ArrayList<Task> displayedTasks;	
 	
 	/**
-	 * This feedback object represent the feedback of the latest add/update/done/open/delete command.
+	 * This list contains the state of the tasks before the latest add/update/done/open/delete command.
 	 * Memorizing the commands which have been executed recently is needed by the undo method.
 	 * 
 	 * TODO
 	 */
-	private Feedback recentAddUpdateMarkDeleteClearFeedback;
+	// private ArrayList<Task> recentAddUpdateMarkDeleteClearFeedback;
 
 	/**
 	 * This operation parses the command from the user and executes it if valid. Afterwards a 
-	 * feedback is returned.
+	 * feedback String is returned.
 	 * 
 	 * @param  userCommand  command given by user
 	 * @return              feedback to the UI
 	 */
-	public Feedback executeCommand(String userCommand) {	
+	public String executeCommand(String userCommand) {	
 		if (userCommand == null | userCommand == "") {
-			return new Feedback(false,Global.MESSAGE_NO_COMMAND, TaskCommander.data.getAllTasks());
+			return String.format(Global.MESSAGE_NO_COMMAND);
 		}
 
 		Global.CommandType commandType = TaskCommander.parser.determineCommandType(userCommand);
@@ -58,7 +57,7 @@ public class Controller {
 				// taskName
 				String taskName = TaskCommander.parser.determineTaskName(userCommand);
 				if (taskName == null) {
-					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
+					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 				}
 				
 				// taskDateTime (3 cases depending on taskType)
@@ -73,16 +72,15 @@ public class Controller {
 				} else if (taskDateTime.size() == 2) { 
 					return TaskCommander.data.addTimedTask(taskName, taskDateTime.get(0), taskDateTime.get(1));
 				} else {
-					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
+					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 				}
 				
 			case UPDATE: case DONE: case OPEN: case DELETE:
 				
 				// Index in recent display of tasks
 				int indexDisplayedTasks = TaskCommander.parser.determineIndex(userCommand);
-				ArrayList<Task> displayedTasks = recentDisplayFeedback.getCommandRelatedTasks();
 				if (indexDisplayedTasks > displayedTasks.size() - Global.INDEX_OFFSET || indexDisplayedTasks < 0) {
-					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexDisplayedTasks + Global.INDEX_OFFSET), TaskCommander.data.getAllTasks());
+					return String.format(Global.MESSAGE_NO_INDEX, indexDisplayedTasks + Global.INDEX_OFFSET);
 				}
 				
 				// Task to be updated
@@ -117,13 +115,13 @@ public class Controller {
 								newStartDate = newTaskDateTime.get(0);
 								newEndDate = newTaskDateTime.get(1);
 							} else {
-								return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
+								return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 							}
 						}
 						
 						// No changes at all, that is, no new DateTime, Name, or "none" given
 						if ((newTaskDateTime == null) && (newTaskName == oldTaskName) && (oldTaskType == newTaskType)) {	// Invalid Format when input: update 1 none for a floatingTask
-							return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
+							return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 						}
 						
 						// Update including change of taskType if necessary
@@ -168,7 +166,7 @@ public class Controller {
 						startDate = new Date(); // current DateTime
 						endDate = DatePeriod.get(0);
 					} else { // no DateTime period
-						return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
+						return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 					}
 				}
 
@@ -201,26 +199,51 @@ public class Controller {
 				
 				// Case 1: No restrictions of display
 				if (!isDatePeriodRestricted && !isTaskTypeRestricted && !isStatusRestricted) {
-					recentDisplayFeedback = TaskCommander.data.displayTasks();
-					return recentDisplayFeedback;
+					displayedTasks = TaskCommander.data.getTasks();
+					return String.format(Global.MESSAGE_DISPLAYED, "all");
+					
 				// Case 2: With restrictions of display
 				} else {
-					recentDisplayFeedback = TaskCommander.data.displayTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, done);
-					return recentDisplayFeedback;
-				}
+					displayedTasks = TaskCommander.data.getTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, done);
+					String displayRestriction = "tasks ";
+					if (isDatePeriodRestricted) {
+						displayRestriction = "within ["+ Global.dayFormat.format(startDate)+ " "+ Global.timeFormat.format(startDate)+ "-"+ Global.timeFormat.format(endDate) + "] ";
+					}
+					if (isTaskTypeRestricted) {
+						displayRestriction = "of the type ";
+						if (shownFloatingTask) {
+							displayRestriction += "none ";
+						}
+						if (shownDeadlineTask) {
+							displayRestriction += "timed ";
+						}
+						if (shownTimedTask) {
+							displayRestriction += "deadline ";
+						}
+					}
+					if (isStatusRestricted) {
+						displayRestriction = "of the status ";
+						if (done) {
+							displayRestriction += "done ";
+						} else {
+							displayRestriction += "open ";
+						}
+					}
+					return String.format(Global.MESSAGE_DISPLAYED, displayRestriction);
+			}
 				
 			case CLEAR:
 				if (isSingleWord(userCommand)) {
 					return TaskCommander.data.clearTasks();
 				} else {
-					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
+					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 				}
 				
 			case HELP:
 				if (isSingleWord(userCommand)) {
-					return new Feedback(false,Global.MESSAGE_HELP, TaskCommander.data.getAllTasks());
+					return String.format(Global.MESSAGE_HELP);
 				} else {
-					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
+					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 				}
 				
 			case SYNC: 
@@ -230,21 +253,32 @@ public class Controller {
 				}
 				return TaskCommander.syncHandler.sync();
 			*/
-				return new Feedback(false,"out of order", TaskCommander.data.getAllTasks());
+				return String.format("out of order");
 				
 			case UNDO: 
 				
-				return new Feedback(false,"to be implemented", TaskCommander.data.getAllTasks());
+				return String.format("to be implemented");
 				
 			case INVALID:
-				return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
+				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 				
 			case EXIT:
 				System.exit(0);
 				
 			default:
-				return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
+				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 		}
+	}
+	
+	
+	/**
+	 * Returns the tasks to be displayed in the UI's table.
+	 */
+	public ArrayList<Task> getDisplayedTasks() {
+		if (displayedTasks == null) {
+			executeCommand("display");
+		}
+		return displayedTasks;
 	}
 	
 	/**

@@ -62,7 +62,7 @@ public class Data {
 	 * @param 	task     
 	 * @return 	feedback for UI
 	 */
-	public Feedback addTask(Task task) {
+	public String addTask(Task task) {
 		switch ( task.getType()) {
 		case FLOATING:
 			FloatingTask floatingTask = (FloatingTask) task;
@@ -84,12 +84,12 @@ public class Data {
 	 * @param 	endDate       
 	 * @return 	feedback for UI
 	 */
-	public Feedback addTimedTask(String taskName, Date startDate, Date endDate) {
+	public String addTimedTask(String taskName, Date startDate, Date endDate) {
 		TimedTask timedTask = new TimedTask(taskName,startDate,endDate);
 		saveToHistory();
 		tasks.add(timedTask);
 		save();
-		return new Feedback(true, Global.CommandType.ADD, new TimedTask(timedTask), getAllTasks());
+		return String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 	}
 	
 	/**
@@ -99,12 +99,12 @@ public class Data {
 	 * @param 	endDate       
 	 * @return 	feedback for UI
 	 */
-	public Feedback addDeadlineTask(String taskName, Date endDate) {
+	public String addDeadlineTask(String taskName, Date endDate) {
 		DeadlineTask deadlineTask= new DeadlineTask(taskName,endDate);
 		saveToHistory();
 		tasks.add(deadlineTask);
 		save();
-		return new Feedback(true, Global.CommandType.ADD, new DeadlineTask(deadlineTask), getAllTasks());
+		return String.format(Global.MESSAGE_ADDED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
 	}
 	
 	/**
@@ -113,24 +113,41 @@ public class Data {
 	 * @param 	taskName        
 	 * @return 	feedback for UI
 	 */
-	public Feedback addFloatingTask(String taskName) {
+	public String addFloatingTask(String taskName) {
 		FloatingTask floatingTask = new FloatingTask(taskName);
 		saveToHistory();
 		tasks.add(floatingTask);
 		save();
-		return new Feedback(true, Global.CommandType.ADD, new FloatingTask(floatingTask), getAllTasks());
+		return String.format(Global.MESSAGE_ADDED,"\"" + floatingTask.getName() + "\"");
 	}
 
 	/**
 	 * This operation displays all tasks by forwarding all the needed information to the UI.
 	 *  
-	 * @return 	feedback for UI
+	 * @return 	ArrayList<Task>
 	 */
-	public Feedback displayTasks() {
+	public ArrayList<Task> getTasks() {
 
-		ArrayList<Task> displayedTasks = getAllTasks();
+		ArrayList<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
+		ArrayList<DatedTask> datedTasks = new ArrayList<DatedTask>();
+		ArrayList<Task> allTasks = new ArrayList<Task>();
 		
-		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
+		for(Task task: tasks) {
+			if(task.getType() == Task.TaskType.FLOATING) {
+				floatingTasks.add(new FloatingTask((FloatingTask) task));	// TODO: use cloned task with "new FloatingTask((FloatingTask)" to  add a copy of the respective task, not the original
+			} else if (task.getType() == Task.TaskType.DEADLINE) {
+				datedTasks.add(new DeadlineTask((DeadlineTask) task));
+			} else if (task.getType() == Task.TaskType.TIMED) {
+				datedTasks.add(new TimedTask((TimedTask) task));
+			}
+		}
+
+		Collections.sort(floatingTasks);
+		allTasks.addAll(floatingTasks);
+		Collections.sort(datedTasks);
+		allTasks.addAll(datedTasks);
+		
+		return allTasks;
 	}
 	
 	/**
@@ -145,12 +162,12 @@ public class Data {
 	 * @param shownTimedTask
 	 * @param isStatusRestricted
 	 * @param done
-	 * @return 	feedback for UI
+	 * @return 	ArrayList<Task>
 	 */
-	public Feedback displayTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean status) {
-		ArrayList<FloatingTask> displayedFloatingTasks = new ArrayList<FloatingTask>();
-		ArrayList<DatedTask> displayedDatedTasks = new ArrayList<DatedTask>();
-		ArrayList<Task> displayedTasks = new ArrayList<Task>();
+	public ArrayList<Task> getTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean status) {
+		ArrayList<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
+		ArrayList<DatedTask> datedTasks = new ArrayList<DatedTask>();
+		ArrayList<Task> concernedTasks = new ArrayList<Task>();
 		
 		for(Task task: tasks) {
 			// Step 1: Check Status
@@ -159,33 +176,33 @@ public class Data {
 				if(task.getType() == Task.TaskType.FLOATING && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownFloatingTask))) {	
 					// Step 3: Check DatePeriod
 					if (!isDateTimeRestricted) {
-						displayedFloatingTasks.add(new FloatingTask((FloatingTask) task));
+						floatingTasks.add(new FloatingTask((FloatingTask) task));
 					}
 				} else if (task.getType() == Task.TaskType.DEADLINE && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownDeadlineTask))) {
 					DeadlineTask deadlineTask = (DeadlineTask) task;
 					if (!isDateTimeRestricted || (isDateTimeRestricted && (deadlineTask.getEndDate().compareTo(endDate) < 0) || deadlineTask.getEndDate().compareTo(endDate) == 0) ) { //TODO: Refactor Date Comparison methods
-						displayedDatedTasks.add(new DeadlineTask((DeadlineTask) task));
+						datedTasks.add(new DeadlineTask((DeadlineTask) task));
 					}
 				} else if (task.getType() == Task.TaskType.TIMED && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownTimedTask))) {
 					TimedTask timedTask = (TimedTask) task;
 					if (!isDateTimeRestricted || (isDateTimeRestricted && (timedTask.getStartDate().compareTo(startDate) > 0 || timedTask.getStartDate().compareTo(startDate) == 0) && (timedTask.getEndDate().compareTo(endDate) < 0) || timedTask.getEndDate().compareTo(endDate) == 0) ){
-						displayedDatedTasks.add(new TimedTask((TimedTask) task));
+						datedTasks.add(new TimedTask((TimedTask) task));
 					}
 				}		 
 			}		 
 		}
 		
-		Collections.sort(displayedFloatingTasks);
-		displayedTasks.addAll(displayedFloatingTasks);
-		Collections.sort(displayedDatedTasks);
-		displayedTasks.addAll(displayedDatedTasks);
+		Collections.sort(floatingTasks);
+		concernedTasks.addAll(floatingTasks);
+		Collections.sort(datedTasks);
+		concernedTasks.addAll(datedTasks);
 		
-		for(Task task: displayedTasks) {
+		for(Task task: concernedTasks) {
 			System.out.print(task.getName());
 			System.out.println(task.isDone());
 		}
 		
-		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
+		return concernedTasks;
 	}
 	
 	/**
@@ -199,13 +216,13 @@ public class Data {
 	 * @param endDate      
 	 * @return             feedback for UI
 	 */
-	public Feedback updateToTimedTask(int index, String name, Date startDate, Date endDate) {
+	public String updateToTimedTask(int index, String name, Date startDate, Date endDate) {
 		if (tasks.isEmpty()) {
-			return new Feedback(false, String.format(Global.MESSAGE_EMPTY), getAllTasks());
+			return String.format(Global.MESSAGE_EMPTY);
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET) {
-			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index), getAllTasks());
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
 		if  (tasks.get(index).getType() != Task.TaskType.TIMED) {
 			TimedTask timedTask = new TimedTask(name,startDate,endDate);
@@ -215,7 +232,7 @@ public class Data {
 			deleteTask(index);
 			tasks.add(index, timedTask);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, new TimedTask(timedTask), getAllTasks());
+			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 		} else {
 			saveToHistory();
 			TimedTask timedTask = (TimedTask) tasks.get(index);
@@ -230,7 +247,7 @@ public class Data {
 			}
 			timedTask.setEdited(true);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, new TimedTask(timedTask), getAllTasks());
+			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 		}
 		
 	}
@@ -245,13 +262,13 @@ public class Data {
 	 * @param endDate      
 	 * @return             feedback for UI
 	 */
-	public Feedback updateToDeadlineTask(int index, String name, Date endDate) {
+	public String updateToDeadlineTask(int index, String name, Date endDate) {
 		if (tasks.isEmpty()) {
-			return new Feedback(false, String.format(Global.MESSAGE_EMPTY), getAllTasks());
+			return String.format(Global.MESSAGE_EMPTY);
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET) {
-			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index), getAllTasks());
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
 
 		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
@@ -262,7 +279,7 @@ public class Data {
 			deleteTask(index);
 			tasks.add(index, deadlineTask);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, new DeadlineTask(deadlineTask), getAllTasks());
+			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
 		} else {
 			saveToHistory();
 			DeadlineTask deadlineTask = (DeadlineTask) tasks.get(index);
@@ -274,7 +291,7 @@ public class Data {
 			}
 			deadlineTask.setEdited(true);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, new DeadlineTask(deadlineTask), getAllTasks()); 
+			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
 			}
 	}
 	
@@ -287,13 +304,13 @@ public class Data {
 	 * @param taskName     description of task    
 	 * @return             feedback for UI
 	 */
-	public Feedback updateToFloatingTask(int index, String name) {
+	public String updateToFloatingTask(int index, String name) {
 		if (tasks.isEmpty()) {
-			return new Feedback(false, String.format(Global.MESSAGE_EMPTY), getAllTasks());
+			return String.format(Global.MESSAGE_EMPTY);
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index), getAllTasks());
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
 		
 		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
@@ -304,7 +321,7 @@ public class Data {
 			deleteTask(index);
 			tasks.add(index, floatingTask);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, new FloatingTask(floatingTask), getAllTasks());
+			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
 		} else {
 			saveToHistory();
 			FloatingTask floatingTask = (FloatingTask) tasks.get(index);
@@ -313,8 +330,8 @@ public class Data {
 			}
 			floatingTask.setEdited(true);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, new FloatingTask(floatingTask), getAllTasks());
-		}
+			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
+			}
 	}
 
 	/**
@@ -323,29 +340,32 @@ public class Data {
 	 * @param index        index of the done task 
 	 * @return             feedback for UI
 	 */
-	public Feedback done(int index) {
+	public String done(int index) {
 		if (tasks.isEmpty()) {
-			return new Feedback(false, String.format(Global.MESSAGE_EMPTY), getAllTasks());
+			return String.format(Global.MESSAGE_EMPTY);
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index), getAllTasks());
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
 		
 		Task doneTask = tasks.get(index);
 		if (doneTask.isDone()) {
-			return new Feedback(false, String.format(Global.MESSAGE_ALREADY_DONE), getAllTasks());
+			return String.format(Global.MESSAGE_ALREADY_DONE);
 		} else {
 			saveToHistory();
 			doneTask.markDone();
 			save();
 			switch ( doneTask.getType()) {
 			case FLOATING:
-				return new Feedback(true, Global.CommandType.DONE, (FloatingTask) doneTask, getAllTasks());
+				FloatingTask floatingTask = (FloatingTask) doneTask;
+				return String.format(Global.MESSAGE_DONE,"\"" + floatingTask.getName() + "\"");
 			case DEADLINE:
-				return new Feedback(true, Global.CommandType.DONE, (DeadlineTask) doneTask, getAllTasks());
-			default:																				// TODO: find better solution than default
-				return new Feedback(true, Global.CommandType.DONE,(TimedTask) doneTask, getAllTasks());
+				DeadlineTask deadlineTask = (DeadlineTask) doneTask;
+				return String.format(Global.MESSAGE_DONE,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
+			default:
+				TimedTask timedTask = (TimedTask) doneTask;// TODO: find better solution than default
+				return String.format(Global.MESSAGE_DONE,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 			}
 		}
 	}
@@ -356,29 +376,32 @@ public class Data {
 	 * @param index        index of the undone tasks   
 	 * @return             feedback for UI
 	 */
-	public Feedback open(int index) {
+	public String open(int index) {
 		if (tasks.isEmpty()) {
-			return new Feedback(false, String.format(Global.MESSAGE_EMPTY), getAllTasks());
+			return String.format(Global.MESSAGE_EMPTY);
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index), getAllTasks());
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
 		
 		Task openTask = tasks.get(index);
 		if (!openTask.isDone()) {
-			return new Feedback(false, String.format(Global.MESSAGE_ALREADY_OPEN), getAllTasks());
+			return String.format(Global.MESSAGE_ALREADY_OPEN);
 		} else {
 			saveToHistory();
 			openTask.markOpen();
 			save();
 			switch ( openTask.getType()) {
 			case FLOATING:
-				return new Feedback(true, Global.CommandType.OPEN, new FloatingTask((FloatingTask) openTask), getAllTasks());
+				FloatingTask floatingTask = (FloatingTask) openTask;
+				return String.format(Global.MESSAGE_OPEN,"\"" + floatingTask.getName() + "\"");
 			case DEADLINE:
-				return new Feedback(true, Global.CommandType.OPEN, new DeadlineTask((DeadlineTask) openTask), getAllTasks());
+				DeadlineTask deadlineTask = (DeadlineTask) openTask;
+				return String.format(Global.MESSAGE_OPEN,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
 			default:
-				return new Feedback(true, Global.CommandType.OPEN, new TimedTask((TimedTask) openTask), getAllTasks());
+				TimedTask timedTask = (TimedTask) openTask;// TODO: find better solution than default
+				return String.format(Global.MESSAGE_OPEN,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 			}
 		}
 	}
@@ -390,13 +413,13 @@ public class Data {
 	 * @param index        Index of the task to delete, as a string. 
 	 * @return             Feedback for user.
 	 */
-	public Feedback deleteTask(int index) {
+	public String deleteTask(int index) {
 		if (tasks.isEmpty()) {
-			return new Feedback(false,String.format(Global.MESSAGE_EMPTY), getAllTasks());
+			return String.format(Global.MESSAGE_EMPTY);
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return new Feedback(false,String.format(Global.MESSAGE_NO_INDEX, index), getAllTasks());
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		} else {
 			Task deletedTask = tasks.get(index);
 			saveToHistory();
@@ -405,11 +428,14 @@ public class Data {
 			save();
 			switch ( deletedTask.getType()) {
 			case FLOATING:
-				return new Feedback(true, Global.CommandType.DELETE, new FloatingTask((FloatingTask) deletedTask), getAllTasks());
+				FloatingTask floatingTask = (FloatingTask) deletedTask;
+				return String.format(Global.MESSAGE_DELETED,"\"" + floatingTask.getName() + "\"");
 			case DEADLINE:
-				return new Feedback(true, Global.CommandType.DELETE, new DeadlineTask((DeadlineTask) deletedTask), getAllTasks());
+				DeadlineTask deadlineTask = (DeadlineTask) deletedTask;
+				return String.format(Global.MESSAGE_DELETED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
 			default:
-				return new Feedback(true, Global.CommandType.DELETE, new TimedTask((TimedTask) deletedTask), getAllTasks());
+				TimedTask timedTask = (TimedTask) deletedTask;// TODO: find better solution than default
+				return String.format(Global.MESSAGE_DELETED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 			}
 		}
 	}
@@ -475,11 +501,11 @@ public class Data {
 	 * @param userCommand 
 	 * @return             Feedback for user.
 	 */
-	public Feedback clearTasks() {
+	public String clearTasks() {
 		deletedTasks.addAll(tasks);
 		tasks.clear();
 		save();
-		return new Feedback(true,Global.CommandType.CLEAR, getAllTasks());
+		return String.format(Global.MESSAGE_CLEARED);
 	}
 	
 	/**
@@ -488,31 +514,6 @@ public class Data {
 	 */
 	public int getIndexOf(Task task) {
 		return tasks.indexOf(task);
-	}
-
-	
-	public ArrayList<Task> getAllTasks() {
-		
-		ArrayList<FloatingTask> displayedFloatingTasks = new ArrayList<FloatingTask>();
-		ArrayList<DatedTask> displayedDatedTasks = new ArrayList<DatedTask>();
-		ArrayList<Task> allTasks = new ArrayList<Task>();
-		
-		for(Task task: tasks) {
-			if(task.getType() == Task.TaskType.FLOATING) {
-				 displayedFloatingTasks.add(new FloatingTask((FloatingTask) task));	// TODO: use cloned task with "new FloatingTask((FloatingTask)" to  add a copy of the respective task, not the original
-			} else if (task.getType() == Task.TaskType.DEADLINE) {
-				displayedDatedTasks.add(new DeadlineTask((DeadlineTask) task));
-			} else if (task.getType() == Task.TaskType.TIMED) {
-				displayedDatedTasks.add(new TimedTask((TimedTask) task));
-			}
-		}
-
-		Collections.sort(displayedFloatingTasks);
-		allTasks.addAll(displayedFloatingTasks);
-		Collections.sort(displayedDatedTasks);
-		allTasks.addAll(displayedDatedTasks);
-		
-		return allTasks;
 	}
 	
 	public ArrayList<Task> getDeletedTasks() {

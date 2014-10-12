@@ -22,6 +22,7 @@ public class Global {
 	public static final String MESSAGE_ALREADY_OPEN = "Already opened.";
 	public static final String MESSAGE_DELETED = "Deleted: %1$s";
 	public static final String MESSAGE_CLEARED = "All content deleted.";
+	public static final String MESSAGE_DISPLAYED = "Displayed: %1$s";
 	public static final String MESSAGE_INVALID_FORMAT = "Invalid command format: %1$s. " + "Type 'help' to see the list of commands.";
 	public static final String MESSAGE_NO_COMMAND = "No command given.";
 	public static final String MESSAGE_NO_INDEX = "Index %1$s does not exist. Please type a valid index.";
