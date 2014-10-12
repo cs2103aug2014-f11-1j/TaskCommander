@@ -126,7 +126,7 @@ public class Data {
 	 *  
 	 * @return 	ArrayList<Task>
 	 */
-	public ArrayList<Task> getTasks() {
+	public ArrayList<Task> getCopiedTasks() {
 
 		ArrayList<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
 		ArrayList<DatedTask> datedTasks = new ArrayList<DatedTask>();
@@ -164,7 +164,7 @@ public class Data {
 	 * @param done
 	 * @return 	ArrayList<Task>
 	 */
-	public ArrayList<Task> getTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean status) {
+	public ArrayList<Task> getCopiedTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean status) {
 		ArrayList<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
 		ArrayList<DatedTask> datedTasks = new ArrayList<DatedTask>();
 		ArrayList<Task> concernedTasks = new ArrayList<Task>();
@@ -515,6 +515,7 @@ public class Data {
 	public int getIndexOf(Task task) {
 		return tasks.indexOf(task);
 	}
+
 	
 	public ArrayList<Task> getDeletedTasks() {
 		return deletedTasks;
@@ -527,4 +528,12 @@ public class Data {
 		}
 		return idList;
 	}
+	
+	/**
+	 * Returns the tasks.
+	 */
+	public ArrayList<Task> getTasks() {
+		return tasks;
+	}
+	
 }
