@@ -127,24 +127,8 @@ public class Data {
 	 * @return 	feedback for UI
 	 */
 	public Feedback displayTasks() {
-		ArrayList<FloatingTask> displayedFloatingTasks = new ArrayList<FloatingTask>();
-		ArrayList<DatedTask> displayedDatedTasks = new ArrayList<DatedTask>();
-		ArrayList<Task> displayedTasks = new ArrayList<Task>();
-		
-		for(Task task: tasks) {
-			if(task.getType() == Task.TaskType.FLOATING) {
-				 displayedFloatingTasks.add(new FloatingTask((FloatingTask) task));	// TODO: use cloned task with "new FloatingTask((FloatingTask)" to  add a copy of the respective task, not the original
-			} else if (task.getType() == Task.TaskType.DEADLINE) {
-				displayedDatedTasks.add(new DeadlineTask((DeadlineTask) task));
-			} else if (task.getType() == Task.TaskType.TIMED) {
-				displayedDatedTasks.add(new TimedTask((TimedTask) task));
-			}
-		}
 
-		Collections.sort(displayedFloatingTasks);
-		displayedTasks.addAll(displayedFloatingTasks);
-		Collections.sort(displayedDatedTasks);
-		displayedTasks.addAll(displayedDatedTasks);
+		ArrayList<Task> displayedTasks = getAllTasks();
 		
 		return new Feedback(true, Global.CommandType.DISPLAY, displayedTasks);
 	}
@@ -508,7 +492,27 @@ public class Data {
 
 	
 	public ArrayList<Task> getAllTasks() {
-		return tasks;
+		
+		ArrayList<FloatingTask> displayedFloatingTasks = new ArrayList<FloatingTask>();
+		ArrayList<DatedTask> displayedDatedTasks = new ArrayList<DatedTask>();
+		ArrayList<Task> allTasks = new ArrayList<Task>();
+		
+		for(Task task: tasks) {
+			if(task.getType() == Task.TaskType.FLOATING) {
+				 displayedFloatingTasks.add(new FloatingTask((FloatingTask) task));	// TODO: use cloned task with "new FloatingTask((FloatingTask)" to  add a copy of the respective task, not the original
+			} else if (task.getType() == Task.TaskType.DEADLINE) {
+				displayedDatedTasks.add(new DeadlineTask((DeadlineTask) task));
+			} else if (task.getType() == Task.TaskType.TIMED) {
+				displayedDatedTasks.add(new TimedTask((TimedTask) task));
+			}
+		}
+
+		Collections.sort(displayedFloatingTasks);
+		allTasks.addAll(displayedFloatingTasks);
+		Collections.sort(displayedDatedTasks);
+		allTasks.addAll(displayedDatedTasks);
+		
+		return allTasks;
 	}
 	
 	public ArrayList<Task> getDeletedTasks() {

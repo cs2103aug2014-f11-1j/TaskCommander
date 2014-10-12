@@ -59,11 +59,11 @@ public class TableUI {
 	private final Color red = display.getSystemColor(SWT.COLOR_RED);
 	private final Color gray = display.getSystemColor(SWT.COLOR_GRAY);
 	private final Color blue = display.getSystemColor(SWT.COLOR_BLUE);
-	private final Color cyan = display.getSystemColor(SWT.COLOR_CYAN);
+	private final Color black = display.getSystemColor(SWT.COLOR_BLACK);
 	
 	private final Color COLOR_COL_FIRST = gray;
 	private final Color COLOR_COL_SECOND = blue;
-	private final Color COLOR_COL_THIRD = cyan;
+	private final Color COLOR_COL_THIRD = black;
 
 	private Text input;
 	private Text output;
