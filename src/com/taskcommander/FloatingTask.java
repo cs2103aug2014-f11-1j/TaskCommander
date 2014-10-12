@@ -14,6 +14,11 @@ public class FloatingTask extends Task implements Comparable<FloatingTask>{
 		super(name, TaskType.FLOATING);
 	}
 	
+	/**
+	 * Overload of constructor. Allows for GoogleID to be passed
+	 * @param name
+	 * @param googleID
+	 */
 	public FloatingTask(String name, String googleID) {
 		super(name, TaskType.FLOATING);
 		this.setId(googleID);
