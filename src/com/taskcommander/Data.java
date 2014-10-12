@@ -532,7 +532,7 @@ public class Data {
 	/**
 	 * Returns the tasks.
 	 */
-	public ArrayList<Task> getTasks() {
+	public ArrayList<Task> getAllTasks() {
 		return tasks;
 	}
 	
