@@ -16,8 +16,24 @@ public class DeadlineTask extends DatedTask {
 	 * Creates a new DatedTask with given name and end time.
 	 * Throws IllegalArgumentException if null arguments are given.
 	 */
-	public DeadlineTask(String name, Date endTime){
+	public DeadlineTask(String name, Date endTime) {
+		super(name, TaskType.DEADLINE, endTime);
+		if (endTime != null) {
+			_endDate = endTime;
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	/**
+	 * Overload of the constructor. Allows for a googleID to be passed
+	 * @param name
+	 * @param endTime
+	 * @param googleID
+	 */
+	public DeadlineTask(String name, Date endTime, String googleID){
 		super(name,TaskType.DEADLINE, endTime);
+		this.setId(googleID);
 		if (endTime != null) {
 			_endDate = endTime;
 		} else {
