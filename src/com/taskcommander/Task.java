@@ -1,4 +1,6 @@
 package com.taskcommander;
+import java.util.Date;
+
 import com.google.gson.annotations.SerializedName;
 //import com.taskcommander.Global.TaskType;
 
@@ -16,6 +18,7 @@ public abstract class Task {
 	private String _id;
 	private boolean _done;
 	private boolean _edited;
+	private Date _updated;
 	
 	
 	// Possible task types
@@ -68,6 +71,10 @@ public abstract class Task {
 	
 	public boolean isEdited() {
 		return _edited;
+	}
+	
+	public Date getUpdated() {
+		return _updated;
 	}
 	
 	// Returns true if task has a google id and has not been edited since last sync
