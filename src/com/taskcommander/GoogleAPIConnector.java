@@ -46,7 +46,6 @@ public class GoogleAPIConnector {
 		loginManager = new LoginManager();
 		try {
 			eventDataStore = LoginManager.getDataStoreFactory().getDataStore("EventStore");
-			syncSettingsDataStore = LoginManager.getDataStoreFactory().getDataStore("SyncSettings");
 			taskDataStore = LoginManager.getDataStoreFactory().getDataStore("TaskStore");
 		} catch (IOException e) {
 			System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -57,10 +56,6 @@ public class GoogleAPIConnector {
 	private void getServices() {
 		tasks = loginManager.getTasksService();
 		calendar = loginManager.getCalendarService();
-	}
-	
-	public DataStore<String> getSyncSettingsDataStore() {
-		return syncSettingsDataStore;
 	}
 	
 	public DataStore<String> getTaskDataStore() {
