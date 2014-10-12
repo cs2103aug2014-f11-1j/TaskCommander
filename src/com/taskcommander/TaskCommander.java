@@ -11,10 +11,7 @@ public class TaskCommander {
 	public static Parser parser;
 	public static Data data; // temporary memory containing a list of task objects
 	public static Storage storage; 	// (permanent memory consisting of a local .txt-file
-	public static UI ui; // User Interface
 	public static SyncHandler syncHandler;
-	
-	// Uncomment to run TableUI! 
 	public static TableUI tableui;
 
 	/**
@@ -28,15 +25,9 @@ public class TaskCommander {
 		data = new Data();
 		controller = new Controller();
 		parser = new Parser();
-		ui = new UI();
-		
-		// Uncomment to run TableUI! 
-		// Comment out 'UI.open()' before running this
+
 		tableui = new TableUI();
 		tableui.open();
-		
-		// Start of the user interface
-		/*UI.open();*/
 	}
 	
 	//Note: only call this when the sync command is used
