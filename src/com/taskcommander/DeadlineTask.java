@@ -26,6 +26,7 @@ public class DeadlineTask extends DatedTask {
 	}
 	
 	// Constructor for Cloning
+	// A0128620M
 	public DeadlineTask(DeadlineTask otherDeadlineTask){
 		super(otherDeadlineTask.getName(),TaskType.DEADLINE, otherDeadlineTask.getEndDate());
 		_endDate = otherDeadlineTask.getEndDate();
@@ -43,11 +44,13 @@ public class DeadlineTask extends DatedTask {
 	}
 	
 	@Override
+	// A0128620M
 	public int compareTo(DeadlineTask otherTask) {
 		return (_endDate.compareTo(otherTask.getEndDate()));
 	}
 	
 	@Override
+	// A0128620M
 	public boolean equals(Object otherObject) {
 		if (otherObject == null) {
 			return false;

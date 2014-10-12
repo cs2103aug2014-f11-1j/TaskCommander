@@ -116,6 +116,7 @@ public abstract class Task {
 		return 0;
 	}
 
+	// A0128620M
 	@Override
 	public boolean equals(Object otherObject) {
 		if (otherObject == null) {
