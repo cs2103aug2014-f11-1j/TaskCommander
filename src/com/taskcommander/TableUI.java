@@ -119,6 +119,11 @@ public class TableUI {
 						clearTableItems();
 						String command = input.getText();
 						Feedback fb = TaskCommander.controller.executeCommand(command);
+						// Uncomment this line after Controller implements new parts
+						// displayFeedback(fb);
+						
+						// Delete this part after Controller implements new parts
+						// ---- START DELETE ----- 
 						if(fb.wasSuccesfullyExecuted()){
 							ArrayList<Task> tasks = getTasks(fb);
 							displayTasks(tasks);
@@ -129,6 +134,7 @@ public class TableUI {
 							output.setText(fb.getErrorMessage());
 							output.setForeground(red);
 						}
+						// ---- END DELETE ----- 
 						input.setText("");
 					}catch (Exception e1) {
 						output.setText(e1.getMessage());
@@ -145,6 +151,18 @@ public class TableUI {
 		// ArrayList<Task> tasks = TaskCommander.controller.getTasks().getCommandRelatedTasks();
 		ArrayList<Task> tasks = TaskCommander.controller.executeCommand("display").getCommandRelatedTasks();
 		displayTasks(tasks);
+	}
+	
+	private void displayFeedback(Feedback fb) {
+		if (fb.wasSuccesfullyExecuted()) {
+			displayTasks(fb.getCommandRelatedTasks());
+			// Uncomment this line after Controller implements new parts
+			//output.setText(fb.getMessage());
+			//output.setForeground(blue);
+		} else {
+			output.setText(fb.getErrorMessage());
+			output.setForeground(red);
+		}
 	}
 
 	public ArrayList<Task> getTasks(Feedback fb) {
