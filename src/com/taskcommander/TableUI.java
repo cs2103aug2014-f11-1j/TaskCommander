@@ -50,7 +50,7 @@ public class TableUI {
 	private static final int TABLE_PREFERRED_WIDTH = 500;
 	private static final int TABLE_PREFERRED_HEIGHT = 100;
 	private static final int TABLE_COLUMNS_NUM = 4;
-	private static final String[] TABLE_COLUMNS_NAMES = {"No.", "Date", "Task", "Done"};
+	private static final String[] TABLE_COLUMNS_NAMES = {"No.", "Date", "Task", "Status"};
 
 	private final Display display = Display.getDefault();
 	private final Shell shell = new Shell(display);
