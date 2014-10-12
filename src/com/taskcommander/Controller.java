@@ -46,7 +46,7 @@ public class Controller {
 	 */
 	public Feedback executeCommand(String userCommand) {	
 		if (userCommand == null | userCommand == "") {
-			return new Feedback(false,Global.MESSAGE_NO_COMMAND);
+			return new Feedback(false,Global.MESSAGE_NO_COMMAND, TaskCommander.data.getAllTasks());
 		}
 
 		Global.CommandType commandType = TaskCommander.parser.determineCommandType(userCommand);
@@ -58,7 +58,7 @@ public class Controller {
 				// taskName
 				String taskName = TaskCommander.parser.determineTaskName(userCommand);
 				if (taskName == null) {
-					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
 				}
 				
 				// taskDateTime (3 cases depending on taskType)
@@ -73,7 +73,7 @@ public class Controller {
 				} else if (taskDateTime.size() == 2) { 
 					return TaskCommander.data.addTimedTask(taskName, taskDateTime.get(0), taskDateTime.get(1));
 				} else {
-					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
 				}
 				
 			case UPDATE: case DONE: case OPEN: case DELETE:
@@ -82,7 +82,7 @@ public class Controller {
 				int indexDisplayedTasks = TaskCommander.parser.determineIndex(userCommand);
 				ArrayList<Task> displayedTasks = recentDisplayFeedback.getCommandRelatedTasks();
 				if (indexDisplayedTasks > displayedTasks.size() - Global.INDEX_OFFSET || indexDisplayedTasks < 0) {
-					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexDisplayedTasks + Global.INDEX_OFFSET));
+					return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, indexDisplayedTasks + Global.INDEX_OFFSET), TaskCommander.data.getAllTasks());
 				}
 				
 				// Task to be updated
@@ -117,13 +117,13 @@ public class Controller {
 								newStartDate = newTaskDateTime.get(0);
 								newEndDate = newTaskDateTime.get(1);
 							} else {
-								return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+								return new Feedback(false, String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
 							}
 						}
 						
 						// No changes at all, that is, no new DateTime, Name, or "none" given
 						if ((newTaskDateTime == null) && (newTaskName == oldTaskName) && (oldTaskType == newTaskType)) {	// Invalid Format when input: update 1 none for a floatingTask
-							return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+							return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
 						}
 						
 						// Update including change of taskType if necessary
@@ -168,7 +168,7 @@ public class Controller {
 						startDate = new Date(); // current DateTime
 						endDate = DatePeriod.get(0);
 					} else { // no DateTime period
-						return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+						return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
 					}
 				}
 
@@ -213,14 +213,14 @@ public class Controller {
 				if (isSingleWord(userCommand)) {
 					return TaskCommander.data.clearTasks();
 				} else {
-					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
 				}
 				
 			case HELP:
 				if (isSingleWord(userCommand)) {
-					return new Feedback(false,Global.MESSAGE_HELP);
+					return new Feedback(false,Global.MESSAGE_HELP, TaskCommander.data.getAllTasks());
 				} else {
-					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+					return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
 				}
 				
 			case SYNC: 
@@ -230,20 +230,20 @@ public class Controller {
 				}
 				return TaskCommander.syncHandler.sync();
 			*/
-				return new Feedback(false,"out of order");
+				return new Feedback(false,"out of order", TaskCommander.data.getAllTasks());
 				
 			case UNDO: 
 				
-				return new Feedback(false,"to be implemented");
+				return new Feedback(false,"to be implemented", TaskCommander.data.getAllTasks());
 				
 			case INVALID:
-				return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+				return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
 				
 			case EXIT:
 				System.exit(0);
 				
 			default:
-				return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand));
+				return new Feedback(false,String.format(Global.MESSAGE_INVALID_FORMAT, userCommand), TaskCommander.data.getAllTasks());
 		}
 	}
 	

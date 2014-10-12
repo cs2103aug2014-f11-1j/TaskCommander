@@ -89,7 +89,7 @@ public class Data {
 		saveToHistory();
 		tasks.add(timedTask);
 		save();
-		return new Feedback(true, Global.CommandType.ADD, new TimedTask(timedTask));
+		return new Feedback(true, Global.CommandType.ADD, new TimedTask(timedTask), getAllTasks());
 	}
 	
 	/**
@@ -104,7 +104,7 @@ public class Data {
 		saveToHistory();
 		tasks.add(deadlineTask);
 		save();
-		return new Feedback(true, Global.CommandType.ADD, new DeadlineTask(deadlineTask));
+		return new Feedback(true, Global.CommandType.ADD, new DeadlineTask(deadlineTask), getAllTasks());
 	}
 	
 	/**
@@ -118,7 +118,7 @@ public class Data {
 		saveToHistory();
 		tasks.add(floatingTask);
 		save();
-		return new Feedback(true, Global.CommandType.ADD, new FloatingTask(floatingTask));
+		return new Feedback(true, Global.CommandType.ADD, new FloatingTask(floatingTask), getAllTasks());
 	}
 
 	/**
@@ -201,11 +201,11 @@ public class Data {
 	 */
 	public Feedback updateToTimedTask(int index, String name, Date startDate, Date endDate) {
 		if (tasks.isEmpty()) {
-			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
+			return new Feedback(false, String.format(Global.MESSAGE_EMPTY), getAllTasks());
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET) {
-			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index));
+			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index), getAllTasks());
 		}
 		if  (tasks.get(index).getType() != Task.TaskType.TIMED) {
 			TimedTask timedTask = new TimedTask(name,startDate,endDate);
@@ -215,7 +215,7 @@ public class Data {
 			deleteTask(index);
 			tasks.add(index, timedTask);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, new TimedTask(timedTask));
+			return new Feedback(true, Global.CommandType.UPDATE, new TimedTask(timedTask), getAllTasks());
 		} else {
 			saveToHistory();
 			TimedTask timedTask = (TimedTask) tasks.get(index);
@@ -230,7 +230,7 @@ public class Data {
 			}
 			timedTask.setEdited(true);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, new TimedTask(timedTask));
+			return new Feedback(true, Global.CommandType.UPDATE, new TimedTask(timedTask), getAllTasks());
 		}
 		
 	}
@@ -247,11 +247,11 @@ public class Data {
 	 */
 	public Feedback updateToDeadlineTask(int index, String name, Date endDate) {
 		if (tasks.isEmpty()) {
-			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
+			return new Feedback(false, String.format(Global.MESSAGE_EMPTY), getAllTasks());
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET) {
-			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index));
+			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index), getAllTasks());
 		}
 
 		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
@@ -262,7 +262,7 @@ public class Data {
 			deleteTask(index);
 			tasks.add(index, deadlineTask);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, new DeadlineTask(deadlineTask));
+			return new Feedback(true, Global.CommandType.UPDATE, new DeadlineTask(deadlineTask), getAllTasks());
 		} else {
 			saveToHistory();
 			DeadlineTask deadlineTask = (DeadlineTask) tasks.get(index);
@@ -274,7 +274,7 @@ public class Data {
 			}
 			deadlineTask.setEdited(true);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, new DeadlineTask(deadlineTask)); 
+			return new Feedback(true, Global.CommandType.UPDATE, new DeadlineTask(deadlineTask), getAllTasks()); 
 			}
 	}
 	
@@ -289,11 +289,11 @@ public class Data {
 	 */
 	public Feedback updateToFloatingTask(int index, String name) {
 		if (tasks.isEmpty()) {
-			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
+			return new Feedback(false, String.format(Global.MESSAGE_EMPTY), getAllTasks());
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index));
+			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index), getAllTasks());
 		}
 		
 		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
@@ -304,7 +304,7 @@ public class Data {
 			deleteTask(index);
 			tasks.add(index, floatingTask);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, new FloatingTask(floatingTask));
+			return new Feedback(true, Global.CommandType.UPDATE, new FloatingTask(floatingTask), getAllTasks());
 		} else {
 			saveToHistory();
 			FloatingTask floatingTask = (FloatingTask) tasks.get(index);
@@ -313,7 +313,7 @@ public class Data {
 			}
 			floatingTask.setEdited(true);
 			save();
-			return new Feedback(true, Global.CommandType.UPDATE, new FloatingTask(floatingTask));
+			return new Feedback(true, Global.CommandType.UPDATE, new FloatingTask(floatingTask), getAllTasks());
 		}
 	}
 
@@ -325,27 +325,27 @@ public class Data {
 	 */
 	public Feedback done(int index) {
 		if (tasks.isEmpty()) {
-			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
+			return new Feedback(false, String.format(Global.MESSAGE_EMPTY), getAllTasks());
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index));
+			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index), getAllTasks());
 		}
 		
 		Task doneTask = tasks.get(index);
 		if (doneTask.isDone()) {
-			return new Feedback(false, String.format(Global.MESSAGE_ALREADY_DONE));
+			return new Feedback(false, String.format(Global.MESSAGE_ALREADY_DONE), getAllTasks());
 		} else {
 			saveToHistory();
 			doneTask.markDone();
 			save();
 			switch ( doneTask.getType()) {
 			case FLOATING:
-				return new Feedback(true, Global.CommandType.DONE, (FloatingTask) doneTask);
+				return new Feedback(true, Global.CommandType.DONE, (FloatingTask) doneTask, getAllTasks());
 			case DEADLINE:
-				return new Feedback(true, Global.CommandType.DONE, (DeadlineTask) doneTask);
+				return new Feedback(true, Global.CommandType.DONE, (DeadlineTask) doneTask, getAllTasks());
 			default:																				// TODO: find better solution than default
-				return new Feedback(true, Global.CommandType.DONE,(TimedTask) doneTask);
+				return new Feedback(true, Global.CommandType.DONE,(TimedTask) doneTask, getAllTasks());
 			}
 		}
 	}
@@ -358,27 +358,27 @@ public class Data {
 	 */
 	public Feedback open(int index) {
 		if (tasks.isEmpty()) {
-			return new Feedback(false, String.format(Global.MESSAGE_EMPTY));
+			return new Feedback(false, String.format(Global.MESSAGE_EMPTY), getAllTasks());
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index));
+			return new Feedback(false, String.format(Global.MESSAGE_NO_INDEX, index), getAllTasks());
 		}
 		
 		Task openTask = tasks.get(index);
 		if (!openTask.isDone()) {
-			return new Feedback(false, String.format(Global.MESSAGE_ALREADY_OPEN));
+			return new Feedback(false, String.format(Global.MESSAGE_ALREADY_OPEN), getAllTasks());
 		} else {
 			saveToHistory();
 			openTask.markOpen();
 			save();
 			switch ( openTask.getType()) {
 			case FLOATING:
-				return new Feedback(true, Global.CommandType.OPEN, new FloatingTask((FloatingTask) openTask));
+				return new Feedback(true, Global.CommandType.OPEN, new FloatingTask((FloatingTask) openTask), getAllTasks());
 			case DEADLINE:
-				return new Feedback(true, Global.CommandType.OPEN, new DeadlineTask((DeadlineTask) openTask));
+				return new Feedback(true, Global.CommandType.OPEN, new DeadlineTask((DeadlineTask) openTask), getAllTasks());
 			default:
-				return new Feedback(true, Global.CommandType.OPEN, new TimedTask((TimedTask) openTask));
+				return new Feedback(true, Global.CommandType.OPEN, new TimedTask((TimedTask) openTask), getAllTasks());
 			}
 		}
 	}
@@ -392,11 +392,11 @@ public class Data {
 	 */
 	public Feedback deleteTask(int index) {
 		if (tasks.isEmpty()) {
-			return new Feedback(false,String.format(Global.MESSAGE_EMPTY));
+			return new Feedback(false,String.format(Global.MESSAGE_EMPTY), getAllTasks());
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return new Feedback(false,String.format(Global.MESSAGE_NO_INDEX, index));
+			return new Feedback(false,String.format(Global.MESSAGE_NO_INDEX, index), getAllTasks());
 		} else {
 			Task deletedTask = tasks.get(index);
 			saveToHistory();
@@ -405,11 +405,11 @@ public class Data {
 			save();
 			switch ( deletedTask.getType()) {
 			case FLOATING:
-				return new Feedback(true, Global.CommandType.DELETE, new FloatingTask((FloatingTask) deletedTask));
+				return new Feedback(true, Global.CommandType.DELETE, new FloatingTask((FloatingTask) deletedTask), getAllTasks());
 			case DEADLINE:
-				return new Feedback(true, Global.CommandType.DELETE, new DeadlineTask((DeadlineTask) deletedTask));
+				return new Feedback(true, Global.CommandType.DELETE, new DeadlineTask((DeadlineTask) deletedTask), getAllTasks());
 			default:
-				return new Feedback(true, Global.CommandType.DELETE, new TimedTask((TimedTask) deletedTask));
+				return new Feedback(true, Global.CommandType.DELETE, new TimedTask((TimedTask) deletedTask), getAllTasks());
 			}
 		}
 	}
@@ -479,7 +479,7 @@ public class Data {
 		deletedTasks.addAll(tasks);
 		tasks.clear();
 		save();
-		return new Feedback(true,Global.CommandType.CLEAR);
+		return new Feedback(true,Global.CommandType.CLEAR, getAllTasks());
 	}
 	
 	/**
