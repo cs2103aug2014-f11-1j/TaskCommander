@@ -65,7 +65,7 @@ public class UI {
 
 	}
 
-	//@author Chenwei
+	//@author A0105753J
 	/**
 	 * @wbp.parser.entryPoint
 	 */
@@ -245,7 +245,7 @@ public class UI {
 		output.setForeground(red);
 	}
 
-	//@author Chenwei-unused
+	//@author A0105753J-unused
 	public ArrayList<Task> getTasks(Feedback fb) {
 		ArrayList<Task> tasks = new ArrayList<Task>();
 		switch(fb.getCommandType()){
