@@ -275,9 +275,7 @@ public class Controller {
 	 * Returns the tasks to be displayed in the UI's table.
 	 */
 	public ArrayList<Task> getDisplayedTasks() {
-		if (displayedTasks == null) {
-			executeCommand("display");
-		}
+		executeCommand("display");
 		return displayedTasks;
 	}
 	
