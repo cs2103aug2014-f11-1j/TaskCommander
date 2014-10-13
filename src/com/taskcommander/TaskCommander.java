@@ -12,7 +12,7 @@ public class TaskCommander {
 	public static Data data; // temporary memory containing a list of task objects
 	public static Storage storage; 	// (permanent memory consisting of a local .txt-file
 	public static SyncHandler syncHandler;
-	public static TableUI tableui;
+	public static UI ui;
 
 	/**
 	 * Launch the application
@@ -26,8 +26,8 @@ public class TaskCommander {
 		controller = new Controller();
 		parser = new Parser();
 
-		tableui = new TableUI();
-		tableui.open();
+		ui = new UI();
+		ui.open();
 	}
 	
 	//Note: only call this when the sync command is used
