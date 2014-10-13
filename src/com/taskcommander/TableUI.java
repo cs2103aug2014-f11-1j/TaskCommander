@@ -167,8 +167,8 @@ public class TableUI {
 	}
 	
 	private void displayFeedback(String fb) {
-		displayTasks(TaskCommander.controller.getDisplayedTasks());
 		displayMessage(fb);
+		displayTasks(TaskCommander.controller.getDisplayedTasks());
 	}
 
 	public void displayTasks(ArrayList<Task> tasks) {
