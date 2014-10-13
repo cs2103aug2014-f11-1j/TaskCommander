@@ -102,12 +102,12 @@ public class Data {
 	 * @param 	id
 	 * @return 	feedback for UI
 	 */
-	public Feedback addTimedTask(String taskName, Date startDate, Date endDate, String googleID) {
+	public String addTimedTask(String taskName, Date startDate, Date endDate, String googleID) {
 		TimedTask timedTask = new TimedTask(taskName,startDate,endDate, googleID);
 		saveToHistory();
 		tasks.add(timedTask);
 		save();
-		return new Feedback(true, Global.CommandType.ADD, new TimedTask(timedTask), getAllTasks());
+		return String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 	}
 	
 	/**
@@ -133,12 +133,12 @@ public class Data {
 	 * @param googleID
 	 * @return
 	 */
-	public Feedback addDeadlineTask(String taskName, Date endDate, String googleID) {
+	public String addDeadlineTask(String taskName, Date endDate, String googleID) {
 		DeadlineTask deadlineTask= new DeadlineTask(taskName, endDate, googleID);
 		saveToHistory();
 		tasks.add(deadlineTask);
 		save();
-		return new Feedback(true, Global.CommandType.ADD, new DeadlineTask(deadlineTask), getAllTasks());
+		return String.format(Global.MESSAGE_ADDED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
 	}
 	
 	/**
@@ -162,12 +162,12 @@ public class Data {
 	 * @param googleID
 	 * @return
 	 */
-	public Feedback addFloatingTask(String taskName, String googleID) {
+	public String addFloatingTask(String taskName, String googleID) {
 		FloatingTask floatingTask = new FloatingTask(taskName, googleID);
 		saveToHistory();
 		tasks.add(floatingTask);
 		save();
-		return new Feedback(true, Global.CommandType.ADD, new FloatingTask(floatingTask), getAllTasks());
+		return String.format(Global.MESSAGE_ADDED,"\"" + floatingTask.getName() + "\"");
 	}
 
 	/**
@@ -175,7 +175,7 @@ public class Data {
 	 *  
 	 * @return 	ArrayList<Task>
 	 */
-	public ArrayList<Task> getTasks() {
+	public ArrayList<Task> getCopiedTasks() {
 
 		ArrayList<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
 		ArrayList<DatedTask> datedTasks = new ArrayList<DatedTask>();
@@ -213,7 +213,7 @@ public class Data {
 	 * @param done
 	 * @return 	ArrayList<Task>
 	 */
-	public ArrayList<Task> getTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean status) {
+	public ArrayList<Task> getCopiedTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean status) {
 		ArrayList<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
 		ArrayList<DatedTask> datedTasks = new ArrayList<DatedTask>();
 		ArrayList<Task> concernedTasks = new ArrayList<Task>();
@@ -564,6 +564,7 @@ public class Data {
 	public int getIndexOf(Task task) {
 		return tasks.indexOf(task);
 	}
+
 	
 	public ArrayList<Task> getDeletedTasks() {
 		return deletedTasks;
@@ -576,4 +577,12 @@ public class Data {
 		}
 		return idList;
 	}
+	
+	/**
+	 * Returns the tasks.
+	 */
+	public ArrayList<Task> getAllTasks() {
+		return tasks;
+	}
+	
 }

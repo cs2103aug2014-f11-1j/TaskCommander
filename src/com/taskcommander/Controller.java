@@ -199,12 +199,12 @@ public class Controller {
 				
 				// Case 1: No restrictions of display
 				if (!isDatePeriodRestricted && !isTaskTypeRestricted && !isStatusRestricted) {
-					displayedTasks = TaskCommander.data.getTasks();
+					displayedTasks = TaskCommander.data.getCopiedTasks();
 					return String.format(Global.MESSAGE_DISPLAYED, "all");
 					
 				// Case 2: With restrictions of display
 				} else {
-					displayedTasks = TaskCommander.data.getTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, done);
+					displayedTasks = TaskCommander.data.getCopiedTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, done);
 					String displayRestriction = "tasks ";
 					if (isDatePeriodRestricted) {
 						displayRestriction = "within ["+ Global.dayFormat.format(startDate)+ " "+ Global.timeFormat.format(startDate)+ "-"+ Global.timeFormat.format(endDate) + "] ";
