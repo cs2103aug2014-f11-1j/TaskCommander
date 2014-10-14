@@ -55,14 +55,18 @@ public class UI {
 	private final Color gray = display.getSystemColor(SWT.COLOR_GRAY);
 	private final Color blue = display.getSystemColor(SWT.COLOR_BLUE);
 	private final Color black = display.getSystemColor(SWT.COLOR_BLACK);
+	private final Color darkRed = display.getSystemColor(SWT.COLOR_DARK_RED);
 	private final Color darkGray = display.getSystemColor(SWT.COLOR_DARK_GRAY);
-	private final Color darkCyan = display.getSystemColor(SWT.COLOR_DARK_CYAN);
 	private final Color darkBlue = display.getSystemColor(SWT.COLOR_DARK_BLUE);
-
+	private final Color darkCyan = display.getSystemColor(SWT.COLOR_DARK_CYAN);
+	private final Color darkMagenta = display.getSystemColor(SWT.COLOR_DARK_MAGENTA);
+	
 	private final Color COLOR_COL_FIRST = darkGray;
 	private final Color COLOR_COL_SECOND = blue;
 	private final Color COLOR_COL_THIRD = black;
 	private final Color COLOR_DATE_ROW = darkCyan;
+	private final Color COLOR_DONE = darkGray;
+	private final Color COLOR_NOT_DONE = red;
 
 	private Text input;
 	private Text output;
@@ -179,7 +183,7 @@ public class UI {
 
 	public void displayTasks(ArrayList<Task> tasks) {
 		int index = 1;
-		Date lastDate = null;
+		String lastDate = null;
 		for (Task task : tasks) { 
 			switch(task.getType()) {
 			case FLOATING:
@@ -188,16 +192,16 @@ public class UI {
 				break;
 			case DEADLINE:
 				DeadlineTask dt = (DeadlineTask) task;
-				if (isNewDate(dt, lastDate)) {
-					lastDate = dt.getDate();
+				if (isNewDay(dt, lastDate)) {
+					lastDate = getDisplayDate(dt.getDate());
 					createDateRow(lastDate);
 				}
 				createRowFromTask(index, dt);
 				break;
 			case TIMED:
 				TimedTask tt = (TimedTask) task;
-				if (isNewDate(tt, lastDate)) {
-					lastDate = tt.getDate();
+				if (isNewDay(tt, lastDate)) {
+					lastDate = getDisplayDate(tt.getDate());
 					createDateRow(lastDate);
 				}
 				createRowFromTask(index, tt);
@@ -235,23 +239,23 @@ public class UI {
 		setColorsForTableItem(item, getDoneColor(task));
 	}
 	
-	private void createDateRow(Date date) {
+	private void createDateRow(String date) {
 		TableItem item = new TableItem(table, TABLE_STYLE);
-		item.setText(new String[] { " ", getDisplayDate(date), " ", " "});
+		item.setText(new String[] { " ", date, " ", " "});
 		item.setForeground(1, COLOR_DATE_ROW);
 	}
 
 	private String getDisplayDate(DeadlineTask task) {
-		return "[by "+ Global.dayFormat.format(task.getEndDate())+ " "+ Global.timeFormat.format(task.getEndDate()) + "]";
+		return Global.timeFormat.format(task.getEndDate());
 	}
 
 	private String getDisplayDate(TimedTask task) {
-		return "["+ Global.dayFormat.format(task.getStartDate())+ " "+ Global.timeFormat.format(task.getStartDate())+ "-"+ 
-				Global.timeFormat.format(task.getEndDate()) + "]";
+		return Global.timeFormat.format(task.getStartDate())+ "-"+ 
+			   Global.timeFormat.format(task.getEndDate());
 	}
 
 	private String getDisplayDate(Date date) {
-		return "|"+ Global.dayFormat.format(date) + "|";
+		return "["+Global.dayFormat.format(date)+"]";
 	}
 
 	private String getDoneMessage(Task task) {
@@ -264,15 +268,22 @@ public class UI {
 
 	private Color getDoneColor(Task task) {
 		if (task.isDone()) {
-			return gray;
+			return COLOR_DONE;
 		} else {
-			return red;
+			return COLOR_NOT_DONE;
 		}
 	}
 	
-	private boolean isNewDate(DatedTask task, Date lastDate) {
+	/** Checks if the given task has a different day from the
+	 *  last date string, by converting the task's date into
+	 *  a display date string.
+	 * @param task
+	 * @param lastDate
+	 * @return          If the given task has a later day.
+	 */
+	private boolean isNewDay(DatedTask task, String lastDate) {
 		if (lastDate != null) {
-			return (task.getDate().compareTo(lastDate) > 0);
+			return !(getDisplayDate(task.getDate()).equals(lastDate));
 		} else {
 			return true;
 		}
