@@ -161,7 +161,7 @@ public class UI {
 		display.dispose();
 	}
 	
-	//@author A0112828H
+	//@author A0112828H 
 	private void displayTasksUponOpening() {
 		displayTasks(TaskCommander.controller.getDisplayedTasks());
 	}
