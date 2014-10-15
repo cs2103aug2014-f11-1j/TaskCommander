@@ -246,11 +246,6 @@ public class Data {
 		Collections.sort(datedTasks);
 		concernedTasks.addAll(datedTasks);
 		
-		for(Task task: concernedTasks) {
-			System.out.print(task.getName());
-			System.out.println(task.isDone());
-		}
-		
 		return concernedTasks;
 	}
 	
