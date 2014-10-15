@@ -1,6 +1,8 @@
 package com.taskcommander;
 
 import java.util.ArrayList;
+import java.util.Date;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
@@ -14,7 +16,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public class TableUI {
+public class UI {
 
 	private static final int SHELL_MIN_HEIGHT = 500;
 	private static final int SHELL_MIN_WIDTH = 200;
@@ -53,19 +55,27 @@ public class TableUI {
 	private final Color gray = display.getSystemColor(SWT.COLOR_GRAY);
 	private final Color blue = display.getSystemColor(SWT.COLOR_BLUE);
 	private final Color black = display.getSystemColor(SWT.COLOR_BLACK);
-
-	private final Color COLOR_COL_FIRST = gray;
+	private final Color darkRed = display.getSystemColor(SWT.COLOR_DARK_RED);
+	private final Color darkGray = display.getSystemColor(SWT.COLOR_DARK_GRAY);
+	private final Color darkBlue = display.getSystemColor(SWT.COLOR_DARK_BLUE);
+	private final Color darkCyan = display.getSystemColor(SWT.COLOR_DARK_CYAN);
+	private final Color darkMagenta = display.getSystemColor(SWT.COLOR_DARK_MAGENTA);
+	
+	private final Color COLOR_COL_FIRST = darkGray;
 	private final Color COLOR_COL_SECOND = blue;
 	private final Color COLOR_COL_THIRD = black;
+	private final Color COLOR_DATE_ROW = darkCyan;
+	private final Color COLOR_DONE = darkGray;
+	private final Color COLOR_NOT_DONE = red;
 
 	private Text input;
 	private Text output;
 
-	public TableUI() {
+	public UI() {
 
 	}
 
-	//@author Chenwei
+	//@author A0105753J
 	/**
 	 * @wbp.parser.entryPoint
 	 */
@@ -74,13 +84,13 @@ public class TableUI {
 
 		createTextFields();
 		setupUIElements();
-		
+
 		displayTasksUponOpening();
 		addListenerForInput();
-		
+
 		runUntilWindowClosed();
 	}
-	
+
 	private void setupShell() {
 		shell.setLayout(new GridLayout(GRID_COLUMNS_SPAN, GRID_COLUMNS_EQUAL_SIZE));
 		shell.setText(Global.APPLICATION_NAME);
@@ -92,7 +102,7 @@ public class TableUI {
 		new Label(shell, SWT.NONE).setText("Enter command: ");
 		input = new Text(shell, SWT.BORDER);
 	}
-	
+
 	private void setupUIElements() {
 		setupInput();
 		setupOutput();
@@ -145,7 +155,7 @@ public class TableUI {
 			}
 		});
 	}
-	
+
 	/**
 	 * Opens the shell and runs until the shell is closed.
 	 * Disposes of the display.
@@ -160,12 +170,12 @@ public class TableUI {
 		}
 		display.dispose();
 	}
-	
-	//@author A0112828H
+
+	//@author A0112828H 
 	private void displayTasksUponOpening() {
 		displayTasks(TaskCommander.controller.getDisplayedTasks());
 	}
-	
+
 	private void displayFeedback(String fb) {
 		displayMessage(fb);
 		displayTasks(TaskCommander.controller.getDisplayedTasks());
@@ -173,43 +183,110 @@ public class TableUI {
 
 	public void displayTasks(ArrayList<Task> tasks) {
 		int index = 1;
+		String lastDate = null;
 		for (Task task : tasks) { 
-			TableItem item = new TableItem(table, TABLE_STYLE);
-			String done;
-			Color doneColor;
-			if (task.isDone()) {
-				done = "done";
-				doneColor = gray;
-			} else {
-				done = "not done";
-				doneColor = red;
-			}
 			switch(task.getType()) {
 			case FLOATING:
-				item.setText(new String[] {Integer.toString(index),
-						" ", 
-						task.getName(),
-						done });
+				FloatingTask ft = (FloatingTask) task;
+				createRowFromTask(index, ft);
 				break;
 			case DEADLINE:
-				DeadlineTask deadlineTask = (DeadlineTask) task;
-				item.setText(new String[] {Integer.toString(index),
-						"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]", 
-						task.getName(),
-						done });
+				DeadlineTask dt = (DeadlineTask) task;
+				if (isNewDay(dt, lastDate)) {
+					lastDate = getDisplayDate(dt.getDate());
+					createDateRow(lastDate);
+				}
+				createRowFromTask(index, dt);
 				break;
 			case TIMED:
-				TimedTask timedTask = (TimedTask) task;
-				item.setText(new String[] { Integer.toString(index),
-						"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]", 
-						task.getName(),
-						done });
+				TimedTask tt = (TimedTask) task;
+				if (isNewDay(tt, lastDate)) {
+					lastDate = getDisplayDate(tt.getDate());
+					createDateRow(lastDate);
+				}
+				createRowFromTask(index, tt);
 				break;
 			}
-			setColorsForTableItem(item, doneColor);
 			index++;
 		}
 		packUI();
+	}
+
+	private void createRowFromTask(int index, FloatingTask task) {
+		TableItem item = new TableItem(table, TABLE_STYLE);
+		item.setText(new String[] {Integer.toString(index),
+				" ", 
+				task.getName(),
+				getDoneMessage(task)});
+		setColorsForTableItem(item, getDoneColor(task));
+	}
+
+	private void createRowFromTask(int index, DeadlineTask task) {
+		TableItem item = new TableItem(table, TABLE_STYLE);
+		item.setText(new String[] {Integer.toString(index),
+				getDisplayDate(task), 
+				task.getName(),
+				getDoneMessage(task)});
+		setColorsForTableItem(item, getDoneColor(task));
+	}
+
+	private void createRowFromTask(int index, TimedTask task) {
+		TableItem item = new TableItem(table, TABLE_STYLE);
+		item.setText(new String[] { Integer.toString(index),
+				getDisplayDate(task), 
+				task.getName(),
+				getDoneMessage(task)});
+		setColorsForTableItem(item, getDoneColor(task));
+	}
+	
+	private void createDateRow(String date) {
+		TableItem item = new TableItem(table, TABLE_STYLE);
+		item.setText(new String[] { " ", date, " ", " "});
+		item.setForeground(1, COLOR_DATE_ROW);
+	}
+
+	private String getDisplayDate(DeadlineTask task) {
+		return Global.timeFormat.format(task.getEndDate());
+	}
+
+	private String getDisplayDate(TimedTask task) {
+		return Global.timeFormat.format(task.getStartDate())+ "-"+ 
+			   Global.timeFormat.format(task.getEndDate());
+	}
+
+	private String getDisplayDate(Date date) {
+		return "["+Global.dayFormat.format(date)+"]";
+	}
+
+	private String getDoneMessage(Task task) {
+		if (task.isDone()) {
+			return "done";
+		} else {
+			return "not done";
+		}
+	}
+
+	private Color getDoneColor(Task task) {
+		if (task.isDone()) {
+			return COLOR_DONE;
+		} else {
+			return COLOR_NOT_DONE;
+		}
+	}
+	
+	/** Checks if the given task has a different day from the
+	 *  last date string, by converting the task's date into
+	 *  a display date string.
+	 * @param task
+	 * @param lastDate
+	 * @return          If the given task has a later day.
+	 */
+	private boolean isNewDay(DatedTask task, String lastDate) {
+		if (lastDate != null) {
+			return !(getDisplayDate(task.getDate()).equals(lastDate));
+		} else {
+			return true;
+		}
 	}
 
 	private void setColorsForTableItem(TableItem item, Color doneColor) {
@@ -234,7 +311,7 @@ public class TableUI {
 	private void clearInput() {
 		input.setText("");
 	}
-	
+
 	private void displayMessage(String s) {
 		output.setText(s);
 		output.setForeground(blue);
@@ -245,7 +322,7 @@ public class TableUI {
 		output.setForeground(red);
 	}
 
-	//@author Chenwei-unused
+	//@author A0105753J-unused
 	public ArrayList<Task> getTasks(Feedback fb) {
 		ArrayList<Task> tasks = new ArrayList<Task>();
 		switch(fb.getCommandType()){
