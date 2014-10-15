@@ -4,24 +4,37 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * Singleton class that has the following functions:
+ * - Creates the UI
+ * - Receives user input and sends it to the controller
+ * - Receives feedback from controller and shows it to the user
+ * - Facilitates Google sync function by allowing user to login through a local browser
+ * - Receives user's authorisation code and sends it to the controller
+ */
 public class UI {
-
+	
 	private static final int SHELL_MIN_HEIGHT = 500;
 	private static final int SHELL_MIN_WIDTH = 200;
 
-	private static final int GRID_COLUMNS_SPAN = 2;
+	private static final int GRID_COLUMNS_NUM = 2;
 	private static final boolean GRID_COLUMNS_EQUAL_SIZE = false;
 
 	private static final boolean INPUT_FIT_HORIZONTAL = true;
@@ -46,10 +59,19 @@ public class UI {
 	private static final int TABLE_PREFERRED_HEIGHT = 100;
 	private static final int TABLE_COLUMNS_NUM = 4;
 	private static final String[] TABLE_COLUMNS_NAMES = {"No.", "Date", "Task", "Status"};
+	
+	private static final boolean BROWSER_FIT_HORIZONTAL = true;
+	private static final boolean BROWSER_FIT_VERTICAL = true;
+	private static final int BROWSER_COLUMNS_SPAN = 2;
+	private static final int BROWSER_ROWS_SPAN = 1;
+	private static final int BROWSER_PREFERRED_WIDTH = 500;
 
 	private final Display display = Display.getDefault();
 	private final Shell shell = new Shell(display);
-	private final Table table = new Table(shell, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+	private final TabFolder tabFolder = new TabFolder(shell, SWT.NONE);
+	private final Composite mainWindow = new Composite(tabFolder, SWT.FILL);
+	private final Composite browserWindow = new Composite(tabFolder, SWT.FILL);
+	private final Table table = new Table(mainWindow, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 
 	private final Color red = display.getSystemColor(SWT.COLOR_RED);
 	private final Color gray = display.getSystemColor(SWT.COLOR_GRAY);
@@ -60,16 +82,23 @@ public class UI {
 	private final Color darkBlue = display.getSystemColor(SWT.COLOR_DARK_BLUE);
 	private final Color darkCyan = display.getSystemColor(SWT.COLOR_DARK_CYAN);
 	private final Color darkMagenta = display.getSystemColor(SWT.COLOR_DARK_MAGENTA);
-	
+
 	private final Color COLOR_COL_FIRST = darkGray;
 	private final Color COLOR_COL_SECOND = blue;
 	private final Color COLOR_COL_THIRD = black;
 	private final Color COLOR_DATE_ROW = darkCyan;
 	private final Color COLOR_DONE = darkGray;
 	private final Color COLOR_NOT_DONE = red;
-
+	
+	private static final String INSTRUCTIONS_MAIN = "Enter command: ";
+	private static final String INSTRUCTIONS_BROWSER = "1. Login to Google. \n 2. Accept application permissions. \n" +
+	                                                   "3. Copy the authorisation code given and paste it here:";
+	
+	private TabItem browserTab;
 	private Text input;
 	private Text output;
+	private Browser browser;
+	private Text browserInput;
 
 	public UI() {
 
@@ -81,29 +110,72 @@ public class UI {
 	 */
 	public void open() {
 		setupShell();
-
-		createTextFields();
-		setupUIElements();
-
-		displayTasksUponOpening();
-		addListenerForInput();
-
+		setupTabFolder();
+		createMainTab();
 		runUntilWindowClosed();
 	}
-
+	
 	private void setupShell() {
-		shell.setLayout(new GridLayout(GRID_COLUMNS_SPAN, GRID_COLUMNS_EQUAL_SIZE));
+		shell.setLayout(new FillLayout());
 		shell.setText(Global.APPLICATION_NAME);
 		shell.setMinimumSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
 	}
 
-	private void createTextFields() {
-		output = new Text(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-		new Label(shell, SWT.NONE).setText("Enter command: ");
-		input = new Text(shell, SWT.BORDER);
+	private void setupTabFolder() {
+		tabFolder.setLayout(new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE));
+		tabFolder.setSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
 	}
 
-	private void setupUIElements() {
+	private void createMainTab() {
+		TabItem item = new TabItem(tabFolder, SWT.NONE);
+		item.setText("Main");
+		setupMainWindow();
+		item.setControl(mainWindow);
+	}
+
+	private void setupMainWindow() {
+		GridLayout layout = new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
+		mainWindow.setLayout(layout);
+		
+		createTextFieldsForMain();
+		setupMainElements();
+		addInputListenerForMain();
+		displayTasksUponOpening();
+	}
+	
+	//@author A0112828H
+	private void createBrowserTab(String url) {
+		browserTab = new TabItem(tabFolder, SWT.NONE);
+		browserTab.setText("Google Login");
+		setupBrowserWindow(url);
+		browserTab.setControl(browserWindow);
+		tabFolder.setSelection(browserTab);
+	}
+	
+	private void setupBrowserWindow(String url) {
+		GridLayout layout = new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
+		browserWindow.setLayout(layout);
+		
+		createTextFieldsForBrowser();
+		setupBrowserElements();
+		addInputListenerForBrowser();
+		
+		browser.setUrl(url);
+	}
+	
+	private void createTextFieldsForMain() {
+		output = new Text(mainWindow, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		new Label(mainWindow, SWT.NONE).setText(INSTRUCTIONS_MAIN);
+		input = new Text(mainWindow, SWT.BORDER);
+	}
+
+	private void createTextFieldsForBrowser() {
+		new Label(browserWindow, SWT.NONE).setText(INSTRUCTIONS_BROWSER);
+		browserInput = new Text(browserWindow, SWT.BORDER);
+	}
+
+	//@author A0105753J
+	private void setupMainElements() {
 		setupInput();
 		setupOutput();
 		setupTable();
@@ -138,8 +210,31 @@ public class UI {
 			column.setText(TABLE_COLUMNS_NAMES[i]);
 		}
 	}
+	
+	//@author A0112828H
+	private void setupBrowserElements() {
+		setupBrowser();
+		setupBrowserInput();
+	}
+	
+	private void setupBrowserInput() {
+		GridData gridData = new GridData(SWT.FILL, SWT.DOWN, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
+				INPUT_COLUMNS_SPAN, INPUT_ROWS_SPAN);
+		gridData.widthHint = INPUT_PREFERRED_WIDTH;
+		browserInput.setLayoutData(gridData);
+	}
 
-	private void addListenerForInput() {
+	private void setupBrowser() {
+		browser = new Browser(browserWindow, SWT.FILL);
+		GridData browserGridData = new GridData(SWT.FILL, SWT.FILL, BROWSER_FIT_HORIZONTAL, BROWSER_FIT_VERTICAL, 
+				BROWSER_COLUMNS_SPAN, BROWSER_ROWS_SPAN);
+		browserGridData.widthHint = BROWSER_PREFERRED_WIDTH;
+		browser.setLayoutData(browserGridData);
+		browser.setUrl("http://www.google.com/");
+	}
+
+	//@author A0105753J
+	private void addInputListenerForMain() {
 		input.addListener(SWT.Traverse, new Listener(){
 			@Override
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
@@ -148,6 +243,9 @@ public class UI {
 						clearTableItems();
 						String command = input.getText();
 						displayFeedback(TaskCommander.controller.executeCommand(command));
+						// Insert sync detection and execute this line
+						// Needs a string url passed for the browser to show
+						//createBrowserTab("google.com");
 						clearInput();
 					}catch (Exception e1) {
 						displayErrorMessage(e1.getMessage());
@@ -155,7 +253,26 @@ public class UI {
 			}
 		});
 	}
+	
+	//@author A0112828H
+	private void addInputListenerForBrowser() {
+		browserInput.addListener(SWT.Traverse, new Listener(){
+			@Override
+			public void handleEvent(org.eclipse.swt.widgets.Event event) {
+				if(event.detail == SWT.TRAVERSE_RETURN)
+					try {
+						String code = input.getText();
+						// Send code to Google Integration component
+						browserTab.dispose();
+						output.setText("Executed sync"); // Get string message from feedback
+					}catch (Exception e1) {
+						displayErrorMessage(e1.getMessage());
+					}
+			}
+		});
+	}
 
+	//@author A0105753J
 	/**
 	 * Opens the shell and runs until the shell is closed.
 	 * Disposes of the display.
@@ -168,10 +285,14 @@ public class UI {
 				display.sleep();
 			}
 		}
+		disposeElements();
+	}
+
+	private void disposeElements() {
 		display.dispose();
 	}
 
-	//@author A0112828H 
+	//@author A0112828H
 	private void displayTasksUponOpening() {
 		displayTasks(TaskCommander.controller.getDisplayedTasks());
 	}
@@ -238,7 +359,7 @@ public class UI {
 				getDoneMessage(task)});
 		setColorsForTableItem(item, getDoneColor(task));
 	}
-	
+
 	private void createDateRow(String date) {
 		TableItem item = new TableItem(table, TABLE_STYLE);
 		item.setText(new String[] { " ", date, " ", " "});
@@ -251,7 +372,7 @@ public class UI {
 
 	private String getDisplayDate(TimedTask task) {
 		return Global.timeFormat.format(task.getStartDate())+ "-"+ 
-			   Global.timeFormat.format(task.getEndDate());
+				Global.timeFormat.format(task.getEndDate());
 	}
 
 	private String getDisplayDate(Date date) {
@@ -273,7 +394,7 @@ public class UI {
 			return COLOR_NOT_DONE;
 		}
 	}
-	
+
 	/** Checks if the given task has a different day from the
 	 *  last date string, by converting the task's date into
 	 *  a display date string.
