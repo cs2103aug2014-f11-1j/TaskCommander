@@ -1,8 +1,10 @@
 package com.taskcommander;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 
 /**
  * This class represents the Controller component. After receiving the user's
@@ -17,9 +19,22 @@ import java.util.List;
 public class Controller {
 	
 	/**
-	 * Constructor
+	 * Constructor, which sets the default values for the display restriction
+	 * so that the user gets an overview of the open tasks of the next week when starting the application.
 	 */
 	public Controller(){
+		displayRestriction = "Period: one week from now Status: open";
+		isDatePeriodRestricted = true;
+		Calendar calendar = Calendar.getInstance();
+		startDate = calendar.getTime();
+		calendar.add(Calendar.WEEK_OF_YEAR, 1);
+		endDate = calendar.getTime();
+		isTaskTypeRestricted = false;
+		shownFloatingTask = true;
+		shownDeadlineTask = true;
+		shownTimedTask = true;
+		isStatusRestricted = true;
+		done = false; // false = open, true = done
 	}
 
 	/**
@@ -30,18 +45,17 @@ public class Controller {
 	
 	/**
 	 * This variables represent the display settings, the user has been set by his last display comment.
-	 * TODO: Default values, like open tasks of the next week, when starting the application.
 	 */
-	String displayRestriction = "default";
-	boolean isDatePeriodRestricted = false;
-	Date startDate = null;
-	Date endDate = null;
-	boolean isTaskTypeRestricted = false;
-	boolean shownFloatingTask = true;
-	boolean shownDeadlineTask = true;
-	boolean shownTimedTask = true;
-	boolean isStatusRestricted = false;
-	boolean done = false; // false = open, true = done
+	String displayRestriction;
+	boolean isDatePeriodRestricted;
+	Date startDate;
+	Date endDate;
+	boolean isTaskTypeRestricted;
+	boolean shownFloatingTask;
+	boolean shownDeadlineTask;
+	boolean shownTimedTask;
+	boolean isStatusRestricted;
+	boolean done; // false = open, true = done
 	
 	/**
 	 * This list contains the state of the tasks before the latest add/update/done/open/delete command.
@@ -68,6 +82,9 @@ public class Controller {
 		switch (commandType) {
 		
 			case ADD:
+				if (getNumberOfWords(userCommand) < 2) {
+					return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
+				}
 				
 				// taskName
 				String taskName = TaskCommander.parser.determineTaskName(userCommand);
@@ -94,6 +111,10 @@ public class Controller {
 				}
 				
 			case UPDATE: case DONE: case OPEN: case DELETE:
+				
+				if (getNumberOfWords(userCommand) < 2) {
+					return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
+				}
 				
 				// Index in DisplayedTasks
 				int indexDisplayedTasks = TaskCommander.parser.determineIndex(userCommand);
@@ -225,24 +246,29 @@ public class Controller {
 					
 				// Case 2: With restrictions of display
 				} else {
-					displayRestriction = "tasks ";
+					displayRestriction = "";
 					if (isDatePeriodRestricted) {
-						displayRestriction += "within ["+ Global.dayFormat.format(startDate)+ " "+ Global.timeFormat.format(startDate)+ "-"+ Global.timeFormat.format(endDate) + "] ";
+						displayRestriction += "Period: ["+ Global.dayFormat.format(startDate)+ " "+ Global.timeFormat.format(startDate)+ "-"+ Global.timeFormat.format(endDate) + "]  ";
 					}
 					if (isTaskTypeRestricted) {
-						displayRestriction += "of the type ";
+						displayRestriction += "Type: ";
 						if (shownFloatingTask) {
-							displayRestriction += "floating ";
+							displayRestriction += "none";
 						}
-						if (shownDeadlineTask) {
-							displayRestriction += "deadline ";
+						if (shownDeadlineTask && !shownFloatingTask) {
+							displayRestriction += "deadline";
+						} else {
+							displayRestriction += ", deadline";
 						}
-						if (shownTimedTask) {
+						if (shownTimedTask && !shownFloatingTask && !shownDeadlineTask) {
 							displayRestriction += "timed ";
+						} else {
+							displayRestriction += ", timed";
 						}
+						displayRestriction += " ";
 					}
 					if (isStatusRestricted) {
-						displayRestriction = "of the status ";
+						displayRestriction = "Status: ";
 						if (done) {
 							displayRestriction += "done ";
 						} else {
@@ -253,43 +279,40 @@ public class Controller {
 			}
 				
 			case CLEAR:
-				if (isSingleWord(userCommand)) {
+				if (getNumberOfWords(userCommand) == 1) {
 					return TaskCommander.data.clearTasks();
 				} else {
 					return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
 				}
 				
 			case HELP:
-				if (isSingleWord(userCommand)) {
+				if (getNumberOfWords(userCommand) == 1) {
 					return String.format(Global.MESSAGE_HELP);
 				} else {
 					return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
 				}
 				
 			case SYNC: 
-			/* TODO
-				if (TaskCommander.syncHandler == null) {
+				if (getNumberOfWords(userCommand) == 1) {
+					if (TaskCommander.syncHandler == null) {
 					TaskCommander.getSyncHandler();
-				}
-				return TaskCommander.syncHandler.sync();
-			*/
-				return String.format("out of order");
+					}
+					return TaskCommander.syncHandler.sync();
+				} else {
+					return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
+				}				
 				
 			case UNDO: 
 				
-				return String.format("to be implemented");
-				
-			case INVALID:
-				return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
+				return String.format("to  implemented yet");
 				
 			case EXIT:
 				System.exit(0);
 				
-			default:
-				return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
+			default: //Invalid
+				return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);		
 		}
 	}
-	
 	
 	/**
 	 * Returns the tasks to be displayed in the UI's table.
@@ -311,11 +334,9 @@ public class Controller {
 	/**
 	 * Auxiliary methods
 	 */
-	private static boolean isSingleWord(String userCommand) {
-		return getNumberOfWords(userCommand) == 1;
-	}
+
 	
-	private static int getNumberOfWords(String userCommand) {
+	private int getNumberOfWords(String userCommand) {
 		String[] allWords = userCommand.trim().split("\\s+");
 		return allWords.length;
 	}
