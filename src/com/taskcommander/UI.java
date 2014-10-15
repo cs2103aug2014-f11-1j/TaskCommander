@@ -34,7 +34,7 @@ public class UI {
 	private static final int SHELL_MIN_HEIGHT = 500;
 	private static final int SHELL_MIN_WIDTH = 200;
 
-	private static final int GRID_COLUMNS_SPAN = 2;
+	private static final int GRID_COLUMNS_NUM = 2;
 	private static final boolean GRID_COLUMNS_EQUAL_SIZE = false;
 
 	private static final boolean INPUT_FIT_HORIZONTAL = true;
@@ -122,7 +122,7 @@ public class UI {
 	}
 
 	private void setupTabFolder() {
-		tabFolder.setLayout(new GridLayout(GRID_COLUMNS_SPAN, GRID_COLUMNS_EQUAL_SIZE));
+		tabFolder.setLayout(new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE));
 		tabFolder.setSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
 	}
 
@@ -134,8 +134,7 @@ public class UI {
 	}
 
 	private void setupMainWindow() {
-		GridLayout layout = new GridLayout(2, false);
-		layout.marginWidth = 0;
+		GridLayout layout = new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
 		mainWindow.setLayout(layout);
 		
 		createTextFieldsForMain();
@@ -154,9 +153,7 @@ public class UI {
 	}
 	
 	private void setupBrowserWindow(String url) {
-		GridLayout layout = new GridLayout(1, false);
-		layout.marginWidth = 0;
-		layout.verticalSpacing = 0;
+		GridLayout layout = new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
 		browserWindow.setLayout(layout);
 		
 		createTextFieldsForBrowser();
@@ -221,7 +218,7 @@ public class UI {
 	}
 	
 	private void setupBrowserInput() {
-		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
+		GridData gridData = new GridData(SWT.FILL, SWT.DOWN, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
 				INPUT_COLUMNS_SPAN, INPUT_ROWS_SPAN);
 		gridData.widthHint = INPUT_PREFERRED_WIDTH;
 		browserInput.setLayoutData(gridData);
@@ -248,7 +245,7 @@ public class UI {
 						displayFeedback(TaskCommander.controller.executeCommand(command));
 						// Insert sync detection and execute this line
 						// Needs a string url passed for the browser to show
-						// createBrowserTab(url);
+						//createBrowserTab("google.com");
 						clearInput();
 					}catch (Exception e1) {
 						displayErrorMessage(e1.getMessage());
