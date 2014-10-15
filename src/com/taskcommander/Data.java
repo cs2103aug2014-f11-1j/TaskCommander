@@ -271,7 +271,7 @@ public class Data {
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET) {
-			return String.format(Global.MESSAGE_NO_INDEX, index);
+			return String.format(Global.ERROR_MESSAGE_NO_INDEX, index);
 		}
 		if  (tasks.get(index).getType() != Task.TaskType.TIMED) {
 			TimedTask timedTask = new TimedTask(name,startDate,endDate);
@@ -317,7 +317,7 @@ public class Data {
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET) {
-			return String.format(Global.MESSAGE_NO_INDEX, index);
+			return String.format(Global.ERROR_MESSAGE_NO_INDEX, index);
 		}
 
 		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
@@ -359,7 +359,7 @@ public class Data {
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return String.format(Global.MESSAGE_NO_INDEX, index);
+			return String.format(Global.ERROR_MESSAGE_NO_INDEX, index);
 		}
 		
 		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
@@ -395,7 +395,7 @@ public class Data {
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return String.format(Global.MESSAGE_NO_INDEX, index);
+			return String.format(Global.ERROR_MESSAGE_NO_INDEX, index);
 		}
 		
 		Task doneTask = tasks.get(index);
@@ -431,7 +431,7 @@ public class Data {
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return String.format(Global.MESSAGE_NO_INDEX, index);
+			return String.format(Global.ERROR_MESSAGE_NO_INDEX, index);
 		}
 		
 		Task openTask = tasks.get(index);
@@ -468,7 +468,7 @@ public class Data {
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return String.format(Global.MESSAGE_NO_INDEX, index);
+			return String.format(Global.ERROR_MESSAGE_NO_INDEX, index);
 		} else {
 			Task deletedTask = tasks.get(index);
 			saveToHistory();

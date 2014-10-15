@@ -29,6 +29,21 @@ public class Controller {
 	private ArrayList<Task> displayedTasks;	
 	
 	/**
+	 * This variables represent the display settings, the user has been set by his last display comment.
+	 * TODO: Default values, like open tasks of the next week, when starting the application.
+	 */
+	String displayRestriction = "default";
+	boolean isDatePeriodRestricted = false;
+	Date startDate = null;
+	Date endDate = null;
+	boolean isTaskTypeRestricted = false;
+	boolean shownFloatingTask = true;
+	boolean shownDeadlineTask = true;
+	boolean shownTimedTask = true;
+	boolean isStatusRestricted = false;
+	boolean done = false; // false = open, true = done
+	
+	/**
 	 * This list contains the state of the tasks before the latest add/update/done/open/delete command.
 	 * Memorizing the commands which have been executed recently is needed by the undo method.
 	 * 
@@ -45,7 +60,7 @@ public class Controller {
 	 */
 	public String executeCommand(String userCommand) {	
 		if (userCommand == null | userCommand == "") {
-			return String.format(Global.MESSAGE_NO_COMMAND);
+			return String.format(Global.ERROR_MESSAGE_NO_COMMAND);
 		}
 
 		Global.CommandType commandType = TaskCommander.parser.determineCommandType(userCommand);
@@ -57,11 +72,13 @@ public class Controller {
 				// taskName
 				String taskName = TaskCommander.parser.determineTaskName(userCommand);
 				if (taskName == null) {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+					return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
 				}
 				
-				// taskDateTime (3 cases depending on taskType)
+				// taskDateTime
 				List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand, false);
+				
+				// Adding to data component depending on taskType
 				// case 1: FloatingTask
 				if (taskDateTime == null) { 			
 					return TaskCommander.data.addFloatingTask(taskName);
@@ -71,37 +88,45 @@ public class Controller {
 				// case 3: TimedTask
 				} else if (taskDateTime.size() == 2) { 
 					return TaskCommander.data.addTimedTask(taskName, taskDateTime.get(0), taskDateTime.get(1));
+				// Invalid format, when no command parameter given
 				} else {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+					return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
 				}
 				
 			case UPDATE: case DONE: case OPEN: case DELETE:
 				
-				// Index in recent display of tasks
+				// Index in DisplayedTasks
 				int indexDisplayedTasks = TaskCommander.parser.determineIndex(userCommand);
 				if (indexDisplayedTasks > displayedTasks.size() - Global.INDEX_OFFSET || indexDisplayedTasks < 0) {
-					return String.format(Global.MESSAGE_NO_INDEX, indexDisplayedTasks + Global.INDEX_OFFSET);
+					return String.format(Global.ERROR_MESSAGE_NO_INDEX, indexDisplayedTasks + Global.INDEX_OFFSET);
 				}
 				
 				// Task to be updated
 				Task displayedTask = displayedTasks.get(indexDisplayedTasks);
 				
-				// Index in tasks list of Data
-				int indexTasks = TaskCommander.data.getIndexOf(displayedTask);
+				// Index in tasks list of Data component
+				int indexDataTasks = TaskCommander.data.getIndexOf(displayedTask);
 				
 				if (commandType == Global.CommandType.UPDATE) {
 
 						// New taskName, if stated
-						String oldTaskName = displayedTask.getName();
 						String newTaskName = TaskCommander.parser.determineTaskName(userCommand);
-						if (newTaskName == null) {
-							newTaskName = oldTaskName;
-						}
+						
 						
 						// New taskDateTime and taskType, if stated
 						List<Date> newTaskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand, true);	// returns null if no date found in given String
-						Task.TaskType oldTaskType = displayedTask.getType();
-						Task.TaskType newTaskType = oldTaskType;
+						
+						// Invalid command format when no parameter like a new Name, DateTime or "none" given
+						if ((newTaskDateTime == null) && !(TaskCommander.parser.containsParameter(userCommand, "none")) && (newTaskName == null)) {
+							return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
+						}
+						
+						// Updating of respective task in Data component including change of taskType if necessary
+						String oldTaskName = displayedTask.getName();
+						if (newTaskName == null) {
+							newTaskName = oldTaskName;
+						}
+						Task.TaskType newTaskType;
 						Date newStartDate = null;
 						Date newEndDate = null;
 						if ((newTaskDateTime == null) && (TaskCommander.parser.containsParameter(userCommand, "none"))) {	// "none" is a keyword used by the user to indicate, that he wants to change a DatedTask to a FloatingTask
@@ -115,45 +140,38 @@ public class Controller {
 								newStartDate = newTaskDateTime.get(0);
 								newEndDate = newTaskDateTime.get(1);
 							} else {
-								return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+								return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
 							}
+						} else {
+							Task.TaskType oldTaskType = displayedTask.getType();
+							newTaskType = oldTaskType;
 						}
-						
-						// No changes at all, that is, no new DateTime, Name, or "none" given
-						if ((newTaskDateTime == null) && (newTaskName == oldTaskName) && (oldTaskType == newTaskType)) {	// Invalid Format when input: update 1 none for a floatingTask
-							return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-						}
-						
-						// Update including change of taskType if necessary
 						switch (newTaskType) {
 							case FLOATING:
-								return TaskCommander.data.updateToFloatingTask(indexTasks, newTaskName);
+								return TaskCommander.data.updateToFloatingTask(indexDataTasks, newTaskName);
 							case DEADLINE:
-								return TaskCommander.data.updateToDeadlineTask(indexTasks, newTaskName, newEndDate);
+								return TaskCommander.data.updateToDeadlineTask(indexDataTasks, newTaskName, newEndDate);
 							case TIMED:
-								return TaskCommander.data.updateToTimedTask(indexTasks, newTaskName, newStartDate, newEndDate);
-							}
+								return TaskCommander.data.updateToTimedTask(indexDataTasks, newTaskName, newStartDate, newEndDate);
+						}
 						
 				} else if (commandType == Global.CommandType.DONE) {
 					
-					return TaskCommander.data.done(indexTasks);
+					return TaskCommander.data.done(indexDataTasks);
 					
 				} else if (commandType == Global.CommandType.OPEN) {
 					
-					return TaskCommander.data.open(indexTasks);
+					return TaskCommander.data.open(indexDataTasks);
 				
 				} else if (commandType == Global.CommandType.DELETE) {
 					
-					return TaskCommander.data.deleteTask(indexTasks);
+					return TaskCommander.data.deleteTask(indexDataTasks);
 					
 				}
 				
 			case DISPLAY:
 				
-				// DateTime period to be displayed
-				boolean isDatePeriodRestricted = false;
-				Date startDate = null;
-				Date endDate = null;
+				// DatePeriod Restriction
 				List<Date> DatePeriod = TaskCommander.parser.determineTaskDateTime(userCommand, false);	// returns null if no date found in given String
 		
 				if (DatePeriod != null) { // DatePeriod given
@@ -166,24 +184,27 @@ public class Controller {
 						startDate = new Date(); // current DateTime
 						endDate = DatePeriod.get(0);
 					} else { // no DateTime period
-						return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+						return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
 					}
+				} else {
+					isDatePeriodRestricted = false;
+					startDate = null;
+					endDate = null;
 				}
 
-				// TaskType to be displayed
-				boolean isTaskTypeRestricted;
-				boolean shownFloatingTask = Arrays.asList(userCommand.split(" ")).contains("none");
-				boolean shownDeadlineTask = Arrays.asList(userCommand.split(" ")).contains("deadline");
-				boolean shownTimedTask = Arrays.asList(userCommand.split(" ")).contains("timed");
+				// TaskType Restriction
+				shownFloatingTask = Arrays.asList(userCommand.split(" ")).contains("none");
+				shownDeadlineTask = Arrays.asList(userCommand.split(" ")).contains("deadline");
+				shownTimedTask = Arrays.asList(userCommand.split(" ")).contains("timed");
 				if ((!shownFloatingTask && !shownDeadlineTask && !shownTimedTask) || (shownFloatingTask && shownDeadlineTask && shownTimedTask)) {
 					isTaskTypeRestricted = false;
 				} else {
 					isTaskTypeRestricted = true;
 				}
 				
-				// Status to be displayed
-				boolean isStatusRestricted = false;
-				boolean done = false; // false = open, true = done
+				// Status Restriction
+				isStatusRestricted = false;
+				done = false; // false = open, true = done
 				boolean shownDone = Arrays.asList(userCommand.split(" ")).contains("done");
 				boolean shownOpen = Arrays.asList(userCommand.split(" ")).contains("open");
 				if ((!shownDone && !shownOpen) || (shownDone && shownOpen) ) {
@@ -204,21 +225,20 @@ public class Controller {
 					
 				// Case 2: With restrictions of display
 				} else {
-					displayedTasks = TaskCommander.data.getCopiedTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, done);
-					String displayRestriction = "tasks ";
+					displayRestriction = "tasks ";
 					if (isDatePeriodRestricted) {
-						displayRestriction = "within ["+ Global.dayFormat.format(startDate)+ " "+ Global.timeFormat.format(startDate)+ "-"+ Global.timeFormat.format(endDate) + "] ";
+						displayRestriction += "within ["+ Global.dayFormat.format(startDate)+ " "+ Global.timeFormat.format(startDate)+ "-"+ Global.timeFormat.format(endDate) + "] ";
 					}
 					if (isTaskTypeRestricted) {
-						displayRestriction = "of the type ";
+						displayRestriction += "of the type ";
 						if (shownFloatingTask) {
-							displayRestriction += "none ";
+							displayRestriction += "floating ";
 						}
 						if (shownDeadlineTask) {
-							displayRestriction += "timed ";
+							displayRestriction += "deadline ";
 						}
 						if (shownTimedTask) {
-							displayRestriction += "deadline ";
+							displayRestriction += "timed ";
 						}
 					}
 					if (isStatusRestricted) {
@@ -236,14 +256,14 @@ public class Controller {
 				if (isSingleWord(userCommand)) {
 					return TaskCommander.data.clearTasks();
 				} else {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+					return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
 				}
 				
 			case HELP:
 				if (isSingleWord(userCommand)) {
 					return String.format(Global.MESSAGE_HELP);
 				} else {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+					return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
 				}
 				
 			case SYNC: 
@@ -260,13 +280,13 @@ public class Controller {
 				return String.format("to be implemented");
 				
 			case INVALID:
-				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+				return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
 				
 			case EXIT:
 				System.exit(0);
 				
 			default:
-				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+				return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
 		}
 	}
 	
@@ -275,7 +295,16 @@ public class Controller {
 	 * Returns the tasks to be displayed in the UI's table.
 	 */
 	public ArrayList<Task> getDisplayedTasks() {
-		executeCommand("display");
+		
+		// Case 1: No display restrictions
+		if (!isDatePeriodRestricted && !isTaskTypeRestricted && !isStatusRestricted) {
+			displayedTasks = TaskCommander.data.getCopiedTasks();
+		
+		// Case 2: With display restrictions
+		} else {
+			displayedTasks = TaskCommander.data.getCopiedTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, done);
+		}
+
 		return displayedTasks;
 	}
 	
