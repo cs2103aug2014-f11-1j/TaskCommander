@@ -26,7 +26,7 @@ public class TaskCommander {
 		controller = Controller.getInstance();
 		parser = Parser.getInstance();
 
-		ui = new UI();
+		ui = UI.getInstance();
 		ui.open();
 	}
 	
