@@ -82,12 +82,13 @@ public class UI {
 	private final Color darkRed = display.getSystemColor(SWT.COLOR_DARK_RED);
 	private final Color darkGray = display.getSystemColor(SWT.COLOR_DARK_GRAY);
 	private final Color darkBlue = display.getSystemColor(SWT.COLOR_DARK_BLUE);
+	private final Color yellow = display.getSystemColor(SWT.COLOR_DARK_YELLOW);
 	private final Color darkCyan = display.getSystemColor(SWT.COLOR_DARK_CYAN);
 	private final Color darkMagenta = display.getSystemColor(SWT.COLOR_DARK_MAGENTA);
 
 	private final Color COLOR_COL_FIRST = darkGray;
 	private final Color COLOR_COL_SECOND = blue;
-	private final Color COLOR_COL_THIRD = black;
+	private final Color COLOR_COL_THIRD = yellow;
 	private final Color COLOR_DATE_ROW = darkCyan;
 	private final Color COLOR_DONE = darkGray;
 	private final Color COLOR_NOT_DONE = red;
