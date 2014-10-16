@@ -20,6 +20,23 @@ public class Data {
 	// Logging
 	private static Logger logger = Logger.getLogger("Data");
 	
+	/**
+	 * This variable is initialized with the one and only instance of the Data class 
+	 * (see also getInstance() below)
+	 */
+	private static Data theOne;
+	
+	/**
+	 * This operation which returns either a new instance of the Data or an existing one, if any.
+	 * Therefore, it ensures that there will be only one instance of the Controller (see Singleton pattern)
+	 */
+	public static Data getInstance(){
+		if (theOne == null) {    
+			theOne = new Data();
+		}
+		return theOne;
+	}
+	
 	/** 
 	 * This Array contains all available task objects.
 	 */
@@ -38,7 +55,7 @@ public class Data {
 	/**
 	 * Constructor
 	 */
-	public Data() {
+	private Data() {
 		tasks = new ArrayList<Task>();
 		tasksHistory = new ArrayList<Task>();
 		deletedTasks = new ArrayList<Task>();

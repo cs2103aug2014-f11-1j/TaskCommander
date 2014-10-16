@@ -22,9 +22,9 @@ public class TaskCommander {
 		
 		// Creation of the components
 		storage = new Storage();
-		data = new Data();
-		controller = new Controller();
-		parser = new Parser();
+		data = Data.getInstance();
+		controller = Controller.getInstance();
+		parser = Parser.getInstance();
 
 		ui = new UI();
 		ui.open();

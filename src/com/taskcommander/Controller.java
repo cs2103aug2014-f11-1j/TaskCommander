@@ -23,10 +23,27 @@ public class Controller {
 	private static Logger logger = Logger.getLogger("Controller");
 	
 	/**
+	 * This variable is initialized with the one and only instance of the Controller class 
+	 * (see also getInstance() below)
+	 */
+	private static Controller theOne;
+	
+	/**
+	 * This operation which returns either a new instance of the Controller or an existing one, if any.
+	 * Therefore, it ensures that there will be only one instance of the Controller (see Singleton pattern)
+	 */
+	public static Controller getInstance(){
+		if (theOne == null) {    
+			theOne = new Controller();
+		}
+		return theOne;
+	}
+	
+	/**
 	 * Constructor, which sets the default values for the display restriction
 	 * so that the user gets an overview of the open tasks of the next week when starting the application.
 	 */
-	public Controller(){
+	private Controller(){
 		
 		// Set default display settings
 		displayRestriction = "Period: one week from now Status: open";
@@ -42,7 +59,7 @@ public class Controller {
 		isStatusRestricted = true;
 		done = false; // false = open, true = done
 	}
-
+	
 	/**
 	 * This list contains all tasks which were recently displayed by the UI. Memorizing the 
 	 * tasks which have been displayed recently by the UI is needed by the update, delete, done and open methods.

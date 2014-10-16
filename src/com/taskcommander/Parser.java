@@ -20,9 +20,26 @@ public class Parser {
 	private static Logger logger = Logger.getLogger("Parser");
 	
 	/**
+	 * This variable is initialized with the one and only instance of the Parser class 
+	 * (see also getInstance() below)
+	 */
+	private static Parser theOne;
+	
+	/**
+	 * This operation which returns either a new instance of the Parser or an existing one, if any.
+	 * Therefore, it ensures that there will be only one instance of the Controller (see Singleton pattern)
+	 */
+	public static Parser getInstance(){
+		if (theOne == null) {    
+			theOne = new Parser();
+		}
+		return theOne;
+	}
+	
+	/**
 	 * Constructor
 	 */
-	public Parser(){
+	private Parser(){
 	}
 
 	/**
