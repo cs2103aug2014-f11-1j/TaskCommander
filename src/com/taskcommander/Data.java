@@ -70,6 +70,7 @@ public class Data {
 	 */
 	public String addTask(Task task) {
 		logger.log(Level.INFO, "Called addTask(Task task)");
+		assert task.getId() != null;
 		switch ( task.getType()) {
 		case FLOATING:
 			FloatingTask floatingTask = (FloatingTask) task;
