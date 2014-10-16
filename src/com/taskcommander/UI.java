@@ -2,6 +2,8 @@ package com.taskcommander;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -99,6 +101,8 @@ public class UI {
 	private Text output;
 	private Browser browser;
 	private Text browserInput;
+	
+	private static Logger logger = Logger.getLogger("UI");
 
 	public UI() {
 
@@ -109,6 +113,7 @@ public class UI {
 	 * @wbp.parser.entryPoint
 	 */
 	public void open() {
+		logger.log(Level.INFO,"run UI");
 		setupShell();
 		setupTabFolder();
 		createMainTab();
@@ -240,8 +245,10 @@ public class UI {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				if(event.detail == SWT.TRAVERSE_RETURN)
 					try {
+						logger.log(Level.INFO,"Receive input command with enter key");
 						clearTableItems();
 						String command = input.getText();
+						assert TaskCommander.controller.executeCommand(command) != null;
 						displayFeedback(TaskCommander.controller.executeCommand(command));
 						// Insert sync detection and execute this line
 						// Needs a string url passed for the browser to show
@@ -261,6 +268,7 @@ public class UI {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				if(event.detail == SWT.TRAVERSE_RETURN)
 					try {
+						logger.log(Level.INFO,"Receive input for browser");
 						String code = input.getText();
 						// Send code to Google Integration component
 						browserTab.dispose();
