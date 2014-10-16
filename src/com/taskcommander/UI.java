@@ -451,33 +451,4 @@ public class UI {
 		output.setForeground(red);
 	}
 
-	//@author A0105753J-unused
-	public ArrayList<Task> getTasks(Feedback fb) {
-		ArrayList<Task> tasks = new ArrayList<Task>();
-		switch(fb.getCommandType()){
-		case DISPLAY: 
-			tasks = fb.getCommandRelatedTasks();
-			break;
-		case ADD:case DELETE: case UPDATE:case DONE: case OPEN:
-			tasks.add(fb.getCommandRelatedTask());
-		case HELP:
-			// Desired Output has to be discussed, but low priority anyway
-			break;
-
-		case SYNC:
-			// Desired Output has to be discussed
-			break;
-
-		case EXIT:
-			break;
-
-		case INVALID:
-			break;
-
-		default:
-			break;
-		}
-		return tasks;
-	}
-
 }
