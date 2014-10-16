@@ -1,6 +1,8 @@
 package com.taskcommander;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.joestelmach.natty.*;
 
@@ -13,6 +15,9 @@ import com.joestelmach.natty.*;
  */
 
 public class Parser {
+	
+	// Logging
+	private static Logger logger = Logger.getLogger("Parser");
 	
 	/**
 	 * Constructor
@@ -92,6 +97,8 @@ public class Parser {
 		if (determineTaskName(userCommand) != null) {
 			residualUserCommand = removeQuotedSubstring(residualUserCommand);
 		}
+		
+		logger.log(Level.INFO, "ResidualUserCommand after removing commandType, commandParameter and TaskName if any: "+residualUserCommand);
 		
 		List<Date> dates = null;
 		com.joestelmach.natty.Parser nattyParser = new com.joestelmach.natty.Parser();

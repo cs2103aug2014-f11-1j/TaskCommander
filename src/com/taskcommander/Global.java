@@ -1,6 +1,7 @@
 package com.taskcommander;
 
 import java.text.SimpleDateFormat;
+import java.util.logging.Level;
 
 /**
  * This class stores global variables for use in the program.

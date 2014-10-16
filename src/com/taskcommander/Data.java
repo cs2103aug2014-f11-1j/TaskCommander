@@ -2,6 +2,8 @@ package com.taskcommander;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -15,6 +17,9 @@ import java.util.Collections;
 
 public class Data {
 
+	// Logging
+	private static Logger logger = Logger.getLogger("Data");
+	
 	/** 
 	 * This Array contains all available task objects.
 	 */
@@ -64,6 +69,7 @@ public class Data {
 	 * @return 	feedback for UI
 	 */
 	public String addTask(Task task) {
+		logger.log(Level.INFO, "Called addTask(Task task)");
 		switch ( task.getType()) {
 		case FLOATING:
 			FloatingTask floatingTask = (FloatingTask) task;

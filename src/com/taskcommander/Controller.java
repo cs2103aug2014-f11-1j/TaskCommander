@@ -1,9 +1,10 @@
 package com.taskcommander;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -18,11 +19,16 @@ import java.util.List;
 
 public class Controller {
 	
+	// Logging
+	private static Logger logger = Logger.getLogger("Controller");
+	
 	/**
 	 * Constructor, which sets the default values for the display restriction
 	 * so that the user gets an overview of the open tasks of the next week when starting the application.
 	 */
 	public Controller(){
+		
+		// Set default display settings
 		displayRestriction = "Period: one week from now Status: open";
 		isDatePeriodRestricted = true;
 		Calendar calendar = Calendar.getInstance();
@@ -44,7 +50,7 @@ public class Controller {
 	private ArrayList<Task> displayedTasks;	
 	
 	/**
-	 * This variables represent the display settings, the user has been set by his last display comment.
+	 * This variables represent the memorized display settings, the user has been set with his last display comment.
 	 */
 	String displayRestriction;
 	boolean isDatePeriodRestricted;
@@ -83,6 +89,7 @@ public class Controller {
 		
 			case ADD:
 				if (getNumberOfWords(userCommand) < 2) {
+					logger.log(Level.WARNING, "Not enough parameters for add command");
 					return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
 				}
 				
@@ -98,12 +105,15 @@ public class Controller {
 				// Adding to data component depending on taskType
 				// case 1: FloatingTask
 				if (taskDateTime == null) { 			
+					logger.log(Level.INFO, "Task to be added is FloatingTask");
 					return TaskCommander.data.addFloatingTask(taskName);
 				// case 2: DeadlineTask
 				} else if (taskDateTime.size() == 1 ) { 	
+					logger.log(Level.INFO, "Task to be added is DeadlineTask");
 					return TaskCommander.data.addDeadlineTask(taskName, taskDateTime.get(0));
 				// case 3: TimedTask
 				} else if (taskDateTime.size() == 2) { 
+					logger.log(Level.INFO, "Task to be added is TimedTask");
 					return TaskCommander.data.addTimedTask(taskName, taskDateTime.get(0), taskDateTime.get(1));
 				// Invalid format, when no command parameter given
 				} else {
@@ -214,9 +224,9 @@ public class Controller {
 				}
 
 				// TaskType Restriction
-				shownFloatingTask = Arrays.asList(userCommand.split(" ")).contains("none");
-				shownDeadlineTask = Arrays.asList(userCommand.split(" ")).contains("deadline");
-				shownTimedTask = Arrays.asList(userCommand.split(" ")).contains("timed");
+				shownFloatingTask = TaskCommander.parser.containsParameter(userCommand, "none");
+				shownDeadlineTask = TaskCommander.parser.containsParameter(userCommand, "deadline");
+				shownTimedTask = TaskCommander.parser.containsParameter(userCommand, "timed");
 				if ((!shownFloatingTask && !shownDeadlineTask && !shownTimedTask) || (shownFloatingTask && shownDeadlineTask && shownTimedTask)) {
 					isTaskTypeRestricted = false;
 				} else {
@@ -226,8 +236,8 @@ public class Controller {
 				// Status Restriction
 				isStatusRestricted = false;
 				done = false; // false = open, true = done
-				boolean shownDone = Arrays.asList(userCommand.split(" ")).contains("done");
-				boolean shownOpen = Arrays.asList(userCommand.split(" ")).contains("open");
+				boolean shownDone = TaskCommander.parser.containsParameter(userCommand, "done");
+				boolean shownOpen = TaskCommander.parser.containsParameter(userCommand, "open");
 				if ((!shownDone && !shownOpen) || (shownDone && shownOpen) ) {
 					isStatusRestricted = false;
 				} else {
@@ -241,8 +251,8 @@ public class Controller {
 				
 				// Case 1: No restrictions of display
 				if (!isDatePeriodRestricted && !isTaskTypeRestricted && !isStatusRestricted) {
-					displayedTasks = TaskCommander.data.getCopiedTasks();
-					return String.format(Global.MESSAGE_DISPLAYED, "all");
+					displayRestriction = "all";
+					return String.format(Global.MESSAGE_DISPLAYED, displayRestriction);
 					
 				// Case 2: With restrictions of display
 				} else {
@@ -257,18 +267,18 @@ public class Controller {
 						}
 						if (shownDeadlineTask && !shownFloatingTask) {
 							displayRestriction += "deadline";
-						} else {
+						} else if (shownDeadlineTask) {
 							displayRestriction += ", deadline";
 						}
 						if (shownTimedTask && !shownFloatingTask && !shownDeadlineTask) {
 							displayRestriction += "timed ";
-						} else {
+						} else if (shownTimedTask) {
 							displayRestriction += ", timed";
 						}
 						displayRestriction += " ";
 					}
 					if (isStatusRestricted) {
-						displayRestriction = "Status: ";
+						displayRestriction += "Status: ";
 						if (done) {
 							displayRestriction += "done ";
 						} else {
@@ -331,13 +341,14 @@ public class Controller {
 		return displayedTasks;
 	}
 	
-	/**
-	 * Auxiliary methods
-	 */
-
+	// Auxiliary methods:
 	
+	/**
+	 * This operation returns the number of words the given String consists of.
+	 */
 	private int getNumberOfWords(String userCommand) {
 		String[] allWords = userCommand.trim().split("\\s+");
 		return allWords.length;
 	}
+	
 }
