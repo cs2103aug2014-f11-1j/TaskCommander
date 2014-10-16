@@ -255,8 +255,9 @@ public class UI {
 						logger.log(Level.INFO,"Receive input command with enter key");
 						clearTableItems();
 						String command = input.getText();
-						assert TaskCommander.controller.executeCommand(command) != null;
-						displayFeedback(TaskCommander.controller.executeCommand(command));
+						String feedback = TaskCommander.controller.executeCommand(command);
+						assert(feedback != null);
+						displayFeedback(feedback);
 						// Insert sync detection and execute this line
 						// Needs a string url passed for the browser to show
 						//createBrowserTab("google.com");
