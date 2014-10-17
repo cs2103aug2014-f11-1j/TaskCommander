@@ -13,24 +13,24 @@ public class TaskCommanderTest {
 	
 	@Test
 	public void testWithNoCommand() throws Exception {
-		
+		String userCommand = "";
 		assertEquals("No command given.", String.format(Global.ERROR_MESSAGE_NO_COMMAND));
 		assertEquals("No command given.", TaskCommander.controller.executeCommand(""));
-		assertEquals(String.format(Global.ERROR_MESSAGE_NO_COMMAND), TaskCommander.controller.executeCommand(null));
+		assertEquals(String.format(Global.ERROR_MESSAGE_NO_COMMAND), TaskCommander.controller.executeCommand(userCommand));
 	}
 
-/*	@Test
-	public void testAddWithoutContent(){
+	/*@Test
+	public void testAddWithoutContent()throws Exception{
 		String userCommand = "add";
-		assertEquals(String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand),TaskCommander.controller.executeCommand(userCommand));
-	}
-	*/
-/*	@Test
+		assertEquals("Invalid command format: add. Type 'help' to see the list of commands.",TaskCommander.controller.executeCommand(userCommand));
+	}*/
+	
+	@Test
 	public void testAddWithoutDate() {
 
 		assertEquals("Added: \"little boy\"", TaskCommander.controller.executeCommand("add \"little boy\""));
 	}
 
-*/
+
 
 }
