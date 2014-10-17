@@ -67,6 +67,8 @@ public class Parser {
 			return Global.CommandType.OPEN;
 		} else if (commandTypeString.equalsIgnoreCase("display")) {
 			return Global.CommandType.DISPLAY;
+		} else if (commandTypeString.equalsIgnoreCase("search")) {
+			return Global.CommandType.SEARCH;
 		} else if (commandTypeString.equalsIgnoreCase("delete")) {
 			return Global.CommandType.DELETE;
 		} else if (commandTypeString.equalsIgnoreCase("clear")) {
@@ -142,6 +144,22 @@ public class Parser {
 			return -1;
 		} 
 		return index;
+	}
+	
+	/**
+	 * This operation determines the searched words and returns them as an string array.
+	 * 
+	 * @param userCommand  
+	 */
+	public String[] determineSearchedWords(String userCommand) {
+		String residualUserCommand = removeFirstWord(userCommand);
+
+		String[] searchedWords = residualUserCommand.split("\\s+");
+		for(int i = 0; i < searchedWords.length; ++i) {
+			searchedWords[i] = searchedWords[i].trim();
+		}
+		
+		return searchedWords;
 	}
 	
 	/**

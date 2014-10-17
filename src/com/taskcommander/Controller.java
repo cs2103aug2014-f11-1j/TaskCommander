@@ -48,17 +48,23 @@ public class Controller {
 		
 		// Set default display settings
 		displayRestriction = "Period: one week from now Status: open";
+	
 		isDatePeriodRestricted = true;
 		Calendar calendar = Calendar.getInstance();
 		startDate = calendar.getTime();
 		calendar.add(Calendar.WEEK_OF_YEAR, 1);
 		endDate = calendar.getTime();
+	
 		isTaskTypeRestricted = false;
 		shownFloatingTask = true;
 		shownDeadlineTask = true;
 		shownTimedTask = true;
+	
 		isStatusRestricted = true;
 		done = false; // false = open, true = done
+		
+		isSearchedWordsRestricted = false;
+		searchedWords = null;
 	}
 	
 	/**
@@ -74,12 +80,17 @@ public class Controller {
 	boolean isDatePeriodRestricted;
 	Date startDate;
 	Date endDate;
+	
 	boolean isTaskTypeRestricted;
 	boolean shownFloatingTask;
 	boolean shownDeadlineTask;
 	boolean shownTimedTask;
+	
 	boolean isStatusRestricted;
 	boolean done; // false = open, true = done
+	
+	boolean isSearchedWordsRestricted;
+	String[] searchedWords;
 	
 	/**
 	 * This list contains the state of the tasks before the latest add/update/done/open/delete command.
@@ -282,6 +293,10 @@ public class Controller {
 					}
 				}
 				
+				// Reset SearchedWord Restrictions
+				isSearchedWordsRestricted = false;
+				searchedWords = null;
+				
 				// Case 1: No restrictions of display
 				if (!isDatePeriodRestricted && !isTaskTypeRestricted && !isStatusRestricted) {
 					displayRestriction = "all";
@@ -321,6 +336,26 @@ public class Controller {
 					return String.format(Global.MESSAGE_DISPLAYED, displayRestriction);
 			}
 				
+			case SEARCH:	
+				
+				// SearchedWords
+				searchedWords = TaskCommander.parser.determineSearchedWords(userCommand);	
+				
+				isDatePeriodRestricted = false;
+				isTaskTypeRestricted = false;
+				isStatusRestricted = false;
+				isSearchedWordsRestricted = true;
+				
+				displayRestriction = "";
+				for(String searchedWord : searchedWords) {
+					if (displayRestriction.equals("")) {
+						displayRestriction = "Tasks containing the words "+searchedWord;
+					} else {
+						displayRestriction += ", "+searchedWord;
+					}
+				}
+				return String.format(Global.MESSAGE_DISPLAYED, displayRestriction);
+
 			case CLEAR:
 				if (getNumberOfWords(userCommand) == 1) {
 					return TaskCommander.data.clearTasks();
@@ -363,12 +398,12 @@ public class Controller {
 	public ArrayList<Task> getDisplayedTasks() {
 		
 		// Case 1: No display restrictions
-		if (!isDatePeriodRestricted && !isTaskTypeRestricted && !isStatusRestricted) {
+		if (!isDatePeriodRestricted && !isTaskTypeRestricted && !isStatusRestricted  && !isSearchedWordsRestricted) {
 			displayedTasks = TaskCommander.data.getCopiedTasks();
 		
 		// Case 2: With display restrictions
 		} else {
-			displayedTasks = TaskCommander.data.getCopiedTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, done);
+			displayedTasks = TaskCommander.data.getCopiedTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, done, isSearchedWordsRestricted, searchedWords);
 		}
 
 		return displayedTasks;

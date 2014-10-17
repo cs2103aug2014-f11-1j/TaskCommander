@@ -237,32 +237,49 @@ public class Data {
 	 * @param done
 	 * @return 	ArrayList<Task>
 	 */
-	public ArrayList<Task> getCopiedTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean status) {
+	public ArrayList<Task> getCopiedTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean status, boolean isSearchedWordRestricted, String[] searchedWords) {
 		ArrayList<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
 		ArrayList<DatedTask> datedTasks = new ArrayList<DatedTask>();
 		ArrayList<Task> concernedTasks = new ArrayList<Task>();
+		boolean containsSearchedWords = false;
 		
 		for(Task task: tasks) {
-			// Step 1: Check Status
-			if (!isStatusRestricted || (isStatusRestricted && status == task.isDone() )) {
-				// Step 2: Check Type
-				if(task.getType() == Task.TaskType.FLOATING && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownFloatingTask))) {	
-					// Step 3: Check DatePeriod
-					if (!isDateTimeRestricted) {
-						floatingTasks.add(new FloatingTask((FloatingTask) task));
+
+			// Step 1: Check SearchedWords
+			if (isSearchedWordRestricted) {
+				containsSearchedWords = true;
+				for(String searchedWord : searchedWords) {
+					if (!task.getName().contains(searchedWord)) {
+						logger.log(Level.INFO, "Doesn't contain the word");
+						containsSearchedWords = false;
+						break;
 					}
-				} else if (task.getType() == Task.TaskType.DEADLINE && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownDeadlineTask))) {
-					DeadlineTask deadlineTask = (DeadlineTask) task;
-					if (!isDateTimeRestricted || (isDateTimeRestricted && (deadlineTask.getEndDate().compareTo(endDate) < 0) || deadlineTask.getEndDate().compareTo(endDate) == 0) ) { //TODO: Refactor Date Comparison methods
-						datedTasks.add(new DeadlineTask((DeadlineTask) task));
-					}
-				} else if (task.getType() == Task.TaskType.TIMED && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownTimedTask))) {
-					TimedTask timedTask = (TimedTask) task;
-					if (!isDateTimeRestricted || (isDateTimeRestricted && (timedTask.getStartDate().compareTo(startDate) > 0 || timedTask.getStartDate().compareTo(startDate) == 0) && (timedTask.getEndDate().compareTo(endDate) < 0) || timedTask.getEndDate().compareTo(endDate) == 0) ){
-						datedTasks.add(new TimedTask((TimedTask) task));
-					}
-				}		 
-			}		 
+				} 
+			}
+			
+			if (!isSearchedWordRestricted || containsSearchedWords) {	
+
+				// Step 2: Check Status
+				if (!isStatusRestricted || (isStatusRestricted && status == task.isDone() )) {
+					// Step 3: Check Type
+					if(task.getType() == Task.TaskType.FLOATING && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownFloatingTask))) {	
+						// Step 4: Check DatePeriod
+						if (!isDateTimeRestricted) {
+							floatingTasks.add(new FloatingTask((FloatingTask) task));
+						}
+					} else if (task.getType() == Task.TaskType.DEADLINE && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownDeadlineTask))) {
+						DeadlineTask deadlineTask = (DeadlineTask) task;
+						if (!isDateTimeRestricted || (isDateTimeRestricted && (deadlineTask.getEndDate().compareTo(endDate) < 0) || deadlineTask.getEndDate().compareTo(endDate) == 0) ) { //TODO: Refactor Date Comparison methods
+							datedTasks.add(new DeadlineTask((DeadlineTask) task));
+						}
+					} else if (task.getType() == Task.TaskType.TIMED && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownTimedTask))) {
+						TimedTask timedTask = (TimedTask) task;
+						if (!isDateTimeRestricted || (isDateTimeRestricted && (timedTask.getStartDate().compareTo(startDate) > 0 || timedTask.getStartDate().compareTo(startDate) == 0) && (timedTask.getEndDate().compareTo(endDate) < 0) || timedTask.getEndDate().compareTo(endDate) == 0) ){
+							datedTasks.add(new TimedTask((TimedTask) task));
+						}
+					}				
+				}	
+			}
 		}
 		
 		Collections.sort(floatingTasks);
