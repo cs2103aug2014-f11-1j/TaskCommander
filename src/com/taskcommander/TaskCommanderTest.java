@@ -1,7 +1,6 @@
 package com.taskcommander;
 import static org.junit.Assert.*;
 
-
 import org.junit.Test;
 
 /**
@@ -12,20 +11,26 @@ import org.junit.Test;
 
 public class TaskCommanderTest {
 
-	TaskCommander myTaskCommander= new TaskCommander();
+	TaskCommander tc= new TaskCommander();
+
+	
+/*	@Test
+	public void testWithNoCommand() {
+		assertEquals("No command given.", TaskCommander.controller.executeCommand(null));
+	}*/
 
 	@Test
-	public void  testExecuteCommand() {
-		testOneCommand("addTask", "Added: \"oldTaskDescription\"",
-				"add oldTaskDescription");
-		testOneCommand("updateTask", "Updated: \"newTaskDescription\"",
-				"update 1 newTaskDescription");
+	public void testAddWithoutContent(){
+		String userCommand = "add";
+		assertEquals(String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand),TaskCommander.controller.executeCommand(userCommand));
 	}
 	
-	@Test
-	public void testOneCommand(String description, String expected,
-			String command) {
-		assertEquals(description, expected, myTaskCommander.controller.executeCommand(command));
-	}
-	
+/*	@Test
+	public void testAddWithoutDate() {
+
+		assertEquals("Added: \"little boy\"", TaskCommander.controller.executeCommand("add \"little boy\""));
+	}*/
+
+
+
 }
