@@ -22,10 +22,10 @@ public class TaskCommanderTest {
 				"update 1 newTaskDescription");
 	}
 	
-	private void testOneCommand(String description, String expected,
+	@Test
+	public void testOneCommand(String description, String expected,
 			String command) {
 		assertEquals(description, expected, myTaskCommander.controller.executeCommand(command));
 	}
 	
-
 }

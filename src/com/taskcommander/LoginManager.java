@@ -21,6 +21,7 @@ import com.google.api.client.util.store.DataStore;
 import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.TasksScopes;
 
@@ -252,7 +253,7 @@ public class LoginManager {
 	 */
 	private GoogleAuthorizationCodeFlow buildAuthorisationCodeFlow() throws IOException {
 		return new GoogleAuthorizationCodeFlow.Builder(
-				httpTransport, jsonFactory, CLIENT_ID, CLIENT_SECRET, Arrays.asList(TasksScopes.TASKS))
+				httpTransport, jsonFactory, CLIENT_ID, CLIENT_SECRET, Arrays.asList(TasksScopes.TASKS, CalendarScopes.CALENDAR))
 		.setAccessType(FLOW_ACCESS_TYPE)
 		.setApprovalPrompt(FLOW_APPROVAL_PROMPT)
 		.setDataStoreFactory(dataStoreFactory).build();
