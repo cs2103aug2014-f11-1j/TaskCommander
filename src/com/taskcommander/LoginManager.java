@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.api.client.auth.oauth2.DataStoreCredentialRefreshListener;
 import com.google.api.client.auth.oauth2.StoredCredential;
@@ -47,6 +49,8 @@ public class LoginManager {
 	private GoogleAuthorizationCodeFlow flow;
 	private DataStore<StoredCredential> dataStore;
 	private GoogleCredential credential;
+	
+	private static Logger logger = Logger.getLogger("LoginManager");
 
 	/**
 	 * Returns a LoginManager instance.
@@ -56,10 +60,11 @@ public class LoginManager {
 		jsonFactory = new JacksonFactory();
 		File dataStoreFile = new File(DATA_STORE_DIR);
 		try {
+			logger.log(Level.INFO,"Retrieving DataStore");
 			dataStoreFactory = new FileDataStoreFactory(dataStoreFile);
 			dataStore = dataStoreFactory.getDataStore(DATA_STORE_NAME);
 		} catch (IOException e) {
-			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.WARNING,"IOException: Unable to retrieve DataStore", e);
 		}
 
 	}
@@ -118,12 +123,16 @@ public class LoginManager {
 	 * @return           Credential
 	 */
 	private GoogleCredential getCredential() {
+		logger.log(Level.INFO,"Attempting to get credentials.");
 		GoogleCredential newCredential = buildCredential();
 		if(hasStoredCredential()) {
+			logger.log(Level.INFO,"Using stored credential.");
 			setTokensFromStoredCredential(newCredential);
 		} else {
+			logger.log(Level.INFO,"Getting new credential from login.");
 			setTokensFromLogin(newCredential);
 		}
+		logger.log(Level.INFO,"Saving credential...");
 		saveCredential(newCredential);
 		return newCredential;
 	}
@@ -149,7 +158,7 @@ public class LoginManager {
 			newCredential.setAccessToken(storedCredential.getAccessToken());
 			newCredential.setRefreshToken(storedCredential.getRefreshToken());
 		} catch (IOException e) {
-			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.WARNING,"IOException: Unable to retrieve StoredCredential.", e);
 		}
 	}
 
@@ -162,7 +171,7 @@ public class LoginManager {
 		try {
 			return !dataStore.isEmpty() && dataStore.containsKey(USERNAME);
 		} catch (IOException e) {
-			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.WARNING,"IOException: Unable to check if DataStore contains key.", e);
 			return false;
 		}
 	}
@@ -172,6 +181,7 @@ public class LoginManager {
 	 * @return
 	 */
 	private GoogleCredential buildCredential() {
+		logger.log(Level.INFO,"Building credential.");
 		GoogleCredential credential = new GoogleCredential.Builder()
 		.setJsonFactory(jsonFactory)
 		.setTransport(httpTransport)
@@ -191,7 +201,7 @@ public class LoginManager {
 		try {
 			dataStore.set(USERNAME, storedCredential);
 		} catch (IOException e) {
-			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.WARNING,"IOException: Unable to store credential in DataStore.", e);
 		}
 	}
 
@@ -208,7 +218,7 @@ public class LoginManager {
 		try {
 			flow = buildAuthorisationCodeFlow();
 		} catch (IOException e) {
-			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.WARNING,"IOException: Unable to build authorisation code flow.", e);
 		}
 
 		askUserForAuthorisationCode();
@@ -230,7 +240,7 @@ public class LoginManager {
 					.setRedirectUri(REDIRECT_URI).execute();
 			return response;
 		} catch (IOException e) {
-			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.WARNING,"IOException: Unable to execute GoogleTokenResponse", e);
 		}
 		return null;
 	}
@@ -269,7 +279,7 @@ public class LoginManager {
 			input = br.readLine();
 			br.close();
 		} catch (IOException e) {
-			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.WARNING,"IOException: Unable to read user input.", e);
 		}
 		return input;
 	}

@@ -1,5 +1,7 @@
 package com.taskcommander;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +36,7 @@ public class GoogleAPIConnector {
 	private static Tasks tasks;
 	private static DataStore<String> eventDataStore;
 	private static DataStore<String> taskDataStore;
-	private static DataStore<String> syncSettingsDataStore;
+	private static final Logger logger = Logger.getLogger(GoogleAPIConnector.class.getName());
 	
 	/**
 	 * Creates a new GoogleAPIHandler instance.
@@ -49,6 +51,7 @@ public class GoogleAPIConnector {
 			taskDataStore = LoginManager.getDataStoreFactory().getDataStore("TaskStore");
 		} catch (IOException e) {
 			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.SEVERE, "Error getting services", e);
 		}
 		getServices();
 	}
@@ -89,6 +92,7 @@ public class GoogleAPIConnector {
 			return tasks;
 		} catch (IOException e) {
 			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.SEVERE, "Error getting Google tasks", e);
 			return null;
 		}
 	}
@@ -109,6 +113,7 @@ public class GoogleAPIConnector {
 			return taskList;
 		} catch (IOException e) {
 			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.SEVERE, "Error getting Floating Tasks", e);
 			return null;
 		}
 	}
@@ -119,6 +124,7 @@ public class GoogleAPIConnector {
 			return request;
 		} catch (IOException e) {
 			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.SEVERE, "Error getting Task list request", e);
 			return null;
 		}
 	}
@@ -143,6 +149,7 @@ public class GoogleAPIConnector {
 			return taskList;
 		} catch (IOException e) {
 			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.SEVERE, "Error getting Events", e);
 			return null;
 		}
 	}
@@ -160,6 +167,7 @@ public class GoogleAPIConnector {
 			return events;
 		} catch (IOException e) {
 			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.SEVERE, "Error getting Google Events", e);
 			return null;
 		}
 	}
@@ -175,6 +183,7 @@ public class GoogleAPIConnector {
 			return request;
 		} catch (IOException e) {
 			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+			logger.log(Level.SEVERE, "Error getting event list request", e);
 			return null;
 		}
 	}
@@ -190,6 +199,7 @@ public class GoogleAPIConnector {
 	private String addTask(FloatingTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			logger.log(Level.WARNING, "Task is null");
 		} else {
 			Task taskToAdd = new Task();
 			taskToAdd.setTitle(task.getName());
@@ -201,6 +211,7 @@ public class GoogleAPIConnector {
 				}
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				logger.log(Level.SEVERE, "Error adding task", e);
 			}
 		}
 		return null;
@@ -216,6 +227,7 @@ public class GoogleAPIConnector {
 	private String addTask(DeadlineTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			logger.log(Level.WARNING, "Task is null");
 		} else {
 			Task taskToAdd = new Task();
 			taskToAdd.setTitle(task.getName());
@@ -228,6 +240,7 @@ public class GoogleAPIConnector {
 				}
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				logger.log(Level.SEVERE, "Error adding task", e);
 			}
 		}
 		return null;
@@ -244,6 +257,7 @@ public class GoogleAPIConnector {
 	private String addTask(TimedTask task) {
 		if (task == null){
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			logger.log(Level.WARNING, "Task is null");
 		} else {
 			Event event = new Event();
 			event.setSummary(task.getName());
@@ -257,6 +271,7 @@ public class GoogleAPIConnector {
 				}
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				logger.log(Level.SEVERE, "Error adding task", e);
 			}
 		}
 		return null;
@@ -274,6 +289,7 @@ public class GoogleAPIConnector {
 	private com.taskcommander.Task getTask(FloatingTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			logger.log(Level.WARNING, "Task is null");
 		} else if (task.getId() == null) {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
@@ -282,6 +298,7 @@ public class GoogleAPIConnector {
 				return toTask(check);
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				logger.log(Level.SEVERE, "Error getting task", e);
 			}
 		}
 		return null;
@@ -298,6 +315,7 @@ public class GoogleAPIConnector {
 	private com.taskcommander.Task getTask(DeadlineTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			logger.log(Level.WARNING, "Task is null");
 		} else if (task.getId() == null) {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
@@ -306,6 +324,7 @@ public class GoogleAPIConnector {
 				return toTask(check);
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				logger.log(Level.SEVERE, "Error getting task", e);
 			}
 		}
 		return null;
@@ -322,6 +341,7 @@ public class GoogleAPIConnector {
 	private com.taskcommander.Task getTask(TimedTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			logger.log(Level.WARNING, "Task is null");
 		} else if (task.getId() == null) {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
@@ -330,6 +350,7 @@ public class GoogleAPIConnector {
 				return toTask(check);
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				logger.log(Level.SEVERE, "Error getting task", e);
 			}
 		}
 		return null;
@@ -347,6 +368,7 @@ public class GoogleAPIConnector {
 	private boolean deleteTask(FloatingTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			logger.log(Level.WARNING, "Task is null");
 		} else if (task.getId() == null) {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
@@ -357,6 +379,7 @@ public class GoogleAPIConnector {
 				return check == null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				logger.log(Level.SEVERE, "Error deleting task", e);
 			}
 		}
 		return false;
@@ -373,6 +396,7 @@ public class GoogleAPIConnector {
 	private boolean deleteTask(DeadlineTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			logger.log(Level.WARNING, "Task is null");
 		} else if (task.getId() == null) {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
@@ -383,6 +407,7 @@ public class GoogleAPIConnector {
 				return check == null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				logger.log(Level.SEVERE, "Error deleting task", e);
 			}
 		}
 		return false;
@@ -399,6 +424,7 @@ public class GoogleAPIConnector {
 	private boolean deleteTask(TimedTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			logger.log(Level.WARNING, "Task is null");
 		} else if (task.getId() == null) {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
@@ -408,6 +434,7 @@ public class GoogleAPIConnector {
 				return check == null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				logger.log(Level.SEVERE, "Error deleting task", e);
 			}
 		}
 		return false;
@@ -425,6 +452,7 @@ public class GoogleAPIConnector {
 	private boolean updateTask(FloatingTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			logger.log(Level.WARNING, "Task is null");
 		} else if (task.getId() == null) {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
@@ -433,6 +461,7 @@ public class GoogleAPIConnector {
 				return result != null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				logger.log(Level.SEVERE, "Error updating task", e);
 			}
 		}
 		return false;
@@ -450,6 +479,7 @@ public class GoogleAPIConnector {
 	private boolean updateTask(DeadlineTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			logger.log(Level.WARNING, "Task is null");
 		} else if (task.getId() == null) {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
@@ -458,6 +488,7 @@ public class GoogleAPIConnector {
 				return result != null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				logger.log(Level.SEVERE, "Error updating task", e);
 			}
 		}
 		return false;
@@ -474,6 +505,7 @@ public class GoogleAPIConnector {
 	private boolean updateTask(TimedTask task) {
 		if (task == null) {
 			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
+			logger.log(Level.WARNING, "Task is null");
 		} else if (task.getId() == null) {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
@@ -482,6 +514,7 @@ public class GoogleAPIConnector {
 				return result != null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
+				logger.log(Level.SEVERE, "Error updating task", e);
 			}
 		}
 		return false;
