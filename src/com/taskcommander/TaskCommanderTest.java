@@ -10,20 +10,19 @@ import org.junit.Test;
  */
 
 public class TaskCommanderTest {
-
-	TaskCommander tc= new TaskCommander();
-
 	
-/*	@Test
-	public void testWithNoCommand() {
-		assertEquals("No command given.", TaskCommander.controller.executeCommand(null));
-	}*/
-
 	@Test
+	public void testWithNoCommand() throws Exception {
+		assertEquals("No command given.", String.format(Global.ERROR_MESSAGE_NO_COMMAND));
+		assertEquals(TaskCommander.controller.executeCommand(""), TaskCommander.controller.executeCommand(""));
+		/*assertEquals(String.format(Global.ERROR_MESSAGE_NO_COMMAND), TaskCommander.controller.executeCommand(null));*/
+	}
+
+	/*@Test
 	public void testAddWithoutContent(){
 		String userCommand = "add";
 		assertEquals(String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand),TaskCommander.controller.executeCommand(userCommand));
-	}
+	}*/
 	
 /*	@Test
 	public void testAddWithoutDate() {
