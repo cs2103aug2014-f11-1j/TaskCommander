@@ -115,8 +115,6 @@ public class Parser {
 			residualUserCommand = removeQuotedSubstring(residualUserCommand);
 		}
 		
-		logger.log(Level.INFO, "ResidualUserCommand after removing commandType, commandParameter and TaskName if any: "+residualUserCommand);
-		
 		List<Date> dates = null;
 		com.joestelmach.natty.Parser nattyParser = new com.joestelmach.natty.Parser();
 		List<DateGroup> groups = nattyParser.parse(residualUserCommand);
