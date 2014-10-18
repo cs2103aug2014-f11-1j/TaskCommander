@@ -208,6 +208,7 @@ public class GoogleAPIConnector {
 				Tasks.TasksOperations.Insert request = tasks.tasks().insert(PRIMARY_TASK_ID, taskToAdd);
 				Task result = request.execute();
 				if (result != null) {
+					task.setUpdated(result.getUpdated());
 					return result.getId();
 				}
 			} catch (IOException e) {
@@ -237,6 +238,7 @@ public class GoogleAPIConnector {
 				Tasks.TasksOperations.Insert request = tasks.tasks().insert(PRIMARY_TASK_ID, taskToAdd);
 				Task result = request.execute();
 				if (result != null) {
+					task.setUpdated(result.getUpdated());
 					return result.getId();
 				}
 			} catch (IOException e) {
@@ -268,6 +270,7 @@ public class GoogleAPIConnector {
 			try {
 				Event createdEvent = calendar.events().insert(PRIMARY_CALENDAR_ID, event).execute();
 				if (createdEvent != null) {
+					task.setUpdated(createdEvent.getUpdated());
 					return createdEvent.getId();
 				}
 			} catch (IOException e) {
