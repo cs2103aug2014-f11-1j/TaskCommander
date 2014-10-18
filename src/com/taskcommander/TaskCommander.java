@@ -8,7 +8,7 @@ public class TaskCommander {
 	 * In other words, instances instead of classes are used.)
 	 */
 	public static Controller controller=Controller.getInstance();
-	public static Parser parser;
+	public static Parser parser=Parser.getInstance();
 	public static Data data; // temporary memory containing a list of task objects
 	public static Storage storage; 	// (permanent memory consisting of a local .txt-file
 	public static SyncHandler syncHandler;
@@ -23,7 +23,7 @@ public class TaskCommander {
 		// Creation of the components
 		storage = new Storage();
 		data = Data.getInstance();
-		parser = Parser.getInstance();
+		/*parser = Parser.getInstance();*/
 
 		ui = UI.getInstance();
 		ui.open();
