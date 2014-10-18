@@ -24,11 +24,11 @@ public class TaskCommanderTest {
 		assertEquals("Invalid command format: add. Type 'help' to see the list of commands.",TaskCommander.controller.executeCommand(userCommand));
 	}
 	
-	/*@Test
+	@Test
 	public void testAddWithoutDate() {
 
 		assertEquals("Added: \"little boy\"", TaskCommander.controller.executeCommand("add \"little boy\""));
-	}*/
+	}
 
 
 

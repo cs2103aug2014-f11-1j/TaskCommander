@@ -9,8 +9,8 @@ public class TaskCommander {
 	 */
 	public static Controller controller=Controller.getInstance();
 	public static Parser parser=Parser.getInstance();
-	public static Data data; // temporary memory containing a list of task objects
-	public static Storage storage; 	// (permanent memory consisting of a local .txt-file
+	public static Storage storage= new Storage(); 
+	public static Data data = Data.getInstance(); // temporary memory containing a list of task objects
 	public static SyncHandler syncHandler;
 	public static UI ui;
 
@@ -21,8 +21,8 @@ public class TaskCommander {
 	public static void main(String[] args) {
 		
 		// Creation of the components
-		storage = new Storage();
-		data = Data.getInstance();
+		/*storage = new Storage();*/
+		/*data = Data.getInstance();*/
 		/*parser = Parser.getInstance();*/
 
 		ui = UI.getInstance();
