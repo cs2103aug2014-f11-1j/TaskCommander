@@ -24,6 +24,7 @@ public class TaskCommander {
 		/*storage = new Storage();*/
 		/*data = Data.getInstance();*/
 		/*parser = Parser.getInstance();*/
+		/*controller=Controller.getInstance();*/
 
 		ui = UI.getInstance();
 		ui.open();
