@@ -2,6 +2,8 @@ package com.taskcommander;
 import java.util.Date;
 
 import com.google.gson.annotations.SerializedName;
+import com.google.api.client.util.DateTime;
+
 //import com.taskcommander.Global.TaskType;
 
 //@author A0112828H
@@ -18,7 +20,7 @@ public abstract class Task {
 	private String _id;
 	private boolean _done;
 	private boolean _edited;
-	private Date _updated;
+	private DateTime _updated;
 	
 	
 	// Possible task types
@@ -73,7 +75,7 @@ public abstract class Task {
 		return _edited;
 	}
 	
-	public Date getUpdated() {
+	public DateTime getUpdated() {
 		return _updated;
 	}
 	
@@ -102,7 +104,7 @@ public abstract class Task {
 		this._edited = edited;
 	}
 	
-	public void setUpdated(Date updated) {
+	public void setUpdated(DateTime updated) {
 		_updated = updated;
 	}
 
