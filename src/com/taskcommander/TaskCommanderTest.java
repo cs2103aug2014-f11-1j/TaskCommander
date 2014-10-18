@@ -47,6 +47,7 @@ public class TaskCommanderTest {
 	public void testDisplayWithoutRestriction() throws Exception{
 		String userCommand = "display";
 		assertEquals("Displayed: all", TaskCommander.controller.executeCommand(userCommand));
+		/*Assert.AreEqual(TaskCommander.controller.getDisplayedTasks(), RightObject);*/
 	}
 	@Test
 	public void testDisplayDone() throws Exception{
@@ -57,6 +58,18 @@ public class TaskCommanderTest {
 	public void testDisplayOpen() throws Exception{
 		String userCommand = "display open";
 		assertEquals("Displayed: Status: open ", TaskCommander.controller.executeCommand(userCommand));
+	}
+	@Test
+	public void testDisplayTimedDealineOpen() throws Exception{
+		String userCommand = "display timed deadline open";
+		assertEquals("Displayed: Type: deadline, timed Status: open ", TaskCommander.controller.executeCommand(userCommand));
+		
+	}
+	@Test
+	public void testDisplayDealineInPeriod() throws Exception{
+		String userCommand = "display open deadline 04/11/14 to 18/11/14";
+		assertEquals("Displayed: Period: [Sat Oct 18 '14 15:35-15:35]  Type: deadline Status: open ", TaskCommander.controller.executeCommand(userCommand));
+		
 	}
 	
 }

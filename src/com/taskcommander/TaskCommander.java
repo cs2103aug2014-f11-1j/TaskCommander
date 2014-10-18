@@ -12,7 +12,7 @@ public class TaskCommander {
 	public static Storage storage= new Storage(); 
 	public static Data data = Data.getInstance(); // temporary memory containing a list of task objects
 	public static SyncHandler syncHandler;
-	public static UI ui;
+	public static UI ui= UI.getInstance();
 
 	/**
 	 * Launch the application
@@ -26,7 +26,7 @@ public class TaskCommander {
 		/*parser = Parser.getInstance();*/
 		/*controller=Controller.getInstance();*/
 
-		ui = UI.getInstance();
+	/*	ui = UI.getInstance();*/
 		ui.open();
 	}
 	
