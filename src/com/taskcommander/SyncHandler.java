@@ -9,6 +9,8 @@ import com.google.api.services.tasks.Tasks;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.taskcommander.Task.TaskType;
 
@@ -16,6 +18,8 @@ import com.taskcommander.Task.TaskType;
 public class SyncHandler {
 
 	private static GoogleAPIConnector con = null;
+	private static final Logger logger = Logger.getLogger(SyncHandler.class.getName());
+
 	
 	public SyncHandler() {
 
@@ -42,6 +46,7 @@ public class SyncHandler {
 	
 	private void push() {
 		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
+		logger.log(Level.INFO, "PUSH: Retrieved All Tasks");
 		for (Task t : tasks) {
 			if (!t.isSynced()) {
 				if (t.getId() == null) {
@@ -54,6 +59,7 @@ public class SyncHandler {
 				}
 			}
 		}
+		logger.log(Level.INFO, "PUSH: Handled Added Cases");
 
 		// Handle delete cases
 		ArrayList<Task> deletedTasks = TaskCommander.data.getDeletedTasks();
@@ -62,11 +68,13 @@ public class SyncHandler {
 				con.deleteTask(t);
 			}
 		}
+		logger.log(Level.INFO, "PUSH: Handled Deleted Cases");
 	}
 	
 	private void pull() throws IOException {
 		//Get all Tasks
 		ArrayList<Task> tasks = con.getAllTasks();
+		logger.log(Level.INFO, "PULL: Retrieved All Tasks");
 		
 		//Added case
 		ArrayList<String> taskIds = TaskCommander.data.getAllIds();
@@ -75,8 +83,11 @@ public class SyncHandler {
 				TaskCommander.data.addTask(t);
 			}
 		}
+		logger.log(Level.INFO, "PULL: Handled Added Tasks");
+		
 		
 		//TODO Updated cases
+		
 		
 		
 		//Deleted case
@@ -87,13 +98,16 @@ public class SyncHandler {
 				TaskCommander.data.deleteTask(con.toTask(task));
 			}
 		}
+		logger.log(Level.INFO, "PULL: Handled Deleted Google Tasks");
 		
-		//For Events
+		
+		//Deleted Case For Events
 		List<Event> googleEvents = con.getAllGoogleEvents();
 		for (Event event : googleEvents) {
 			if ("cancelled".equals(event.getStatus())) {
 				TaskCommander.data.deleteTask(con.toTask(event));
 			}
-		}	
+		}
+		logger.log(Level.INFO, "PULL: Handled Deleted Google Events");
 	}
 }
