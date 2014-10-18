@@ -1,6 +1,8 @@
 package com.taskcommander;
 import static org.junit.Assert.*;
 
+import java.util.Date;
+
 import org.junit.Test;
 
 /**
@@ -11,6 +13,14 @@ import org.junit.Test;
 
 public class TaskCommanderTest {
 	
+	
+	//Clear Operation testing
+	@Test
+	public void testClear() throws Exception {
+		String userCommand = "clear";
+		assertEquals("All content deleted.", TaskCommander.controller.executeCommand(userCommand));
+	}
+
 	@Test
 	public void testWithNoCommand() throws Exception {
 		String userCommand = "";
@@ -18,7 +28,7 @@ public class TaskCommanderTest {
 		assertEquals("No command given.", TaskCommander.controller.executeCommand(userCommand));
 	}
 
-	
+
 	/**test add function
 	 **/
 	@Test
@@ -31,16 +41,15 @@ public class TaskCommanderTest {
 		String userCommand = "add \"little boy\"";
 		assertEquals("Added: \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
 	}
-/*	@Test
+	@Test
 	public void testAddTimeTask()throws Exception{
 		String userCommand = "add \"little boy\" 3pm";
-		assertEquals(String.format(Global.MESSAGE_ADDED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ 
-		Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + "little boy" + "\""),
-		TaskCommander.controller.executeCommand(userCommand));
-	}*/
-	
-	
-	
+		assertEquals("Added: [by Sat Oct 18 '14 15:00] \"little boy\"",
+				TaskCommander.controller.executeCommand(userCommand));
+	}
+
+
+
 	/**Test Display Function
 	 * */
 	@Test
@@ -63,13 +72,27 @@ public class TaskCommanderTest {
 	public void testDisplayTimedDealineOpen() throws Exception{
 		String userCommand = "display timed deadline open";
 		assertEquals("Displayed: Type: deadline, timed Status: open ", TaskCommander.controller.executeCommand(userCommand));
-		
+
 	}
+	
+	//In this test it uses current time, so sometimes the date will have a slite difference
 	@Test
 	public void testDisplayDealineInPeriod() throws Exception{
 		String userCommand = "display open deadline 04/11/14 to 18/11/14";
-		assertEquals("Displayed: Period: [Sat Oct 18 '14 15:35-15:35]  Type: deadline Status: open ", TaskCommander.controller.executeCommand(userCommand));
-		
+		Date date  = new Date();
+		assertEquals("Displayed: Period: [Sat Oct 18 '14 "+Global.timeFormat.format(date)+"-"+
+				Global.timeFormat.format(date)+ "]  Type: deadline Status: open ", TaskCommander.controller.executeCommand(userCommand));
+
+	}
+
+
+	@Test
+	public void testUpdateTaskWithTimeAdded() throws Exception{
+		String userCommand = "update 1 3pm";
+		TaskCommander.controller.getDisplayedTasks();
+		assertEquals("Updated: [by Sat Oct 18 '14 15:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
+
 	}
 	
+
 }
