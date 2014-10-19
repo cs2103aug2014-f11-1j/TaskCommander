@@ -462,6 +462,7 @@ public class GoogleAPIConnector {
 		} else {
 			try {
 				Task result = tasks.tasks().update(PRIMARY_TASK_ID, task.getId(), toGoogleTask(task)).execute();
+				task.setUpdated(result.getUpdated());
 				return result != null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -489,6 +490,7 @@ public class GoogleAPIConnector {
 		} else {
 			try {
 				Task result = tasks.tasks().update(PRIMARY_TASK_ID, task.getId(), toGoogleTask(task)).execute();
+				task.setUpdated(result.getUpdated());
 				return result != null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -515,6 +517,7 @@ public class GoogleAPIConnector {
 		} else {
 			try {
 				Event result = calendar.events().update(PRIMARY_TASK_ID, task.getId(), toGoogleTask(task)).execute();
+				task.setUpdated(result.getUpdated());
 				return result != null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -543,9 +546,12 @@ public class GoogleAPIConnector {
 		if (task.containsKey("due")) {
 			DeadlineTask deadlineTask = new DeadlineTask(task.getTitle(), toDate(task.getDue()));
 			deadlineTask.setId(task.getId());
+			deadlineTask.setUpdated(task.getUpdated());
 			return deadlineTask;
 		} else {
-			return new FloatingTask(task.getTitle(), task.getId());	
+			FloatingTask floatingTask = new FloatingTask(task.getTitle(), task.getId());
+			floatingTask.setUpdated(task.getUpdated());
+			return floatingTask;
 		}
 	}
 
@@ -558,6 +564,7 @@ public class GoogleAPIConnector {
 				toDate(event.getStart().getDateTime()),
 				toDate(event.getEnd().getDateTime()));
 		timedTask.setId(event.getId());
+		timedTask.setUpdated(event.getUpdated());
 		return timedTask;
 	}
 				
