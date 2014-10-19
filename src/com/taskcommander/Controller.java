@@ -166,6 +166,7 @@ public class Controller {
 				
 				// Index in DisplayedTasks
 				int indexDisplayedTasks = TaskCommander.parser.determineIndex(userCommand);
+				System.out.println(userCommand+indexDisplayedTasks+displayedTasks.size());
 				if (indexDisplayedTasks > displayedTasks.size() - Global.INDEX_OFFSET || indexDisplayedTasks < 0) {
 					return String.format(Global.ERROR_MESSAGE_NO_INDEX, indexDisplayedTasks + Global.INDEX_OFFSET);
 				}
