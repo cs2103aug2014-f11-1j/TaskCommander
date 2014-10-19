@@ -337,6 +337,46 @@ public class Data {
 		
 	}
 	
+	
+	/**
+	 * This operation updates a task with a TimedTask object as a parameter
+	 * It is usually called by the SyncHandler
+	 * 
+	 * @param 		index
+	 * @param 		task
+	 * @return		Feedback for user
+	 */
+	public String updateToTimedTask(int index, TimedTask task) {
+		if (tasks.get(index).getType() != Task.TaskType.TIMED) {
+			TimedTask timedTask = new TimedTask(task.getName(), task.getStartDate(), task.getEndDate());
+			timedTask.setEdited(tasks.get(index).isEdited());
+			timedTask.setDone(tasks.get(index).isDone());
+			timedTask.setUpdated(task.getUpdated());
+			saveToHistory();
+			deleteTask(index);
+			tasks.add(index, timedTask);
+			save();
+			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
+		} else {
+			saveToHistory();
+			TimedTask timedTask = (TimedTask) tasks.get(index);
+			if (task.getName() != null) {
+				timedTask.setName(task.getName());
+			}
+			if (task.getStartDate() != null) {
+				timedTask.setStartDate(task.getStartDate());
+			}
+			if (task.getEndDate() != null) {
+				timedTask.setEndDate(task.getEndDate());
+			}
+			timedTask.setEdited(true);
+			timedTask.setUpdated(task.getUpdated());
+			save();
+			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
+		}
+		
+	}
+	
 	/**
 	 * This operation updates a DeadlineTask with the given index and replaces the old taskName, 
 	 * startDate or endDate respectively and changes the taskType if needed.
@@ -381,6 +421,41 @@ public class Data {
 	}
 	
 	/**
+	 * This operation updates a task with a DeadlineTask object as a parameter
+	 * It is usually called by the SyncHandler
+	 * 
+	 * @param 		index
+	 * @param 		task
+	 * @return		Feedback for user
+	 */
+	public String updateToDeadlineTask(int index, DeadlineTask task) {
+		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
+			DeadlineTask deadlineTask = new DeadlineTask(task.getName(),task.getEndDate());
+			deadlineTask.setEdited(tasks.get(index).isEdited());
+			deadlineTask.setDone(tasks.get(index).isDone());
+			deadlineTask.setUpdated(task.getUpdated());
+			saveToHistory();
+			deleteTask(index);
+			tasks.add(index, deadlineTask);
+			save();
+			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
+		} else {
+			saveToHistory();
+			DeadlineTask deadlineTask = (DeadlineTask) tasks.get(index);
+			if (task.getName() != null) {
+				deadlineTask.setName(task.getName());
+			}
+			if (task.getEndDate() != null) {
+				deadlineTask.setEndDate(task.getEndDate());
+			}
+			deadlineTask.setEdited(true);
+			deadlineTask.setUpdated(task.getUpdated());
+			save();
+			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
+			}
+	}
+	
+	/**
 	 * This operation updates a FloatingTask with the given index and replaces the old taskName, 
 	 * startDate or endDate respectively and changes the taskType if needed.
 	 * If a given date or name parameter equals null, the old value remains.
@@ -417,6 +492,38 @@ public class Data {
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
 			}
+	}
+	
+	/**
+	 * This operation updates a task with a FloatingTask object as a parameter
+	 * It is usually called by the SyncHandler
+	 * 
+	 * @param 		index
+	 * @param 		task
+	 * @return		Feedback for user
+	 */
+	public String updateToFloatingTask(int index, FloatingTask task) {
+		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
+			FloatingTask floatingTask = new FloatingTask(task.getName());
+			floatingTask.setEdited(tasks.get(index).isEdited());
+			floatingTask.setDone(tasks.get(index).isDone());
+			floatingTask.setUpdated(task.getUpdated());
+			saveToHistory();
+			deleteTask(index);
+			tasks.add(index, floatingTask);
+			save();
+			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
+		} else {
+			saveToHistory();
+			FloatingTask floatingTask = (FloatingTask) tasks.get(index);
+			if (task.getName() != null) {
+				floatingTask.setName(task.getName());
+			}
+			floatingTask.setEdited(true);
+			floatingTask.setUpdated(task.getUpdated());
+			save();
+			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
+		}
 	}
 
 	/**
@@ -538,6 +645,7 @@ public class Data {
 		} else {
 			deletedTasks.add(task);
 			tasks.remove(task);
+			saveToHistory();
 			return true;
 		}
 	}
