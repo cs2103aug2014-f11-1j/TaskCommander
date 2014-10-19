@@ -73,22 +73,17 @@ public class SyncHandler {
 	
 	private void pull() throws IOException {
 		//Get all Tasks
-		ArrayList<Task> tasks = con.getAllTasks();
+		ArrayList<Task> tasksToSync = con.getAllTasks();
 		logger.log(Level.INFO, "PULL: Retrieved All Tasks");
 		
 		//Added case
 		ArrayList<String> taskIds = TaskCommander.data.getAllIds();
-		for (Task t: tasks) {
+		for (Task t: tasksToSync) {
 			if (!taskIds.contains(t.getId())) {
 				TaskCommander.data.addTask(t);
 			}
 		}
 		logger.log(Level.INFO, "PULL: Handled Added Tasks");
-		
-		
-		//TODO Updated cases
-		
-		
 		
 		//Deleted case
 		//For Tasks
@@ -109,5 +104,22 @@ public class SyncHandler {
 			}
 		}
 		logger.log(Level.INFO, "PULL: Handled Deleted Google Events");
+		
+		//Updated cases
+		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
+		taskIds = TaskCommander.data.getAllIds(); 
+		for (Task t: tasksToSync) {
+			int index = taskIds.indexOf(t.getId());
+			if (t.getUpdated() != tasks.get(index).getUpdated()) {
+				switch(t.getType()) {
+				case FLOATING:
+					TaskCommander.data.updateToFloatingTask(index, (FloatingTask) t);
+				case TIMED:
+					TaskCommander.data.updateToTimedTask(index, (TimedTask) t);
+				case DEADLINE:
+					TaskCommander.data.updateToDeadlineTask(index, (DeadlineTask) t);
+				}		
+			}
+		}
 	}
 }
