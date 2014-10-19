@@ -12,8 +12,8 @@ import org.junit.Test;
  */
 
 public class TaskCommanderTest {
-	
-	
+
+
 	//Clear Operation testing
 	@Test
 	public void testClear() throws Exception {
@@ -44,7 +44,8 @@ public class TaskCommanderTest {
 	@Test
 	public void testAddTimeTask()throws Exception{
 		String userCommand = "add \"little boy\" 3pm";
-		assertEquals("Added: [by Sat Oct 18 '14 15:00] \"little boy\"",
+		Date date = new Date();
+		assertEquals("Added: [by "+Global.dayFormat.format(date)+" "+"15:00] \"little boy\"",
 				TaskCommander.controller.executeCommand(userCommand));
 	}
 
@@ -74,25 +75,61 @@ public class TaskCommanderTest {
 		assertEquals("Displayed: Type: deadline, timed Status: open ", TaskCommander.controller.executeCommand(userCommand));
 
 	}
-	
+
 	//In this test it uses current time, so sometimes the date will have a slite difference
 	@Test
 	public void testDisplayDealineInPeriod() throws Exception{
 		String userCommand = "display open deadline 04/11/14 to 18/11/14";
 		Date date  = new Date();
-		assertEquals("Displayed: Period: [Sat Oct 18 '14 "+Global.timeFormat.format(date)+"-"+
+		assertEquals("Displayed: Period: ["+Global.dayFormat.format(date)+" "+ Global.timeFormat.format(date)+"-"+
 				Global.timeFormat.format(date)+ "]  Type: deadline Status: open ", TaskCommander.controller.executeCommand(userCommand));
 
 	}
 
-
+	// Update testing
 	@Test
 	public void testUpdateTaskWithTimeAdded() throws Exception{
 		String userCommand = "update 1 3pm";
 		TaskCommander.controller.getDisplayedTasks();
-		assertEquals("Updated: [by Sat Oct 18 '14 15:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
+		Date date  = new Date();
+		assertEquals("Updated: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
 
 	}
-	
+	/*	@Test
+	public void testUpdateTaskChangeContent() throws Exception{
+		String userCommand = "update 1 \"early bird catches the worm\"";
+		TaskCommander.controller.getDisplayedTasks();
+		assertEquals("Updated: \"early bird catches the worm\"", TaskCommander.controller.executeCommand(userCommand));
+	}*/
+
+	/*@Test
+	public void testUpdateTaskChangeTime() throws Exception{
+		String userCommand = "update 2 none";
+		TaskCommander.controller.getDisplayedTasks();
+		assertEquals("Updated: \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
+	}*/
+
+	//Mark Testing
+	@Test
+	public void testMarkDone() throws Exception{
+		String userCommand = "done 1";
+		TaskCommander.controller.getDisplayedTasks();
+		Date date = new Date();
+		assertEquals("Done: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
+	}
+	/*@Test
+	public void testAlreadyOpen() throws Exception{
+		String userCommand = "open 2 ";
+		TaskCommander.controller.getDisplayedTasks();
+		assertEquals("Already opened.", TaskCommander.controller.executeCommand(userCommand));
+	}*/
+
+
+	/*	@Test
+	public void testDelete() throws Exception{
+		String userCommand = "delete 1 ";
+		TaskCommander.controller.getDisplayedTasks();
+		assertEquals("Deleted: \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
+	}*/
 
 }
