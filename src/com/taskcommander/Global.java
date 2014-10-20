@@ -66,6 +66,7 @@ public class Global {
 		DISPLAY, 
 		SEARCH,
 		CLEAR,
+		UNCLEAR,
 		INVALID,
 		SYNC,
 		UNDO,
