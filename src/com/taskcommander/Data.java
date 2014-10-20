@@ -56,6 +56,21 @@ public class Data {
 	public ArrayList<Task> deletedTasks;
 	
 	/**
+	 * Stores all the tasks that was deleted in a clear command.
+	 */
+	public ArrayList<ArrayList<Task>> clearedTasks;
+	
+	/**
+	 * Stores history of added tasks for undo command.
+	 */
+	public ArrayList<Task> addedTasks;
+	
+	/**
+	 * Stores history of tasks before being updated.
+	 */
+	public ArrayList<Task> preupdatedTasks;
+	
+	/**
 	 * This Stack contains the history of all operations.
 	 */
 	public Stack<CommandType> operationHistory;
@@ -105,6 +120,7 @@ public class Data {
 	public String addTask(Task task) {
 		logger.log(Level.INFO, "Called addTask(Task task)");
 		assert task.getId() != null;
+		saveToOperationHistory(Global.CommandType.ADD);
 		switch ( task.getType()) {
 		case FLOATING:
 			FloatingTask floatingTask = (FloatingTask) task;
@@ -331,12 +347,14 @@ public class Data {
 			timedTask.setEdited(tasks.get(index).isEdited());
 			timedTask.setDone(tasks.get(index).isDone());
 			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.UPDATE);
 			deleteTask(index);
 			tasks.add(index, timedTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 		} else {
 			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.UPDATE);
 			TimedTask timedTask = (TimedTask) tasks.get(index);
 			if (name != null) {
 				timedTask.setName(name);
@@ -418,12 +436,14 @@ public class Data {
 			deadlineTask.setEdited(tasks.get(index).isEdited());
 			deadlineTask.setDone(tasks.get(index).isDone());
 			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.UPDATE);
 			deleteTask(index);
 			tasks.add(index, deadlineTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
 		} else {
 			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.UPDATE);
 			DeadlineTask deadlineTask = (DeadlineTask) tasks.get(index);
 			if (name != null) {
 				deadlineTask.setName(name);
@@ -495,12 +515,14 @@ public class Data {
 			floatingTask.setEdited(tasks.get(index).isEdited());
 			floatingTask.setDone(tasks.get(index).isDone());
 			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.UPDATE);
 			deleteTask(index);
 			tasks.add(index, floatingTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
 		} else {
 			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.UPDATE);
 			FloatingTask floatingTask = (FloatingTask) tasks.get(index);
 			if (name != null) {
 				floatingTask.setName(name);
@@ -632,6 +654,7 @@ public class Data {
 		} else {
 			Task deletedTask = tasks.get(index);
 			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.DELETE);
 			deletedTasks.add(deletedTask);
 			tasks.remove(index);
 			save();
@@ -667,6 +690,22 @@ public class Data {
 		}
 	}
 	
+	public void undo() {
+		Global.CommandType type = operationHistory.peek();
+		Global.CommandType undoCommand;
+		switch(type) {
+		case ADD:
+			undoCommand = Global.CommandType.DELETE;
+			saveToUndoHistory(undoCommand);
+		case DELETE:
+			undoCommand = Global.CommandType.ADD;
+			saveToUndoHistory(undoCommand);
+		case UPDATE:
+			undoCommand = Global.CommandType.UPDATE;
+			saveToUndoHistory(undoCommand);
+		}
+	}
+	
 	/**
 	 * This operation saves a backup to history tasks ArrayList.
 	 */
@@ -688,6 +727,10 @@ public class Data {
 	
 	public void saveToOperationHistory(Global.CommandType type) {
 		operationHistory.push(type);
+	}
+	
+	public void saveToUndoHistory(Global.CommandType type) {
+		undoHistory.push(type);
 	}
 	
 	/**
@@ -716,7 +759,9 @@ public class Data {
 	 * @return             Feedback for user.
 	 */
 	public String clearTasks() {
-		deletedTasks.addAll(tasks);
+		ArrayList<Task> cleared = new ArrayList<Task>();
+		cleared.addAll(tasks);
+		clearedTasks.add(cleared);
 		tasks.clear();
 		save();
 		return String.format(Global.MESSAGE_CLEARED);
