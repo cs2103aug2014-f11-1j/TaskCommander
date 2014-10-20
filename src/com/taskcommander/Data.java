@@ -686,6 +686,10 @@ public class Data {
 		}
 	}	
 	
+	public void saveToOperationHistory(Global.CommandType type) {
+		operationHistory.push(type);
+	}
+	
 	/**
 	 * This operation restores from history tasks ArrayList.
 	 */
