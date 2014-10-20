@@ -121,5 +121,6 @@ public class SyncHandler {
 				}		
 			}
 		}
+		logger.log(Level.INFO, "PULL: Handled Updated Cases");
 	}
 }
