@@ -6,9 +6,9 @@ import java.util.Date;
 import org.junit.Test;
 
 /**
- * This class is supposed to test the program automatically.
+ * This class is supposed to test the program integrated.
  * 
- * @author Group F11-1J
+ * @author Group F11-1J A0105753J
  */
 
 public class TaskCommanderTest {
@@ -94,6 +94,16 @@ public class TaskCommanderTest {
 
 	/**Test Update Function
 	 * */
+	
+	//This is a boundry testing for invalid index
+	@Test
+	public void testUpdateTaskWithInvalidIndex() throws Exception{
+		String userCommand = "update 0 3pm";
+		TaskCommander.controller.getDisplayedTasks();
+		Date date  = new Date();
+		assertEquals(String.format(Global.ERROR_MESSAGE_NO_INDEX, 0), TaskCommander.controller.executeCommand(userCommand));
+
+	}
 	@Test
 	public void testUpdateTaskWithTimeAdded() throws Exception{
 		String userCommand = "update 1 3pm";
