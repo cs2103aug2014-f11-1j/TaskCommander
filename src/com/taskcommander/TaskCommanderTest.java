@@ -92,7 +92,8 @@ public class TaskCommanderTest {
 
 	}
 
-	// Update testing
+	/**Test Update Function
+	 * */
 	@Test
 	public void testUpdateTaskWithTimeAdded() throws Exception{
 		String userCommand = "update 1 3pm";
@@ -117,7 +118,8 @@ public class TaskCommanderTest {
 		assertEquals("Updated: \"hi baby\"", TaskCommander.controller.executeCommand(userCommand));
 	}
 
-	//Mark Testing
+	/**Test Mark Function
+	 * */
 	@Test
 	public void testMarkDone() throws Exception{
 		String userCommand = "done 1";
@@ -133,7 +135,7 @@ public class TaskCommanderTest {
 	}
 
 
-		@Test
+	@Test
 	public void testDelete() throws Exception{
 		String userCommand = "delete 1 ";
 		TaskCommander.controller.getDisplayedTasks();
