@@ -20,7 +20,7 @@ public class SyncHandler {
 	private static GoogleAPIConnector con = null;
 	private static final Logger logger = Logger.getLogger(SyncHandler.class.getName());
 
-	
+
 	public SyncHandler() {
 
 	}
@@ -35,15 +35,20 @@ public class SyncHandler {
 		if (con == null) {
 			con = new GoogleAPIConnector();
 		}
-		push();
-		try {
-			pull();
-		} catch (IOException e) {
-			System.out.println(Global.MESSAGE_FAILED_PULL);
+
+		if (con.getAllTasks() == null) {
+			return null;
+		} else {
+			push();
+			try {
+				pull();
+			} catch (IOException e) {
+				System.out.println(Global.MESSAGE_FAILED_PULL);
+			}
+			return Global.MESSAGE_SYNC_SUCCESS;
 		}
-		return Global.MESSAGE_SYNC_SUCCESS;
 	}
-	
+
 	private void push() {
 		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
 		logger.log(Level.INFO, "PUSH: Retrieved All Tasks");
@@ -70,12 +75,12 @@ public class SyncHandler {
 		}
 		logger.log(Level.INFO, "PUSH: Handled Deleted Cases");
 	}
-	
+
 	private void pull() throws IOException {
 		//Get all Tasks
 		ArrayList<Task> tasksToSync = con.getAllTasks();
 		logger.log(Level.INFO, "PULL: Retrieved All Tasks");
-		
+
 		//Added case
 		ArrayList<String> taskIds = TaskCommander.data.getAllIds();
 		for (Task t: tasksToSync) {
@@ -84,7 +89,7 @@ public class SyncHandler {
 			}
 		}
 		logger.log(Level.INFO, "PULL: Handled Added Tasks");
-		
+
 		//Deleted case
 		//For Tasks
 		List<com.google.api.services.tasks.model.Task> googleTasks = con.getAllGoogleTasks();
@@ -94,8 +99,8 @@ public class SyncHandler {
 			}
 		}
 		logger.log(Level.INFO, "PULL: Handled Deleted Google Tasks");
-		
-		
+
+
 		//Deleted Case For Events
 		List<Event> googleEvents = con.getAllGoogleEvents();
 		for (Event event : googleEvents) {
@@ -104,7 +109,7 @@ public class SyncHandler {
 			}
 		}
 		logger.log(Level.INFO, "PULL: Handled Deleted Google Events");
-		
+
 		//Updated cases
 		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
 		taskIds = TaskCommander.data.getAllIds(); 

@@ -102,7 +102,7 @@ public class UI extends Observable {
 	private Text input;
 	private Text output;
 	private Browser browser;
-	
+
 	private String code; // For authorisation code from Google
 
 	private static Logger logger = Logger.getLogger(UI.class.getName());
@@ -163,7 +163,7 @@ public class UI extends Observable {
 		createBrowserTab(url);
 		return code;
 	}
-	
+
 	private void createBrowserTab(String url) {
 		browserTab = new TabItem(tabFolder, SWT.NONE);
 		browserTab.setText("Google Login");
@@ -251,11 +251,8 @@ public class UI extends Observable {
 						clearTableItems();
 						String command = input.getText();
 						String feedback = TaskCommander.controller.executeCommand(command);
-						assert(feedback != null);
 						displayFeedback(feedback);
 						// Insert sync detection and execute this line
-						// Needs a string url passed for the browser to show
-						//createBrowserTab("google.com");
 						clearInput();
 					}catch (Exception e) {
 						logger.log(Level.WARNING,"Exception while executing command flow", e);
@@ -279,7 +276,7 @@ public class UI extends Observable {
 			}
 		});
 	}
-	
+
 	/**
 	 * Sets the Google authorisation code received and 
 	 * notifies observers.
@@ -290,7 +287,7 @@ public class UI extends Observable {
 		setChanged();
 		notifyObservers();
 	}
-	
+
 	public String getCode() {
 		return code;
 	}

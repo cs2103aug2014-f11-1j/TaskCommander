@@ -33,7 +33,7 @@ public class LoginManager implements Observer {
 	private static final String CLIENT_SECRET = "9ILpkbnlGwVMQiqh10za3exf";
 	private static final String APPLICATION_NAME = "Task Commander";
 
-	private static final String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
+	private static final String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:auto";
 
 	private static final String DATA_STORE_DIR = "credentials";
 	private static final String DATA_STORE_NAME = "credentialDataStore";
