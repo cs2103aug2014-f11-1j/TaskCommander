@@ -1,4 +1,5 @@
 package com.taskcommander;
+import com.taskcommander.LoginManager;
 
 import static org.junit.Assert.*;
 
@@ -11,7 +12,7 @@ public class GoogleAPIHandlerTest {
 
 	@Test
 	public void testLoginManager() {
-		LoginManager manager = new LoginManager();
+		LoginManager manager = LoginManager.getInstanceOf();
 		Tasks tasks = manager.getTasksService();
 		Calendar calendar = manager.getCalendarService();
 		assertEquals("Able to get TasksService", tasks!=null);

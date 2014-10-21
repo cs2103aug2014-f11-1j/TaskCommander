@@ -15,6 +15,8 @@ import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.model.Task;
 
+import com.taskcommander.LoginManager;
+
 /**
  * This class is used to connect to the Google API and
  * invoke the Calendar and Tasks services.
@@ -38,15 +40,25 @@ public class GoogleAPIConnector {
 	private static DataStore<String> eventDataStore;
 	private static DataStore<String> taskDataStore;
 	private static final Logger logger = Logger.getLogger(GoogleAPIConnector.class.getName());
-
+	
+	/**
+	 * This method returns a GoogleAPIConnector
+	 * It is to be called by SyncHandler.
+	 * @return GoogleAPIConnector object
+	 */
+	public static GoogleAPIConnector getInstanceOf() {
+		GoogleAPIConnector connector = new GoogleAPIConnector();
+		return connector;
+	}
+	
 	/**
 	 * Creates a new GoogleAPIHandler instance.
 	 * Also creates a new LoginManager and attempts
 	 * to get the Tasks and Calendar services.
 	 * @throws IOException 
 	 */
-	public GoogleAPIConnector() {
-		loginManager = new LoginManager();
+	private GoogleAPIConnector() {
+		loginManager = LoginManager.getInstanceOf();
 		try {
 			eventDataStore = LoginManager.getDataStoreFactory().getDataStore("EventStore");
 			taskDataStore = LoginManager.getDataStoreFactory().getDataStore("TaskStore");

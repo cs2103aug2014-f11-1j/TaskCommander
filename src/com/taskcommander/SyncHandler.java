@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.taskcommander.GoogleAPIConnector;
 
 //@author A0112828H and A0109194A
 public class SyncHandler {
@@ -26,7 +27,7 @@ public class SyncHandler {
 	 */
 	public String sync() {
 		if (con == null) {
-			con = new GoogleAPIConnector();
+			con = GoogleAPIConnector.getInstanceOf();
 		}
 
 		if (con.getAllTasks() == null) {
