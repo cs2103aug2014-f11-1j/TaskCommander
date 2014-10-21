@@ -1,18 +1,11 @@
 package com.taskcommander;
 
-import com.google.api.client.util.DateTime;
-import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.Events;
-import com.google.api.services.tasks.Tasks;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.taskcommander.Task.TaskType;
 
 //@author A0112828H and A0109194A
 public class SyncHandler {
