@@ -71,6 +71,11 @@ public class Data {
 	public Stack<Task> preupdatedTasks;
 	
 	/**
+	 * Stores the history of tasks after being updated.
+	 */
+	public Stack<Task> updatedTasks;
+	
+	/**
 	 * This Stack contains the history of all operations.
 	 */
 	public Stack<CommandType> operationHistory;
@@ -90,6 +95,7 @@ public class Data {
 		deletedTasks = new ArrayList<Task>();
 		addedTasks = new Stack<Task>();
 		preupdatedTasks = new Stack<Task>();
+		updatedTasks = new Stack<Task>();
 		clearedTasks = new Stack<ArrayList<Task>>();
 		operationHistory = new Stack<Global.CommandType>();
 		undoHistory = new Stack<Global.CommandType>();
@@ -362,6 +368,7 @@ public class Data {
 			preupdatedTasks.push(toChange);
 			tasks.remove(index);
 			tasks.add(index, timedTask);
+			updatedTasks.push(timedTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 		} else {
@@ -379,6 +386,7 @@ public class Data {
 				timedTask.setEndDate(endDate);
 			}
 			timedTask.setEdited(true);
+			updatedTasks.push(timedTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 		}
@@ -457,6 +465,7 @@ public class Data {
 			preupdatedTasks.push(toChange);
 			tasks.remove(index);
 			tasks.add(index, deadlineTask);
+			updatedTasks.push(deadlineTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
 		} else {
@@ -471,6 +480,7 @@ public class Data {
 				deadlineTask.setEndDate(endDate);
 			}
 			deadlineTask.setEdited(true);
+			updatedTasks.push(deadlineTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
 			}
@@ -544,6 +554,7 @@ public class Data {
 			preupdatedTasks.push(toChange);
 			tasks.remove(index);
 			tasks.add(index, floatingTask);
+			updatedTasks.push(floatingTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
 		} else {
@@ -555,6 +566,7 @@ public class Data {
 				floatingTask.setName(name);
 			}
 			floatingTask.setEdited(true);
+			updatedTasks.push(floatingTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
 			}
@@ -722,7 +734,7 @@ public class Data {
 	}
 	
 	public void undo() {
-		Global.CommandType type = operationHistory.peek();
+		Global.CommandType type = operationHistory.pop();
 		Global.CommandType undoCommand;
 		switch(type) {
 		case ADD:
@@ -736,10 +748,12 @@ public class Data {
 		case UPDATE:
 			undoCommand = Global.CommandType.UPDATE;
 			saveToUndoHistory(undoCommand);
+			undoUpdate();
 		case CLEAR:
 			undoCommand = Global.CommandType.UNCLEAR;
 			saveToUndoHistory(undoCommand);
 		}
+		save();
 	}
 	
 	private void undoAdd() {
@@ -767,7 +781,33 @@ public class Data {
 		}
 	}
 	
-	
+	private void undoUpdate() {
+		Task updated = updatedTasks.pop();
+		Task beforeUpdate = preupdatedTasks.pop();
+		if (updated.getType() != beforeUpdate.getType()) {
+			deletedTasks.remove(deletedTasks.size() - 1);
+		}
+		
+		int index = 0;
+		switch (updated.getType()) {
+		case TIMED:
+			index = tasks.indexOf((TimedTask) updated);
+		case DEADLINE:
+			index = tasks.indexOf((DeadlineTask) updated);
+		case FLOATING:
+			index = tasks.indexOf((FloatingTask) updated);
+		}
+		
+		tasks.remove(index);
+		switch (beforeUpdate.getType()) {
+		case TIMED:
+			tasks.add(index, (TimedTask) beforeUpdate);
+		case DEADLINE:
+			tasks.add(index, (DeadlineTask) beforeUpdate);
+		case FLOATING:
+			tasks.add(index, (FloatingTask) beforeUpdate);
+		}
+	}
 	
 	/**
 	 * This operation saves a backup to history tasks ArrayList.
