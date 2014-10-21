@@ -733,6 +733,11 @@ public class Data {
 		}
 	}
 	
+	/**@author A0109194A
+	 * This operation undoes the latest command
+	 * It supports Add, Delete, Update, and Clear commands
+	 * 
+	 */
 	public void undo() {
 		Global.CommandType type = operationHistory.pop();
 		Global.CommandType undoCommand;
@@ -741,47 +746,71 @@ public class Data {
 			undoCommand = Global.CommandType.DELETE;
 			saveToUndoHistory(undoCommand);
 			undoAdd();
+			break;
 		case DELETE:
 			undoCommand = Global.CommandType.ADD;
 			saveToUndoHistory(undoCommand);
 			undoDelete();
+			break;
 		case UPDATE:
 			undoCommand = Global.CommandType.UPDATE;
 			saveToUndoHistory(undoCommand);
 			undoUpdate();
+			break;
 		case CLEAR:
 			undoCommand = Global.CommandType.UNCLEAR;
 			saveToUndoHistory(undoCommand);
+			undoClear();
+			break;
+		default:
+			undo(); //Calls undo again to look for one of the four commands above
 		}
 		save();
 	}
 	
-	private void undoAdd() {
+	/**
+	 * This operation undoes the add command
+	 */
+	private boolean undoAdd() {
 		Task toDelete = addedTasks.pop();
 		switch (toDelete.getType()) {
 		case TIMED:
 			tasks.remove((TimedTask) toDelete);
+			return true;
 		case DEADLINE:
 			tasks.remove((DeadlineTask) toDelete);
+			return true;
 		case FLOATING:
 			tasks.remove((FloatingTask) toDelete);
+			return true;
 		}
+		return false;
 	}
 	
-	private void undoDelete() {
+	/**
+	 * This operation undoes the delete command
+	 */
+	private boolean undoDelete() {
 		Task toAdd = deletedTasks.get(deletedTasks.size() - 1);
 		deletedTasks.remove(deletedTasks.size() - 1);
 		switch (toAdd.getType()) {
 		case TIMED:
 			tasks.add((TimedTask) toAdd);
+			return true;
 		case DEADLINE:
 			tasks.add((DeadlineTask) toAdd);
+			return true;
 		case FLOATING:
 			tasks.add((FloatingTask) toAdd);
+			return true;
 		}
+		return false;
 	}
 	
-	private void undoUpdate() {
+	/**
+	 * This operation undoes the update command
+	 */
+	private boolean undoUpdate() {
 		Task updated = updatedTasks.pop();
 		Task beforeUpdate = preupdatedTasks.pop();
 		if (updated.getType() != beforeUpdate.getType()) {
@@ -792,21 +821,34 @@ public class Data {
 		switch (updated.getType()) {
 		case TIMED:
 			index = tasks.indexOf((TimedTask) updated);
+			break;
 		case DEADLINE:
 			index = tasks.indexOf((DeadlineTask) updated);
+			break;
 		case FLOATING:
 			index = tasks.indexOf((FloatingTask) updated);
+			break;
 		}
 		
 		tasks.remove(index);
 		switch (beforeUpdate.getType()) {
 		case TIMED:
 			tasks.add(index, (TimedTask) beforeUpdate);
+			return true;
 		case DEADLINE:
 			tasks.add(index, (DeadlineTask) beforeUpdate);
+			return true;
 		case FLOATING:
 			tasks.add(index, (FloatingTask) beforeUpdate);
+			return true;
 		}
+		return false;
+	}
+	
+	private boolean undoClear() {
+		ArrayList<Task> toRestore = clearedTasks.pop();
+		tasks.addAll(toRestore);
+		return true;
 	}
 	
 	/**
@@ -864,7 +906,7 @@ public class Data {
 	public String clearTasks() {
 		ArrayList<Task> cleared = new ArrayList<Task>();
 		cleared.addAll(tasks);
-		clearedTasks.add(cleared);
+		clearedTasks.push(cleared);
 		tasks.clear();
 		save();
 		return String.format(Global.MESSAGE_CLEARED);
