@@ -26,7 +26,6 @@ import com.google.api.services.tasks.model.Task;
  */
 public class GoogleAPIConnector {
 
-	private static final String PRIMARY_TASK_ID = "@default";
 	private static final String MESSAGE_NO_ID = "Task has not been synced to Google API.";
 	private static final String PRIMARY_CALENDAR_ID = "primary";
 	private static final String PRIMARY_TASKS_ID = "@default";
@@ -382,7 +381,7 @@ public class GoogleAPIConnector {
 			try {
 				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
 				request.execute();
-				Task check = tasks.tasks().get(PRIMARY_TASK_ID, task.getId()).execute();
+				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
 				return check == null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -410,7 +409,7 @@ public class GoogleAPIConnector {
 			try {
 				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
 				request.execute();
-				Task check = tasks.tasks().get(PRIMARY_TASK_ID, task.getId()).execute();
+				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
 				return check == null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -437,7 +436,7 @@ public class GoogleAPIConnector {
 		} else {
 			try {
 				calendar.events().delete(PRIMARY_CALENDAR_ID, "eventId").execute();
-				Event check = calendar.events().get(PRIMARY_TASK_ID, task.getId()).execute();
+				Event check = calendar.events().get(PRIMARY_TASKS_ID, task.getId()).execute();
 				return check == null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
