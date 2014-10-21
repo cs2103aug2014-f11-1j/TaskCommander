@@ -7,6 +7,8 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.TitleEvent;
+import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -94,18 +96,19 @@ public class UI {
 	private final Color COLOR_NOT_DONE = red;
 
 	private static final String INSTRUCTIONS_MAIN = "Enter command: ";
-	private static final String INSTRUCTIONS_BROWSER = "1. Login to Google. \n 2. Accept application permissions. \n" +
-			"3. Copy the authorisation code given and paste it here:";
+	private static final String INSTRUCTIONS_BROWSER = "1. Login to Google. \n 2. Accept application permissions. \n";
 
 	private TabItem browserTab;
 	private Text input;
 	private Text output;
 	private Browser browser;
 	private Text browserInput;
+	
+	private String code; // For authorisation code from Google
 
 	private static Logger logger = Logger.getLogger("UI");
-	
-	
+
+
 	/**
 	 * this method return a instance of UI for singleton pattern 
 	 */
@@ -156,7 +159,14 @@ public class UI {
 	}
 
 	//@author A0112828H
+	public String getCodeFromUser(String url) {
+		code = null;
+		createBrowserTab(url);
+		return code;
+	}
+	
 	private void createBrowserTab(String url) {
+		System.out.println("createbrowsertab");
 		browserTab = new TabItem(tabFolder, SWT.NONE);
 		browserTab.setText("Google Login");
 		setupBrowserWindow(url);
@@ -165,6 +175,7 @@ public class UI {
 	}
 
 	private void setupBrowserWindow(String url) {
+		System.out.println("setupbrowsertab");
 		GridLayout layout = new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
 		browserWindow.setLayout(layout);
 
@@ -263,7 +274,7 @@ public class UI {
 						//createBrowserTab("google.com");
 						clearInput();
 					}catch (Exception e1) {
-						displayErrorMessage(e1.getMessage());
+						//displayErrorMessage(e1.getMessage());
 					}
 			}
 		});
@@ -284,6 +295,17 @@ public class UI {
 					}catch (Exception e1) {
 						displayErrorMessage(e1.getMessage());
 					}
+			}
+		});
+
+		browser.addTitleListener(new TitleListener() {
+			@Override
+			public void changed(TitleEvent event) {
+				if(event.title.contains("Success")) {
+					code = event.title.replace("Success=", "");
+					System.out.println("yes");
+				}
+				System.out.println("noo");
 			}
 		});
 	}

@@ -12,7 +12,8 @@ import java.util.logging.Logger;
  * input from the UI, the Controller determines the exact type of command and its 
  * related parameters by means of the Parser. Then the respective method
  * of the Data component is called to execute the command and the regained feedback
- * is returned to the UI.
+ * is returned to the UI. By hiding all other internal components like Parser, Data, Storage and so on,
+ * the Controller acts as a Facade class (see Facade pattern).
  * 
  * @author A0128620M
  */
@@ -47,17 +48,23 @@ public class Controller {
 		
 		// Set default display settings
 		displayRestriction = "Period: one week from now Status: open";
+	
 		isDatePeriodRestricted = true;
 		Calendar calendar = Calendar.getInstance();
 		startDate = calendar.getTime();
 		calendar.add(Calendar.WEEK_OF_YEAR, 1);
 		endDate = calendar.getTime();
+	
 		isTaskTypeRestricted = false;
 		shownFloatingTask = true;
 		shownDeadlineTask = true;
 		shownTimedTask = true;
+	
 		isStatusRestricted = true;
 		done = false; // false = open, true = done
+		
+		isSearchedWordsRestricted = false;
+		searchedWords = null;
 	}
 	
 	/**
@@ -73,12 +80,17 @@ public class Controller {
 	boolean isDatePeriodRestricted;
 	Date startDate;
 	Date endDate;
+	
 	boolean isTaskTypeRestricted;
 	boolean shownFloatingTask;
 	boolean shownDeadlineTask;
 	boolean shownTimedTask;
+	
 	boolean isStatusRestricted;
 	boolean done; // false = open, true = done
+	
+	boolean isSearchedWordsRestricted;
+	String[] searchedWords;
 	
 	/**
 	 * This list contains the state of the tasks before the latest add/update/done/open/delete command.
@@ -126,12 +138,21 @@ public class Controller {
 					return TaskCommander.data.addFloatingTask(taskName);
 				// case 2: DeadlineTask
 				} else if (taskDateTime.size() == 1 ) { 	
-					logger.log(Level.INFO, "Task to be added is DeadlineTask");
+					logger.log(Level.INFO, "Task to be added is DeadlineTask with EndDate "+taskDateTime.get(0));
 					return TaskCommander.data.addDeadlineTask(taskName, taskDateTime.get(0));
 				// case 3: TimedTask
 				} else if (taskDateTime.size() == 2) { 
-					logger.log(Level.INFO, "Task to be added is TimedTask");
-					return TaskCommander.data.addTimedTask(taskName, taskDateTime.get(0), taskDateTime.get(1));
+					Date startDate = taskDateTime.get(0);
+					Date endDate = taskDateTime.get(1);
+					logger.log(Level.INFO, "Task to be added is TimedTask with StartDate "+taskDateTime.get(0)+" and Enddate "+taskDateTime.get(1));
+					if ( endDate.compareTo(startDate) < 0 ) {
+						Calendar c = Calendar.getInstance(); 
+						c.setTime(endDate); 
+						c.add(Calendar.DATE, 1);
+						endDate = c.getTime();
+					}
+					logger.log(Level.INFO, "Task which is really added as a TimedTask has a StartDate "+startDate+" and Enddate "+endDate);
+					return TaskCommander.data.addTimedTask(taskName, startDate, endDate);
 				// Invalid format, when no command parameter given
 				} else {
 					return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
@@ -145,6 +166,7 @@ public class Controller {
 				
 				// Index in DisplayedTasks
 				int indexDisplayedTasks = TaskCommander.parser.determineIndex(userCommand);
+				System.out.println(userCommand+indexDisplayedTasks+displayedTasks.size());
 				if (indexDisplayedTasks > displayedTasks.size() - Global.INDEX_OFFSET || indexDisplayedTasks < 0) {
 					return String.format(Global.ERROR_MESSAGE_NO_INDEX, indexDisplayedTasks + Global.INDEX_OFFSET);
 				}
@@ -187,6 +209,12 @@ public class Controller {
 								newTaskType = Task.TaskType.TIMED;
 								newStartDate = newTaskDateTime.get(0);
 								newEndDate = newTaskDateTime.get(1);
+								if ( newEndDate.compareTo(newStartDate) < 0 ) {
+									Calendar c = Calendar.getInstance(); 
+									c.setTime(newEndDate); 
+									c.add(Calendar.DATE, 1);
+									newEndDate = c.getTime();
+								}
 							} else {
 								return String.format(Global.ERROR_MESSAGE_INVALID_FORMAT, userCommand);
 							}
@@ -266,6 +294,10 @@ public class Controller {
 					}
 				}
 				
+				// Reset SearchedWord Restrictions
+				isSearchedWordsRestricted = false;
+				searchedWords = null;
+				
 				// Case 1: No restrictions of display
 				if (!isDatePeriodRestricted && !isTaskTypeRestricted && !isStatusRestricted) {
 					displayRestriction = "all";
@@ -305,6 +337,26 @@ public class Controller {
 					return String.format(Global.MESSAGE_DISPLAYED, displayRestriction);
 			}
 				
+			case SEARCH:	
+				
+				// SearchedWords
+				searchedWords = TaskCommander.parser.determineSearchedWords(userCommand);	
+				
+				isDatePeriodRestricted = false;
+				isTaskTypeRestricted = false;
+				isStatusRestricted = false;
+				isSearchedWordsRestricted = true;
+				
+				displayRestriction = "";
+				for(String searchedWord : searchedWords) {
+					if (displayRestriction.equals("")) {
+						displayRestriction = "Tasks containing the words "+searchedWord;
+					} else {
+						displayRestriction += ", "+searchedWord;
+					}
+				}
+				return String.format(Global.MESSAGE_DISPLAYED, displayRestriction);
+
 			case CLEAR:
 				if (getNumberOfWords(userCommand) == 1) {
 					return TaskCommander.data.clearTasks();
@@ -347,12 +399,12 @@ public class Controller {
 	public ArrayList<Task> getDisplayedTasks() {
 		
 		// Case 1: No display restrictions
-		if (!isDatePeriodRestricted && !isTaskTypeRestricted && !isStatusRestricted) {
+		if (!isDatePeriodRestricted && !isTaskTypeRestricted && !isStatusRestricted  && !isSearchedWordsRestricted) {
 			displayedTasks = TaskCommander.data.getCopiedTasks();
 		
 		// Case 2: With display restrictions
 		} else {
-			displayedTasks = TaskCommander.data.getCopiedTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, done);
+			displayedTasks = TaskCommander.data.getCopiedTasks(isDatePeriodRestricted, startDate, endDate, isTaskTypeRestricted, shownFloatingTask, shownDeadlineTask, shownTimedTask, isStatusRestricted, done, isSearchedWordsRestricted, searchedWords);
 		}
 
 		return displayedTasks;

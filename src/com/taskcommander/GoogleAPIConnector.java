@@ -26,6 +26,7 @@ import com.google.api.services.tasks.model.Task;
  */
 public class GoogleAPIConnector {
 
+	private static final String PRIMARY_TASK_ID = "@default";
 	private static final String MESSAGE_NO_ID = "Task has not been synced to Google API.";
 	private static final String PRIMARY_CALENDAR_ID = "primary";
 	private static final String PRIMARY_TASKS_ID = "@default";
@@ -88,7 +89,11 @@ public class GoogleAPIConnector {
 	 */
 	public List<Task> getAllGoogleTasks() {
 		try {
+<<<<<<< HEAD
 			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
+=======
+			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASK_ID);
+>>>>>>> 92f39b86fe5ec4535c2deec460507760edb0aaa5
 			List<Task> tasks = request.execute().getItems();
 			return tasks;
 		} catch (IOException e) {
@@ -104,7 +109,11 @@ public class GoogleAPIConnector {
 	 */
 	private ArrayList<com.taskcommander.Task> getAllFloatingTasks() {
 		try {
+<<<<<<< HEAD
 			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
+=======
+			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASK_ID);
+>>>>>>> 92f39b86fe5ec4535c2deec460507760edb0aaa5
 			List<Task> tasks = request.execute().getItems();
 
 			ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
@@ -121,7 +130,11 @@ public class GoogleAPIConnector {
 
 	public Tasks.TasksOperations.List getListTasksRequest() {
 		try {
+<<<<<<< HEAD
 			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
+=======
+			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASK_ID);
+>>>>>>> 92f39b86fe5ec4535c2deec460507760edb0aaa5
 			return request;
 		} catch (IOException e) {
 			System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -205,9 +218,14 @@ public class GoogleAPIConnector {
 			Task taskToAdd = new Task();
 			taskToAdd.setTitle(task.getName());
 			try {
+<<<<<<< HEAD
 				Tasks.TasksOperations.Insert request = tasks.tasks().insert(PRIMARY_TASKS_ID, taskToAdd);
+=======
+				Tasks.TasksOperations.Insert request = tasks.tasks().insert(PRIMARY_TASK_ID, taskToAdd);
+>>>>>>> 92f39b86fe5ec4535c2deec460507760edb0aaa5
 				Task result = request.execute();
 				if (result != null) {
+					task.setUpdated(result.getUpdated());
 					return result.getId();
 				}
 			} catch (IOException e) {
@@ -234,9 +252,14 @@ public class GoogleAPIConnector {
 			taskToAdd.setTitle(task.getName());
 			taskToAdd.setDue(toDateTime(task.getEndDate()));
 			try {
+<<<<<<< HEAD
 				Tasks.TasksOperations.Insert request = tasks.tasks().insert(PRIMARY_TASKS_ID, taskToAdd);
+=======
+				Tasks.TasksOperations.Insert request = tasks.tasks().insert(PRIMARY_TASK_ID, taskToAdd);
+>>>>>>> 92f39b86fe5ec4535c2deec460507760edb0aaa5
 				Task result = request.execute();
 				if (result != null) {
+					task.setUpdated(result.getUpdated());
 					return result.getId();
 				}
 			} catch (IOException e) {
@@ -268,6 +291,7 @@ public class GoogleAPIConnector {
 			try {
 				Event createdEvent = calendar.events().insert(PRIMARY_CALENDAR_ID, event).execute();
 				if (createdEvent != null) {
+					task.setUpdated(createdEvent.getUpdated());
 					return createdEvent.getId();
 				}
 			} catch (IOException e) {
@@ -295,7 +319,11 @@ public class GoogleAPIConnector {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
 			try {
+<<<<<<< HEAD
 				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
+=======
+				Task check = tasks.tasks().get(PRIMARY_TASK_ID, task.getId()).execute();
+>>>>>>> 92f39b86fe5ec4535c2deec460507760edb0aaa5
 				return toTask(check);
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -321,7 +349,11 @@ public class GoogleAPIConnector {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
 			try {
+<<<<<<< HEAD
 				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
+=======
+				Task check = tasks.tasks().get(PRIMARY_TASK_ID, task.getId()).execute();
+>>>>>>> 92f39b86fe5ec4535c2deec460507760edb0aaa5
 				return toTask(check);
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -347,7 +379,11 @@ public class GoogleAPIConnector {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
 			try {
+<<<<<<< HEAD
 				Event check = calendar.events().get(PRIMARY_CALENDAR_ID, task.getId()).execute();
+=======
+				Event check = calendar.events().get(PRIMARY_TASK_ID, task.getId()).execute();
+>>>>>>> 92f39b86fe5ec4535c2deec460507760edb0aaa5
 				return toTask(check);
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -374,9 +410,13 @@ public class GoogleAPIConnector {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
 			try {
+<<<<<<< HEAD
 				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
+=======
+				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASK_ID, task.getId());
+>>>>>>> 92f39b86fe5ec4535c2deec460507760edb0aaa5
 				request.execute();
-				Task check = tasks.tasks().get("@default", task.getId()).execute();
+				Task check = tasks.tasks().get(PRIMARY_TASK_ID, task.getId()).execute();
 				return check == null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -402,9 +442,13 @@ public class GoogleAPIConnector {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
 			try {
+<<<<<<< HEAD
 				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
+=======
+				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASK_ID, task.getId());
+>>>>>>> 92f39b86fe5ec4535c2deec460507760edb0aaa5
 				request.execute();
-				Task check = tasks.tasks().get("@default", task.getId()).execute();
+				Task check = tasks.tasks().get(PRIMARY_TASK_ID, task.getId()).execute();
 				return check == null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -431,7 +475,7 @@ public class GoogleAPIConnector {
 		} else {
 			try {
 				calendar.events().delete(PRIMARY_CALENDAR_ID, "eventId").execute();
-				Event check = calendar.events().get("@default", task.getId()).execute();
+				Event check = calendar.events().get(PRIMARY_TASK_ID, task.getId()).execute();
 				return check == null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -458,7 +502,12 @@ public class GoogleAPIConnector {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
 			try {
+<<<<<<< HEAD
 				Task result = tasks.tasks().update(PRIMARY_TASKS_ID, task.getId(), toGoogleTask(task)).execute();
+=======
+				Task result = tasks.tasks().update(PRIMARY_TASK_ID, task.getId(), toGoogleTask(task)).execute();
+				task.setUpdated(result.getUpdated());
+>>>>>>> 92f39b86fe5ec4535c2deec460507760edb0aaa5
 				return result != null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -485,7 +534,12 @@ public class GoogleAPIConnector {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
 			try {
+<<<<<<< HEAD
 				Task result = tasks.tasks().update(PRIMARY_TASKS_ID, task.getId(), toGoogleTask(task)).execute();
+=======
+				Task result = tasks.tasks().update(PRIMARY_TASK_ID, task.getId(), toGoogleTask(task)).execute();
+				task.setUpdated(result.getUpdated());
+>>>>>>> 92f39b86fe5ec4535c2deec460507760edb0aaa5
 				return result != null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -511,7 +565,12 @@ public class GoogleAPIConnector {
 			System.out.println(MESSAGE_NO_ID);
 		} else {
 			try {
+<<<<<<< HEAD
 				Event result = calendar.events().update(PRIMARY_CALENDAR_ID, task.getId(), toGoogleTask(task)).execute();
+=======
+				Event result = calendar.events().update(PRIMARY_TASK_ID, task.getId(), toGoogleTask(task)).execute();
+				task.setUpdated(result.getUpdated());
+>>>>>>> 92f39b86fe5ec4535c2deec460507760edb0aaa5
 				return result != null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -540,9 +599,12 @@ public class GoogleAPIConnector {
 		if (task.containsKey("due")) {
 			DeadlineTask deadlineTask = new DeadlineTask(task.getTitle(), toDate(task.getDue()));
 			deadlineTask.setId(task.getId());
+			deadlineTask.setUpdated(task.getUpdated());
 			return deadlineTask;
 		} else {
-			return new FloatingTask(task.getTitle(), task.getId());	
+			FloatingTask floatingTask = new FloatingTask(task.getTitle(), task.getId());
+			floatingTask.setUpdated(task.getUpdated());
+			return floatingTask;
 		}
 	}
 
@@ -555,6 +617,7 @@ public class GoogleAPIConnector {
 				toDate(event.getStart().getDateTime()),
 				toDate(event.getEnd().getDateTime()));
 		timedTask.setId(event.getId());
+		timedTask.setUpdated(event.getUpdated());
 		return timedTask;
 	}
 				

@@ -1,9 +1,12 @@
 package com.taskcommander;
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.Stack;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.taskcommander.Global.CommandType;
 
 
 /**
@@ -51,7 +54,33 @@ public class Data {
 	 * This Array contains all the deleted tasks, needed by the GoogleAPI.
 	 */
 	public ArrayList<Task> deletedTasks;
-
+	
+	/**
+	 * Stores all the tasks that was deleted in a clear command.
+	 */
+	public ArrayList<ArrayList<Task>> clearedTasks;
+	
+	/**
+	 * Stores history of added tasks for undo command.
+	 */
+	public ArrayList<Task> addedTasks;
+	
+	/**
+	 * Stores history of tasks before being updated.
+	 */
+	public ArrayList<Task> preupdatedTasks;
+	
+	/**
+	 * This Stack contains the history of all operations.
+	 */
+	public Stack<CommandType> operationHistory;
+	
+	/**
+	 * This Stack contains the history of all operations.
+	 */
+	public Stack<Global.CommandType> undoHistory;
+	
+	
 	/**
 	 * Constructor
 	 */
@@ -59,6 +88,9 @@ public class Data {
 		tasks = new ArrayList<Task>();
 		tasksHistory = new ArrayList<Task>();
 		deletedTasks = new ArrayList<Task>();
+		operationHistory = new Stack<Global.CommandType>();
+		undoHistory = new Stack<Global.CommandType>();
+		
 		load();
 	}
 
@@ -88,6 +120,7 @@ public class Data {
 	public String addTask(Task task) {
 		logger.log(Level.INFO, "Called addTask(Task task)");
 		assert task.getId() != null;
+		saveToOperationHistory(Global.CommandType.ADD);
 		switch ( task.getType()) {
 		case FLOATING:
 			FloatingTask floatingTask = (FloatingTask) task;
@@ -111,7 +144,7 @@ public class Data {
 	 */
 	public String addTimedTask(String taskName, Date startDate, Date endDate) {
 		TimedTask timedTask = new TimedTask(taskName,startDate,endDate);
-		saveToHistory();
+		saveToTaskHistory();
 		tasks.add(timedTask);
 		save();
 		return String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
@@ -128,7 +161,7 @@ public class Data {
 	 */
 	public String addTimedTask(String taskName, Date startDate, Date endDate, String googleID) {
 		TimedTask timedTask = new TimedTask(taskName,startDate,endDate, googleID);
-		saveToHistory();
+		saveToTaskHistory();
 		tasks.add(timedTask);
 		save();
 		return String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
@@ -143,7 +176,7 @@ public class Data {
 	 */
 	public String addDeadlineTask(String taskName, Date endDate) {
 		DeadlineTask deadlineTask= new DeadlineTask(taskName,endDate);
-		saveToHistory();
+		saveToTaskHistory();
 		tasks.add(deadlineTask);
 		save();
 		return String.format(Global.MESSAGE_ADDED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
@@ -159,7 +192,7 @@ public class Data {
 	 */
 	public String addDeadlineTask(String taskName, Date endDate, String googleID) {
 		DeadlineTask deadlineTask= new DeadlineTask(taskName, endDate, googleID);
-		saveToHistory();
+		saveToTaskHistory();
 		tasks.add(deadlineTask);
 		save();
 		return String.format(Global.MESSAGE_ADDED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
@@ -173,7 +206,7 @@ public class Data {
 	 */
 	public String addFloatingTask(String taskName) {
 		FloatingTask floatingTask = new FloatingTask(taskName);
-		saveToHistory();
+		saveToTaskHistory();
 		tasks.add(floatingTask);
 		save();
 		return String.format(Global.MESSAGE_ADDED,"\"" + floatingTask.getName() + "\"");
@@ -188,7 +221,7 @@ public class Data {
 	 */
 	public String addFloatingTask(String taskName, String googleID) {
 		FloatingTask floatingTask = new FloatingTask(taskName, googleID);
-		saveToHistory();
+		saveToTaskHistory();
 		tasks.add(floatingTask);
 		save();
 		return String.format(Global.MESSAGE_ADDED,"\"" + floatingTask.getName() + "\"");
@@ -237,32 +270,49 @@ public class Data {
 	 * @param done
 	 * @return 	ArrayList<Task>
 	 */
-	public ArrayList<Task> getCopiedTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean status) {
+	public ArrayList<Task> getCopiedTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean status, boolean isSearchedWordRestricted, String[] searchedWords) {
 		ArrayList<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
 		ArrayList<DatedTask> datedTasks = new ArrayList<DatedTask>();
 		ArrayList<Task> concernedTasks = new ArrayList<Task>();
+		boolean containsSearchedWords = false;
 		
 		for(Task task: tasks) {
-			// Step 1: Check Status
-			if (!isStatusRestricted || (isStatusRestricted && status == task.isDone() )) {
-				// Step 2: Check Type
-				if(task.getType() == Task.TaskType.FLOATING && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownFloatingTask))) {	
-					// Step 3: Check DatePeriod
-					if (!isDateTimeRestricted) {
-						floatingTasks.add(new FloatingTask((FloatingTask) task));
+
+			// Step 1: Check SearchedWords
+			if (isSearchedWordRestricted) {
+				containsSearchedWords = true;
+				for(String searchedWord : searchedWords) {
+					if (!task.getName().contains(searchedWord)) {
+						logger.log(Level.INFO, "Doesn't contain the word");
+						containsSearchedWords = false;
+						break;
 					}
-				} else if (task.getType() == Task.TaskType.DEADLINE && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownDeadlineTask))) {
-					DeadlineTask deadlineTask = (DeadlineTask) task;
-					if (!isDateTimeRestricted || (isDateTimeRestricted && (deadlineTask.getEndDate().compareTo(endDate) < 0) || deadlineTask.getEndDate().compareTo(endDate) == 0) ) { //TODO: Refactor Date Comparison methods
-						datedTasks.add(new DeadlineTask((DeadlineTask) task));
-					}
-				} else if (task.getType() == Task.TaskType.TIMED && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownTimedTask))) {
-					TimedTask timedTask = (TimedTask) task;
-					if (!isDateTimeRestricted || (isDateTimeRestricted && (timedTask.getStartDate().compareTo(startDate) > 0 || timedTask.getStartDate().compareTo(startDate) == 0) && (timedTask.getEndDate().compareTo(endDate) < 0) || timedTask.getEndDate().compareTo(endDate) == 0) ){
-						datedTasks.add(new TimedTask((TimedTask) task));
-					}
-				}		 
-			}		 
+				} 
+			}
+			
+			if (!isSearchedWordRestricted || containsSearchedWords) {	
+
+				// Step 2: Check Status
+				if (!isStatusRestricted || (isStatusRestricted && status == task.isDone() )) {
+					// Step 3: Check Type
+					if(task.getType() == Task.TaskType.FLOATING && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownFloatingTask))) {	
+						// Step 4: Check DatePeriod
+						if (!isDateTimeRestricted) {
+							floatingTasks.add(new FloatingTask((FloatingTask) task));
+						}
+					} else if (task.getType() == Task.TaskType.DEADLINE && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownDeadlineTask))) {
+						DeadlineTask deadlineTask = (DeadlineTask) task;
+						if (!isDateTimeRestricted || (isDateTimeRestricted && (deadlineTask.getEndDate().compareTo(endDate) < 0) || deadlineTask.getEndDate().compareTo(endDate) == 0) ) { //TODO: Refactor Date Comparison methods
+							datedTasks.add(new DeadlineTask((DeadlineTask) task));
+						}
+					} else if (task.getType() == Task.TaskType.TIMED && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownTimedTask))) {
+						TimedTask timedTask = (TimedTask) task;
+						if (!isDateTimeRestricted || (isDateTimeRestricted && (timedTask.getStartDate().compareTo(startDate) > 0 || timedTask.getStartDate().compareTo(startDate) == 0) && (timedTask.getEndDate().compareTo(endDate) < 0) || timedTask.getEndDate().compareTo(endDate) == 0) ){
+							datedTasks.add(new TimedTask((TimedTask) task));
+						}
+					}				
+				}	
+			}
 		}
 		
 		Collections.sort(floatingTasks);
@@ -296,13 +346,15 @@ public class Data {
 			TimedTask timedTask = new TimedTask(name,startDate,endDate);
 			timedTask.setEdited(tasks.get(index).isEdited());
 			timedTask.setDone(tasks.get(index).isDone());
-			saveToHistory();
+			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.UPDATE);
 			deleteTask(index);
 			tasks.add(index, timedTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 		} else {
-			saveToHistory();
+			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.UPDATE);
 			TimedTask timedTask = (TimedTask) tasks.get(index);
 			if (name != null) {
 				timedTask.setName(name);
@@ -314,6 +366,46 @@ public class Data {
 				timedTask.setEndDate(endDate);
 			}
 			timedTask.setEdited(true);
+			save();
+			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
+		}
+		
+	}
+	
+	
+	/**
+	 * This operation updates a task with a TimedTask object as a parameter
+	 * It is usually called by the SyncHandler
+	 * 
+	 * @param 		index
+	 * @param 		task
+	 * @return		Feedback for user
+	 */
+	public String updateToTimedTask(int index, TimedTask task) {
+		if (tasks.get(index).getType() != Task.TaskType.TIMED) {
+			TimedTask timedTask = new TimedTask(task.getName(), task.getStartDate(), task.getEndDate());
+			timedTask.setEdited(tasks.get(index).isEdited());
+			timedTask.setDone(tasks.get(index).isDone());
+			timedTask.setUpdated(task.getUpdated());
+			saveToTaskHistory();
+			deleteTask(index);
+			tasks.add(index, timedTask);
+			save();
+			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
+		} else {
+			saveToTaskHistory();
+			TimedTask timedTask = (TimedTask) tasks.get(index);
+			if (task.getName() != null) {
+				timedTask.setName(task.getName());
+			}
+			if (task.getStartDate() != null) {
+				timedTask.setStartDate(task.getStartDate());
+			}
+			if (task.getEndDate() != null) {
+				timedTask.setEndDate(task.getEndDate());
+			}
+			timedTask.setEdited(true);
+			timedTask.setUpdated(task.getUpdated());
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 		}
@@ -343,13 +435,15 @@ public class Data {
 			DeadlineTask deadlineTask = new DeadlineTask(name,endDate);
 			deadlineTask.setEdited(tasks.get(index).isEdited());
 			deadlineTask.setDone(tasks.get(index).isDone());
-			saveToHistory();
+			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.UPDATE);
 			deleteTask(index);
 			tasks.add(index, deadlineTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
 		} else {
-			saveToHistory();
+			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.UPDATE);
 			DeadlineTask deadlineTask = (DeadlineTask) tasks.get(index);
 			if (name != null) {
 				deadlineTask.setName(name);
@@ -358,6 +452,41 @@ public class Data {
 				deadlineTask.setEndDate(endDate);
 			}
 			deadlineTask.setEdited(true);
+			save();
+			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
+			}
+	}
+	
+	/**
+	 * This operation updates a task with a DeadlineTask object as a parameter
+	 * It is usually called by the SyncHandler
+	 * 
+	 * @param 		index
+	 * @param 		task
+	 * @return		Feedback for user
+	 */
+	public String updateToDeadlineTask(int index, DeadlineTask task) {
+		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
+			DeadlineTask deadlineTask = new DeadlineTask(task.getName(),task.getEndDate());
+			deadlineTask.setEdited(tasks.get(index).isEdited());
+			deadlineTask.setDone(tasks.get(index).isDone());
+			deadlineTask.setUpdated(task.getUpdated());
+			saveToTaskHistory();
+			deleteTask(index);
+			tasks.add(index, deadlineTask);
+			save();
+			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
+		} else {
+			saveToTaskHistory();
+			DeadlineTask deadlineTask = (DeadlineTask) tasks.get(index);
+			if (task.getName() != null) {
+				deadlineTask.setName(task.getName());
+			}
+			if (task.getEndDate() != null) {
+				deadlineTask.setEndDate(task.getEndDate());
+			}
+			deadlineTask.setEdited(true);
+			deadlineTask.setUpdated(task.getUpdated());
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
 			}
@@ -385,13 +514,15 @@ public class Data {
 			FloatingTask floatingTask = new FloatingTask(name);
 			floatingTask.setEdited(tasks.get(index).isEdited());
 			floatingTask.setDone(tasks.get(index).isDone());
-			saveToHistory();
+			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.UPDATE);
 			deleteTask(index);
 			tasks.add(index, floatingTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
 		} else {
-			saveToHistory();
+			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.UPDATE);
 			FloatingTask floatingTask = (FloatingTask) tasks.get(index);
 			if (name != null) {
 				floatingTask.setName(name);
@@ -400,6 +531,38 @@ public class Data {
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
 			}
+	}
+	
+	/**
+	 * This operation updates a task with a FloatingTask object as a parameter
+	 * It is usually called by the SyncHandler
+	 * 
+	 * @param 		index
+	 * @param 		task
+	 * @return		Feedback for user
+	 */
+	public String updateToFloatingTask(int index, FloatingTask task) {
+		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
+			FloatingTask floatingTask = new FloatingTask(task.getName());
+			floatingTask.setEdited(tasks.get(index).isEdited());
+			floatingTask.setDone(tasks.get(index).isDone());
+			floatingTask.setUpdated(task.getUpdated());
+			saveToTaskHistory();
+			deleteTask(index);
+			tasks.add(index, floatingTask);
+			save();
+			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
+		} else {
+			saveToTaskHistory();
+			FloatingTask floatingTask = (FloatingTask) tasks.get(index);
+			if (task.getName() != null) {
+				floatingTask.setName(task.getName());
+			}
+			floatingTask.setEdited(true);
+			floatingTask.setUpdated(task.getUpdated());
+			save();
+			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
+		}
 	}
 
 	/**
@@ -421,7 +584,7 @@ public class Data {
 		if (doneTask.isDone()) {
 			return String.format(Global.MESSAGE_ALREADY_DONE);
 		} else {
-			saveToHistory();
+			saveToTaskHistory();
 			doneTask.markDone();
 			save();
 			switch ( doneTask.getType()) {
@@ -457,7 +620,7 @@ public class Data {
 		if (!openTask.isDone()) {
 			return String.format(Global.MESSAGE_ALREADY_OPEN);
 		} else {
-			saveToHistory();
+			saveToTaskHistory();
 			openTask.markOpen();
 			save();
 			switch ( openTask.getType()) {
@@ -490,7 +653,8 @@ public class Data {
 			return String.format(Global.ERROR_MESSAGE_NO_INDEX, index);
 		} else {
 			Task deletedTask = tasks.get(index);
-			saveToHistory();
+			saveToTaskHistory();
+			saveToOperationHistory(Global.CommandType.DELETE);
 			deletedTasks.add(deletedTask);
 			tasks.remove(index);
 			save();
@@ -521,14 +685,31 @@ public class Data {
 		} else {
 			deletedTasks.add(task);
 			tasks.remove(task);
+			saveToTaskHistory();
 			return true;
+		}
+	}
+	
+	public void undo() {
+		Global.CommandType type = operationHistory.peek();
+		Global.CommandType undoCommand;
+		switch(type) {
+		case ADD:
+			undoCommand = Global.CommandType.DELETE;
+			saveToUndoHistory(undoCommand);
+		case DELETE:
+			undoCommand = Global.CommandType.ADD;
+			saveToUndoHistory(undoCommand);
+		case UPDATE:
+			undoCommand = Global.CommandType.UPDATE;
+			saveToUndoHistory(undoCommand);
 		}
 	}
 	
 	/**
 	 * This operation saves a backup to history tasks ArrayList.
 	 */
-	public void saveToHistory() {
+	public void saveToTaskHistory() {
 		tasksHistory.clear();
 		for(Task task: tasks) {
 			switch ( task.getType()) {
@@ -543,6 +724,14 @@ public class Data {
 			}
 		}
 	}	
+	
+	public void saveToOperationHistory(Global.CommandType type) {
+		operationHistory.push(type);
+	}
+	
+	public void saveToUndoHistory(Global.CommandType type) {
+		undoHistory.push(type);
+	}
 	
 	/**
 	 * This operation restores from history tasks ArrayList.
@@ -570,7 +759,9 @@ public class Data {
 	 * @return             Feedback for user.
 	 */
 	public String clearTasks() {
-		deletedTasks.addAll(tasks);
+		ArrayList<Task> cleared = new ArrayList<Task>();
+		cleared.addAll(tasks);
+		clearedTasks.add(cleared);
 		tasks.clear();
 		save();
 		return String.format(Global.MESSAGE_CLEARED);

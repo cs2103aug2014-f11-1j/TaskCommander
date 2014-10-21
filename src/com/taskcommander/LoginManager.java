@@ -222,8 +222,7 @@ public class LoginManager {
 			logger.log(Level.WARNING,"IOException: Unable to build authorisation code flow.", e);
 		}
 
-		askUserForAuthorisationCode();
-		String code = getUserInput();
+		String code = getAuthorisationCode();
 
 		return getTokenResponse(code);
 	}
@@ -260,13 +259,14 @@ public class LoginManager {
 	}
 
 	/**
-	 * Creates the authorisation URL, asks the user to open the URL and sign in, then type in the
-	 * authorisation code from Google.
+	 * Creates the authorisation URL and passes it to the UI.
+	 * Returns the authorisation code.
 	 */
-	private void askUserForAuthorisationCode() {
+	private String getAuthorisationCode() {
 		String url = flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build();
-		System.out.println("Please open the following URL in your browser then type the authorization code:");
-		System.out.println("  " + url);
+		return TaskCommander.ui.getCodeFromUser(url);
+		//System.out.println("Please open the following URL in your browser then type the authorization code:");
+		//System.out.println("  " + url);
 	}
 
 	/**

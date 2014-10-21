@@ -7,12 +7,12 @@ public class TaskCommander {
 	 * (Please note: All components except for the framework class "TaskCommander" are  instantiated. 
 	 * In other words, instances instead of classes are used.)
 	 */
-	public static Controller controller;
-	public static Parser parser;
-	public static Data data; // temporary memory containing a list of task objects
-	public static Storage storage; 	// (permanent memory consisting of a local .txt-file
+	public static Controller controller=Controller.getInstance();
+	public static Parser parser=Parser.getInstance();
+	public static Storage storage= new Storage(); 
+	public static Data data = Data.getInstance(); // temporary memory containing a list of task objects
 	public static SyncHandler syncHandler;
-	public static UI ui;
+	public static UI ui= UI.getInstance();
 
 	/**
 	 * Launch the application
@@ -21,12 +21,12 @@ public class TaskCommander {
 	public static void main(String[] args) {
 		
 		// Creation of the components
-		storage = new Storage();
-		data = Data.getInstance();
-		controller = Controller.getInstance();
-		parser = Parser.getInstance();
+		/*storage = new Storage();*/
+		/*data = Data.getInstance();*/
+		/*parser = Parser.getInstance();*/
+		/*controller=Controller.getInstance();*/
 
-		ui = UI.getInstance();
+	/*	ui = UI.getInstance();*/
 		ui.open();
 	}
 	
