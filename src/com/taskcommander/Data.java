@@ -71,6 +71,11 @@ public class Data {
 	public Stack<Task> preupdatedTasks;
 	
 	/**
+	 * Stores the history of tasks after being updated.
+	 */
+	public Stack<Task> updatedTasks;
+	
+	/**
 	 * This Stack contains the history of all operations.
 	 */
 	public Stack<CommandType> operationHistory;
@@ -90,6 +95,7 @@ public class Data {
 		deletedTasks = new ArrayList<Task>();
 		addedTasks = new Stack<Task>();
 		preupdatedTasks = new Stack<Task>();
+		updatedTasks = new Stack<Task>();
 		clearedTasks = new Stack<ArrayList<Task>>();
 		operationHistory = new Stack<Global.CommandType>();
 		undoHistory = new Stack<Global.CommandType>();
@@ -362,6 +368,7 @@ public class Data {
 			preupdatedTasks.push(toChange);
 			tasks.remove(index);
 			tasks.add(index, timedTask);
+			updatedTasks.push(timedTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 		} else {
@@ -379,6 +386,7 @@ public class Data {
 				timedTask.setEndDate(endDate);
 			}
 			timedTask.setEdited(true);
+			updatedTasks.push(timedTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
 		}
@@ -457,6 +465,7 @@ public class Data {
 			preupdatedTasks.push(toChange);
 			tasks.remove(index);
 			tasks.add(index, deadlineTask);
+			updatedTasks.push(deadlineTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
 		} else {
@@ -471,6 +480,7 @@ public class Data {
 				deadlineTask.setEndDate(endDate);
 			}
 			deadlineTask.setEdited(true);
+			updatedTasks.push(deadlineTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
 			}
@@ -544,6 +554,7 @@ public class Data {
 			preupdatedTasks.push(toChange);
 			tasks.remove(index);
 			tasks.add(index, floatingTask);
+			updatedTasks.push(floatingTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
 		} else {
@@ -555,6 +566,7 @@ public class Data {
 				floatingTask.setName(name);
 			}
 			floatingTask.setEdited(true);
+			updatedTasks.push(floatingTask);
 			save();
 			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
 			}
@@ -721,53 +733,123 @@ public class Data {
 		}
 	}
 	
+	/**@author A0109194A
+	 * This operation undoes the latest command
+	 * It supports Add, Delete, Update, and Clear commands
+	 * 
+	 */
 	public void undo() {
-		Global.CommandType type = operationHistory.peek();
+		Global.CommandType type = operationHistory.pop();
 		Global.CommandType undoCommand;
 		switch(type) {
 		case ADD:
 			undoCommand = Global.CommandType.DELETE;
 			saveToUndoHistory(undoCommand);
 			undoAdd();
+			break;
 		case DELETE:
 			undoCommand = Global.CommandType.ADD;
 			saveToUndoHistory(undoCommand);
 			undoDelete();
+			break;
 		case UPDATE:
 			undoCommand = Global.CommandType.UPDATE;
 			saveToUndoHistory(undoCommand);
+			undoUpdate();
+			break;
 		case CLEAR:
 			undoCommand = Global.CommandType.UNCLEAR;
 			saveToUndoHistory(undoCommand);
+			undoClear();
+			break;
+		default:
+			undo(); //Calls undo again to look for one of the four commands above
 		}
+		save();
 	}
 	
-	private void undoAdd() {
+	/**
+	 * This operation undoes the add command
+	 */
+	private boolean undoAdd() {
 		Task toDelete = addedTasks.pop();
 		switch (toDelete.getType()) {
 		case TIMED:
 			tasks.remove((TimedTask) toDelete);
+			return true;
 		case DEADLINE:
 			tasks.remove((DeadlineTask) toDelete);
+			return true;
 		case FLOATING:
 			tasks.remove((FloatingTask) toDelete);
+			return true;
 		}
+		return false;
 	}
 	
-	private void undoDelete() {
+	/**
+	 * This operation undoes the delete command
+	 */
+	private boolean undoDelete() {
 		Task toAdd = deletedTasks.get(deletedTasks.size() - 1);
 		deletedTasks.remove(deletedTasks.size() - 1);
 		switch (toAdd.getType()) {
 		case TIMED:
 			tasks.add((TimedTask) toAdd);
+			return true;
 		case DEADLINE:
 			tasks.add((DeadlineTask) toAdd);
+			return true;
 		case FLOATING:
 			tasks.add((FloatingTask) toAdd);
+			return true;
 		}
+		return false;
 	}
 	
+	/**
+	 * This operation undoes the update command
+	 */
+	private boolean undoUpdate() {
+		Task updated = updatedTasks.pop();
+		Task beforeUpdate = preupdatedTasks.pop();
+		if (updated.getType() != beforeUpdate.getType()) {
+			deletedTasks.remove(deletedTasks.size() - 1);
+		}
+		
+		int index = 0;
+		switch (updated.getType()) {
+		case TIMED:
+			index = tasks.indexOf((TimedTask) updated);
+			break;
+		case DEADLINE:
+			index = tasks.indexOf((DeadlineTask) updated);
+			break;
+		case FLOATING:
+			index = tasks.indexOf((FloatingTask) updated);
+			break;
+		}
+		
+		tasks.remove(index);
+		switch (beforeUpdate.getType()) {
+		case TIMED:
+			tasks.add(index, (TimedTask) beforeUpdate);
+			return true;
+		case DEADLINE:
+			tasks.add(index, (DeadlineTask) beforeUpdate);
+			return true;
+		case FLOATING:
+			tasks.add(index, (FloatingTask) beforeUpdate);
+			return true;
+		}
+		return false;
+	}
 	
+	private boolean undoClear() {
+		ArrayList<Task> toRestore = clearedTasks.pop();
+		tasks.addAll(toRestore);
+		return true;
+	}
 	
 	/**
 	 * This operation saves a backup to history tasks ArrayList.
@@ -824,7 +906,7 @@ public class Data {
 	public String clearTasks() {
 		ArrayList<Task> cleared = new ArrayList<Task>();
 		cleared.addAll(tasks);
-		clearedTasks.add(cleared);
+		clearedTasks.push(cleared);
 		tasks.clear();
 		save();
 		return String.format(Global.MESSAGE_CLEARED);

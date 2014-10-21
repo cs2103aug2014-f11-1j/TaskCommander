@@ -54,11 +54,21 @@ public class LoginManager implements Observer {
 	private GoogleCredential credential;
 	
 	private static Logger logger = Logger.getLogger(LoginManager.class.getName());
-
+	
+	/**
+	 * This method returns a LoginManager
+	 * To be called by GoogleAPIConnector
+	 * @return
+	 */
+	public static LoginManager getInstanceOf() {
+		LoginManager manager = new LoginManager();
+		return manager;
+	}
+	
 	/**
 	 * Returns a LoginManager instance.
 	 */
-	public LoginManager() {
+	private LoginManager() {
 		httpTransport = new NetHttpTransport();
 		jsonFactory = new JacksonFactory();
 		File dataStoreFile = new File(DATA_STORE_DIR);

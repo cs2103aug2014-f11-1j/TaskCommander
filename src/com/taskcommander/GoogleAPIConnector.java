@@ -15,6 +15,8 @@ import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.model.Task;
 
+import com.taskcommander.LoginManager;
+
 /**
  * This class is used to connect to the Google API and
  * invoke the Calendar and Tasks services.
@@ -26,7 +28,6 @@ import com.google.api.services.tasks.model.Task;
  */
 public class GoogleAPIConnector {
 
-	private static final String PRIMARY_TASK_ID = "@default";
 	private static final String MESSAGE_NO_ID = "Task has not been synced to Google API.";
 	private static final String PRIMARY_CALENDAR_ID = "primary";
 	private static final String PRIMARY_TASKS_ID = "@default";
@@ -39,15 +40,25 @@ public class GoogleAPIConnector {
 	private static DataStore<String> eventDataStore;
 	private static DataStore<String> taskDataStore;
 	private static final Logger logger = Logger.getLogger(GoogleAPIConnector.class.getName());
-
+	
+	/**
+	 * This method returns a GoogleAPIConnector
+	 * It is to be called by SyncHandler.
+	 * @return GoogleAPIConnector object
+	 */
+	public static GoogleAPIConnector getInstanceOf() {
+		GoogleAPIConnector connector = new GoogleAPIConnector();
+		return connector;
+	}
+	
 	/**
 	 * Creates a new GoogleAPIHandler instance.
 	 * Also creates a new LoginManager and attempts
 	 * to get the Tasks and Calendar services.
 	 * @throws IOException 
 	 */
-	public GoogleAPIConnector() {
-		loginManager = new LoginManager();
+	private GoogleAPIConnector() {
+		loginManager = LoginManager.getInstanceOf();
 		try {
 			eventDataStore = LoginManager.getDataStoreFactory().getDataStore("EventStore");
 			taskDataStore = LoginManager.getDataStoreFactory().getDataStore("TaskStore");
@@ -120,7 +131,12 @@ public class GoogleAPIConnector {
 			return null;
 		}
 	}
-
+	
+	/**
+	 * @author A0109194A
+	 * Returns a List object which holds a request that would be sent to Google
+	 * @return	List object
+	 */
 	public Tasks.TasksOperations.List getListTasksRequest() {
 		try {
 			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
@@ -132,8 +148,8 @@ public class GoogleAPIConnector {
 		}
 	}
 
-	//@author A0109194A
 	/**
+	 * @author A0109194A
 	 * Gets all events from Calendar API starting from
 	 * current system time.
 	 * @return   Arraylist of TaskCommander Tasks.
@@ -221,7 +237,7 @@ public class GoogleAPIConnector {
 		return null;
 	}
 
-	/**
+	/**@author A0109194A
 	 * Adds a Task to the Task API, given a DeadlineTask object.
 	 * Returns the Google ID if successful.
 	 * 
@@ -381,7 +397,7 @@ public class GoogleAPIConnector {
 			try {
 				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
 				request.execute();
-				Task check = tasks.tasks().get(PRIMARY_TASK_ID, task.getId()).execute();
+				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
 				return check == null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -409,7 +425,7 @@ public class GoogleAPIConnector {
 			try {
 				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
 				request.execute();
-				Task check = tasks.tasks().get(PRIMARY_TASK_ID, task.getId()).execute();
+				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
 				return check == null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -436,7 +452,7 @@ public class GoogleAPIConnector {
 		} else {
 			try {
 				calendar.events().delete(PRIMARY_CALENDAR_ID, "eventId").execute();
-				Event check = calendar.events().get(PRIMARY_TASK_ID, task.getId()).execute();
+				Event check = calendar.events().get(PRIMARY_TASKS_ID, task.getId()).execute();
 				return check == null;
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
@@ -537,7 +553,8 @@ public class GoogleAPIConnector {
 	private Date toDate(DateTime dateTime) {
 		return new Date(dateTime.getValue());
 	}
-
+	
+	//@author A0109194A
 	// Changes a Google Task to a TaskCommander Task.
 	public com.taskcommander.Task toTask(Task task) {
 		if (task == null) {
@@ -554,7 +571,8 @@ public class GoogleAPIConnector {
 			return floatingTask;
 		}
 	}
-
+	
+	//@author A0109194A
 	// Changes a Google Calendar Event to a TaskCommander Task.
 	public com.taskcommander.Task toTask(Event event) {
 		if (event == null) {
@@ -567,7 +585,13 @@ public class GoogleAPIConnector {
 		timedTask.setUpdated(event.getUpdated());
 		return timedTask;
 	}
-
+	
+	/**
+	 * @author A0109194A
+	 * The following operations turn a task into a Google Task or Event
+	 * @param 		task
+	 * @return		The created Task object
+	 */
 	private Task toGoogleTask(FloatingTask task) {
 		Task newTask = new Task();
 		newTask.setTitle(task.getName());
@@ -598,7 +622,7 @@ public class GoogleAPIConnector {
 			newTask.setStatus("needsAction");
 		}
 	}
-
+	
 	public String addTask(com.taskcommander.Task task) {
 		switch (task.getType()) {
 		case FLOATING:
