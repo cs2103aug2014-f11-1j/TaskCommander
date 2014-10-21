@@ -2,6 +2,7 @@ package com.taskcommander;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,7 +34,7 @@ import org.eclipse.swt.widgets.Text;
  * - Facilitates Google sync function by allowing user to login through a local browser
  * - Receives user's authorisation code and sends it to the controller
  */
-public class UI {
+public class UI extends Observable {
 	private static UI ui;
 	private static final int SHELL_MIN_HEIGHT = 500;
 	private static final int SHELL_MIN_WIDTH = 200;
@@ -91,22 +92,20 @@ public class UI {
 	private final Color COLOR_COL_FIRST = darkGray;
 	private final Color COLOR_COL_SECOND = blue;
 	private final Color COLOR_COL_THIRD = yellow;
-	private final Color COLOR_DATE_ROW = darkCyan;
 	private final Color COLOR_DONE = darkGray;
 	private final Color COLOR_NOT_DONE = red;
 
 	private static final String INSTRUCTIONS_MAIN = "Enter command: ";
-	private static final String INSTRUCTIONS_BROWSER = "1. Login to Google. \n 2. Accept application permissions. \n";
+	private static final String INSTRUCTIONS_BROWSER = "Please login to Google and accept application permissions to sync your tasks.";
 
 	private TabItem browserTab;
 	private Text input;
 	private Text output;
 	private Browser browser;
-	private Text browserInput;
-	
+
 	private String code; // For authorisation code from Google
 
-	private static Logger logger = Logger.getLogger("UI");
+	private static Logger logger = Logger.getLogger(UI.class.getName());
 
 
 	/**
@@ -164,9 +163,8 @@ public class UI {
 		createBrowserTab(url);
 		return code;
 	}
-	
+
 	private void createBrowserTab(String url) {
-		System.out.println("createbrowsertab");
 		browserTab = new TabItem(tabFolder, SWT.NONE);
 		browserTab.setText("Google Login");
 		setupBrowserWindow(url);
@@ -175,12 +173,11 @@ public class UI {
 	}
 
 	private void setupBrowserWindow(String url) {
-		System.out.println("setupbrowsertab");
 		GridLayout layout = new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
 		browserWindow.setLayout(layout);
 
 		createTextFieldsForBrowser();
-		setupBrowserElements();
+		setupBrowser();
 		addInputListenerForBrowser();
 
 		browser.setUrl(url);
@@ -194,7 +191,6 @@ public class UI {
 
 	private void createTextFieldsForBrowser() {
 		new Label(browserWindow, SWT.NONE).setText(INSTRUCTIONS_BROWSER);
-		browserInput = new Text(browserWindow, SWT.BORDER);
 	}
 
 	//@author A0105753J
@@ -235,20 +231,8 @@ public class UI {
 	}
 
 	//@author A0112828H
-	private void setupBrowserElements() {
-		setupBrowser();
-		setupBrowserInput();
-	}
-
-	private void setupBrowserInput() {
-		GridData gridData = new GridData(SWT.FILL, SWT.DOWN, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
-				INPUT_COLUMNS_SPAN, INPUT_ROWS_SPAN);
-		gridData.widthHint = INPUT_PREFERRED_WIDTH;
-		browserInput.setLayoutData(gridData);
-	}
-
 	private void setupBrowser() {
-		browser = new Browser(browserWindow, SWT.FILL);
+		browser = new Browser(browserWindow, SWT.FILL | SWT.BORDER);
 		GridData browserGridData = new GridData(SWT.FILL, SWT.FILL, BROWSER_FIT_HORIZONTAL, BROWSER_FIT_VERTICAL, 
 				BROWSER_COLUMNS_SPAN, BROWSER_ROWS_SPAN);
 		browserGridData.widthHint = BROWSER_PREFERRED_WIDTH;
@@ -267,47 +251,45 @@ public class UI {
 						clearTableItems();
 						String command = input.getText();
 						String feedback = TaskCommander.controller.executeCommand(command);
-						assert(feedback != null);
 						displayFeedback(feedback);
 						// Insert sync detection and execute this line
-						// Needs a string url passed for the browser to show
-						//createBrowserTab("google.com");
 						clearInput();
-					}catch (Exception e1) {
-						//displayErrorMessage(e1.getMessage());
+					}catch (Exception e) {
+						logger.log(Level.WARNING,"Exception while executing command flow", e);
 					}
 			}
 		});
 	}
 
 	//@author A0112828H
+	/**
+	 * Adds a listener to check if the web page title changes to
+	 * a Success string, then parses and sets the authorisation code.
+	 */
 	private void addInputListenerForBrowser() {
-		browserInput.addListener(SWT.Traverse, new Listener(){
-			@Override
-			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				if(event.detail == SWT.TRAVERSE_RETURN)
-					try {
-						logger.log(Level.INFO,"Receive input for browser");
-						String code = input.getText();
-						// Send code to Google Integration component
-						browserTab.dispose();
-						output.setText("Executed sync"); // Get string message from feedback
-					}catch (Exception e1) {
-						displayErrorMessage(e1.getMessage());
-					}
-			}
-		});
-
 		browser.addTitleListener(new TitleListener() {
 			@Override
 			public void changed(TitleEvent event) {
 				if(event.title.contains("Success")) {
-					code = event.title.replace("Success=", "");
-					System.out.println("yes");
+					setCode(event.title.replace("Success=", ""));
 				}
-				System.out.println("noo");
 			}
 		});
+	}
+
+	/**
+	 * Sets the Google authorisation code received and 
+	 * notifies observers.
+	 * @param text
+	 */
+	private void setCode(String text) {
+		code = text;
+		setChanged();
+		notifyObservers();
+	}
+
+	public String getCode() {
+		return code;
 	}
 
 	//@author A0105753J
@@ -399,18 +381,16 @@ public class UI {
 	}
 
 	private void createDateRow(String date) {
-		TableItem item = new TableItem(table, TABLE_STYLE);
-		item.setText(new String[] { " ", date, " ", " "});
-		item.setForeground(1, COLOR_DATE_ROW);
+		new TableItem(table, TABLE_STYLE);
 	}
 
 	private String getDisplayDate(DeadlineTask task) {
-		return Global.timeFormat.format(task.getEndDate());
+		return Global.dayFormat.format(task.getEndDate()) + " " + Global.timeFormat.format(task.getEndDate());
 	}
 
 	private String getDisplayDate(TimedTask task) {
-		return Global.timeFormat.format(task.getStartDate())+ "-"+ 
-				Global.timeFormat.format(task.getEndDate());
+		return Global.dayFormat.format(task.getStartDate()) + " " + Global.timeFormat.format(task.getStartDate())+ " - " + 
+				Global.dayFormat.format(task.getEndDate()) + " " + Global.timeFormat.format(task.getEndDate());
 	}
 
 	private String getDisplayDate(Date date) {

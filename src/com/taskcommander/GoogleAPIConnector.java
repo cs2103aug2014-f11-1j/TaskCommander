@@ -38,7 +38,7 @@ public class GoogleAPIConnector {
 	private static DataStore<String> eventDataStore;
 	private static DataStore<String> taskDataStore;
 	private static final Logger logger = Logger.getLogger(GoogleAPIConnector.class.getName());
-	
+
 	/**
 	 * Creates a new GoogleAPIHandler instance.
 	 * Also creates a new LoginManager and attempts
@@ -51,7 +51,6 @@ public class GoogleAPIConnector {
 			eventDataStore = LoginManager.getDataStoreFactory().getDataStore("EventStore");
 			taskDataStore = LoginManager.getDataStoreFactory().getDataStore("TaskStore");
 		} catch (IOException e) {
-			System.out.println(Global.MESSAGE_EXCEPTION_IO);
 			logger.log(Level.SEVERE, "Error getting services", e);
 		}
 		getServices();
@@ -61,11 +60,11 @@ public class GoogleAPIConnector {
 		tasks = loginManager.getTasksService();
 		calendar = loginManager.getCalendarService();
 	}
-	
+
 	public DataStore<String> getTaskDataStore() {
 		return taskDataStore;
 	}
-	
+
 	public DataStore<String> getEventDataStore() {
 		return eventDataStore;
 	}
@@ -77,10 +76,12 @@ public class GoogleAPIConnector {
 	 */
 	public ArrayList<com.taskcommander.Task> getAllTasks() {
 		ArrayList<com.taskcommander.Task> result = getAllFloatingTasks();
-		result.addAll(getAllEvents());
+		if (result != null) {
+			result.addAll(getAllEvents());
+		}
 		return result;
 	}
-	
+
 	/**
 	 * @author A0109194A
 	 * Returns all Google Tasks
@@ -88,7 +89,6 @@ public class GoogleAPIConnector {
 	 */
 	public List<Task> getAllGoogleTasks() {
 		try {
-
 			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
 			List<Task> tasks = request.execute().getItems();
 			return tasks;
@@ -98,14 +98,13 @@ public class GoogleAPIConnector {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Gets all tasks from Tasks API.
 	 * @return   Arraylist of TaskCommander Tasks.
 	 */
 	private ArrayList<com.taskcommander.Task> getAllFloatingTasks() {
 		try {
-
 			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
 			List<Task> tasks = request.execute().getItems();
 
@@ -131,7 +130,7 @@ public class GoogleAPIConnector {
 			return null;
 		}
 	}
-	
+
 	//@author A0109194A
 	/**
 	 * Gets all events from Calendar API starting from
@@ -156,7 +155,7 @@ public class GoogleAPIConnector {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * @author A0109194A
 	 * Returns all Events
@@ -174,7 +173,7 @@ public class GoogleAPIConnector {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * @author A0109194A
 	 * Returns a request for listing all the events from Google Calendar
@@ -190,7 +189,7 @@ public class GoogleAPIConnector {
 			return null;
 		}
 	}
-	
+
 	//@author A0112828H
 	/**
 	 * Adds a task to the Tasks API, given a FloatingTask object.
@@ -250,7 +249,7 @@ public class GoogleAPIConnector {
 		}
 		return null;
 	}
-	
+
 	//@author A0109194A
 	/**
 	 * Adds an Event to the Calendar API, given a TimedTask object.
@@ -282,7 +281,7 @@ public class GoogleAPIConnector {
 		}
 		return null;
 	}
-	
+
 	//@author A0112828H
 	/**
 	 * Gets a task from the Tasks API, given a FloatingTask object.
@@ -335,7 +334,7 @@ public class GoogleAPIConnector {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Gets an event from the Calendar API, given a TimedTask object.
 	 * The given task must have a Google ID.
@@ -361,7 +360,7 @@ public class GoogleAPIConnector {
 		}
 		return null;
 	}
-	
+
 	//@author A0112828H
 	/**
 	 * Deletes a task from the Tasks API, given a FloatingTask object.
@@ -390,9 +389,9 @@ public class GoogleAPIConnector {
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Deletes an event from the Calendar API, given a DeadlineTask object.
+	 * Deletes an event from the Tasks API, given a DeadlineTask object.
 	 * The given task must have a Google ID.
 	 * Returns true if successful. 
 	 * 
@@ -418,7 +417,7 @@ public class GoogleAPIConnector {
 		}
 		return false;
 	}
-	
+
 	/**@author A0109194A
 	 * Deletes an event from the Calendar API, given a TimedTask object.
 	 * The given task must have a Google ID.
@@ -445,7 +444,7 @@ public class GoogleAPIConnector {
 		}
 		return false;
 	}
-	
+
 	//@author A0112828H
 	/**
 	 * Updates a task from the Tasks API, given a FloatingTask object.
@@ -500,7 +499,7 @@ public class GoogleAPIConnector {
 		}
 		return false;
 	}
-	
+
 	/**@author A0109194A
 	 * Updates an event from the Calendar API, given a TimedTask object.
 	 * The given task must have a Google ID.
@@ -532,7 +531,7 @@ public class GoogleAPIConnector {
 	private DateTime toDateTime(Date date) {
 		return new DateTime(date);
 	}
-	
+
 	// Changes a DateTime to a Date object.
 	private Date toDate(DateTime dateTime) {
 		return new Date(dateTime.getValue());
@@ -567,14 +566,14 @@ public class GoogleAPIConnector {
 		timedTask.setUpdated(event.getUpdated());
 		return timedTask;
 	}
-				
+
 	private Task toGoogleTask(FloatingTask task) {
 		Task newTask = new Task();
 		newTask.setTitle(task.getName());
 		setStatusFromTask(newTask, task);
 		return newTask;
 	}
-	
+
 	private Task toGoogleTask(DeadlineTask task) {
 		Task newTask = new Task();
 		newTask.setTitle(task.getName());
@@ -582,7 +581,7 @@ public class GoogleAPIConnector {
 		setStatusFromTask(newTask, task);
 		return newTask;
 	}
-	
+
 	private Event toGoogleTask(TimedTask task) {
 		Event newEvent = new Event();
 		newEvent.setSummary(task.getName());
@@ -590,7 +589,7 @@ public class GoogleAPIConnector {
 		newEvent.setEnd(new EventDateTime().setDateTime(toDateTime(task.getEndDate())));		
 		return newEvent;
 	}
-	
+
 	private void setStatusFromTask(Task newTask, com.taskcommander.Task task) {
 		if (task.isDone()) {
 			newTask.setStatus("completed");
@@ -598,7 +597,7 @@ public class GoogleAPIConnector {
 			newTask.setStatus("needsAction");
 		}
 	}
-	
+
 	public String addTask(com.taskcommander.Task task) {
 		switch (task.getType()) {
 		case FLOATING:
@@ -610,7 +609,7 @@ public class GoogleAPIConnector {
 		}
 		return null;
 	}
-	
+
 	public com.taskcommander.Task getTask(com.taskcommander.Task task) {
 		switch (task.getType()) {
 		case FLOATING:
@@ -622,7 +621,7 @@ public class GoogleAPIConnector {
 		}
 		return null;
 	}
-	
+
 	public boolean updateTask(com.taskcommander.Task task) {
 		switch (task.getType()) {
 		case FLOATING:
@@ -634,7 +633,7 @@ public class GoogleAPIConnector {
 		}
 		return false;
 	}
-	
+
 	public boolean deleteTask(com.taskcommander.Task task) {
 		switch (task.getType()) {
 		case FLOATING:
@@ -655,5 +654,5 @@ public class GoogleAPIConnector {
 		}
 		return idList;
 	}
-	
+
 }

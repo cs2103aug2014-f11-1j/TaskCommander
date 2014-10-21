@@ -42,13 +42,19 @@ public class TaskCommanderTest {
 		assertEquals("Added: \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
 	}
 	@Test
-	public void testAddTimeTask()throws Exception{
+	public void testAddDeadlineTask()throws Exception{
 		String userCommand = "add \"little boy\" 3pm";
 		Date date = new Date();
 		assertEquals("Added: [by "+Global.dayFormat.format(date)+" "+"15:00] \"little boy\"",
 				TaskCommander.controller.executeCommand(userCommand));
 	}
-
+	@Test
+	public void testAddTimeTask()throws Exception{
+		String userCommand = "add \"little boy\" 3pm - 4pm";
+		Date date = new Date();
+		assertEquals("Added: ["+Global.dayFormat.format(date)+" "+"15:00-16:00] \"little boy\"",
+				TaskCommander.controller.executeCommand(userCommand));
+	}
 
 
 	/**Test Display Function
@@ -86,7 +92,8 @@ public class TaskCommanderTest {
 
 	}
 
-	// Update testing
+	/**Test Update Function
+	 * */
 	@Test
 	public void testUpdateTaskWithTimeAdded() throws Exception{
 		String userCommand = "update 1 3pm";
@@ -99,23 +106,26 @@ public class TaskCommanderTest {
 	public void testUpdateTaskChangeContent() throws Exception{
 		String userCommand = "update 1 \"early bird catches the worm\"";
 		TaskCommander.controller.getDisplayedTasks();
-		assertEquals("Updated: \"early bird catches the worm\"", TaskCommander.controller.executeCommand(userCommand));
+		assertEquals("Updated: [by Tue Oct 21 '14 15:00] \"early bird catches the worm\"", TaskCommander.controller.executeCommand(userCommand));
 	}
 
 	@Test
 	public void testUpdateTaskChangeTime() throws Exception{
-		String userCommand = "update 1 none";
+		String userCommand = "add \"hi baby\" 3pm";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "update 1 none";
 		TaskCommander.controller.getDisplayedTasks();
-		assertEquals("Updated: \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
+		assertEquals("Updated: \"hi baby\"", TaskCommander.controller.executeCommand(userCommand));
 	}
 
-	//Mark Testing
+	/**Test Mark Function
+	 * */
 	@Test
 	public void testMarkDone() throws Exception{
 		String userCommand = "done 1";
 		TaskCommander.controller.getDisplayedTasks();
 		Date date = new Date();
-		assertEquals("Done: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
+		assertEquals("Done: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"early bird catches the worm\"", TaskCommander.controller.executeCommand(userCommand));
 	}
 	@Test
 	public void testAlreadyOpen() throws Exception{
@@ -125,7 +135,7 @@ public class TaskCommanderTest {
 	}
 
 
-		@Test
+	@Test
 	public void testDelete() throws Exception{
 		String userCommand = "delete 1 ";
 		TaskCommander.controller.getDisplayedTasks();
