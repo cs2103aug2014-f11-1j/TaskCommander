@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +28,7 @@ import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.TasksScopes;
 
 //@author A0112828H
-public class LoginManager {
+public class LoginManager implements Observer {
 	private static final String CLIENT_ID = "1009064713944-qqeb136ojidkjv4usaog806gcafu5dmn.apps.googleusercontent.com";
 	private static final String CLIENT_SECRET = "9ILpkbnlGwVMQiqh10za3exf";
 	private static final String APPLICATION_NAME = "Task Commander";
@@ -51,7 +53,7 @@ public class LoginManager {
 	private DataStore<StoredCredential> dataStore;
 	private GoogleCredential credential;
 	
-	private static Logger logger = Logger.getLogger("LoginManager");
+	private static Logger logger = Logger.getLogger(LoginManager.class.getName());
 
 	/**
 	 * Returns a LoginManager instance.
@@ -98,7 +100,6 @@ public class LoginManager {
 		}
 	}
 	
-	
 	/**
 	 * Gets the datastore factory used
 	 * @return			dataStoreFactory
@@ -125,39 +126,38 @@ public class LoginManager {
 	 */
 	private GoogleCredential getCredential() {
 		logger.log(Level.INFO,"Attempting to get credentials.");
-		GoogleCredential newCredential = buildCredential();
+		credential = buildCredential();
 		if(hasStoredCredential()) {
 			logger.log(Level.INFO,"Using stored credential.");
-			setTokensFromStoredCredential(newCredential);
+			setTokensFromStoredCredential();
 		} else {
 			logger.log(Level.INFO,"Getting new credential from login.");
-			setTokensFromLogin(newCredential);
+			setTokensFromLogin();
 		}
 		logger.log(Level.INFO,"Saving credential...");
-		saveCredential(newCredential);
-		return newCredential;
+		saveCredential();
+		return credential;
 	}
 
 	/**
 	 * Requests the user to login and requests authorisation
-	 * tokens. Then sets the tokens in the given credential.
-	 * @param credential
+	 * tokens. Has to wait for user to login in the UI and 
+	 * retrieve token.
 	 */
-	private void setTokensFromLogin(GoogleCredential credential) {
-		credential.setFromTokenResponse(requestAuthorisation());
+	private void setTokensFromLogin() {
+		requestAuthorisation();
 	}
 
 	/**
 	 * Gets stored credential from data store and sets the tokens 
-	 * in the given credential.
-	 * @param credential
+	 * in the local credential.
 	 */
-	private void setTokensFromStoredCredential(GoogleCredential newCredential) {
+	private void setTokensFromStoredCredential() {
 		StoredCredential storedCredential;
 		try {
 			storedCredential = dataStore.get(USERNAME);
-			newCredential.setAccessToken(storedCredential.getAccessToken());
-			newCredential.setRefreshToken(storedCredential.getRefreshToken());
+			credential.setAccessToken(storedCredential.getAccessToken());
+			credential.setRefreshToken(storedCredential.getRefreshToken());
 		} catch (IOException e) {
 			logger.log(Level.WARNING,"IOException: Unable to retrieve StoredCredential.", e);
 		}
@@ -183,19 +183,19 @@ public class LoginManager {
 	 */
 	private GoogleCredential buildCredential() {
 		logger.log(Level.INFO,"Building credential.");
-		GoogleCredential credential = new GoogleCredential.Builder()
+		GoogleCredential newCredential = new GoogleCredential.Builder()
 		.setJsonFactory(jsonFactory)
 		.setTransport(httpTransport)
 		.setClientSecrets(CLIENT_ID, CLIENT_SECRET)
 		.addRefreshListener(new DataStoreCredentialRefreshListener(USERNAME, dataStore))
 		.build();
-		return credential;
+		return newCredential;
 	}
 
 	/**
-	 * Saves given credential in the datastore.
+	 * Saves the local credential in the datastore.
 	 */
-	private void saveCredential(GoogleCredential credential){
+	private void saveCredential(){
 		StoredCredential storedCredential = new StoredCredential();
 		storedCredential.setAccessToken(credential.getAccessToken());
 		storedCredential.setRefreshToken(credential.getRefreshToken());
@@ -207,24 +207,16 @@ public class LoginManager {
 	}
 
 	/**
-	 * Returns a token response after requesting user
-	 * login and authorisation.
-	 * 
-	 * Makes an authorisation request to Google and prints
-	 * out a URL. The user has to enter the given URL into 
-	 * a browser and login to Google, then paste the returned
-	 * authorisation code into command line. 
+	 * Makes an authorisation request to Google.
 	 */
-	private GoogleTokenResponse requestAuthorisation() {
+	private void requestAuthorisation() {
 		try {
 			flow = buildAuthorisationCodeFlow();
 		} catch (IOException e) {
 			logger.log(Level.WARNING,"IOException: Unable to build authorisation code flow.", e);
 		}
-
-		String code = getAuthorisationCode();
-
-		return getTokenResponse(code);
+		
+		getAuthorisationCode();
 	}
 
 	/**
@@ -260,29 +252,17 @@ public class LoginManager {
 
 	/**
 	 * Creates the authorisation URL and passes it to the UI.
-	 * Returns the authorisation code.
 	 */
-	private String getAuthorisationCode() {
+	private void getAuthorisationCode() {
 		String url = flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build();
-		return TaskCommander.ui.getCodeFromUser(url);
-		//System.out.println("Please open the following URL in your browser then type the authorization code:");
-		//System.out.println("  " + url);
+		TaskCommander.ui.getCodeFromUser(url);
 	}
 
-	/**
-	 * Reads user input and returns it. 
-	 * @return      String of user input.
-	 */
-	private String getUserInput() {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		String input = "";
-		try {
-			input = br.readLine();
-			br.close();
-		} catch (IOException e) {
-			logger.log(Level.WARNING,"IOException: Unable to read user input.", e);
-		}
-		return input;
+	@Override
+	public void update(Observable obs, Object obj) {
+		String code = TaskCommander.ui.getCode();
+		credential.setFromTokenResponse(getTokenResponse(code));
+		saveCredential();
 	}
 
 }

@@ -52,7 +52,6 @@ public class GoogleAPIConnector {
 			eventDataStore = LoginManager.getDataStoreFactory().getDataStore("EventStore");
 			taskDataStore = LoginManager.getDataStoreFactory().getDataStore("TaskStore");
 		} catch (IOException e) {
-			System.out.println(Global.MESSAGE_EXCEPTION_IO);
 			logger.log(Level.SEVERE, "Error getting services", e);
 		}
 		getServices();
@@ -89,7 +88,6 @@ public class GoogleAPIConnector {
 	 */
 	public List<Task> getAllGoogleTasks() {
 		try {
-
 			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
 			List<Task> tasks = request.execute().getItems();
 			return tasks;
@@ -106,7 +104,6 @@ public class GoogleAPIConnector {
 	 */
 	private ArrayList<com.taskcommander.Task> getAllFloatingTasks() {
 		try {
-
 			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
 			List<Task> tasks = request.execute().getItems();
 
@@ -393,7 +390,7 @@ public class GoogleAPIConnector {
 	}
 	
 	/**
-	 * Deletes an event from the Calendar API, given a DeadlineTask object.
+	 * Deletes an event from the Tasks API, given a DeadlineTask object.
 	 * The given task must have a Google ID.
 	 * Returns true if successful. 
 	 * 

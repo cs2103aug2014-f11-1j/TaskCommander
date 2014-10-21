@@ -92,7 +92,6 @@ public class UI extends Observable {
 	private final Color COLOR_COL_FIRST = darkGray;
 	private final Color COLOR_COL_SECOND = blue;
 	private final Color COLOR_COL_THIRD = yellow;
-	private final Color COLOR_DATE_ROW = darkCyan;
 	private final Color COLOR_DONE = darkGray;
 	private final Color COLOR_NOT_DONE = red;
 
@@ -106,7 +105,7 @@ public class UI extends Observable {
 	
 	private String code; // For authorisation code from Google
 
-	private static Logger logger = Logger.getLogger("UI");
+	private static Logger logger = Logger.getLogger(UI.class.getName());
 
 
 	/**
@@ -166,7 +165,6 @@ public class UI extends Observable {
 	}
 	
 	private void createBrowserTab(String url) {
-		System.out.println("createbrowsertab");
 		browserTab = new TabItem(tabFolder, SWT.NONE);
 		browserTab.setText("Google Login");
 		setupBrowserWindow(url);
@@ -175,7 +173,6 @@ public class UI extends Observable {
 	}
 
 	private void setupBrowserWindow(String url) {
-		System.out.println("setupbrowsertab");
 		GridLayout layout = new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
 		browserWindow.setLayout(layout);
 
@@ -235,7 +232,7 @@ public class UI extends Observable {
 
 	//@author A0112828H
 	private void setupBrowser() {
-		browser = new Browser(browserWindow, SWT.FILL);
+		browser = new Browser(browserWindow, SWT.FILL | SWT.BORDER);
 		GridData browserGridData = new GridData(SWT.FILL, SWT.FILL, BROWSER_FIT_HORIZONTAL, BROWSER_FIT_VERTICAL, 
 				BROWSER_COLUMNS_SPAN, BROWSER_ROWS_SPAN);
 		browserGridData.widthHint = BROWSER_PREFERRED_WIDTH;
@@ -292,6 +289,10 @@ public class UI extends Observable {
 		code = text;
 		setChanged();
 		notifyObservers();
+	}
+	
+	public String getCode() {
+		return code;
 	}
 
 	//@author A0105753J
@@ -383,7 +384,7 @@ public class UI extends Observable {
 	}
 
 	private void createDateRow(String date) {
-		TableItem item = new TableItem(table, TABLE_STYLE);
+		new TableItem(table, TABLE_STYLE);
 	}
 
 	private String getDisplayDate(DeadlineTask task) {
