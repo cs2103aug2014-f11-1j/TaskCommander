@@ -131,7 +131,7 @@ public class SyncHandler extends Observable {
 		//For Tasks
 		List<com.google.api.services.tasks.model.Task> googleTasks = con.getAllGoogleTasks();
 		for (com.google.api.services.tasks.model.Task task : googleTasks) {
-			if (task.getDeleted()) {
+			if (task.getDeleted() != null) {
 				TaskCommander.data.deleteTask(con.toTask(task));
 			}
 		}
@@ -156,10 +156,13 @@ public class SyncHandler extends Observable {
 				switch(t.getType()) {
 				case FLOATING:
 					TaskCommander.data.updateToFloatingTask(index, (FloatingTask) t);
+					break;
 				case TIMED:
 					TaskCommander.data.updateToTimedTask(index, (TimedTask) t);
+					break;
 				case DEADLINE:
 					TaskCommander.data.updateToDeadlineTask(index, (DeadlineTask) t);
+					break;
 				}		
 			}
 		}
