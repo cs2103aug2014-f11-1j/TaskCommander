@@ -68,7 +68,6 @@ public class GoogleAPIConnector {
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Error getting services", e);
 		}
-		getServices();
 	}
 
 	private void getServices() {
@@ -91,6 +90,8 @@ public class GoogleAPIConnector {
 	 */
 	public ArrayList<com.taskcommander.Task> getAllTasks() {
 		if (tasks == null || calendar == null) {
+			logger.log(Level.INFO, "Services null, getting services");
+			getServices();
 			return null;
 		} else {
 			ArrayList<com.taskcommander.Task> result = getAllFloatingTasks();

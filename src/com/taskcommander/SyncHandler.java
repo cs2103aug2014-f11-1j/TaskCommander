@@ -1,19 +1,26 @@
 package com.taskcommander;
 
 import com.google.api.services.calendar.model.Event;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.taskcommander.Global.SyncState;
 import com.taskcommander.GoogleAPIConnector;
 
 //@author A0112828H and A0109194A
-public class SyncHandler {
+public class SyncHandler extends Observable {
 
 	private static GoogleAPIConnector con = null;
 	private static final Logger logger = Logger.getLogger(SyncHandler.class.getName());
-
+	
+	public int tasksTotal;
+	public int tasksComplete;
+	public SyncState syncState;
 
 	public SyncHandler() {
 
@@ -46,6 +53,7 @@ public class SyncHandler {
 				} catch (IOException e) {
 					logger.log(Level.WARNING, Global.MESSAGE_SYNC_FAILED, e);
 				}
+				resetSyncState();
 			}
 		};
 		thread.start();
@@ -56,6 +64,7 @@ public class SyncHandler {
 	private void push() {
 		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
 		logger.log(Level.INFO, "PUSH: Retrieved All Tasks");
+		startSyncState(SyncState.PUSH, tasks.size());
 		for (Task t : tasks) {
 			if (!t.isSynced()) {
 				if (t.getId() == null) {
@@ -67,6 +76,7 @@ public class SyncHandler {
 					con.updateTask(t);
 				}
 			}
+			updateTasksComplete(tasksComplete+1);
 		}
 		logger.log(Level.INFO, "PUSH: Handled Added Cases");
 
@@ -131,5 +141,21 @@ public class SyncHandler {
 			}
 		}
 		logger.log(Level.INFO, "PULL: Handled Updated Cases");
+	}
+	
+	private void updateTasksComplete(int completed) {
+		tasksComplete = completed;
+	}
+	
+	private void startSyncState(SyncState state, int total) {
+		syncState = state;
+		tasksTotal = total;
+		tasksComplete = 0;
+	}
+	
+	private void resetSyncState() {
+		syncState = SyncState.NOT_SYNCING;
+		tasksTotal = 0;
+		tasksComplete = 0;
 	}
 }

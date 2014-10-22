@@ -3,6 +3,7 @@ package com.taskcommander;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Observable;
+import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,7 +35,7 @@ import org.eclipse.swt.widgets.Text;
  * - Facilitates Google sync function by allowing user to login through a local browser
  * - Receives user's authorisation code and sends it to the controller
  */
-public class UI extends Observable {
+public class UI extends Observable implements Observer {
 	private static UI ui;
 	private static final int SHELL_MIN_HEIGHT = 500;
 	private static final int SHELL_MIN_WIDTH = 200;
@@ -293,11 +294,7 @@ public class UI extends Observable {
 	private void setCode(String text) {
 		code = text;
 		setChanged();
-		notifyObservers();
-	}
-
-	public String getCode() {
-		return code;
+		notifyObservers(code);
 	}
 
 	//@author A0105753J
@@ -467,6 +464,11 @@ public class UI extends Observable {
 	private void displayErrorMessage(String s) {
 		output.setText(s);
 		output.setForeground(red);
+	}
+
+	@Override
+	public void update(Observable arg0, Object arg1) {
+		output.setText("Updating...");
 	}
 
 }

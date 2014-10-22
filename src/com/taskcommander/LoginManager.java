@@ -91,6 +91,7 @@ public class LoginManager implements Observer {
 	 */
 	public Tasks getTasksService(){
 		if (isLoggedIn()) {
+			logger.log(Level.INFO,"Retrieved Tasks service");
 			return new Tasks.Builder(httpTransport, jsonFactory, credential)
 			.setApplicationName(APPLICATION_NAME).build();
 		} else {
@@ -105,6 +106,7 @@ public class LoginManager implements Observer {
 	 */
 	public Calendar getCalendarService(){
 		if (isLoggedIn()) {
+			logger.log(Level.INFO,"Retrieved Calendar service");
 			return new Calendar.Builder(httpTransport, jsonFactory, credential)
 			.setApplicationName(APPLICATION_NAME).build();
 		} else {
@@ -133,7 +135,7 @@ public class LoginManager implements Observer {
 	 * Checks if logged in.
 	 */
 	private boolean isLoggedIn() {
-		return credential == null;
+		return credential != null;
 	}
 
 	/**
@@ -278,8 +280,7 @@ public class LoginManager implements Observer {
 
 	@Override
 	public void update(Observable obs, Object obj) {
-		String code = TaskCommander.ui.getCode();
-		credential.setFromTokenResponse(getTokenResponse(code));
+		credential.setFromTokenResponse(getTokenResponse((String) obj));
 		saveCredential();
 	}
 

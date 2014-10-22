@@ -73,8 +73,14 @@ public class Global {
 		SYNC,
 		UNDO,
 		EXIT
-	};
+	}
+	
+	public static enum SyncState {
+		PUSH,
+		PULL,
+		NOT_SYNCING
+	}
 	
 	// Name of Storage File
-	public static String fileName;
+	public static String FILENAME = "tasks.json";
 }

@@ -18,7 +18,7 @@ import com.google.gson.GsonBuilder;
 //@author A0112828H
 public class Storage {
 	
-	private static String _fileName = "tasks.json";
+	private static String _fileName = Global.FILENAME;
 	private static Gson gson;
 	
 	/**
