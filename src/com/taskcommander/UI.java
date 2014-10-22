@@ -76,7 +76,7 @@ public class UI extends Observable implements Observer {
 	private static final String TAB_MAIN_NAME = "Tasks";
 	private static final int TAB_BROWSER_INDEX = 1; // Second tab item
 	private static final String TAB_BROWSER_NAME = "Google Login";
-	
+
 	private final Display display = Display.getDefault();
 	private final Shell shell = new Shell(display);
 	private final TabFolder tabFolder = new TabFolder(shell, SWT.NONE);
@@ -113,13 +113,13 @@ public class UI extends Observable implements Observer {
 
 	private static Logger logger = Logger.getLogger(UI.class.getName());
 
-
 	/**
 	 * this method return a instance of UI for singleton pattern 
 	 */
 	public static UI getInstance(){
-		if(ui==null)
+		if(ui == null) {
 			ui = new UI();
+		}
 		return ui;
 	}
 
@@ -466,9 +466,19 @@ public class UI extends Observable implements Observer {
 		output.setForeground(red);
 	}
 
+	/**
+	 * Updates the sync progress output with the given String.
+	 */
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		output.setText("Updating...");
+		if (arg1 instanceof String) {
+	    	final String m = (String) arg1;
+			display.asyncExec(new Runnable() {
+				@Override
+			    public void run() {
+					output.setText(m);
+			    }
+			});
+		}
 	}
-
 }

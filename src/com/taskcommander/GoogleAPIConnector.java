@@ -21,8 +21,7 @@ import com.taskcommander.LoginManager;
  * This class is used to connect to the Google API and
  * invoke the Calendar and Tasks services.
  * 
- * To use this class, the user has to provide the
- * details of their Google account and sign in.
+ * Requires permissions and login token from user.
  * This class can create, read, update or delete tasks
  * and calendar events for the given Google account.
  */
@@ -481,7 +480,6 @@ public class GoogleAPIConnector {
 	 */
 	private boolean updateTask(FloatingTask task) {
 		if (task == null) {
-			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 			logger.log(Level.WARNING, "Task is null");
 		} else if (task.getId() == null) {
 			System.out.println(MESSAGE_NO_ID);
@@ -535,7 +533,6 @@ public class GoogleAPIConnector {
 	 */
 	private boolean updateTask(TimedTask task) {
 		if (task == null) {
-			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 			logger.log(Level.WARNING, "Task is null");
 		} else if (task.getId() == null) {
 			System.out.println(MESSAGE_NO_ID);
@@ -544,7 +541,6 @@ public class GoogleAPIConnector {
 				Event result = calendar.events().update(PRIMARY_CALENDAR_ID, task.getId(), toGoogleTask(task)).execute();
 				return result != null;
 			} catch (IOException e) {
-				System.out.println(Global.MESSAGE_EXCEPTION_IO);
 				logger.log(Level.SEVERE, "Error updating task", e);
 			}
 		}
@@ -594,14 +590,11 @@ public class GoogleAPIConnector {
 		return timedTask;
 	}
 
-	/**
-	 * @author A0109194A
-	 * The following operations turn a task into a Google Task or Event
-	 * @param 		task
-	 * @return		The created Task object
-	 */
+	//@author A0112828H
+	//The following operations turn a task into a Google Task or Event
 	private Task toGoogleTask(FloatingTask task) {
 		Task newTask = new Task();
+		newTask.setId(task.getId());
 		newTask.setTitle(task.getName());
 		setStatusFromTask(newTask, task);
 		return newTask;
@@ -609,6 +602,7 @@ public class GoogleAPIConnector {
 
 	private Task toGoogleTask(DeadlineTask task) {
 		Task newTask = new Task();
+		newTask.setId(task.getId());
 		newTask.setTitle(task.getName());
 		newTask.setDue(toDateTime(task.getEndDate()));
 		setStatusFromTask(newTask, task);
@@ -617,6 +611,7 @@ public class GoogleAPIConnector {
 
 	private Event toGoogleTask(TimedTask task) {
 		Event newEvent = new Event();
+		newEvent.setId(task.getId());
 		newEvent.setSummary(task.getName());
 		newEvent.setStart(new EventDateTime().setDateTime(toDateTime(task.getStartDate())));			
 		newEvent.setEnd(new EventDateTime().setDateTime(toDateTime(task.getEndDate())));		

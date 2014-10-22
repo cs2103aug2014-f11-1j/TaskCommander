@@ -26,6 +26,11 @@ import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.TasksScopes;
 
 //@author A0112828H
+/**
+ * This class is used to connect to the Google API and
+ * retrieve Google services after the user logs in through
+ * the UI browser.
+ */
 public class LoginManager implements Observer {
 	private static final String CLIENT_ID = "1009064713944-qqeb136ojidkjv4usaog806gcafu5dmn.apps.googleusercontent.com";
 	private static final String CLIENT_SECRET = "9ILpkbnlGwVMQiqh10za3exf";

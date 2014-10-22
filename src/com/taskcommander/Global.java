@@ -45,7 +45,7 @@ public class Global {
 	public static final String MESSAGE_SYNC_FULL = "Peforming full sync.";
 	public static final String MESSAGE_SYNC_INCREMENTAL = "Performing incremental sync.";
 	public static final String MESSAGE_SYNC_COMPLETE = "Sync complete.";
-	public static final String MESSAGE_SYNC_FAILED = "Could not pull data";
+	public static final String MESSAGE_SYNC_FAILED = "Sync failed.";
 	
 	public static final int INDEX_OFFSET = 1; // Difference between the array index and actual line number
 
@@ -78,7 +78,7 @@ public class Global {
 	public static enum SyncState {
 		PUSH,
 		PULL,
-		NOT_SYNCING
+		DONE
 	}
 	
 	// Name of Storage File

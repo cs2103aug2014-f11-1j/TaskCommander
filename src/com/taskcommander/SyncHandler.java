@@ -12,12 +12,25 @@ import java.util.logging.Logger;
 import com.taskcommander.Global.SyncState;
 import com.taskcommander.GoogleAPIConnector;
 
-//@author A0112828H and A0109194A
+//@author A0112828H
+/**
+ * Facade for the Google Integration component.
+ * 
+ * Handles synchronisation of data to and from Google services.
+ * Notifies observers with a String message when sync status is updated.
+ * 
+ * To use this class, the user has to sign in and approve
+ * the permissions for this application through the UI.
+ */
 public class SyncHandler extends Observable {
 
 	private static GoogleAPIConnector con = null;
 	private static final Logger logger = Logger.getLogger(SyncHandler.class.getName());
-	
+
+	private static final String MESSAGE_SYNC_PUSH = "Sending data to Google... %1$s/%2$s completed.";
+	private static final String MESSAGE_SYNC_PULL = "Getting data from Google... %1$s/%2$s completed.";
+	private static final String MESSAGE_SYNC_DONE = "Sync completed.";
+
 	public int tasksTotal;
 	public int tasksComplete;
 	public SyncState syncState;
@@ -33,31 +46,40 @@ public class SyncHandler extends Observable {
 	 * @return   Feedback for user
 	 */
 	public String sync() {
+		TaskCommander.syncHandler.addObserver(TaskCommander.ui);
 		if (con == null) {
 			con = GoogleAPIConnector.getInstance();
 		}
-		
+
+		Thread.UncaughtExceptionHandler h = new Thread.UncaughtExceptionHandler() {
+			public void uncaughtException(Thread th, Throwable ex) {
+				logger.log(Level.WARNING, Global.MESSAGE_SYNC_FAILED, ex);
+				th.interrupt();
+			}
+		};
 		Thread thread = new Thread() {
 			@Override
 			public void run() {
 				while (con.getAllTasks() == null) {
 					try {
-                        sleep(10);  // milliseconds
-                     } catch (InterruptedException e) {
-                    	 logger.log(Level.WARNING, "Error while trying to sleep in SyncHandler", e);
-                     }
+						sleep(10);  // milliseconds
+					} catch (InterruptedException e) {
+						logger.log(Level.WARNING, "Error while trying to sleep in SyncHandler", e);
+					}
 				}
+
 				push();
 				try {
 					pull();
-				} catch (IOException e) {
+				} catch (Exception e) {
 					logger.log(Level.WARNING, Global.MESSAGE_SYNC_FAILED, e);
 				}
 				resetSyncState();
 			}
 		};
+		thread.setUncaughtExceptionHandler(h);
 		thread.start();
-		
+
 		return Global.MESSAGE_SYNC_IN_PROGRESS;
 	}
 
@@ -90,11 +112,12 @@ public class SyncHandler extends Observable {
 		logger.log(Level.INFO, "PUSH: Handled Deleted Cases");
 	}
 
+	//@author A0109194A
 	private void pull() throws IOException {
 		//Get all Tasks
 		ArrayList<Task> tasksToSync = con.getAllTasks();
 		logger.log(Level.INFO, "PULL: Retrieved All Tasks");
-
+		startSyncState(SyncState.PULL, tasksToSync.size());
 		//Added case
 		ArrayList<String> taskIds = TaskCommander.data.getAllIds();
 		for (Task t: tasksToSync) {
@@ -142,20 +165,42 @@ public class SyncHandler extends Observable {
 		}
 		logger.log(Level.INFO, "PULL: Handled Updated Cases");
 	}
-	
+
+	//@author A0112828H
 	private void updateTasksComplete(int completed) {
 		tasksComplete = completed;
+		updateSyncMessage();
 	}
-	
+
 	private void startSyncState(SyncState state, int total) {
 		syncState = state;
 		tasksTotal = total;
 		tasksComplete = 0;
+		updateSyncMessage();
 	}
-	
+
 	private void resetSyncState() {
-		syncState = SyncState.NOT_SYNCING;
+		syncState = SyncState.DONE;
 		tasksTotal = 0;
 		tasksComplete = 0;
+		updateSyncMessage();
+	}
+
+	private void updateSyncMessage() {
+		String message = "";
+		switch (syncState) {
+		case DONE:
+			message = MESSAGE_SYNC_DONE;
+			break;
+		case PUSH:
+			message = String.format(MESSAGE_SYNC_PUSH, tasksComplete, tasksTotal);
+			break;
+		case PULL:
+			message = String.format(MESSAGE_SYNC_PULL, tasksComplete, tasksTotal);
+			break;
+		}
+
+		setChanged();
+		notifyObservers(message);
 	}
 }
