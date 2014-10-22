@@ -8,7 +8,7 @@ import org.junit.Test;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.tasks.Tasks;
 
-public class GoogleAPIHandlerTest {
+public class GoogleAPIConnectorTest {
 
 	@Test
 	public void testLoginManager() {
