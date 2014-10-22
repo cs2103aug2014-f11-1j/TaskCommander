@@ -398,13 +398,31 @@ public class UI extends Observable implements Observer {
 		new TableItem(table, TABLE_STYLE);
 	}
 
+	/**
+	 * Returns the display date for DeadlineTasks.
+	 * The format is: Date1 Time
+	 * @param task
+	 * @return      String date to display.
+	 */
 	private String getDisplayDate(DeadlineTask task) {
 		return Global.dayFormat.format(task.getEndDate()) + " " + Global.timeFormat.format(task.getEndDate());
 	}
 
+	/**
+	 * Returns the display date for TimedTasks.
+	 * If the start and end days are different, the format is: Date1 Time - Date2 Time
+	 * If the start and end days are the same, the format is: Date1 Time - Time
+	 * @param task
+	 * @return      String date to display.
+	 */
 	private String getDisplayDate(TimedTask task) {
-		return Global.dayFormat.format(task.getStartDate()) + " " + Global.timeFormat.format(task.getStartDate())+ " - " + 
-				Global.dayFormat.format(task.getEndDate()) + " " + Global.timeFormat.format(task.getEndDate());
+		if (hasDifferentDay(task.getStartDate(), task.getEndDate())) {
+			return Global.dayFormat.format(task.getStartDate()) + " " + Global.timeFormat.format(task.getStartDate())+ " - " + 
+					Global.dayFormat.format(task.getEndDate()) + " " + Global.timeFormat.format(task.getEndDate());
+		} else {
+			return Global.dayFormat.format(task.getStartDate()) + " " + Global.timeFormat.format(task.getStartDate())+ " - " + 
+					Global.timeFormat.format(task.getEndDate());
+		}
 	}
 
 	private String getDisplayDate(Date date) {
@@ -440,6 +458,15 @@ public class UI extends Observable implements Observer {
 		} else {
 			return true;
 		}
+	}
+
+	/** Checks if the given dates have different days.
+	 * @param date1
+	 * @param date2
+	 * @return          If the given dates have different days.
+	 */
+	private boolean hasDifferentDay(Date date1, Date date2) {
+		return !Global.dayFormat.format(date1).equals(Global.dayFormat.format(date2));
 	}
 
 	private void setColorsForTableItem(TableItem item, Color doneColor) {
