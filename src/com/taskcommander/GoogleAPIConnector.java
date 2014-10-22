@@ -40,7 +40,7 @@ public class GoogleAPIConnector {
 	private static DataStore<String> eventDataStore;
 	private static DataStore<String> taskDataStore;
 	private static final Logger logger = Logger.getLogger(GoogleAPIConnector.class.getName());
-	
+
 	/**
 	 * This method returns a GoogleAPIConnector
 	 * It is to be called by SyncHandler.
@@ -50,7 +50,7 @@ public class GoogleAPIConnector {
 		GoogleAPIConnector connector = new GoogleAPIConnector();
 		return connector;
 	}
-	
+
 	/**
 	 * Creates a new GoogleAPIHandler instance.
 	 * Also creates a new LoginManager and attempts
@@ -81,17 +81,21 @@ public class GoogleAPIConnector {
 		return eventDataStore;
 	}
 
+	//@author A0112828H
 	/**
-	 * @author A0109194A
 	 * Returns all tasks.
 	 * @return Feedback for user.
 	 */
 	public ArrayList<com.taskcommander.Task> getAllTasks() {
-		ArrayList<com.taskcommander.Task> result = getAllFloatingTasks();
-		if (result != null) {
-			result.addAll(getAllEvents());
+		if (tasks == null || calendar == null) {
+			return null;
+		} else {
+			ArrayList<com.taskcommander.Task> result = getAllFloatingTasks();
+			if (result != null) {
+				result.addAll(getAllEvents());
+			}
+			return result;
 		}
-		return result;
 	}
 
 	/**
@@ -111,6 +115,7 @@ public class GoogleAPIConnector {
 		}
 	}
 
+	//@author A0112828H
 	/**
 	 * Gets all tasks from Tasks API.
 	 * @return   Arraylist of TaskCommander Tasks.
@@ -126,12 +131,11 @@ public class GoogleAPIConnector {
 			}
 			return taskList;
 		} catch (IOException e) {
-			System.out.println(Global.MESSAGE_EXCEPTION_IO);
 			logger.log(Level.SEVERE, "Error getting Floating Tasks", e);
 			return null;
 		}
 	}
-	
+
 	/**
 	 * @author A0109194A
 	 * Returns a List object which holds a request that would be sent to Google
@@ -553,7 +557,7 @@ public class GoogleAPIConnector {
 	private Date toDate(DateTime dateTime) {
 		return new Date(dateTime.getValue());
 	}
-	
+
 	//@author A0109194A
 	// Changes a Google Task to a TaskCommander Task.
 	public com.taskcommander.Task toTask(Task task) {
@@ -571,7 +575,7 @@ public class GoogleAPIConnector {
 			return floatingTask;
 		}
 	}
-	
+
 	//@author A0109194A
 	// Changes a Google Calendar Event to a TaskCommander Task.
 	public com.taskcommander.Task toTask(Event event) {
@@ -585,7 +589,7 @@ public class GoogleAPIConnector {
 		timedTask.setUpdated(event.getUpdated());
 		return timedTask;
 	}
-	
+
 	/**
 	 * @author A0109194A
 	 * The following operations turn a task into a Google Task or Event
@@ -622,7 +626,7 @@ public class GoogleAPIConnector {
 			newTask.setStatus("needsAction");
 		}
 	}
-	
+
 	public String addTask(com.taskcommander.Task task) {
 		switch (task.getType()) {
 		case FLOATING:

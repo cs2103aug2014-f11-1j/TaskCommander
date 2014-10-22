@@ -1,9 +1,7 @@
 package com.taskcommander;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
@@ -66,7 +64,7 @@ public class LoginManager implements Observer {
 	}
 	
 	/**
-	 * Returns a LoginManager instance.
+	 * Returns a LoginManager instance and attempts to login.
 	 */
 	private LoginManager() {
 		httpTransport = new NetHttpTransport();
@@ -79,7 +77,7 @@ public class LoginManager implements Observer {
 		} catch (IOException e) {
 			logger.log(Level.WARNING,"IOException: Unable to retrieve DataStore", e);
 		}
-		
+		login();
 	}
 
 	/**
@@ -119,14 +117,19 @@ public class LoginManager implements Observer {
 	}
 	
 	/**
-	 * Checks if logged in, else tries to login and get
-	 * credentials.
+	 * Attempts to login.
 	 */
-	private boolean isLoggedIn() {
+	private void login() {
 		if (credential == null) {
 			credential = getCredential();
 		}
-		return true;
+	}
+	
+	/**
+	 * Checks if logged in.
+	 */
+	private boolean isLoggedIn() {
+		return credential == null;
 	}
 
 	/**
