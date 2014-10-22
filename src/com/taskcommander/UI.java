@@ -160,7 +160,7 @@ public class UI extends Observable implements Observer {
 		createTextFieldsForMain();
 		setupMainElements();
 		addInputListenerForMain();
-		displayTasksUponOpening();
+		updateDisplay();
 	}
 
 	//@author A0112828H
@@ -257,7 +257,7 @@ public class UI extends Observable implements Observer {
 						clearTableItems();
 						String command = input.getText();
 						String feedback = TaskCommander.controller.executeCommand(command);
-						displayFeedback(feedback);
+						updateDisplay(feedback);
 						clearInput();
 					}catch (Exception e) {
 						logger.log(Level.WARNING,"Exception while executing command flow", e);
@@ -307,9 +307,11 @@ public class UI extends Observable implements Observer {
 			if (!Global.syncing && !input.getEditable()) {
 				// Accept user input when not syncing
 				input.setEditable(true);
+				updateDisplay();
 			} else if (Global.syncing && input.getEditable()) {
 				// Do not accept user input when syncing
 				input.setEditable(false);
+				updateDisplay();
 			}
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -323,11 +325,13 @@ public class UI extends Observable implements Observer {
 	}
 
 	//@author A0112828H
-	private void displayTasksUponOpening() {
+	private void updateDisplay() {
+		clearTableItems();
 		displayTasks(TaskCommander.controller.getDisplayedTasks());
 	}
 
-	private void displayFeedback(String fb) {
+	private void updateDisplay(String fb) {
+		clearTableItems();
 		displayMessage(fb);
 		displayTasks(TaskCommander.controller.getDisplayedTasks());
 	}

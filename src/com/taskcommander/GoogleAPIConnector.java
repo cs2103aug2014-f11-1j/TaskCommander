@@ -69,9 +69,15 @@ public class GoogleAPIConnector {
 		}
 	}
 
-	private void getServices() {
+	public boolean getServices() {
 		tasks = loginManager.getTasksService();
 		calendar = loginManager.getCalendarService();
+		
+		if (tasks != null && calendar != null) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public DataStore<String> getTaskDataStore() {
@@ -237,7 +243,6 @@ public class GoogleAPIConnector {
 					return result.getId();
 				}
 			} catch (IOException e) {
-				System.out.println(Global.MESSAGE_EXCEPTION_IO);
 				logger.log(Level.SEVERE, "Error adding task", e);
 			}
 		}
@@ -409,6 +414,9 @@ public class GoogleAPIConnector {
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
 				logger.log(Level.SEVERE, "Error deleting task", e);
+			} catch (NullPointerException e) {
+				logger.log(Level.SEVERE, "Null pointer in delete", e);
+				return true;
 			}
 		}
 		return false;
@@ -437,6 +445,9 @@ public class GoogleAPIConnector {
 			} catch (IOException e) {
 				System.out.println(Global.MESSAGE_EXCEPTION_IO);
 				logger.log(Level.SEVERE, "Error deleting task", e);
+			} catch (NullPointerException e) {
+				logger.log(Level.SEVERE, "Null pointer in delete", e);
+				return true;
 			}
 		}
 		return false;
