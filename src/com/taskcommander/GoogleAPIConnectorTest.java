@@ -20,9 +20,19 @@ import com.google.api.services.tasks.Tasks;
  */
 public class GoogleAPIConnectorTest {
 	GoogleAPIConnector con;
-	
+
 	public void login() {
-		con = GoogleAPIConnector.getInstance();
+		if (con == null) {
+			con = GoogleAPIConnector.getInstance();
+		}
+		
+		if (!con.getServices()) {
+			try {
+				wait(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Test
@@ -30,41 +40,133 @@ public class GoogleAPIConnectorTest {
 		login();
 		assertNotNull("Able to get Tasks and Calendar services.", con.getServices());
 	}
-	
+
 	@Test
 	public void testAddOneFloatingTask() {
 		login();
 		FloatingTask task = new FloatingTask("Test Task 1");
 		assertNotNull(con.addTask(task));
+		con.deleteTask(task);
 	}
-	
+
 	@Test
 	public void testAddOneDeadlineTask() {
 		login();
 		DeadlineTask task = new DeadlineTask("Test Task 1", new Date(System.currentTimeMillis()));
 		assertNotNull(con.addTask(task));
+		con.deleteTask(task);
 	}
-	
+
 	@Test
 	public void testAddOneTimedTask() {
 		login();
 		TimedTask task = new TimedTask("Test Task 1", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
 		assertNotNull(con.addTask(task));
-	}
-	
-	//CRUD 1 task of each type
-	//CRUD mixed set of tasks
-	
-	@Test
-	public void testGetTasks() {
-		login();
-		
+		con.deleteTask(task);
 	}
 	
 	@Test
-	public void testLoginManager() {
+	public void testGetOneFloatingTask() {
 		login();
-		
+		FloatingTask task = new FloatingTask("Test Task 1");
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(con.getTask(task));
+		con.deleteTask(task);
 	}
+
+	@Test
+	public void testGetOneDeadlineTask() {
+		login();
+		DeadlineTask task = new DeadlineTask("Test Task 1", new Date(System.currentTimeMillis()));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(con.getTask(task));
+		con.deleteTask(task);
+	}
+
+	@Test
+	public void testGetOneTimedTask() {
+		login();
+		TimedTask task = new TimedTask("Test Task 1", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(con.getTask(task));
+		con.deleteTask(task);
+	}
+	
+	@Test
+	public void testUpdateOneFloatingTask() {
+		login();
+		FloatingTask task = new FloatingTask("Test Task 1");
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		task.setName("Changed Test Task 1");
+		assertTrue(con.updateTask(task));
+		con.deleteTask(task);
+	}
+
+	@Test
+	public void testUpdateOneDeadlineTask() {
+		login();
+		DeadlineTask task = new DeadlineTask("Test Task 1", new Date(System.currentTimeMillis()));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		task.setName("Changed Test Task 1");
+		assertTrue(con.updateTask(task));
+		con.deleteTask(task);
+	}
+
+	@Test
+	public void testUpdateOneTimedTask() {
+		login();
+		TimedTask task = new TimedTask("Test Task 1", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		task.setName("Changed Test Task 1");
+		assertTrue(con.updateTask(task));
+		con.deleteTask(task);
+	}
+	
+	@Test
+	public void testDeleteOneFloatingTask() {
+		login();
+		FloatingTask task = new FloatingTask("Test Task 1");
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(task.getId());
+		assertTrue(con.deleteTask(task));
+	}
+
+	@Test
+	public void testDeleteOneDeadlineTask() {
+		login();
+		DeadlineTask task = new DeadlineTask("Test Task 1", new Date(System.currentTimeMillis()));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(task.getId());
+		assertTrue(con.deleteTask(task));
+	}
+
+	@Test
+	public void testDeleteOneTimedTask() {
+		login();
+		TimedTask task = new TimedTask("Test Task 1", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(task.getId());
+		assertTrue(con.deleteTask(task));
+	}
+	
+	//TODO CRUD mixed set of tasks
 
 }

@@ -30,15 +30,15 @@ public class GoogleAPIConnector {
 	private static final String MESSAGE_SERVICES_NULL = "Services null, getting services.";
 	private static final String MESSAGE_NULL_TASK = "Null task given.";
 	private static final String MESSAGE_NO_ID = "Task has not been synced to Google API.";
-	
+
 	private static final String OPERATION_GET = "get";
 	private static final String OPERATION_ADD = "add";
 	private static final String OPERATION_UPDATE = "update";
 	private static final String OPERATION_DELETE = "delete";
-	
+
 	private static final String PRIMARY_CALENDAR_ID = "primary";
 	private static final String PRIMARY_TASKS_ID = "@default";
-	
+
 	private static GoogleAPIConnector instance;
 	private static LoginManager loginManager;
 
@@ -79,13 +79,12 @@ public class GoogleAPIConnector {
 	}
 
 	public boolean getServices() {
-		tasks = loginManager.getTasksService();
-		calendar = loginManager.getCalendarService();
-		
 		if (tasks != null && calendar != null) {
 			return true;
 		} else {
-			return false;
+			tasks = loginManager.getTasksService();
+			calendar = loginManager.getCalendarService();
+			return (tasks != null && calendar != null);
 		}
 	}
 
@@ -305,6 +304,8 @@ public class GoogleAPIConnector {
 				}
 			} catch (IOException e) {
 				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_ADD), e);
+			} catch (NullPointerException e) {
+				logger.log(Level.SEVERE, MESSAGE_NULL_TASK, e);
 			}
 		}
 		return null;
@@ -402,12 +403,13 @@ public class GoogleAPIConnector {
 				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
 				request.execute();
 				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
-				return check == null;
+				return check.getDeleted();
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_DELETE), e);
-			} catch (NullPointerException e) {
-				logger.log(Level.SEVERE, MESSAGE_NULL_TASK, e);
-				return true;
+				if (e.getMessage().contains("404 Not Found")) {
+					return true;
+				} else {
+					logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_DELETE), e);
+				}
 			}
 		}
 		return false;
@@ -423,7 +425,6 @@ public class GoogleAPIConnector {
 	 */
 	private boolean deleteTask(DeadlineTask task) {
 		if (task == null) {
-			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
 		} else if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
@@ -432,12 +433,13 @@ public class GoogleAPIConnector {
 				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
 				request.execute();
 				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
-				return check == null;
+				return check.getDeleted();
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_DELETE), e);
-			} catch (NullPointerException e) {
-				logger.log(Level.SEVERE, MESSAGE_NULL_TASK, e);
-				return true;
+				if (e.getMessage().contains("404 Not Found")) {
+					return true;
+				} else {
+					logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_DELETE), e);
+				}
 			}
 		}
 		return false;
@@ -453,7 +455,6 @@ public class GoogleAPIConnector {
 	 */
 	private boolean deleteTask(TimedTask task) {
 		if (task == null) {
-			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
 		} else if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
@@ -463,7 +464,11 @@ public class GoogleAPIConnector {
 				Event check = calendar.events().get(PRIMARY_TASKS_ID, task.getId()).execute();
 				return check == null;
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_DELETE), e);
+				if (e.getMessage().contains("404 Not Found")) {
+					return true;
+				} else {
+					logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_DELETE), e);
+				}
 			}
 		}
 		return false;
@@ -505,7 +510,6 @@ public class GoogleAPIConnector {
 	 */
 	private boolean updateTask(DeadlineTask task) {
 		if (task == null) {
-			System.out.println(Global.MESSAGE_ARGUMENTS_NULL);
 			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
 		} else if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
