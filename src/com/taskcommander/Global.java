@@ -83,4 +83,6 @@ public class Global {
 	
 	// Name of Storage File
 	public static String FILENAME = "tasks.json";
+	
+	public static boolean syncing = false;
 }

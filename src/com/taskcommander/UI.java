@@ -258,7 +258,6 @@ public class UI extends Observable implements Observer {
 						String command = input.getText();
 						String feedback = TaskCommander.controller.executeCommand(command);
 						displayFeedback(feedback);
-						// Insert sync detection and execute this line
 						clearInput();
 					}catch (Exception e) {
 						logger.log(Level.WARNING,"Exception while executing command flow", e);
@@ -304,8 +303,14 @@ public class UI extends Observable implements Observer {
 	 */
 	private void runUntilWindowClosed() {
 		shell.open();
-		while (!shell.isDisposed())
-		{
+		while (!shell.isDisposed()) {
+			if (!Global.syncing && !input.getEditable()) {
+				// Accept user input when not syncing
+				input.setEditable(true);
+			} else if (Global.syncing && input.getEditable()) {
+				// Do not accept user input when syncing
+				input.setEditable(false);
+			}
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
@@ -472,12 +477,12 @@ public class UI extends Observable implements Observer {
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		if (arg1 instanceof String) {
-	    	final String m = (String) arg1;
+			final String m = (String) arg1;
 			display.asyncExec(new Runnable() {
 				@Override
-			    public void run() {
+				public void run() {
 					output.setText(m);
-			    }
+				}
 			});
 		}
 	}

@@ -173,6 +173,7 @@ public class SyncHandler extends Observable {
 	}
 
 	private void startSyncState(SyncState state, int total) {
+		Global.syncing = true;
 		syncState = state;
 		tasksTotal = total;
 		tasksComplete = 0;
@@ -180,6 +181,7 @@ public class SyncHandler extends Observable {
 	}
 
 	private void resetSyncState() {
+		Global.syncing = false;
 		syncState = SyncState.DONE;
 		tasksTotal = 0;
 		tasksComplete = 0;
