@@ -79,7 +79,7 @@ public class LoginManager implements Observer {
 		} catch (IOException e) {
 			logger.log(Level.WARNING,"IOException: Unable to retrieve DataStore", e);
 		}
-
+		
 	}
 
 	/**

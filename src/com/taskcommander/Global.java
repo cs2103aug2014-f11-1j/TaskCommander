@@ -30,20 +30,22 @@ public class Global {
 	public static final String MESSAGE_HELP = "Commands: add ¡°<task title>¡± <date> <end time>,\n display [timed] [deadline] [floating] [done|open] [date] [start time] [end time],\n open <index>, done <index>, delete <index of string>, clear, sort, exit.";
 	public static final String MESSAGE_LINE_FOUND = "Found \"%1$s\".";
 	public static final String MESSAGE_LINE_NOT_FOUND = "The line \"%1$s\" does not exist.";
-	public static final String MESSAGE_SORTED = "Tasks has been sorted.";
-	public static final String MESSAGE_SYNC_SUCCESS = "Successfully synced to Google!";
+	public static final String MESSAGE_SORTED = "Tasks have been sorted.";
 	
 	public static final String MESSAGE_FILE_COULD_NOT_BE_WRITTEN = "Error: The File could not be written.";
 	public static final String MESSAGE_FILE_COULD_NOT_BE_LOADED = "Error: The File could not be loaded.";
 	public static final String MESSAGE_EXCEPTION_IO = "Unable to read the data retrieved.";
 	public static final String MESSAGE_ARGUMENTS_NULL = "Null arguments given.";
 	public static final String MESSAGE_ARGUMENTS_INVALID = "Invalid arguments given.";
-	public static final String MESSAGE_INVALID_SYNC_TOKEN = "Invalid sync token, clearing event store and re-syncing.";
-	public static final String MESSAGE_NO_NEW_SYNC = "No new events to sync.";
-	public static final String MESSAGE_FULL_SYNC = "Peforming full sync.";
-	public static final String MESSAGE_INCREMENTAL_SYNC = "Performing incremental sync.";
-	public static final String MESSAGE_COMPLETED_SYNC = "Sync complete.";
-	public static final String MESSAGE_FAILED_PULL = "Could not pull data";
+	
+	public static final String MESSAGE_SYNC_IN_PROGRESS = "Sync in progress...";
+	public static final String MESSAGE_SYNC_SUCCESS = "Successfully synced to Google!";
+	public static final String MESSAGE_SYNC_INVALID_TOKEN = "Invalid sync token, clearing event store and re-syncing.";
+	public static final String MESSAGE_SYNC_NO_NEW = "No new events to sync.";
+	public static final String MESSAGE_SYNC_FULL = "Peforming full sync.";
+	public static final String MESSAGE_SYNC_INCREMENTAL = "Performing incremental sync.";
+	public static final String MESSAGE_SYNC_COMPLETE = "Sync complete.";
+	public static final String MESSAGE_SYNC_FAILED = "Could not pull data";
 	
 	public static final int INDEX_OFFSET = 1; // Difference between the array index and actual line number
 

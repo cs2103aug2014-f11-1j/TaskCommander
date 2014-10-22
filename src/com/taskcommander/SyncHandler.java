@@ -29,18 +29,29 @@ public class SyncHandler {
 		if (con == null) {
 			con = GoogleAPIConnector.getInstanceOf();
 		}
-
-		if (con.getAllTasks() == null) {
-			return null;
-		} else {
-			push();
-			try {
-				pull();
-			} catch (IOException e) {
-				System.out.println(Global.MESSAGE_FAILED_PULL);
+		
+		Thread thread = new Thread() {
+			@Override
+			public void run() {
+				while (con.getAllTasks() == null) {
+					try {
+                        sleep(10);  // milliseconds
+                     } catch (InterruptedException e) {
+                    	 logger.log(Level.WARNING, "Error while trying to sleep in SyncHandler", e);
+                     }
+				}
+				
+				push();
+				try {
+					pull();
+				} catch (IOException e) {
+					logger.log(Level.WARNING, Global.MESSAGE_SYNC_FAILED, e);
+				}
 			}
-			return Global.MESSAGE_SYNC_SUCCESS;
-		}
+		};
+		thread.start();
+		
+		return Global.MESSAGE_SYNC_IN_PROGRESS;
 	}
 
 	private void push() {
