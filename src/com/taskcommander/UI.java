@@ -71,6 +71,11 @@ public class UI extends Observable {
 	private static final int BROWSER_ROWS_SPAN = 1;
 	private static final int BROWSER_PREFERRED_WIDTH = 500;
 
+	private static final int TAB_MAIN_INDEX = 0; // First tab item
+	private static final String TAB_MAIN_NAME = "Tasks";
+	private static final int TAB_BROWSER_INDEX = 1; // Second tab item
+	private static final String TAB_BROWSER_NAME = "Google Login";
+	
 	private final Display display = Display.getDefault();
 	private final Shell shell = new Shell(display);
 	private final TabFolder tabFolder = new TabFolder(shell, SWT.NONE);
@@ -122,7 +127,7 @@ public class UI extends Observable {
 	 * @wbp.parser.entryPoint
 	 */
 	public void open() {
-		logger.log(Level.INFO,"run UI");
+		logger.log(Level.INFO,"Open UI");
 		setupShell();
 		setupTabFolder();
 		createMainTab();
@@ -142,7 +147,7 @@ public class UI extends Observable {
 
 	private void createMainTab() {
 		TabItem item = new TabItem(tabFolder, SWT.NONE);
-		item.setText("Main");
+		item.setText(TAB_MAIN_NAME);
 		setupMainWindow();
 		item.setControl(mainWindow);
 	}
@@ -158,15 +163,15 @@ public class UI extends Observable {
 	}
 
 	//@author A0112828H
-	public String getCodeFromUser(String url) {
+	public void getCodeFromUser(String url) {
+		logger.log(Level.INFO, "Creating browser...");
 		code = null;
 		createBrowserTab(url);
-		return code;
 	}
 
 	private void createBrowserTab(String url) {
 		browserTab = new TabItem(tabFolder, SWT.NONE);
-		browserTab.setText("Google Login");
+		browserTab.setText(TAB_BROWSER_NAME);
 		setupBrowserWindow(url);
 		browserTab.setControl(browserWindow);
 		tabFolder.setSelection(browserTab);
@@ -270,8 +275,11 @@ public class UI extends Observable {
 		browser.addTitleListener(new TitleListener() {
 			@Override
 			public void changed(TitleEvent event) {
+				logger.log(Level.INFO, "Checking title "+event.title);
 				if(event.title.contains("Success")) {
-					setCode(event.title.replace("Success=", ""));
+					logger.log(Level.INFO, "Success "+event.title);
+					setCode(event.title.replace("Success code=", ""));
+					tabFolder.getItem(TAB_BROWSER_INDEX).dispose();
 				}
 			}
 		});

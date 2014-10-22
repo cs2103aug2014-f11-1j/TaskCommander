@@ -31,6 +31,7 @@ public class GoogleAPIConnector {
 	private static final String MESSAGE_NO_ID = "Task has not been synced to Google API.";
 	private static final String PRIMARY_CALENDAR_ID = "primary";
 	private static final String PRIMARY_TASKS_ID = "@default";
+	private static GoogleAPIConnector instance;
 	private static LoginManager loginManager;
 
 	//Global instances
@@ -46,9 +47,11 @@ public class GoogleAPIConnector {
 	 * It is to be called by SyncHandler.
 	 * @return GoogleAPIConnector object
 	 */
-	public static GoogleAPIConnector getInstanceOf() {
-		GoogleAPIConnector connector = new GoogleAPIConnector();
-		return connector;
+	public static GoogleAPIConnector getInstance() {
+		if (instance == null) {
+			instance = new GoogleAPIConnector();
+		}
+		return instance;
 	}
 
 	/**
@@ -58,7 +61,7 @@ public class GoogleAPIConnector {
 	 * @throws IOException 
 	 */
 	private GoogleAPIConnector() {
-		loginManager = LoginManager.getInstanceOf();
+		loginManager = LoginManager.getInstance();
 		try {
 			eventDataStore = LoginManager.getDataStoreFactory().getDataStore("EventStore");
 			taskDataStore = LoginManager.getDataStoreFactory().getDataStore("TaskStore");

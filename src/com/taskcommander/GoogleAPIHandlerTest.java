@@ -12,7 +12,7 @@ public class GoogleAPIHandlerTest {
 
 	@Test
 	public void testLoginManager() {
-		LoginManager manager = LoginManager.getInstanceOf();
+		LoginManager manager = LoginManager.getInstance();
 		Tasks tasks = manager.getTasksService();
 		Calendar calendar = manager.getCalendarService();
 		assertEquals("Able to get TasksService", tasks!=null);

@@ -31,7 +31,7 @@ public class LoginManager implements Observer {
 	private static final String CLIENT_SECRET = "9ILpkbnlGwVMQiqh10za3exf";
 	private static final String APPLICATION_NAME = "Task Commander";
 
-	private static final String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:auto";
+	private static final String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
 
 	private static final String DATA_STORE_DIR = "credentials";
 	private static final String DATA_STORE_NAME = "credentialDataStore";
@@ -42,6 +42,8 @@ public class LoginManager implements Observer {
 	private static final String FLOW_APPROVAL_PROMPT = "auto";
 
 	private static final String USERNAME = "User";
+	
+	private static LoginManager instance;
 
 	private static FileDataStoreFactory dataStoreFactory;
 
@@ -58,9 +60,12 @@ public class LoginManager implements Observer {
 	 * To be called by GoogleAPIConnector
 	 * @return
 	 */
-	public static LoginManager getInstanceOf() {
-		LoginManager manager = new LoginManager();
-		return manager;
+	public static LoginManager getInstance() {
+		if (instance == null) {
+			instance = new LoginManager();
+			instance.login();
+		}
+		return instance;
 	}
 	
 	/**
@@ -77,7 +82,6 @@ public class LoginManager implements Observer {
 		} catch (IOException e) {
 			logger.log(Level.WARNING,"IOException: Unable to retrieve DataStore", e);
 		}
-		login();
 	}
 
 	/**
@@ -143,12 +147,12 @@ public class LoginManager implements Observer {
 		if(hasStoredCredential()) {
 			logger.log(Level.INFO,"Using stored credential.");
 			setTokensFromStoredCredential();
+			logger.log(Level.INFO,"Saving credential...");
+			saveCredential();
 		} else {
 			logger.log(Level.INFO,"Getting new credential from login.");
 			setTokensFromLogin();
 		}
-		logger.log(Level.INFO,"Saving credential...");
-		saveCredential();
 		return credential;
 	}
 
@@ -268,6 +272,7 @@ public class LoginManager implements Observer {
 	 */
 	private void getAuthorisationCode() {
 		String url = flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build();
+		TaskCommander.ui.addObserver(LoginManager.getInstance());
 		TaskCommander.ui.getCodeFromUser(url);
 	}
 

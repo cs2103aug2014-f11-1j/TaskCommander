@@ -27,7 +27,7 @@ public class SyncHandler {
 	 */
 	public String sync() {
 		if (con == null) {
-			con = GoogleAPIConnector.getInstanceOf();
+			con = GoogleAPIConnector.getInstance();
 		}
 		
 		Thread thread = new Thread() {
@@ -40,7 +40,6 @@ public class SyncHandler {
                     	 logger.log(Level.WARNING, "Error while trying to sleep in SyncHandler", e);
                      }
 				}
-				
 				push();
 				try {
 					pull();
