@@ -328,10 +328,17 @@ public class GoogleAPIConnector {
 		} else {
 			try {
 				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
-				return toTask(check);
+				if (check != null) {
+					if (check.getDeleted() == null || !check.getDeleted()) {
+						return toTask(check);
+					}
+				}
 			} catch (IOException e) {
 				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+			} catch (NullPointerException e) {
+				logger.log(Level.SEVERE, "", e);
 			}
+
 		}
 		return null;
 	}
@@ -348,13 +355,19 @@ public class GoogleAPIConnector {
 		if (task == null) {
 			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
 		} else if (task.getId() == null) {
-			logger.log(Level.WARNING, "Task has no ID");
+			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
 			try {
 				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
-				return toTask(check);
+				if (check != null) {
+					if (check.getDeleted() == null || !check.getDeleted()) {
+						return toTask(check);
+					}
+				}
 			} catch (IOException e) {
 				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+			} catch (NullPointerException e) {
+				logger.log(Level.SEVERE, "", e);
 			}
 		}
 		return null;
@@ -376,7 +389,9 @@ public class GoogleAPIConnector {
 		} else {
 			try {
 				Event check = calendar.events().get(PRIMARY_CALENDAR_ID, task.getId()).execute();
-				return toTask(check);
+				if (check != null && check.getStatus().equals("confirmed")) {
+					return toTask(check);
+				}
 			} catch (IOException e) {
 				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
 			}
@@ -402,8 +417,7 @@ public class GoogleAPIConnector {
 			try {
 				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
 				request.execute();
-				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
-				return check.getDeleted();
+				return (getTask(task) == null);
 			} catch (IOException e) {
 				if (e.getMessage().contains("404 Not Found")) {
 					return true;
@@ -432,8 +446,7 @@ public class GoogleAPIConnector {
 			try {
 				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
 				request.execute();
-				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
-				return check.getDeleted();
+				return (getTask(task) == null);
 			} catch (IOException e) {
 				if (e.getMessage().contains("404 Not Found")) {
 					return true;
@@ -460,9 +473,8 @@ public class GoogleAPIConnector {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
 			try {
-				calendar.events().delete(PRIMARY_CALENDAR_ID, "eventId").execute();
-				Event check = calendar.events().get(PRIMARY_TASKS_ID, task.getId()).execute();
-				return check == null;
+				calendar.events().delete(PRIMARY_CALENDAR_ID, task.getId()).execute();
+				return (getTask(task) == null);
 			} catch (IOException e) {
 				if (e.getMessage().contains("404 Not Found")) {
 					return true;
@@ -629,49 +641,57 @@ public class GoogleAPIConnector {
 	}
 
 	public String addTask(com.taskcommander.Task task) {
-		switch (task.getType()) {
-		case FLOATING:
-			return addTask((FloatingTask) task);
-		case TIMED:
-			return addTask((TimedTask) task);
-		case DEADLINE:
-			return addTask((DeadlineTask) task);
+		if (task != null) {
+			switch (task.getType()) {
+			case FLOATING:
+				return addTask((FloatingTask) task);
+			case TIMED:
+				return addTask((TimedTask) task);
+			case DEADLINE:
+				return addTask((DeadlineTask) task);
+			}
 		}
 		return null;
 	}
 
 	public com.taskcommander.Task getTask(com.taskcommander.Task task) {
-		switch (task.getType()) {
-		case FLOATING:
-			return getTask((FloatingTask) task);
-		case TIMED:
-			return getTask((TimedTask) task);
-		case DEADLINE:
-			return getTask((DeadlineTask) task);
+		if (task != null) {
+			switch (task.getType()) {
+			case FLOATING:
+				return getTask((FloatingTask) task);
+			case TIMED:
+				return getTask((TimedTask) task);
+			case DEADLINE:
+				return getTask((DeadlineTask) task);
+			}
 		}
 		return null;
 	}
 
 	public boolean updateTask(com.taskcommander.Task task) {
-		switch (task.getType()) {
-		case FLOATING:
-			return updateTask((FloatingTask) task);
-		case TIMED:
-			return updateTask((TimedTask) task);
-		case DEADLINE:
-			return updateTask((DeadlineTask) task);
+		if (task != null) {
+			switch (task.getType()) {
+			case FLOATING:
+				return updateTask((FloatingTask) task);
+			case TIMED:
+				return updateTask((TimedTask) task);
+			case DEADLINE:
+				return updateTask((DeadlineTask) task);
+			}
 		}
 		return false;
 	}
 
 	public boolean deleteTask(com.taskcommander.Task task) {
-		switch (task.getType()) {
-		case FLOATING:
-			return deleteTask((FloatingTask) task);
-		case TIMED:
-			return deleteTask((TimedTask) task);
-		case DEADLINE:
-			return deleteTask((DeadlineTask) task);
+		if (task != null) {
+			switch (task.getType()) {
+			case FLOATING:
+				return deleteTask((FloatingTask) task);
+			case TIMED:
+				return deleteTask((TimedTask) task);
+			case DEADLINE:
+				return deleteTask((DeadlineTask) task);
+			}
 		}
 		return false;
 	}

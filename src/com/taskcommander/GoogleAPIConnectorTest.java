@@ -40,11 +40,61 @@ public class GoogleAPIConnectorTest {
 		login();
 		assertNotNull("Able to get Tasks and Calendar services.", con.getServices());
 	}
+	
+	// Test null inputs for CRUD
+	@Test
+	public void testAddNullTask() {
+		login();
+		assertNull(con.addTask(null));
+	}
+	
+	@Test
+	public void testGetNullTask() {
+		login();
+		assertNull(con.getTask(null));
+	}
+	
+	@Test
+	public void testUpdateNullTask() {
+		login();
+		assertNull(con.updateTask(null));
+	}
+	
+	@Test
+	public void testDeleteNullTask() {
+		login();
+		assertNull(con.deleteTask(null));
+	}
+	
+	// Test unsynced task inputs for get, update and delete
+	@Test
+	public void testUpdateUnsyncedFloatingTask() {
+		login();
+		FloatingTask task = new FloatingTask("Update Unsynced Floating Task");
+		assertFalse(con.updateTask(task));
+	}
+	
+	@Test
+	public void testUpdateUnsyncedDeadlineTask() {
+		login();
+		DeadlineTask task = new DeadlineTask("Update Unsynced Deadline Task", new Date(System.currentTimeMillis()));
+		assertFalse(con.updateTask(task));
+	}
+	
+	@Test
+	public void testUpdateUnsyncedTimedTask() {
+		login();
+		TimedTask task = new TimedTask("Update Unsynced Timed Task", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		assertFalse(con.updateTask(task));
+	}
+	
+	// Test special case inputs for CRUD
 
+	// Test normal task inputs for each task type for CRUD
 	@Test
 	public void testAddOneFloatingTask() {
 		login();
-		FloatingTask task = new FloatingTask("Test Task 1");
+		FloatingTask task = new FloatingTask("Add Floating Task");
 		assertNotNull(con.addTask(task));
 		con.deleteTask(task);
 	}
@@ -52,7 +102,7 @@ public class GoogleAPIConnectorTest {
 	@Test
 	public void testAddOneDeadlineTask() {
 		login();
-		DeadlineTask task = new DeadlineTask("Test Task 1", new Date(System.currentTimeMillis()));
+		DeadlineTask task = new DeadlineTask("Add Deadline Task", new Date(System.currentTimeMillis()));
 		assertNotNull(con.addTask(task));
 		con.deleteTask(task);
 	}
@@ -60,7 +110,7 @@ public class GoogleAPIConnectorTest {
 	@Test
 	public void testAddOneTimedTask() {
 		login();
-		TimedTask task = new TimedTask("Test Task 1", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		TimedTask task = new TimedTask("Add Timed Task", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
 		assertNotNull(con.addTask(task));
 		con.deleteTask(task);
 	}
@@ -68,10 +118,11 @@ public class GoogleAPIConnectorTest {
 	@Test
 	public void testGetOneFloatingTask() {
 		login();
-		FloatingTask task = new FloatingTask("Test Task 1");
+		FloatingTask task = new FloatingTask("Get Floating Task");
 		String id = con.addTask(task);
 		assertNotNull(id);
 		task.setId(id);
+		assertNotNull(task.getId());
 		assertNotNull(con.getTask(task));
 		con.deleteTask(task);
 	}
@@ -79,7 +130,7 @@ public class GoogleAPIConnectorTest {
 	@Test
 	public void testGetOneDeadlineTask() {
 		login();
-		DeadlineTask task = new DeadlineTask("Test Task 1", new Date(System.currentTimeMillis()));
+		DeadlineTask task = new DeadlineTask("Get Deadline Task", new Date(System.currentTimeMillis()));
 		String id = con.addTask(task);
 		assertNotNull(id);
 		task.setId(id);
@@ -90,7 +141,7 @@ public class GoogleAPIConnectorTest {
 	@Test
 	public void testGetOneTimedTask() {
 		login();
-		TimedTask task = new TimedTask("Test Task 1", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		TimedTask task = new TimedTask("Get Timed Task", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
 		String id = con.addTask(task);
 		assertNotNull(id);
 		task.setId(id);
@@ -101,11 +152,11 @@ public class GoogleAPIConnectorTest {
 	@Test
 	public void testUpdateOneFloatingTask() {
 		login();
-		FloatingTask task = new FloatingTask("Test Task 1");
+		FloatingTask task = new FloatingTask("Update Floating Task");
 		String id = con.addTask(task);
 		assertNotNull(id);
 		task.setId(id);
-		task.setName("Changed Test Task 1");
+		task.setName("Update Floating Task Changed");
 		assertTrue(con.updateTask(task));
 		con.deleteTask(task);
 	}
@@ -113,11 +164,11 @@ public class GoogleAPIConnectorTest {
 	@Test
 	public void testUpdateOneDeadlineTask() {
 		login();
-		DeadlineTask task = new DeadlineTask("Test Task 1", new Date(System.currentTimeMillis()));
+		DeadlineTask task = new DeadlineTask("Update Deadline Task", new Date(System.currentTimeMillis()));
 		String id = con.addTask(task);
 		assertNotNull(id);
 		task.setId(id);
-		task.setName("Changed Test Task 1");
+		task.setName("Update Deadline Task Changed");
 		assertTrue(con.updateTask(task));
 		con.deleteTask(task);
 	}
@@ -125,11 +176,11 @@ public class GoogleAPIConnectorTest {
 	@Test
 	public void testUpdateOneTimedTask() {
 		login();
-		TimedTask task = new TimedTask("Test Task 1", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		TimedTask task = new TimedTask("Update Timed Task", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
 		String id = con.addTask(task);
 		assertNotNull(id);
 		task.setId(id);
-		task.setName("Changed Test Task 1");
+		task.setName("Update Timed Task Changed");
 		assertTrue(con.updateTask(task));
 		con.deleteTask(task);
 	}
@@ -137,36 +188,37 @@ public class GoogleAPIConnectorTest {
 	@Test
 	public void testDeleteOneFloatingTask() {
 		login();
-		FloatingTask task = new FloatingTask("Test Task 1");
+		FloatingTask task = new FloatingTask("Delete Floating Task");
 		String id = con.addTask(task);
 		assertNotNull(id);
 		task.setId(id);
 		assertNotNull(task.getId());
 		assertTrue(con.deleteTask(task));
+		assertNull(con.getTask(task));
 	}
 
 	@Test
 	public void testDeleteOneDeadlineTask() {
 		login();
-		DeadlineTask task = new DeadlineTask("Test Task 1", new Date(System.currentTimeMillis()));
+		DeadlineTask task = new DeadlineTask("Delete Deadline Task", new Date(System.currentTimeMillis()));
 		String id = con.addTask(task);
 		assertNotNull(id);
 		task.setId(id);
 		assertNotNull(task.getId());
 		assertTrue(con.deleteTask(task));
+		assertNull(con.getTask(task));
 	}
 
 	@Test
 	public void testDeleteOneTimedTask() {
 		login();
-		TimedTask task = new TimedTask("Test Task 1", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		TimedTask task = new TimedTask("Delete Timed Task", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
 		String id = con.addTask(task);
 		assertNotNull(id);
 		task.setId(id);
 		assertNotNull(task.getId());
 		assertTrue(con.deleteTask(task));
+		assertNull(con.getTask(task));
 	}
-	
-	//TODO CRUD mixed set of tasks
 
 }
