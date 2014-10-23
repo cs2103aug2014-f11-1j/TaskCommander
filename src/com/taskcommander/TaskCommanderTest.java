@@ -62,7 +62,7 @@ public class TaskCommanderTest {
 				TaskCommander.controller.executeCommand(userCommand));
 	}
 	
-	//Here the String returned should be changed in controller
+	
 	@Test
 	public void testAddTimeTaskWithDifferentDate()throws Exception{
 		String userCommand = "add \"Meeting In ShangHai\" Nov 11 2014 3pm -  Dec 12 2014 4pm";
@@ -109,7 +109,8 @@ public class TaskCommanderTest {
 	/**Test Update Function
 	 * */
 	
-	//This is a boundry testing for invalid index
+	//This is a boundry testing for invalid index 
+	// index >=1
 	@Test
 	public void testUpdateTaskWithInvalidIndex() throws Exception{
 		String userCommand = "update 0 3pm";
@@ -118,6 +119,7 @@ public class TaskCommanderTest {
 		assertEquals(String.format(Global.ERROR_MESSAGE_NO_INDEX, 0), TaskCommander.controller.executeCommand(userCommand));
 
 	}
+	
 	@Test
 	public void testUpdateTaskWithTimeAdded() throws Exception{
 		String userCommand = "update 1 3pm";
@@ -126,12 +128,20 @@ public class TaskCommanderTest {
 		assertEquals("Updated: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
 
 	}
-		@Test
+	@Test
 	public void testUpdateTaskChangeContent() throws Exception{
 		String userCommand = "update 1 \"early bird catches the worm\"";
 		TaskCommander.controller.getDisplayedTasks();
 		Date date = new Date();
 		assertEquals("Updated: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"early bird catches the worm\"", TaskCommander.controller.executeCommand(userCommand));
+	}
+	@Test
+	public void testUpdateDeadlineTaskToTimedTask() throws Exception{
+		String userCommand = "add \"welcome boss\" 3pm";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "update 1 Nov 11 3pm - 4 pm";
+		TaskCommander.controller.getDisplayedTasks();
+		assertEquals("Updated: [Tue Nov 11 '14 15:00-16:00] \"welcome boss\"", TaskCommander.controller.executeCommand(userCommand));
 	}
 
 	@Test
