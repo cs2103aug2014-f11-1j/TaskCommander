@@ -49,10 +49,24 @@ public class TaskCommanderTest {
 				TaskCommander.controller.executeCommand(userCommand));
 	}
 	@Test
+	public void testAddDeadlineTaskWithSpecificDate()throws Exception{
+		String userCommand = "add \"walk a dog\" Nov 11 2015 3pm";
+		assertEquals("Added: [by Wed Nov 11 '15 15:00] \"walk a dog\"",
+				TaskCommander.controller.executeCommand(userCommand));
+	}
+	@Test
 	public void testAddTimeTask()throws Exception{
 		String userCommand = "add \"little boy\" 3pm - 4pm";
 		Date date = new Date();
 		assertEquals("Added: ["+Global.dayFormat.format(date)+" "+"15:00-16:00] \"little boy\"",
+				TaskCommander.controller.executeCommand(userCommand));
+	}
+	
+	//Here the String returned should be changed in controller
+	@Test
+	public void testAddTimeTaskWithDifferentDate()throws Exception{
+		String userCommand = "add \"Meeting In ShangHai\" Nov 11 2014 3pm -  Dec 12 2014 4pm";
+		assertEquals("Added: [Tue Nov 11 '14 15:00-Fri 12 '14 16:00] \"Meeting In ShangHai\"",
 				TaskCommander.controller.executeCommand(userCommand));
 	}
 
@@ -116,16 +130,16 @@ public class TaskCommanderTest {
 	public void testUpdateTaskChangeContent() throws Exception{
 		String userCommand = "update 1 \"early bird catches the worm\"";
 		TaskCommander.controller.getDisplayedTasks();
-		assertEquals("Updated: [by Tue Oct 21 '14 15:00] \"early bird catches the worm\"", TaskCommander.controller.executeCommand(userCommand));
+		Date date = new Date();
+		assertEquals("Updated: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"early bird catches the worm\"", TaskCommander.controller.executeCommand(userCommand));
 	}
 
 	@Test
 	public void testUpdateTaskChangeTime() throws Exception{
-		String userCommand = "add \"hi baby\" 3pm";
-		TaskCommander.controller.executeCommand(userCommand);
+		String userCommand;
 		userCommand = "update 1 none";
 		TaskCommander.controller.getDisplayedTasks();
-		assertEquals("Updated: \"hi baby\"", TaskCommander.controller.executeCommand(userCommand));
+		assertEquals("Updated: \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
 	}
 
 	/**Test Mark Function
