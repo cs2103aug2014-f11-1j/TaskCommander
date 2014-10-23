@@ -80,12 +80,12 @@ public class GoogleAPIConnector {
 	}
 
 	public boolean getServices() {
-		if (tasks != null && calendar != null) {
+		if (isLoggedIn()) {
 			return true;
 		} else {
 			tasks = loginManager.getTasksService();
 			calendar = loginManager.getCalendarService();
-			return (tasks != null && calendar != null);
+			return isLoggedIn();
 		}
 	}
 
@@ -103,7 +103,7 @@ public class GoogleAPIConnector {
 	 * @return Feedback for user.
 	 */
 	public ArrayList<com.taskcommander.Task> getAllTasks() {
-		if (tasks == null || calendar == null) {
+		if (!isLoggedIn()) {
 			logger.log(Level.INFO, MESSAGE_SERVICES_NULL);
 			getServices();
 			return null;
@@ -142,11 +142,17 @@ public class GoogleAPIConnector {
 			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
 			List<Task> tasks = request.execute().getItems();
 
-			ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
-			for (Task task : tasks) {
-				taskList.add(toTask(task));
+			if (tasks != null) {
+				ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
+				for (Task task : tasks) {
+					taskList.add(toTask(task));
+				}
+				return taskList;
+			} else {
+				logger.log(Level.SEVERE, "Task list was null");
+				return null;
 			}
-			return taskList;
+
 		}  catch (GoogleJsonResponseException e) {
 			if (e.getMessage().contains("401 Unauthorized")) {
 				// If not logged in, login attempt handled outside of this class
@@ -187,11 +193,15 @@ public class GoogleAPIConnector {
 					.setTimeMin(new DateTime(System.currentTimeMillis())) 
 					.execute().getItems();
 
-			ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
-			for (Event event : events) {
-				taskList.add(toTask(event));
+			if (events != null) {
+				ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
+				for (Event event : events) {
+					taskList.add(toTask(event));
+				}
+				return taskList;
+			} else {
+				return null;
 			}
-			return taskList;
 		}  catch (GoogleJsonResponseException e) {
 			if (e.getMessage().contains("401 Unauthorized")) {
 				// If not logged in, login attempt handled outside of this class
@@ -716,6 +726,13 @@ public class GoogleAPIConnector {
 			idList.add(t.getId());
 		}
 		return idList;
+	}
+
+	/**
+	 * Checks if the services are not null.
+	 */
+	public boolean isLoggedIn() {
+		return (tasks != null && calendar != null);
 	}
 
 }

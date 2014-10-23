@@ -61,8 +61,9 @@ public class SyncHandler extends Observable {
 		Thread thread = new Thread() {
 			@Override
 			public void run() {
-				while (con.getAllTasks() == null) {
+				while (!con.getServices()) {
 					try {
+						logger.log(Level.WARNING, "Waiting for login...");
 						sleep(10);  // milliseconds
 					} catch (InterruptedException e) {
 						logger.log(Level.WARNING, "Error while trying to sleep in SyncHandler", e);
@@ -86,8 +87,10 @@ public class SyncHandler extends Observable {
 
 	private void push() {
 		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
+		ArrayList<Task> deletedTasks = TaskCommander.data.getDeletedTasks();
 		logger.log(Level.INFO, "PUSH: Retrieved All Tasks");
-		startSyncState(SyncState.PUSH, tasks.size());
+		startSyncState(SyncState.PUSH, tasks.size() + deletedTasks.size());
+		
 		for (Task t : tasks) {
 			if (!t.isSynced()) {
 				if (t.getId() == null) {
@@ -104,7 +107,7 @@ public class SyncHandler extends Observable {
 		logger.log(Level.INFO, "PUSH: Handled Added Cases");
 
 		// Handle delete cases
-		ArrayList<Task> deletedTasks = TaskCommander.data.getDeletedTasks();
+
 		for (Task t : deletedTasks) {
 			if (t.getId() != null) {
 				con.deleteTask(t);
@@ -117,8 +120,12 @@ public class SyncHandler extends Observable {
 	private void pull() throws IOException {
 		//Get all Tasks
 		ArrayList<Task> tasksToSync = con.getAllTasks();
+		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
+		List<com.google.api.services.tasks.model.Task> googleTasks = con.getAllGoogleTasks();
+		List<Event> googleEvents = con.getAllGoogleEvents();
 		logger.log(Level.INFO, "PULL: Retrieved All Tasks");
-		startSyncState(SyncState.PULL, tasksToSync.size());
+		startSyncState(SyncState.PULL, tasksToSync.size() + tasks.size() + googleTasks.size() + googleEvents.size());
+		
 		//Added case
 		ArrayList<String> taskIds = TaskCommander.data.getAllIds();
 		for (Task t: tasksToSync) {
@@ -128,28 +135,8 @@ public class SyncHandler extends Observable {
 		}
 		logger.log(Level.INFO, "PULL: Handled Added Tasks");
 
-		//Deleted case
-		//For Tasks
-		List<com.google.api.services.tasks.model.Task> googleTasks = con.getAllGoogleTasks();
-		for (com.google.api.services.tasks.model.Task task : googleTasks) {
-			if (task.getDeleted() != null) {
-				TaskCommander.data.deleteTask(con.toTask(task));
-			}
-		}
-		logger.log(Level.INFO, "PULL: Handled Deleted Google Tasks");
-
-
-		//Deleted Case For Events
-		List<Event> googleEvents = con.getAllGoogleEvents();
-		for (Event event : googleEvents) {
-			if ("cancelled".equals(event.getStatus())) {
-				TaskCommander.data.deleteTask(con.toTask(event));
-			}
-		}
-		logger.log(Level.INFO, "PULL: Handled Deleted Google Events");
-
 		//Updated cases
-		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
+
 		taskIds = TaskCommander.data.getAllIds(); 
 		for (Task t: tasksToSync) {
 			int index = taskIds.indexOf(t.getId());
@@ -168,6 +155,23 @@ public class SyncHandler extends Observable {
 			}
 		}
 		logger.log(Level.INFO, "PULL: Handled Updated Cases");
+		
+		//Deleted case
+		//For Tasks
+		for (com.google.api.services.tasks.model.Task task : googleTasks) {
+			if (task.getDeleted() != null) {
+				TaskCommander.data.deleteTask(con.toTask(task));
+			}
+		}
+		logger.log(Level.INFO, "PULL: Handled Deleted Google Tasks");
+		
+		//Deleted Case For Events
+		for (Event event : googleEvents) {
+			if ("cancelled".equals(event.getStatus())) {
+				TaskCommander.data.deleteTask(con.toTask(event));
+			}
+		}
+		logger.log(Level.INFO, "PULL: Handled Deleted Google Events");
 	}
 
 	//@author A0112828H

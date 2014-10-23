@@ -913,6 +913,7 @@ public class Data {
 	public String clearTasks() {
 		ArrayList<Task> cleared = new ArrayList<Task>();
 		cleared.addAll(tasks);
+		deletedTasks.addAll(tasks);
 		clearedTasks.push(cleared);
 		tasks.clear();
 		saveToOperationHistory(Global.CommandType.CLEAR);
