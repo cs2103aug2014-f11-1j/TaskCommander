@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Lists;
 import com.google.api.client.util.store.DataStore;
@@ -146,10 +147,16 @@ public class GoogleAPIConnector {
 				taskList.add(toTask(task));
 			}
 			return taskList;
+		}  catch (GoogleJsonResponseException e) {
+			if (e.getMessage().contains("401 Unauthorized")) {
+				// If not logged in, login attempt handled outside of this class
+			} else {
+				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+			}
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
-			return null;
 		}
+		return null;
 	}
 
 	/**
@@ -185,10 +192,16 @@ public class GoogleAPIConnector {
 				taskList.add(toTask(event));
 			}
 			return taskList;
+		}  catch (GoogleJsonResponseException e) {
+			if (e.getMessage().contains("401 Unauthorized")) {
+				// If not logged in, login attempt handled outside of this class
+			} else {
+				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+			}
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
-			return null;
 		}
+		return null;
 	}
 
 	/**

@@ -46,6 +46,7 @@ public class SyncHandler extends Observable {
 	 * @return   Feedback for user
 	 */
 	public String sync() {
+		Global.syncing = true;
 		TaskCommander.syncHandler.addObserver(TaskCommander.ui);
 		if (con == null) {
 			con = GoogleAPIConnector.getInstance();
@@ -176,7 +177,6 @@ public class SyncHandler extends Observable {
 	}
 
 	private void startSyncState(SyncState state, int total) {
-		Global.syncing = true;
 		syncState = state;
 		tasksTotal = total;
 		tasksComplete = 0;
