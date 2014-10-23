@@ -741,7 +741,10 @@ public class Data {
 	 * It supports Add, Delete, Update, and Clear commands
 	 * 
 	 */
-	public void undo() {
+	public String undo() {
+		if (operationHistory.empty()) {
+			return Global.MESSAGE_UNDO_EMPTY;
+		}
 		Global.CommandType type = operationHistory.pop();
 		Global.CommandType undoCommand;
 		switch(type) {
@@ -769,6 +772,7 @@ public class Data {
 			undo(); //Calls undo again to look for one of the four commands above
 		}
 		save();
+		return String.format(Global.MESSAGE_UNDONE, type);
 	}
 	
 	/**
@@ -911,6 +915,7 @@ public class Data {
 		cleared.addAll(tasks);
 		clearedTasks.push(cleared);
 		tasks.clear();
+		saveToOperationHistory(Global.CommandType.CLEAR);
 		save();
 		return String.format(Global.MESSAGE_CLEARED);
 	}
