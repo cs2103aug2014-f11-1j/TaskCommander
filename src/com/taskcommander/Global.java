@@ -23,11 +23,13 @@ public class Global {
 	public static final String MESSAGE_CLEARED = "All content deleted.";
 	public static final String MESSAGE_DISPLAYED = "Displayed: %1$s";
 	public static final String MESSAGE_SEARCHED= "Searched for: %1$s";
+	public static final String MESSAGE_UNDONE = "Undone latest command: %1$s.";
 	public static final String ERROR_MESSAGE_INVALID_FORMAT = "Invalid command format: %1$s. " + "Type 'help' to see the list of commands.";
 	public static final String ERROR_MESSAGE_NO_COMMAND = "No command given.";
 	public static final String ERROR_MESSAGE_NO_INDEX = "Index %1$s does not exist. Please type a valid index.";
 	public static final String MESSAGE_EMPTY = "No tasks available";
-	public static final String MESSAGE_HELP = "Commands: add ¡°<task title>¡± <date> <end time>,\n display [timed] [deadline] [floating] [done|open] [date] [start time] [end time],\n open <index>, done <index>, delete <index of string>, clear, sort, exit.";
+	public static final String MESSAGE_UNDO_EMPTY = "No commands to undo";
+	public static final String MESSAGE_HELP = "Commands: add ¡°<task title>¡± <date> <end time>,\n display [timed] [deadline] [floating] [done|open] [date] [start time] [end time],\n open <index>, done <index>, delete <index of string>, clear, sort, undo, exit.";
 	public static final String MESSAGE_LINE_FOUND = "Found \"%1$s\".";
 	public static final String MESSAGE_LINE_NOT_FOUND = "The line \"%1$s\" does not exist.";
 	public static final String MESSAGE_SORTED = "Tasks have been sorted.";
