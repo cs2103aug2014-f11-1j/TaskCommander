@@ -66,7 +66,7 @@ public class TaskCommanderTest {
 	@Test
 	public void testAddTimeTaskWithDifferentDate()throws Exception{
 		String userCommand = "add \"Meeting In ShangHai\" Nov 11 2014 3pm -  Dec 12 2014 4pm";
-		assertEquals("Added: [Tue Nov 11 '14 15:00-Fri 12 '14 16:00] \"Meeting In ShangHai\"",
+		assertEquals("Added: [Tue Nov 11 '14 15:00-Fri Dec 12 '14 16:00] \"Meeting In ShangHai\"",
 				TaskCommander.controller.executeCommand(userCommand));
 	}
 

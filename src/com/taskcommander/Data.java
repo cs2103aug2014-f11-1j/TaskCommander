@@ -158,7 +158,10 @@ public class Data {
 		tasks.add(timedTask);
 		addedTasks.push(timedTask);
 		save();
-		return String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
+		if(!Global.dayFormat.format(timedTask.getStartDate()).equals(Global.dayFormat.format(timedTask.getEndDate())))
+		return String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.dayFormat.format(timedTask.getEndDate()) +" "+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\"");
+		else
+			return String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ /*Global.dayFormat.format(timedTask.getEndDate()) +" "+*/ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\""); 
 	}
 	
 	/**
