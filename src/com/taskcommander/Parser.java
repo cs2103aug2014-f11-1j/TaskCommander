@@ -1,8 +1,11 @@
 package com.taskcommander;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.joestelmach.natty.*;
 
@@ -149,19 +152,28 @@ public class Parser {
 	}
 	
 	/**
-	 * This operation determines the searched words and returns them as an string array.
+	 * This operation determines the searched phrases in double quotes and the single words
+	 * and returns them within a ArrayList.
 	 * 
 	 * @param userCommand  
 	 */
-	public String[] determineSearchedWords(String userCommand) {
+	public ArrayList<String> determineSearchedWords(String userCommand) {
 		String residualUserCommand = removeFirstWord(userCommand);
 
-		String[] searchedWords = residualUserCommand.split("\\s+");
-		for(int i = 0; i < searchedWords.length; ++i) {
-			searchedWords[i] = searchedWords[i].trim();
-		}
+		ArrayList<String> searchedWords = new ArrayList<String>();
 		
+		Pattern pattern = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"");	// group 1 extracts phrases in double quotes, else it returns the single words split by space
+		Matcher matcher = pattern.matcher(residualUserCommand);
+		while (matcher.find()) {
+		    if (matcher.group(1) != null) {
+		    	searchedWords.add(matcher.group(1));
+		    } else {
+		    	searchedWords.add(matcher.group());
+		    }
+		}
+
 		return searchedWords;
+
 	}
 	
 	/**

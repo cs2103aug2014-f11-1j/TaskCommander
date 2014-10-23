@@ -90,7 +90,7 @@ public class Controller {
 	boolean done; // false = open, true = done
 	
 	boolean isSearchedWordsRestricted;
-	String[] searchedWords;
+	ArrayList<String> searchedWords;
 	
 	/**
 	 * This list contains the state of the tasks before the latest add/update/done/open/delete command.
@@ -350,9 +350,9 @@ public class Controller {
 				displayRestriction = "";
 				for(String searchedWord : searchedWords) {
 					if (displayRestriction.equals("")) {
-						displayRestriction = "Tasks containing the words "+searchedWord;
+						displayRestriction = "Tasks containing the words and/or phrases "+"\""+searchedWord+"\"";
 					} else {
-						displayRestriction += ", "+searchedWord;
+						displayRestriction += ", "+"\""+searchedWord+"\"";
 					}
 				}
 				return String.format(Global.MESSAGE_DISPLAYED, displayRestriction);
