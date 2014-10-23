@@ -383,7 +383,7 @@ public class Controller {
 				
 			case UNDO: 
 				
-				return String.format("to  implemented yet");
+				return TaskCommander.data.undo();
 				
 			case EXIT:
 				System.exit(0);
