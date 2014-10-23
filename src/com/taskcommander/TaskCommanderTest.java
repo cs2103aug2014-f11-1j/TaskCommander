@@ -61,8 +61,8 @@ public class TaskCommanderTest {
 		assertEquals("Added: ["+Global.dayFormat.format(date)+" "+"15:00-16:00] \"little boy\"",
 				TaskCommander.controller.executeCommand(userCommand));
 	}
-	
-	
+
+
 	@Test
 	public void testAddTimeTaskWithDifferentDate()throws Exception{
 		String userCommand = "add \"Meeting In ShangHai\" Nov 11 2014 3pm -  Dec 12 2014 4pm";
@@ -108,7 +108,7 @@ public class TaskCommanderTest {
 
 	/**Test Update Function
 	 * */
-	
+
 	//This is a boundry testing for invalid index 
 	// index >=1
 	@Test
@@ -119,7 +119,7 @@ public class TaskCommanderTest {
 		assertEquals(String.format(Global.ERROR_MESSAGE_NO_INDEX, 0), TaskCommander.controller.executeCommand(userCommand));
 
 	}
-	
+
 	@Test
 	public void testUpdateTaskWithTimeAdded() throws Exception{
 		String userCommand = "update 1 3pm";
@@ -146,7 +146,8 @@ public class TaskCommanderTest {
 
 	@Test
 	public void testUpdateTaskChangeTime() throws Exception{
-		String userCommand;
+		String userCommand = "add \"little boy\" 3pm";
+		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "update 1 none";
 		TaskCommander.controller.getDisplayedTasks();
 		assertEquals("Updated: \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
@@ -159,7 +160,7 @@ public class TaskCommanderTest {
 		String userCommand = "done 1";
 		TaskCommander.controller.getDisplayedTasks();
 		Date date = new Date();
-		assertEquals("Done: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"early bird catches the worm\"", TaskCommander.controller.executeCommand(userCommand));
+		assertEquals("Done: ["+Global.dayFormat.format(date)+" "+ "15:00-16:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
 	}
 	@Test
 	public void testAlreadyOpen() throws Exception{
@@ -167,8 +168,10 @@ public class TaskCommanderTest {
 		TaskCommander.controller.getDisplayedTasks();
 		assertEquals("Already opened.", TaskCommander.controller.executeCommand(userCommand));
 	}
-
-
+	/**
+	 * Testing delete
+	 * @throws Exception
+	 */
 	@Test
 	public void testDelete() throws Exception{
 		String userCommand = "delete 1 ";
@@ -176,5 +179,32 @@ public class TaskCommanderTest {
 		Date date =  new Date();
 		assertEquals("Deleted: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
 	}
-
+	/**
+	 * Testing undo
+	 * @throws Exception
+	 */
+	@Test
+	public void testUndoAdd() throws Exception{
+		String userCommand = "add \"little boy\" 3pm";
+		Date date = new Date();
+		assertEquals("Added: [by "+Global.dayFormat.format(date)+" "+"15:00] \"little boy\"",
+				TaskCommander.controller.executeCommand(userCommand));
+		userCommand = "undo";
+		assertEquals("Undone latest command: ADD.",
+				TaskCommander.controller.executeCommand(userCommand));
+	}
+	
+	@Test
+	public void testUndoDelete() throws Exception{
+		String userCommand = "add \"little boy\" 3pm";
+		Date date = new Date();
+		assertEquals("Added: [by "+Global.dayFormat.format(date)+" "+"15:00] \"little boy\"",
+				TaskCommander.controller.executeCommand(userCommand));
+		userCommand = "delete 1 ";
+		TaskCommander.controller.getDisplayedTasks();
+		assertEquals("Deleted: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"early bird catches the worm\"", TaskCommander.controller.executeCommand(userCommand));
+		userCommand = "undo";
+		assertEquals("Undone latest command: DELETE.",
+				TaskCommander.controller.executeCommand(userCommand));
+	}
 }
