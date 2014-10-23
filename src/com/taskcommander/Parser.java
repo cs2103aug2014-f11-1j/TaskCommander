@@ -75,6 +75,8 @@ public class Parser {
 			return Global.CommandType.CLEAR;
 		} else if (commandTypeString.equalsIgnoreCase("sync")) {
 			return Global.CommandType.SYNC;
+		} else if (commandTypeString.equalsIgnoreCase("undo")) {
+			return Global.CommandType.UNDO;
 		}else if (commandTypeString.equalsIgnoreCase("exit")) {
 			return Global.CommandType.EXIT;
 		} else {
