@@ -141,7 +141,7 @@ public class Parser {
 	 */
 	public int determineIndex(String userCommand) {
 		String indexString = getSecondWord(userCommand);
-
+		System.out.println(indexString);
 		int index;
 		try {
 			index = Integer.parseInt(indexString) - Global.INDEX_OFFSET; // Change the line number to an array index
