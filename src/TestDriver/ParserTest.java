@@ -16,22 +16,27 @@ import com.taskcommander.TaskCommander;
 
 public class ParserTest {
 
-	/* This is a boundary Test of the operation determineIndec()
-	 * 
-	 * UserCommand: [commandType][index]
-	 * 
-	 * Equivalence partions:
-	 * [commandtype]: ("update", "delete", "done", "open"), (any other String), null
-	 * [index]: (MIN_INT - MAX_INT), (any non integer), null
-	 */
-	
-	/*
 	@Test
-	private void testDetermineIndex(String description, String expected, String command) {
+	public void testParser() {
+		
+		/* 
+		 * These are test cases for the operation determineIndex(userCommand:String)
+		 * 
+		 * Initial partition of userCommand: [commandType][index]
+		 * Equivalence partitions:
+		 * [commandtype]: ("update", "delete", "done", "open"), (any other String), (null)
+		 * [index]: (MIN_INT - MAX_INT), (any non integer), (null)
+		 */
+		
+		testDetermineIndex("Case 1", Integer.MIN_VALUE+1, "update "+Integer.MIN_VALUE);
+	
+	}
+
+	private void testDetermineIndex(String description, int expected, String userCommand) {
 	    assertEquals(description, expected, TaskCommander.parser.determineIndex(userCommand)); 
 	}
-	*/
 	
+	/*
 	@Test
 	public void testDetermineIndex() throws Exception{
 		String userCommand = "update "+Integer.MIN_VALUE;
@@ -157,5 +162,5 @@ public class ParserTest {
 		TaskCommander.parser.determineIndex(userCommand);
 		assertEquals(-1, TaskCommander.parser.determineIndex(userCommand));
 	}
-
+	*/
 }

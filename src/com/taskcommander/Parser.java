@@ -6,31 +6,33 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import com.joestelmach.natty.*;
 
 /**
- * This class represents the Parser component. The Parser contains methods to parse the 
- * user's command and extract the command type and the related command parameters like index, 
- * name or dateTime of task.
+ * This class represents the Parser, a subcomponent of the Logic component. The Parser analyzes the user's
+ * input and makes meaning out of it. Therefore, the Parser provides several methods to parse the user's
+ * command and extract the command type and its related command parameters like index, name or date among others.
  * 
  * @author A0128620M
  */
 
 public class Parser {
 	
-	// Logging
-	private static Logger logger = Logger.getLogger("Parser");
+	// Logger and related logging messages
+	private static Logger logger = Logger.getLogger(Parser.class.getName());
+	private static final String MESSAGE_NO_COMMANDTYPE = "No command type found.";
+	private static final String MESSAGE_NO_TASKNAME = "No task name found.";
+	private static final String MESSAGE_NO_INDEX = "No index found.";
+	private static final String MESSAGE_NO_DATETIMES = "No dateTimes found.";
 	
 	/**
-	 * This variable is initialized with the one and only instance of the Parser class 
-	 * (see also getInstance() below)
+	 * This variable is initialized with the one and only instance of the Parser class.
 	 */
 	private static Parser theOne;
 	
 	/**
-	 * This operation which returns either a new instance of the Parser or an existing one, if any.
-	 * Therefore, it ensures that there will be only one instance of the Controller (see Singleton pattern)
+	 * This operation returns either a new instance of the Parser or an existing one, if any.
+	 * In doing so, it ensures that there will be only one instance of the Controller (Singleton pattern).
 	 */
 	public static Parser getInstance(){
 		if (theOne == null) {    
@@ -40,23 +42,26 @@ public class Parser {
 	}
 	
 	/**
-	 * Constructor
+	 * Private Constructor, only called by the getInstance() method.
 	 */
 	private Parser(){
 	}
 
 	/**
-	 * This operation determines which of the supported command types the user
-	 * wants to perform.
+	 * This operation determines which of the supported command types the user wants to perform.
 	 * 
-	 * @param userCommand
+	 * @param	user command
+	 * @return	type of command 
 	 */
 	public Global.CommandType determineCommandType(String userCommand) {
-		if (userCommand == null) {
-			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
+		String commandTypeString;
+	
+		try {
+			commandTypeString = getFirstWord(userCommand);
+		} catch (Exception e) {
+			logger.log(Level.INFO, MESSAGE_NO_COMMANDTYPE, e);
+			return Global.CommandType.INVALID;
 		}
-		
-		String commandTypeString = getFirstWort(userCommand);
 		
 		if (commandTypeString.equalsIgnoreCase("help")) {
 			return Global.CommandType.HELP;
@@ -68,14 +73,14 @@ public class Parser {
 			return Global.CommandType.DONE;
 		} else if (commandTypeString.equalsIgnoreCase("open")) {
 			return Global.CommandType.OPEN;
+		} else if (commandTypeString.equalsIgnoreCase("delete")) {
+			return Global.CommandType.DELETE;		
+		} else if (commandTypeString.equalsIgnoreCase("clear")) {
+			return Global.CommandType.CLEAR;	
 		} else if (commandTypeString.equalsIgnoreCase("display")) {
 			return Global.CommandType.DISPLAY;
 		} else if (commandTypeString.equalsIgnoreCase("search")) {
 			return Global.CommandType.SEARCH;
-		} else if (commandTypeString.equalsIgnoreCase("delete")) {
-			return Global.CommandType.DELETE;
-		} else if (commandTypeString.equalsIgnoreCase("clear")) {
-			return Global.CommandType.CLEAR;
 		} else if (commandTypeString.equalsIgnoreCase("sync")) {
 			return Global.CommandType.SYNC;
 		} else if (commandTypeString.equalsIgnoreCase("undo")) {
@@ -88,43 +93,171 @@ public class Parser {
 	}
 	
 	/**
-	 * This operation determines the name of the task, which has to be written in quotation marks.
-	 * Returns null pointer if no name found.
+	 * This operation determines the name of the task which has to be put in quotation marks.
+	 * Returns null if name not found.
 	 * 
-	 * @param userCommand
+	 * @param 	user command
+	 * @return	name of task
 	 */
 	public String determineTaskName(String userCommand) {
-
 		try {
-			return userCommand.substring(userCommand.indexOf("\"") + 1,userCommand.lastIndexOf("\""));	// possible exception because of substring() when no " is found
-		} catch (StringIndexOutOfBoundsException e) {
+			return getQuotedSubstring(userCommand);
+		} catch (Exception e) {
+			logger.log(Level.INFO, MESSAGE_NO_TASKNAME, e);
 			return null;
 		}
 	}
 
 	/**
-	 * This operation determines the end date and/or start date of the task. If the user command
-	 * contains a numeric command parameter like an index in second place, it will be removed before
-	 * parsing in order to avoid mixing-up. Returns null pointer if no date found.
+	 * This operation determines the end date and/or start date of the stated task within given command string. 
+	 * Returns null if no date found. ( Remark: If the user command contains a numeric command parameter 
+	 * like an index in second place, it will be removed before parsing the dates and times in order to avoid mixing-up.)
 	 * 
-	 * @param userCommand 
-	 * @param existsCommandParameter e.g. the index of the command: update 2 "Call Boss" 3pm
+	 * @param 	user command
+	 * @return	dateTime(s) of task
 	 */
-	public List<Date> determineTaskDateTime(String userCommand, boolean existsCommandParameter) {
-		
-		String residualUserCommand;
-		if (existsCommandParameter) {
-			residualUserCommand = removeFirstWord(removeFirstWord(userCommand));
+	public List<Date> determineTaskDateTime(String userCommand) {
+		String userCommandWithoutIndex;
+		Global.CommandType commandType = TaskCommander.parser.determineCommandType(userCommand);
+	
+		if (commandType.equals(Global.CommandType.UPDATE) | commandType.equals(Global.CommandType.DONE) | commandType.equals(Global.CommandType.OPEN) | commandType.equals(Global.CommandType.DELETE)) {
+			try {
+				userCommandWithoutIndex = removeSecondWord(userCommand);
+			} catch (Exception e) {
+				logger.log(Level.INFO, MESSAGE_NO_INDEX, e);
+				return null;
+			}
 		} else {
-			residualUserCommand = removeFirstWord(userCommand);
-		}
-		if (determineTaskName(userCommand) != null) {
-			residualUserCommand = removeQuotedSubstring(residualUserCommand);
+			userCommandWithoutIndex = userCommand;
 		}
 		
+		try {
+			return getDateTimes(userCommandWithoutIndex);
+		} catch (Exception e) {
+			logger.log(Level.INFO, MESSAGE_NO_DATETIMES, e);
+			return null;
+		}
+	}
+	
+	/**
+	 * This operation determines the index which is provided with the update, delete, 
+	 * done or open command and represents the position of the task within the recently displayed task table.
+	 * Returns null -1 not found.
+	 * 
+	 * @param 	user command
+	 * @return	index of task
+	 */
+	public int determineIndex(String userCommand) {
+		try {
+			String indexString = getSecondWord(userCommand);
+			int indexInteger = Integer.parseInt(indexString); 
+			return indexInteger;
+		} catch (Exception e) {
+			logger.log(Level.INFO, MESSAGE_NO_INDEX, e);
+			return -1;
+		} 
+	}
+	
+	/**
+	 * This operation determines the single words and phrases one searches for and returns them as an ArrayList.
+	 * 
+	 * @param 	user command
+	 * @return	ArrayList containing the searched words and phrases
+	 */
+	public ArrayList<String> determineSearchedWords(String userCommand) {
+		String userCommandWithoutCommandType;
+	
+		try {
+			userCommandWithoutCommandType = removeFirstWord(userCommand);
+		} catch (Exception e) {
+			logger.log(Level.INFO, MESSAGE_NO_COMMANDTYPE, e);
+			return null;
+		}
+
+		ArrayList<String> searchedWords = new ArrayList<String>();
+		Pattern pattern = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"");
+		Matcher matcher = pattern.matcher(userCommandWithoutCommandType);
+		
+		while (matcher.find()) {
+		    if (matcher.group(1) != null) {
+		    	// phrase in double quotes
+		    	searchedWords.add(matcher.group(1));
+		    } else {
+		    	// single word
+		    	searchedWords.add(matcher.group());
+		    }
+		}
+		return searchedWords;
+	}
+	
+	/**
+	 * This operation determines if the user command contains the given string, e.g. "none".
+	 * 
+	 * @param 	string
+	 * @param 	parameter which is looked for
+	 * @return	true if found, false if not
+	 */
+	public boolean containsParameter(String userCommand, String parameter) {
+		String userCommandWithoutTaskName;
+
+		try {
+			userCommandWithoutTaskName = removeQuotedSubstring(userCommand);
+		} catch (Exception e) {
+			logger.log(Level.INFO, MESSAGE_NO_TASKNAME, e);
+			userCommandWithoutTaskName = userCommand;
+		}
+		
+		if (parameter == null) {
+			return false;
+		} else {
+			return userCommandWithoutTaskName.contains(parameter);
+		}
+	}	
+	
+	/* ================================ General auxiliary methods =================================== */
+	
+	/**
+	 * This operation returns the first word of the given string.
+	 * 
+	 * @param 	string
+	 * @return	first word
+	 */
+	private String getFirstWord(String str) throws Exception {
+		return str.trim().split("\\s+")[0];	
+	}
+	
+	/**
+	 * This operation returns the second word of the given string.
+	 * 
+	 * @param 	string
+	 * @return	second word
+	 */
+	private String getSecondWord(String str) throws Exception {
+		return str.trim().split("\\s+")[1];	
+
+	}
+	
+	/**
+	 * This operation gets the quoted substring within the given string. 
+	 * 
+	 * @param 	string
+	 * @return	quoted substring
+	 */
+	private String getQuotedSubstring(String str) throws Exception  {
+		return str.substring(str.indexOf("\"") + 1,str.lastIndexOf("\"")).trim();
+	}
+	
+	/**
+	 * This operation gets dateTimes within the given string. 
+	 * 
+	 * @param 	string
+	 * @return	dateTimes list
+	 */
+	private List<Date> getDateTimes(String str)  throws Exception {
 		List<Date> dates = null;
+
 		com.joestelmach.natty.Parser nattyParser = new com.joestelmach.natty.Parser();
-		List<DateGroup> groups = nattyParser.parse(residualUserCommand);
+		List<DateGroup> groups = nattyParser.parse(str);
 		
 		for(DateGroup group:groups) {
 			dates = group.getDates();
@@ -133,85 +266,33 @@ public class Parser {
 	}
 	
 	/**
-	 * This operation determines the index which is provided with the update, delete, 
-	 * done or open command and represents the position of the task within the recent display.
-	 * Returns -1 if not found.
+	 * This operation removes the first word of the given string. 
 	 * 
-	 * @param userCommand  
+	 * @param 	string
+	 * @return	string without first word
 	 */
-	public int determineIndex(String userCommand) {
-		String indexString = getSecondWord(userCommand);
-		System.out.println(indexString);
-		int index;
-		try {
-			index = Integer.parseInt(indexString) - Global.INDEX_OFFSET; // Change the line number to an array index
-		} catch (NumberFormatException e) {
-			return -1;
-		} 
-		return index;
+	private  String removeFirstWord(String str) throws Exception {
+		return str.replaceFirst(getFirstWord(str), "").trim();
 	}
 	
 	/**
-	 * This operation determines the searched phrases in double quotes and the single words
-	 * and returns them within a ArrayList.
+	 * This operation removes the second word of the given string. 
 	 * 
-	 * @param userCommand  
+	 * @param 	string
+	 * @return	string without second word
 	 */
-	public ArrayList<String> determineSearchedWords(String userCommand) {
-		String residualUserCommand = removeFirstWord(userCommand);
-
-		ArrayList<String> searchedWords = new ArrayList<String>();
-		
-		Pattern pattern = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"");	// group 1 extracts phrases in double quotes, else it returns the single words split by space
-		Matcher matcher = pattern.matcher(residualUserCommand);
-		while (matcher.find()) {
-		    if (matcher.group(1) != null) {
-		    	searchedWords.add(matcher.group(1));
-		    } else {
-		    	searchedWords.add(matcher.group());
-		    }
-		}
-
-		return searchedWords;
-
+	private  String removeSecondWord(String str)  throws Exception {
+		return str.replaceFirst(getSecondWord(str), "");
 	}
 	
 	/**
-	 * This operation determines if the user command contains the given String parameter,
-	 * e.g. "none".
+	 * This operation removes the quoted substring within the given string. It is assumed that all quotation marks 
+	 * between the first quote and the last quote belong to the substring.
 	 * 
-	 * @param userCommand  
-	 * @param parameter
+	 * @param 	string
+	 * @return	string without quoted substring
 	 */
-	public boolean containsParameter(String userCommand, String parameter) {
-
-		String residualUserCommand = userCommand;
-		if (determineTaskName(userCommand) != null) {
-			residualUserCommand = removeQuotedSubstring(residualUserCommand);
-		}
-		return residualUserCommand.contains(parameter);
-	}
-	
-	/**
-	 * Auxiliary String manipulating methods
-	 */
-	private String getFirstWort(String userCommand) {
-		return userCommand.trim().split("\\s+")[0];
-	}
-	
-	private String getSecondWord(String userCommand) {
-		return userCommand.trim().split("\\s+")[1];
-	}
-	
-	private  String removeFirstWord(String userCommand) {
-		return userCommand.replaceFirst(getFirstWort(userCommand), "").trim();
-	}
-	
-	private String removeQuotedSubstring(String userCommand) {
-		if ( determineTaskName(userCommand) != null) {
-			return userCommand.replaceFirst("\""+determineTaskName(userCommand)+"\"", "").trim();
-		} else {
-			return userCommand;
-		}
+	private String removeQuotedSubstring(String str)  throws Exception {
+		return str.replaceFirst(str.substring(str.indexOf("\"") + 1,str.lastIndexOf("\"")), "");
 	}
 }

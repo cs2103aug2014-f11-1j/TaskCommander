@@ -12,7 +12,8 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ TaskCommanderTest.class, ParserTest.class, GoogleAPIConnectorTest.class })
+@SuiteClasses({  TaskCommanderTest.class, ControllerTest.class, ParserTest.class, DataTest.class,
+	GoogleAPIConnectorTest.class })
 public class AllTests {
 
 } 

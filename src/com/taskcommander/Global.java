@@ -37,7 +37,7 @@ public class Global {
 	public static final String MESSAGE_FILE_COULD_NOT_BE_WRITTEN = "Error: The File could not be written.";
 	public static final String MESSAGE_FILE_COULD_NOT_BE_LOADED = "Error: The File could not be loaded.";
 	public static final String MESSAGE_EXCEPTION_IO = "Unable to read the data retrieved.";
-	public static final String MESSAGE_ARGUMENTS_NULL = "Null arguments given.";
+	public static final String MESSAGE_ILLEGAL_ARGUMENTS = "Illegal arguments given.";
 	public static final String MESSAGE_ARGUMENTS_INVALID = "Invalid arguments given.";
 	
 	public static final String MESSAGE_SYNC_IN_PROGRESS = "Sync in progress...";
