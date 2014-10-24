@@ -1,10 +1,18 @@
-package com.taskcommander;
+package TestDriver;
 
 import static org.junit.Assert.*;
 
 import java.util.Date;
 
 import org.junit.Test;
+
+import com.taskcommander.TaskCommander;
+
+/**
+ * This class contains all test cases for the Parser class of the Logic Component.
+ * 
+ * @author A0128620M
+ */
 
 public class ParserTest {
 
@@ -17,9 +25,15 @@ public class ParserTest {
 	 * [index]: (MIN_INT - MAX_INT), (any non integer), null
 	 */
 	
+	/*
+	@Test
+	private void testDetermineIndex(String description, String expected, String command) {
+	    assertEquals(description, expected, TaskCommander.parser.determineIndex(userCommand)); 
+	}
+	*/
 	
 	@Test
-	public void testDetermineIndex1() throws Exception{
+	public void testDetermineIndex() throws Exception{
 		String userCommand = "update "+Integer.MIN_VALUE;
 		TaskCommander.parser.determineIndex(userCommand);
 		assertEquals(Integer.MIN_VALUE+1, TaskCommander.parser.determineIndex(userCommand));
