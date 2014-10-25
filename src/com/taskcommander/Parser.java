@@ -52,7 +52,8 @@ public class Parser {
 	}
 
 	/**
-	 * This operation determines which of the supported command types the user wants to perform.
+	 * This operation determines which of the supported command types the user wants to perform
+	 * (not case sensitive).
 	 * 
 	 * @param	user command
 	 * @return	type of command 
@@ -199,13 +200,17 @@ public class Parser {
 	}
 	
 	/**
-	 * This operation determines if the user command contains the given string, e.g. "none".
+	 * This operation determines if the user command contains exactly the given string, e.g. "none", "timed", "deadline"
+	 * (case sensitive).
 	 * 
 	 * @param 	string
 	 * @param 	parameter which is looked for
 	 * @return	true if found, false if not
 	 */
 	public boolean containsParameter(String userCommand, String parameter) {
+		if (userCommand == null | parameter == null | parameter == "") {
+			return false;
+		}
 		String userCommandWithoutTaskName;
 
 		try {
@@ -215,11 +220,7 @@ public class Parser {
 			userCommandWithoutTaskName = userCommand;
 		}
 		
-		if (parameter == null) {
-			return false;
-		} else {
-			return userCommandWithoutTaskName.contains(parameter);
-		}
+		return userCommandWithoutTaskName.matches(".*\\b" + parameter + "\\b.*");
 	}	
 	
 	/* ================================ General auxiliary methods =================================== */
