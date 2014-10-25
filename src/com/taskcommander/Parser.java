@@ -59,6 +59,11 @@ public class Parser {
 	 * @return	type of command 
 	 */
 	public Global.CommandType determineCommandType(String userCommand) {
+		if (userCommand == null || userCommand.equals("")) {
+			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
+			return Global.CommandType.INVALID;
+		}
+		
 		String commandTypeString;
 	
 		try {
@@ -105,6 +110,11 @@ public class Parser {
 	 * @return	name of task
 	 */
 	public String determineTaskName(String userCommand) {
+		if (userCommand == null || userCommand.equals("")) {
+			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
+			return null;
+		}
+		
 		try {
 			return getQuotedSubstring(userCommand);
 		} catch (Exception e) {
@@ -122,6 +132,11 @@ public class Parser {
 	 * @return	dateTime(s) of task
 	 */
 	public List<Date> determineTaskDateTime(String userCommand) {
+		if (userCommand == null || userCommand.equals("")) {
+			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
+			return null;
+		}
+		
 		String userCommandWithoutIndex;
 		Global.CommandType commandType = TaskCommander.parser.determineCommandType(userCommand);
 	
@@ -153,6 +168,11 @@ public class Parser {
 	 * @return	index of task
 	 */
 	public int determineIndex(String userCommand) {
+		if (userCommand == null || userCommand.equals("")) {
+			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
+			return -1;
+		}
+		
 		try {
 			String indexString = getSecondWord(userCommand);
 			int indexInteger = Integer.parseInt(indexString); 
@@ -174,6 +194,11 @@ public class Parser {
 	 * @return	ArrayList containing the searched words and phrases
 	 */
 	public ArrayList<String> determineSearchedWords(String userCommand) {
+		if (userCommand == null || userCommand.equals("")) {
+			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
+			return null;
+		}
+		
 		String userCommandWithoutCommandType;
 	
 		try {
@@ -207,8 +232,9 @@ public class Parser {
 	 * @param 	parameter which is looked for
 	 * @return	true if found, false if not
 	 */
-	public boolean containsParameter(String userCommand, String parameter) {
-		if (userCommand == null | parameter == null | parameter == "") {
+	public boolean containsParameter(String userCommand, String parameter) {	
+		if (userCommand == null || userCommand.equals("")|| parameter == null || parameter.equals("")) {
+			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
 			return false;
 		}
 		String userCommandWithoutTaskName;
