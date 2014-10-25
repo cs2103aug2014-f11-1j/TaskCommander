@@ -1,4 +1,4 @@
-package TestDriver;
+package automatedTestDriver.Data;
 
 import static org.junit.Assert.*;
 

@@ -18,17 +18,27 @@ import com.joestelmach.natty.*;
 
 public class Parser {
 	
-	// Logger and related logging messages
+	/* 
+	 * Logger and related logging messages
+	 */
 	private static Logger logger = Logger.getLogger(Parser.class.getName());
 	private static final String MESSAGE_NO_COMMANDTYPE = "No command type found.";
 	private static final String MESSAGE_NO_TASKNAME = "No task name found.";
 	private static final String MESSAGE_NO_INDEX = "No index found.";
 	private static final String MESSAGE_NO_DATETIMES = "No dateTimes found.";
 	
-	/**
+	/*
 	 * This variable is initialized with the one and only instance of the Parser class.
 	 */
 	private static Parser theOne;
+	
+	/*
+	 * Private Constructor, only called by the getInstance() method.
+	 */
+	private Parser(){
+	}
+	
+	/* ============================================ API ============================================= */
 	
 	/**
 	 * This operation returns either a new instance of the Parser or an existing one, if any.
@@ -39,12 +49,6 @@ public class Parser {
 			theOne = new Parser();
 		}
 		return theOne;
-	}
-	
-	/**
-	 * Private Constructor, only called by the getInstance() method.
-	 */
-	private Parser(){
 	}
 
 	/**
