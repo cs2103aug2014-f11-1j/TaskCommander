@@ -146,7 +146,7 @@ public class Parser {
 	/**
 	 * This operation determines the index which is provided with the update, delete, 
 	 * done or open command and represents the position of the task within the recently displayed task table.
-	 * Returns null -1 not found.
+	 * Returns -1 if not found or below one.
 	 * 
 	 * @param 	user command
 	 * @return	index of task
@@ -155,7 +155,11 @@ public class Parser {
 		try {
 			String indexString = getSecondWord(userCommand);
 			int indexInteger = Integer.parseInt(indexString); 
-			return indexInteger;
+			if (indexInteger > 0) {
+				return indexInteger;
+			} else {
+				return -1;
+			}
 		} catch (Exception e) {
 			logger.log(Level.INFO, MESSAGE_NO_INDEX, e);
 			return -1;

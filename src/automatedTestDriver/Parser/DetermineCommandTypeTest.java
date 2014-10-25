@@ -8,6 +8,12 @@ import org.junit.runners.Parameterized;
 import com.taskcommander.Global;
 import com.taskcommander.TaskCommander;
 
+/**
+ * This class contains all test cases for the method determineCommandType(userCommand:String) of the component Parser.
+ * 
+ * @author A0128620M
+ */
+
 @RunWith(Parameterized.class)
 public class DetermineCommandTypeTest {
 	private String userCommand;
@@ -22,11 +28,11 @@ public class DetermineCommandTypeTest {
 	 * Test cases:
 	 * 
 	 * Initial partition of userCommand: 	[string with at least one word], [empty string], [null]
-	 * For strings with at least one word:
-	 * - One word:		[valid commandType], [valid commandType with leading/following/surrounding spaces], [any other String]	
-	 * - Two words: 	[valid commandType]+[any other String], [valid commandType with leading/following/surrounding spaces]+[any other String], 
-	 * 					[any other String]+[any other String]
-	 * For valid commandType: ["Help", "help", "HELP", ..., "Synch", "synch", "SYNCH"]
+	 * 	For strings with at least one word:
+	 * 	- One word:							[valid commandType], [valid commandType with leading/following/surrounding spaces], [any other String]	
+	 * 	- Two words: 						[valid commandType]+[any other String], [valid commandType with leading/following/surrounding spaces]+[any other String], 
+	 * 										[any other String]+[any other String]
+	 * 		For valid commandType: 			["Help", "help", "HELP", ..., "Synch", "synch", "SYNCH"]
 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
