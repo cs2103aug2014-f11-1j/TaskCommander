@@ -32,10 +32,9 @@ public class ContainsParameterTest {
 	 * 
 	 * Initial partition of userCommand: 	[string with at least one word], [empty string], [null]
 	 * 	For strings with at least one word:
-	 * 	- One word:							[Searched string], [String containing the searched string], [any other string],	
-	 * 	- Two words: 						[Searched string]+[any other string], [any other string]+[Searched string], [any other string]+[any other string]
-	 *  - Three words:						[Searched string]+[any other string]+[any other string], [any other string]+[Searched string]+[any other string],
-	 *  									[Searched string]+[Searched string]+[any other string], [any other string]+[any other string]+[any other string]
+	 * 	- One word:							[exact searched string], [String containing the searched string], [any other string],	
+	 * 	- Two words: 						[exact searched string]+[any other string], [any other string]+[exact searched string]
+	 *  - Three words:						[any other string]+[exact searched string]+[any other string]
 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
@@ -56,12 +55,9 @@ public class ContainsParameterTest {
 				
 				{ searchedString + " " + anyOtherString, searchedString, true},
 				{ anyOtherString + " " + searchedString, searchedString, true},
-				{ anyOtherString + " " + anyOtherString, searchedString, false},
 				
-				{ searchedString + " " + anyOtherString + " " + anyOtherString, searchedString, true},
 				{ anyOtherString + " " + searchedString + " " + anyOtherString, searchedString, true},
-				{ anyOtherString + " " + anyOtherString + " " + searchedString, searchedString, true},
-				{ anyOtherString + " " + anyOtherString + " " + anyOtherString, searchedString, false},
+
 				
 		});
 	}

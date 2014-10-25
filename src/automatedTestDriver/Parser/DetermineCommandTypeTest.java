@@ -31,7 +31,7 @@ public class DetermineCommandTypeTest {
 	 * 	For strings with at least one word:
 	 * 	- One word:							[valid commandType], [valid commandType with leading/following/surrounding spaces], [any other String]	
 	 * 	- Two words: 						[valid commandType]+[any other String], [valid commandType with leading/following/surrounding spaces]+[any other String], 
-	 * 										[any other String]+[any other String]
+	 * 										[any other String]+[valid commandType]
 	 * 		For valid commandType: 			["Help", "help", "HELP", ..., "Synch", "synch", "SYNCH"]
 	 */
 	@Parameterized.Parameters
@@ -63,7 +63,9 @@ public class DetermineCommandTypeTest {
 				{ validCommandTypeCompletelyUncapitalizedWithLeadingSpace + " " + anyOtherString, validCommandType },
 				{ validCommandTypeCompletelyUncapitalizedWithFollowingSpace + " " + anyOtherString, validCommandType },
 				{ validCommandTypeCompletelyUncapitalizedWithSurrounding + " " + anyOtherString, validCommandType },
-				{ anyOtherString + " " + anyOtherString, Global.CommandType.INVALID },
+				{ anyOtherString + " " + validCommandTypeFirstLetterCapitalized, Global.CommandType.INVALID },
+				{ anyOtherString + " " + validCommandTypeCompletelyUncapitalized, Global.CommandType.INVALID },
+				{ anyOtherString + " " + validCommandTypeCompletelyCapitalized, Global.CommandType.INVALID },
 
 				});
 	}
