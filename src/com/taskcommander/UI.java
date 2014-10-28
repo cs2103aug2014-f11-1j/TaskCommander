@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+//@author A0112828H
 /**
  * Singleton class that has the following functions:
  * - Creates the UI
@@ -37,6 +38,8 @@ import org.eclipse.swt.widgets.Text;
  */
 public class UI extends Observable implements Observer {
 	private static UI ui;
+	
+	// Variables to adjust UI element sizes and layout behaviour
 	private static final int SHELL_MIN_HEIGHT = 400;
 	private static final int SHELL_MIN_WIDTH = 500;
 
@@ -67,6 +70,11 @@ public class UI extends Observable implements Observer {
 	private static final int TABLE_COLUMNS_NUM = 4;
 	private static final String[] TABLE_COLUMNS_NAMES = {"No.", "Date", "Task", "Status"};
 
+	private static final boolean HELP_FIT_HORIZONTAL = true;
+	private static final boolean HELP_FIT_VERTICAL = true;
+	private static final int HELP_COLUMNS_SPAN = 1;
+	private static final int HELP_ROWS_SPAN = 1;
+	
 	private static final boolean BROWSER_FIT_HORIZONTAL = true;
 	private static final boolean BROWSER_FIT_VERTICAL = true;
 	private static final int BROWSER_COLUMNS_SPAN = 1;
@@ -76,16 +84,21 @@ public class UI extends Observable implements Observer {
 
 	private static final int TAB_MAIN_INDEX = 0; // First tab item
 	private static final String TAB_MAIN_NAME = "Tasks";
-	private static final int TAB_BROWSER_INDEX = 1; // Second tab item
+	private static final int TAB_HELP_INDEX = 1; // Second tab item
+	private static final String TAB_HELP_NAME = "Help";
+	private static final int TAB_BROWSER_INDEX = 2; // Third tab item
 	private static final String TAB_BROWSER_NAME = "Google Login";
 
+	// Immutable UI element instances
 	private final Display display = Display.getDefault();
 	private final Shell shell = new Shell(display, SWT.CLOSE | SWT.TITLE | SWT.MIN & (~SWT.RESIZE));
 	private final TabFolder tabFolder = new TabFolder(shell, SWT.NONE);
 	private final Composite mainWindow = new Composite(tabFolder, SWT.FILL & (~SWT.RESIZE));
+	private final Composite helpWindow = new Composite(tabFolder, SWT.FILL & (~SWT.RESIZE));
 	private final Composite browserWindow = new Composite(tabFolder, SWT.FILL & (~SWT.RESIZE));
 	private final Table table = new Table(mainWindow, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 
+	// System colours for use to colour UI elements
 	private final Color red = display.getSystemColor(SWT.COLOR_RED);
 	private final Color gray = display.getSystemColor(SWT.COLOR_GRAY);
 	private final Color blue = display.getSystemColor(SWT.COLOR_BLUE);
@@ -97,16 +110,34 @@ public class UI extends Observable implements Observer {
 	private final Color darkCyan = display.getSystemColor(SWT.COLOR_DARK_CYAN);
 	private final Color darkMagenta = display.getSystemColor(SWT.COLOR_DARK_MAGENTA);
 
+	// Colours set for table columns
 	private final Color COLOR_COL_FIRST = darkGray;
 	private final Color COLOR_COL_SECOND = blue;
 	private final Color COLOR_COL_THIRD = yellow;
 	private final Color COLOR_DONE = darkGray;
 	private final Color COLOR_NOT_DONE = red;
 
-	private static final String DISPLAY_INFO = "Displaying: ";
+	// String messages for display
+	private static final String INFO_DISPLAY = "Displaying: ";
+	public static final String MESSAGE_HELP = " open <index>, done <index>, delete <index of string>, clear, sort, undo, exit.";
+
+	private static final String INFO_HELP = "You can use these commands: \n" +
+			"add \"<task title>\" <date> <end time> \n" +
+			"display [timed] [deadline] [floating] [done|open] [date] [start time] [end time] \n" +
+			"open <index> \n" +
+			"done <index> \n" +
+			"delete <index of string> \n" +
+			"clear \n" +
+			"sort \n" +
+			"undo \n" +
+			"exit \n";
 	private static final String INSTRUCTIONS_MAIN = "Enter command: ";
 	private static final String INSTRUCTIONS_BROWSER = "Please login to Google and accept application permissions to sync your tasks.";
-
+	
+	// Logger instance
+	private static Logger logger = Logger.getLogger(UI.class.getName());
+	
+	// Mutable UI element instances
 	private TabItem browserTab;
 	private Text input;
 	private Text viewOutput;
@@ -116,10 +147,9 @@ public class UI extends Observable implements Observer {
 	private String displaySettingText = "Timed tasks only";
 	private String code; // For authorisation code from Google
 
-	private static Logger logger = Logger.getLogger(UI.class.getName());
-
+	//@author A0105753J
 	/**
-	 * this method return a instance of UI for singleton pattern 
+	 * Returns the only instance of UI. 
 	 */
 	public static UI getInstance(){
 		if(ui == null) {
@@ -128,7 +158,6 @@ public class UI extends Observable implements Observer {
 		return ui;
 	}
 
-	//@author A0105753J
 	/**
 	 * @wbp.parser.entryPoint
 	 */
@@ -137,6 +166,7 @@ public class UI extends Observable implements Observer {
 		setupShell();
 		setupTabFolder();
 		createMainTab();
+		createHelpTab();
 		runUntilWindowClosed();
 	}
 
@@ -174,7 +204,7 @@ public class UI extends Observable implements Observer {
 	}
 
 	private void createTextFieldsForMain() {
-		new Label(mainWindow, SWT.NONE).setText(DISPLAY_INFO);
+		new Label(mainWindow, SWT.NONE).setText(INFO_DISPLAY);
 		viewOutput = new Text(mainWindow, SWT.WRAP);
 		output = new Text(mainWindow, SWT.BORDER | SWT.WRAP);
 		new Label(mainWindow, SWT.NONE).setText(INSTRUCTIONS_MAIN);
@@ -187,7 +217,7 @@ public class UI extends Observable implements Observer {
 		setupOutput();
 		setupTable();
 	}
-	
+
 	private void setupViewOutput() {
 		GridData viewOutputGridData = new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
 				INPUT_COLUMNS_SPAN, INPUT_ROWS_SPAN);
@@ -253,6 +283,32 @@ public class UI extends Observable implements Observer {
 	}
 
 	//@author A0112828H
+	// Help tab setup
+	private void createHelpTab() {
+		TabItem item = new TabItem(tabFolder, SWT.NONE);
+		item.setText(TAB_HELP_NAME);
+		setupHelpWindow();
+		item.setControl(helpWindow);
+	}
+
+	private void setupHelpWindow() {
+		GridLayout layout = new GridLayout(TAB_GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
+		helpWindow.setLayout(layout);
+		helpWindow.setBounds(shell.getBounds());
+
+		createTextFieldsForHelp();
+	}
+
+	private void createTextFieldsForHelp() {
+		Text helpOutput = new Text(helpWindow, SWT.BORDER | SWT.MULTI | SWT.WRAP);
+		
+		GridData outputGridData = new GridData(SWT.FILL, SWT.FILL, HELP_FIT_HORIZONTAL, HELP_FIT_VERTICAL, 
+				HELP_COLUMNS_SPAN, HELP_ROWS_SPAN);
+		helpOutput.setLayoutData(outputGridData);
+		helpOutput.setText(INFO_HELP);
+		helpOutput.setEditable(false);
+	}
+
 	// Browser tab setup
 	private void createBrowserTab(String url) {
 		browserTab = new TabItem(tabFolder, SWT.NONE);
