@@ -88,6 +88,8 @@ public class GoogleAPIConnectorTest {
 		assertFalse(con.updateTask(task));
 	}
 	
+	// null or false credentials
+	
 	// Test special case inputs for CRUD
 
 	// Test normal task inputs for each task type for CRUD

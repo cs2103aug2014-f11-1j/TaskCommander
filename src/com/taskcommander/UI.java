@@ -12,6 +12,7 @@ import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -78,10 +79,10 @@ public class UI extends Observable implements Observer {
 	private static final String TAB_BROWSER_NAME = "Google Login";
 
 	private final Display display = Display.getDefault();
-	private final Shell shell = new Shell(display);
+	private final Shell shell = new Shell(display, SWT.CLOSE | SWT.TITLE | SWT.MIN);
 	private final TabFolder tabFolder = new TabFolder(shell, SWT.NONE);
-	private final Composite mainWindow = new Composite(tabFolder, SWT.FILL);
-	private final Composite browserWindow = new Composite(tabFolder, SWT.FILL);
+	private final Composite mainWindow = new Composite(tabFolder, SWT.FILL & (~SWT.RESIZE));
+	private final Composite browserWindow = new Composite(tabFolder, SWT.FILL & (~SWT.RESIZE));
 	private final Table table = new Table(mainWindow, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 
 	private final Color red = display.getSystemColor(SWT.COLOR_RED);
@@ -135,17 +136,21 @@ public class UI extends Observable implements Observer {
 		runUntilWindowClosed();
 	}
 
+	// Shell setup
 	private void setupShell() {
 		shell.setLayout(new FillLayout());
 		shell.setText(Global.APPLICATION_NAME);
 		shell.setMinimumSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
+		shell.setBounds(shell.getBounds().x, shell.getBounds().y, SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
 	}
 
+	// Tabs setup
 	private void setupTabFolder() {
 		tabFolder.setLayout(new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE));
 		tabFolder.setSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
 	}
 
+	// Main tab setup
 	private void createMainTab() {
 		TabItem item = new TabItem(tabFolder, SWT.NONE);
 		item.setText(TAB_MAIN_NAME);
@@ -163,43 +168,12 @@ public class UI extends Observable implements Observer {
 		updateDisplay();
 	}
 
-	//@author A0112828H
-	public void getCodeFromUser(String url) {
-		logger.log(Level.INFO, "Creating browser...");
-		code = null;
-		createBrowserTab(url);
-	}
-
-	private void createBrowserTab(String url) {
-		browserTab = new TabItem(tabFolder, SWT.NONE);
-		browserTab.setText(TAB_BROWSER_NAME);
-		setupBrowserWindow(url);
-		browserTab.setControl(browserWindow);
-		tabFolder.setSelection(browserTab);
-	}
-
-	private void setupBrowserWindow(String url) {
-		GridLayout layout = new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
-		browserWindow.setLayout(layout);
-
-		createTextFieldsForBrowser();
-		setupBrowser();
-		addInputListenerForBrowser();
-
-		browser.setUrl(url);
-	}
-
 	private void createTextFieldsForMain() {
 		output = new Text(mainWindow, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		new Label(mainWindow, SWT.NONE).setText(INSTRUCTIONS_MAIN);
 		input = new Text(mainWindow, SWT.BORDER);
 	}
 
-	private void createTextFieldsForBrowser() {
-		new Label(browserWindow, SWT.NONE).setText(INSTRUCTIONS_BROWSER);
-	}
-
-	//@author A0105753J
 	private void setupMainElements() {
 		setupInput();
 		setupOutput();
@@ -236,17 +210,14 @@ public class UI extends Observable implements Observer {
 		}
 	}
 
-	//@author A0112828H
-	private void setupBrowser() {
-		browser = new Browser(browserWindow, SWT.FILL | SWT.BORDER);
-		GridData browserGridData = new GridData(SWT.FILL, SWT.FILL, BROWSER_FIT_HORIZONTAL, BROWSER_FIT_VERTICAL, 
-				BROWSER_COLUMNS_SPAN, BROWSER_ROWS_SPAN);
-		browserGridData.widthHint = BROWSER_PREFERRED_WIDTH;
-		browser.setLayoutData(browserGridData);
-		browser.setUrl("http://www.google.com/");
-	}
-
-	//@author A0105753J
+	/**
+	 * Adds a listener to the input text field. 
+	 * 
+	 * Listener is triggered when the return key (Enter) is hit. 
+	 * The user input is then passed on to the Controller component,
+	 * which returns a String to be displayed to the user.
+	 * Calls the display to refresh after each user command.
+	 */
 	private void addInputListenerForMain() {
 		input.addListener(SWT.Traverse, new Listener(){
 			@Override
@@ -267,6 +238,39 @@ public class UI extends Observable implements Observer {
 	}
 
 	//@author A0112828H
+	// Browser tab setup
+	private void createBrowserTab(String url) {
+		browserTab = new TabItem(tabFolder, SWT.NONE);
+		browserTab.setText(TAB_BROWSER_NAME);
+		setupBrowserWindow(url);
+		browserTab.setControl(browserWindow);
+		tabFolder.setSelection(browserTab);
+	}
+
+	private void setupBrowserWindow(String url) {
+		GridLayout layout = new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
+		browserWindow.setLayout(layout);
+
+		createTextFieldsForBrowser();
+		setupBrowser();
+		addInputListenerForBrowser();
+
+		browser.setUrl(url);
+	}
+
+	private void createTextFieldsForBrowser() {
+		new Label(browserWindow, SWT.NONE).setText(INSTRUCTIONS_BROWSER);
+	}
+
+	private void setupBrowser() {
+		browser = new Browser(browserWindow, SWT.FILL | SWT.BORDER);
+		GridData browserGridData = new GridData(SWT.FILL, SWT.FILL, BROWSER_FIT_HORIZONTAL, BROWSER_FIT_VERTICAL, 
+				BROWSER_COLUMNS_SPAN, BROWSER_ROWS_SPAN);
+		browserGridData.widthHint = BROWSER_PREFERRED_WIDTH;
+		browser.setLayoutData(browserGridData);
+		browser.setUrl("http://www.google.com/");
+	}
+
 	/**
 	 * Adds a listener to check if the web page title changes to
 	 * a Success string, then parses and sets the authorisation code.
@@ -283,6 +287,17 @@ public class UI extends Observable implements Observer {
 				}
 			}
 		});
+	}
+
+	/**
+	 * Attempts to get authorisation code from user by creating
+	 * browser tab.
+	 * @param url
+	 */
+	public void getCodeFromUser(String url) {
+		logger.log(Level.INFO, "Creating browser...");
+		code = null;
+		createBrowserTab(url);
 	}
 
 	/**
@@ -325,17 +340,33 @@ public class UI extends Observable implements Observer {
 	}
 
 	//@author A0112828H
+	/** 
+	 * Updates the display by clearing table items and displaying the
+	 * latest tasks for display from the Controller.
+	 */
 	private void updateDisplay() {
 		clearTableItems();
 		displayTasks(TaskCommander.controller.getDisplayedTasks());
 	}
 
+	/** 
+	 * Updates the display by clearing table items and displaying the
+	 * latest tasks for display from the Controller plus a given String 
+	 * in the output field.
+	 * @param  fb     Feedback for user
+	 */
 	private void updateDisplay(String fb) {
 		clearTableItems();
 		displayMessage(fb);
 		displayTasks(TaskCommander.controller.getDisplayedTasks());
 	}
 
+	/**
+	 * Creates table rows and arranges data for display from a given
+	 * arraylist of TaskCommander Task objects. Displays the tasks
+	 * differently based on their type.
+	 * @param tasks   Arraylist of tasks to display
+	 */
 	public void displayTasks(ArrayList<Task> tasks) {
 		int index = 1;
 		String lastDate = null;
@@ -367,6 +398,7 @@ public class UI extends Observable implements Observer {
 		packUI();
 	}
 
+	// Methods to create a table row from different types of tasks
 	private void createRowFromTask(int index, FloatingTask task) {
 		TableItem item = new TableItem(table, TABLE_STYLE);
 		item.setText(new String[] {Integer.toString(index),
@@ -398,6 +430,7 @@ public class UI extends Observable implements Observer {
 		new TableItem(table, TABLE_STYLE);
 	}
 
+	// Helper methods that return formatted Strings for display when given a task
 	/**
 	 * Returns the display date for DeadlineTasks.
 	 * The format is: Date1 Time
@@ -497,13 +530,10 @@ public class UI extends Observable implements Observer {
 		output.setForeground(blue);
 	}
 
-	private void displayErrorMessage(String s) {
-		output.setText(s);
-		output.setForeground(red);
-	}
-
 	/**
 	 * Updates the sync progress output with the given String.
+	 * 
+	 * For use with the sync method in the Google Integration component.
 	 */
 	@Override
 	public void update(Observable arg0, Object arg1) {
