@@ -119,7 +119,7 @@ public class TaskCommanderTest {
 		String userCommand = "update 0 3pm";
 		TaskCommander.controller.getDisplayedTasks();
 		Date date  = new Date();
-		assertEquals(String.format(Global.ERROR_MESSAGE_NO_INDEX, 0), TaskCommander.controller.executeCommand(userCommand));
+		assertEquals(String.format(Global.ERROR_MESSAGE_NO_INDEX, -1), TaskCommander.controller.executeCommand(userCommand));
 
 	}
 
@@ -140,6 +140,7 @@ public class TaskCommanderTest {
 	}
 	@Test
 	public void testUpdateDeadlineTaskToTimedTask() throws Exception{
+		TaskCommander.controller.executeCommand("clear");
 		String userCommand = "add \"welcome boss\" 3pm";
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "update 1 Nov 11 3pm - 4 pm";
