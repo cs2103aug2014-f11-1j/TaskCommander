@@ -12,7 +12,6 @@ import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -38,10 +37,12 @@ import org.eclipse.swt.widgets.Text;
  */
 public class UI extends Observable implements Observer {
 	private static UI ui;
-	private static final int SHELL_MIN_HEIGHT = 500;
-	private static final int SHELL_MIN_WIDTH = 200;
+	private static final int SHELL_MIN_HEIGHT = 400;
+	private static final int SHELL_MIN_WIDTH = 500;
 
-	private static final int GRID_COLUMNS_NUM = 2;
+	private static final int TAB_GRID_COLUMNS_NUM = 1;
+	private static final int MAIN_GRID_COLUMNS_NUM = 2;
+	private static final int BROWSER_GRID_COLUMNS_NUM = 1;
 	private static final boolean GRID_COLUMNS_EQUAL_SIZE = false;
 
 	private static final boolean INPUT_FIT_HORIZONTAL = true;
@@ -55,7 +56,6 @@ public class UI extends Observable implements Observer {
 	private static final int OUTPUT_COLUMNS_SPAN = 2;
 	private static final int OUTPUT_ROWS_SPAN = 1;
 	private static final int OUTPUT_PREFERRED_WIDTH = 500;
-	private static final int OUTPUT_PREFERRED_HEIGHT = 50;
 
 	private static final int TABLE_STYLE = SWT.NONE;
 	private static final boolean TABLE_FIT_HORIZONTAL = true;
@@ -63,15 +63,16 @@ public class UI extends Observable implements Observer {
 	private static final int TABLE_COLUMNS_SPAN = 2;
 	private static final int TABLE_ROWS_SPAN = 1;
 	private static final int TABLE_PREFERRED_WIDTH = 500;
-	private static final int TABLE_PREFERRED_HEIGHT = 100;
+	private static final int TABLE_PREFERRED_HEIGHT = 200;
 	private static final int TABLE_COLUMNS_NUM = 4;
 	private static final String[] TABLE_COLUMNS_NAMES = {"No.", "Date", "Task", "Status"};
 
 	private static final boolean BROWSER_FIT_HORIZONTAL = true;
 	private static final boolean BROWSER_FIT_VERTICAL = true;
-	private static final int BROWSER_COLUMNS_SPAN = 2;
+	private static final int BROWSER_COLUMNS_SPAN = 1;
 	private static final int BROWSER_ROWS_SPAN = 1;
 	private static final int BROWSER_PREFERRED_WIDTH = 500;
+	private static final int BROWSER_PREFERRED_HEIGHT = 120;
 
 	private static final int TAB_MAIN_INDEX = 0; // First tab item
 	private static final String TAB_MAIN_NAME = "Tasks";
@@ -79,7 +80,7 @@ public class UI extends Observable implements Observer {
 	private static final String TAB_BROWSER_NAME = "Google Login";
 
 	private final Display display = Display.getDefault();
-	private final Shell shell = new Shell(display, SWT.CLOSE | SWT.TITLE | SWT.MIN);
+	private final Shell shell = new Shell(display, SWT.CLOSE | SWT.TITLE | SWT.MIN & (~SWT.RESIZE));
 	private final TabFolder tabFolder = new TabFolder(shell, SWT.NONE);
 	private final Composite mainWindow = new Composite(tabFolder, SWT.FILL & (~SWT.RESIZE));
 	private final Composite browserWindow = new Composite(tabFolder, SWT.FILL & (~SWT.RESIZE));
@@ -102,14 +103,17 @@ public class UI extends Observable implements Observer {
 	private final Color COLOR_DONE = darkGray;
 	private final Color COLOR_NOT_DONE = red;
 
+	private static final String DISPLAY_INFO = "Displaying: ";
 	private static final String INSTRUCTIONS_MAIN = "Enter command: ";
 	private static final String INSTRUCTIONS_BROWSER = "Please login to Google and accept application permissions to sync your tasks.";
 
 	private TabItem browserTab;
 	private Text input;
+	private Text viewOutput;
 	private Text output;
 	private Browser browser;
 
+	private String displaySettingText = "Timed tasks only";
 	private String code; // For authorisation code from Google
 
 	private static Logger logger = Logger.getLogger(UI.class.getName());
@@ -146,7 +150,7 @@ public class UI extends Observable implements Observer {
 
 	// Tabs setup
 	private void setupTabFolder() {
-		tabFolder.setLayout(new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE));
+		tabFolder.setLayout(new GridLayout(TAB_GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE));
 		tabFolder.setSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
 	}
 
@@ -159,8 +163,9 @@ public class UI extends Observable implements Observer {
 	}
 
 	private void setupMainWindow() {
-		GridLayout layout = new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
+		GridLayout layout = new GridLayout(MAIN_GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
 		mainWindow.setLayout(layout);
+		mainWindow.setBounds(shell.getBounds());
 
 		createTextFieldsForMain();
 		setupMainElements();
@@ -169,15 +174,26 @@ public class UI extends Observable implements Observer {
 	}
 
 	private void createTextFieldsForMain() {
-		output = new Text(mainWindow, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		new Label(mainWindow, SWT.NONE).setText(DISPLAY_INFO);
+		viewOutput = new Text(mainWindow, SWT.WRAP);
+		output = new Text(mainWindow, SWT.BORDER | SWT.WRAP);
 		new Label(mainWindow, SWT.NONE).setText(INSTRUCTIONS_MAIN);
 		input = new Text(mainWindow, SWT.BORDER);
 	}
 
 	private void setupMainElements() {
+		setupViewOutput();
 		setupInput();
 		setupOutput();
 		setupTable();
+	}
+	
+	private void setupViewOutput() {
+		GridData viewOutputGridData = new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
+				INPUT_COLUMNS_SPAN, INPUT_ROWS_SPAN);
+		viewOutput.setLayoutData(viewOutputGridData);
+		viewOutput.setForeground(darkCyan);
+		viewOutput.setText(displaySettingText);
 	}
 
 	private void setupInput() {
@@ -191,7 +207,6 @@ public class UI extends Observable implements Observer {
 		GridData outputGridData = new GridData(SWT.FILL, SWT.CENTER, OUTPUT_FIT_HORIZONTAL, OUTPUT_FIT_VERTICAL, 
 				OUTPUT_COLUMNS_SPAN, OUTPUT_ROWS_SPAN);
 		outputGridData.widthHint = OUTPUT_PREFERRED_WIDTH;
-		outputGridData.heightHint = OUTPUT_PREFERRED_HEIGHT;
 		output.setLayoutData(outputGridData);
 		output.setText(Global.MESSAGE_WELCOME);
 		output.setEditable(false);
@@ -248,8 +263,9 @@ public class UI extends Observable implements Observer {
 	}
 
 	private void setupBrowserWindow(String url) {
-		GridLayout layout = new GridLayout(GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
+		GridLayout layout = new GridLayout(BROWSER_GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
 		browserWindow.setLayout(layout);
+		browserWindow.setBounds(shell.getBounds());
 
 		createTextFieldsForBrowser();
 		setupBrowser();
@@ -263,10 +279,11 @@ public class UI extends Observable implements Observer {
 	}
 
 	private void setupBrowser() {
-		browser = new Browser(browserWindow, SWT.FILL | SWT.BORDER);
+		browser = new Browser(browserWindow, SWT.FILL | SWT.BORDER& (~SWT.RESIZE));
 		GridData browserGridData = new GridData(SWT.FILL, SWT.FILL, BROWSER_FIT_HORIZONTAL, BROWSER_FIT_VERTICAL, 
 				BROWSER_COLUMNS_SPAN, BROWSER_ROWS_SPAN);
 		browserGridData.widthHint = BROWSER_PREFERRED_WIDTH;
+		browserGridData.heightHint = BROWSER_PREFERRED_HEIGHT;
 		browser.setLayoutData(browserGridData);
 		browser.setUrl("http://www.google.com/");
 	}
