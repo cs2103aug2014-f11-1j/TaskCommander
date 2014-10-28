@@ -1,8 +1,12 @@
-package com.taskcommander;
+package automatedTestDriver.GoogleIntegration;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import com.taskcommander.DeadlineTask;
+import com.taskcommander.FloatingTask;
+import com.taskcommander.GoogleAPIConnector;
 import com.taskcommander.LoginManager;
+import com.taskcommander.TimedTask;
 
 import static org.junit.Assert.*;
 

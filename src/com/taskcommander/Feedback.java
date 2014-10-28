@@ -29,7 +29,7 @@ public class Feedback {
 	 */
 	public Feedback(boolean wasSuccesfullyExecuted, Global.CommandType commandType, Task commandRelatedTask, ArrayList<Task> displayedTasks) {
 		if (commandType == null || commandRelatedTask == null) {
-			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
+			throw new IllegalArgumentException(String.format(Global.MESSAGE_ILLEGAL_ARGUMENTS)); 
 		} else {
 			_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
 			_commandType = commandType;
@@ -47,7 +47,7 @@ public class Feedback {
 	 */
 	public Feedback(boolean wasSuccesfullyExecuted, Global.CommandType commandType, ArrayList<Task> displayedTasks) {
 		if (commandType == null || displayedTasks == null) {
-			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
+			throw new IllegalArgumentException(String.format(Global.MESSAGE_ILLEGAL_ARGUMENTS)); 
 		} else {
 			_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
 			_commandType = commandType;
@@ -64,7 +64,7 @@ public class Feedback {
 	 */
 	public Feedback(boolean wasSuccesfullyExecuted, String errorMessage, ArrayList<Task> displayedTasks) {
 		if (errorMessage == null) {
-			throw new IllegalArgumentException(String.format(Global.MESSAGE_ARGUMENTS_NULL)); 
+			throw new IllegalArgumentException(String.format(Global.MESSAGE_ILLEGAL_ARGUMENTS)); 
 		} else {
 			_wasSuccesfullyExecuted = wasSuccesfullyExecuted;
 			_errorMessage = errorMessage;

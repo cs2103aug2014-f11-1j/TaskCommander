@@ -129,7 +129,7 @@ public class Controller {
 				}
 				
 				// taskDateTime
-				List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand, false);
+				List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
 				
 				// Adding to data component depending on taskType
 				// case 1: FloatingTask
@@ -165,7 +165,7 @@ public class Controller {
 				}
 				
 				// Index in DisplayedTasks
-				int indexDisplayedTasks = TaskCommander.parser.determineIndex(userCommand);
+				int indexDisplayedTasks = TaskCommander.parser.determineIndex(userCommand) - Global.INDEX_OFFSET;
 				System.out.println(userCommand+indexDisplayedTasks+displayedTasks.size());
 				if (indexDisplayedTasks > displayedTasks.size() - Global.INDEX_OFFSET || indexDisplayedTasks < 0) {
 					return String.format(Global.ERROR_MESSAGE_NO_INDEX, indexDisplayedTasks + Global.INDEX_OFFSET);
@@ -184,7 +184,7 @@ public class Controller {
 						
 						
 						// New taskDateTime and taskType, if stated
-						List<Date> newTaskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand, true);	// returns null if no date found in given String
+						List<Date> newTaskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand);	// returns null if no date found in given String
 						
 						// Invalid command format when no parameter like a new Name, DateTime or "none" given
 						if ((newTaskDateTime == null) && !(TaskCommander.parser.containsParameter(userCommand, "none")) && (newTaskName == null)) {
@@ -248,7 +248,7 @@ public class Controller {
 			case DISPLAY:
 				
 				// DatePeriod Restriction
-				List<Date> DatePeriod = TaskCommander.parser.determineTaskDateTime(userCommand, false);	// returns null if no date found in given String
+				List<Date> DatePeriod = TaskCommander.parser.determineTaskDateTime(userCommand);	// returns null if no date found in given String
 		
 				if (DatePeriod != null) { // DatePeriod given
 					if (DatePeriod.size() == 2) {

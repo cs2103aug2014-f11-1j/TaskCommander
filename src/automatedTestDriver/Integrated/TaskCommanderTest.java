@@ -1,9 +1,12 @@
-package com.taskcommander;
+package automatedTestDriver.Integrated;
 import static org.junit.Assert.*;
 
 import java.util.Date;
 
 import org.junit.Test;
+
+import com.taskcommander.Global;
+import com.taskcommander.TaskCommander;
 
 /**
  * This class is supposed to test the program integrated.
