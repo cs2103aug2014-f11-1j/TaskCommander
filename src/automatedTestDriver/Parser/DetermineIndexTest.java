@@ -27,8 +27,9 @@ public class DetermineIndexTest {
 	 * Test cases:
 	 * 
 	 * Initial partition of userCommand: 	[string with at least two words], [string with one word], [empty string], [null]
-	 * 	For string with one word:			[any non Integer], [any Integer]
-	 * 	For strings with at least two words:[any String]+[1 .. MAX_INT], [any String]+[MIN_INT .. 0], [any String]+[any non Integer], 
+	 * 	For string with one word:			[any word], [any Integer]
+	 * 	For strings with at least two words:[any word]+[1 .. MAX_INT], [any word]+[MIN_INT .. 0], [any non-integer word]+[any non Integer], 
+	 * 										
 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {

@@ -1,6 +1,7 @@
 package automatedTestDriver.Integrated;
 import static org.junit.Assert.*;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import org.junit.Test;
@@ -72,7 +73,22 @@ public class TaskCommanderTest {
 		assertEquals("Added: [Tue Nov 11 '14 15:00-Fri Dec 12 '14 16:00] \"Meeting In ShangHai\"",
 				TaskCommander.controller.executeCommand(userCommand));
 	}
+	
+	@Test
+	public void testAddTimeTaskByConfiguringOutCorrectDate()throws Exception{
+		String userCommand = "add \"little boy\" 9pm - 3am";
+		 // get a calendar instance, which defaults to "now"
+	    Calendar calendar = Calendar.getInstance();
+	     
+	    // get a date to represent "today"
+	    Date today = calendar.getTime();
+	    
+	    calendar.add(Calendar.DAY_OF_YEAR, 1);
+	    Date tomorrow = calendar.getTime();
 
+		assertEquals("Added: ["+Global.dayFormat.format(today)+" "+"21:00-"+ Global.dayFormat.format(tomorrow)+" 03:00] \"little boy\"",
+				TaskCommander.controller.executeCommand(userCommand));
+	}
 
 	/**Test Display Function
 	 * */
@@ -119,7 +135,7 @@ public class TaskCommanderTest {
 		String userCommand = "update 0 3pm";
 		TaskCommander.controller.getDisplayedTasks();
 		Date date  = new Date();
-		assertEquals(String.format(Global.ERROR_MESSAGE_NO_INDEX, 0), TaskCommander.controller.executeCommand(userCommand));
+		assertEquals(String.format(Global.ERROR_MESSAGE_NO_INDEX, -1), TaskCommander.controller.executeCommand(userCommand));
 
 	}
 
@@ -140,6 +156,7 @@ public class TaskCommanderTest {
 	}
 	@Test
 	public void testUpdateDeadlineTaskToTimedTask() throws Exception{
+		TaskCommander.controller.executeCommand("clear");
 		String userCommand = "add \"welcome boss\" 3pm";
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "update 1 Nov 11 3pm - 4 pm";

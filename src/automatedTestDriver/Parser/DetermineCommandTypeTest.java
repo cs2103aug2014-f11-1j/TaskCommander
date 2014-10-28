@@ -29,9 +29,9 @@ public class DetermineCommandTypeTest {
 	 * 
 	 * Initial partition of userCommand: 	[string with at least one word], [empty string], [null]
 	 * 	For strings with at least one word:
-	 * 	- One word:							[valid commandType], [valid commandType with leading/following/surrounding spaces], [any other String]	
-	 * 	- Two words: 						[valid commandType]+[any other String], [valid commandType with leading/following/surrounding spaces]+[any other String], 
-	 * 										[any other String]+[valid commandType]
+	 * 	- One word:							[valid commandType], [valid commandType with leading/following/surrounding spaces], [any word]	
+	 * 	- Two words: 						[valid commandType]+[any word], [valid commandType with leading/following/surrounding spaces]+[any word], 
+	 * 										[any non-commandType word]+[valid commandType]
 	 * 		For valid commandType: 			["Help", "help", "HELP", ..., "Synch", "synch", "SYNCH"]
 	 */
 	@Parameterized.Parameters
@@ -43,7 +43,7 @@ public class DetermineCommandTypeTest {
 		String validCommandTypeCompletelyUncapitalizedWithLeadingSpace = " help ";
 		String validCommandTypeCompletelyUncapitalizedWithFollowingSpace = "help ";
 		String validCommandTypeCompletelyUncapitalizedWithSurrounding = " help ";
-		String anyOtherString = "anyOtherString";
+		String anyWord = "anyWord";
 		
 		return Arrays.asList(new Object[][] {
 				{ null, Global.CommandType.INVALID },
@@ -55,17 +55,17 @@ public class DetermineCommandTypeTest {
 				{ validCommandTypeCompletelyUncapitalizedWithLeadingSpace, validCommandType },
 				{ validCommandTypeCompletelyUncapitalizedWithFollowingSpace, validCommandType },
 				{ validCommandTypeCompletelyUncapitalizedWithSurrounding, validCommandType },
-				{ anyOtherString, Global.CommandType.INVALID },
+				{ anyWord, Global.CommandType.INVALID },
 				
-				{ validCommandTypeFirstLetterCapitalized + " " + anyOtherString, validCommandType },
-				{ validCommandTypeCompletelyUncapitalized + " " + anyOtherString, validCommandType },
-				{ validCommandTypeCompletelyCapitalized + " " + anyOtherString, validCommandType },
-				{ validCommandTypeCompletelyUncapitalizedWithLeadingSpace + " " + anyOtherString, validCommandType },
-				{ validCommandTypeCompletelyUncapitalizedWithFollowingSpace + " " + anyOtherString, validCommandType },
-				{ validCommandTypeCompletelyUncapitalizedWithSurrounding + " " + anyOtherString, validCommandType },
-				{ anyOtherString + " " + validCommandTypeFirstLetterCapitalized, Global.CommandType.INVALID },
-				{ anyOtherString + " " + validCommandTypeCompletelyUncapitalized, Global.CommandType.INVALID },
-				{ anyOtherString + " " + validCommandTypeCompletelyCapitalized, Global.CommandType.INVALID },
+				{ validCommandTypeFirstLetterCapitalized + " " + anyWord, validCommandType },
+				{ validCommandTypeCompletelyUncapitalized + " " + anyWord, validCommandType },
+				{ validCommandTypeCompletelyCapitalized + " " + anyWord, validCommandType },
+				{ validCommandTypeCompletelyUncapitalizedWithLeadingSpace + " " + anyWord, validCommandType },
+				{ validCommandTypeCompletelyUncapitalizedWithFollowingSpace + " " + anyWord, validCommandType },
+				{ validCommandTypeCompletelyUncapitalizedWithSurrounding + " " + anyWord, validCommandType },
+				{ anyWord + " " + validCommandTypeFirstLetterCapitalized, Global.CommandType.INVALID },
+				{ anyWord + " " + validCommandTypeCompletelyUncapitalized, Global.CommandType.INVALID },
+				{ anyWord + " " + validCommandTypeCompletelyCapitalized, Global.CommandType.INVALID },
 
 				});
 	}
