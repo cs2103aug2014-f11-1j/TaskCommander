@@ -28,7 +28,7 @@ public class TaskCommanderTest {
 	@Test
 	public void testWithNoCommand() throws Exception {
 		String userCommand = "";
-		assertEquals("No command given.", String.format(Global.ERROR_MESSAGE_NO_COMMAND));
+		assertEquals("No command given.", String.format(Global.MESSAGE_NO_COMMAND));
 		assertEquals("No command given.", TaskCommander.controller.executeCommand(userCommand));
 	}
 
@@ -135,7 +135,7 @@ public class TaskCommanderTest {
 		String userCommand = "update 0 3pm";
 		TaskCommander.controller.getDisplayedTasks();
 		Date date  = new Date();
-		assertEquals(String.format(Global.ERROR_MESSAGE_NO_INDEX, -1), TaskCommander.controller.executeCommand(userCommand));
+		assertEquals(String.format(Global.MESSAGE_NO_INDEX, -1), TaskCommander.controller.executeCommand(userCommand));
 
 	}
 

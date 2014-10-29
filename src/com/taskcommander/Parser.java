@@ -189,6 +189,7 @@ public class Parser {
 	
 	/**
 	 * This operation determines the single words and phrases one searches for and returns them as an ArrayList.
+	 * Returns null if no word or phrase found.
 	 * 
 	 * @param 	user command
 	 * @return	ArrayList containing the searched words and phrases

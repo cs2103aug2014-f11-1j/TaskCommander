@@ -288,7 +288,7 @@ public class Data {
 	 * @param done
 	 * @return 	ArrayList<Task>
 	 */
-	public ArrayList<Task> getCopiedTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean status, boolean isSearchedWordRestricted, ArrayList<String> searchedWords) {
+	public ArrayList<Task> getCopiedTasks(boolean isDateTimeRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean shownFloatingTask, boolean shownDeadlineTask, boolean shownTimedTask, boolean isStatusRestricted, boolean areDoneTasksDisplayed, boolean areOpenTasksDisplayed, boolean isSearchedWordRestricted, ArrayList<String> searchedWords) {
 		ArrayList<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
 		ArrayList<DatedTask> datedTasks = new ArrayList<DatedTask>();
 		ArrayList<Task> concernedTasks = new ArrayList<Task>();
@@ -311,7 +311,7 @@ public class Data {
 			if (!isSearchedWordRestricted || containsSearchedWords) {	
 
 				// Step 2: Check Status
-				if (!isStatusRestricted || (isStatusRestricted && status == task.isDone() )) {
+				if (!isStatusRestricted || (isStatusRestricted && areDoneTasksDisplayed == task.isDone() )) {
 					// Step 3: Check Type
 					if(task.getType() == Task.TaskType.FLOATING && (!isTaskTypeRestricted || (isTaskTypeRestricted && shownFloatingTask))) {	
 						// Step 4: Check DatePeriod
@@ -358,7 +358,7 @@ public class Data {
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET) {
-			return String.format(Global.ERROR_MESSAGE_NO_INDEX, index);
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
 		if  (tasks.get(index).getType() != Task.TaskType.TIMED) {
 			Task toChange = tasks.get(index);
@@ -454,7 +454,7 @@ public class Data {
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET) {
-			return String.format(Global.ERROR_MESSAGE_NO_INDEX, index);
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
 
 		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
@@ -542,7 +542,7 @@ public class Data {
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return String.format(Global.ERROR_MESSAGE_NO_INDEX, index);
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
 		
 		//Looking at whether the tasktype has changed
@@ -622,7 +622,7 @@ public class Data {
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return String.format(Global.ERROR_MESSAGE_NO_INDEX, index);
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
 		
 		Task doneTask = tasks.get(index);
@@ -658,7 +658,7 @@ public class Data {
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return String.format(Global.ERROR_MESSAGE_NO_INDEX, index);
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
 		
 		Task openTask = tasks.get(index);
@@ -695,7 +695,7 @@ public class Data {
 		} 
 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return String.format(Global.ERROR_MESSAGE_NO_INDEX, index);
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		} else {
 			Task deletedTask = tasks.get(index);
 			saveToTaskHistory();
