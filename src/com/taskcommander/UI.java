@@ -146,7 +146,7 @@ public class UI extends Observable implements Observer {
 	private Browser browser;
 	
 	private static final String []displayMode={"TIMED", "DEADLINE", "FLOATING", "OPEN", "DONE"};
-	private String displaySettingText = displayMode[1];
+	private String displaySettingText = "";
 	private String code; // For authorisation code from Google
 
 	//@author A0105753J
@@ -230,6 +230,7 @@ public class UI extends Observable implements Observer {
 		viewOutput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
 				INPUT_COLUMNS_SPAN, INPUT_ROWS_SPAN));
 		viewOutput.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
+		displaySettingText=TaskCommander.controller.displaySettingsDescription;
 		viewOutput.setText(displaySettingText);
 	}
 
@@ -280,6 +281,7 @@ public class UI extends Observable implements Observer {
 						clearTableItems();
 						String command = input.getText();
 						String feedback = TaskCommander.controller.executeCommand(command);
+						setupViewOutput();
 						updateDisplay(feedback);
 						clearInput();
 					}catch (Exception e) {
