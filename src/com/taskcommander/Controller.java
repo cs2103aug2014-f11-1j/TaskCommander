@@ -295,16 +295,10 @@ public class Controller {
 	 * @param  TODO
 	 */
 	private String updateTaskInData(Task relatedTask, String newTaskName, List<Date> newTaskDateTime, boolean existingDateTimeIsToBeRemoved) {
-		int indexOfRelatedTaskInData = TaskCommander.data.getIndexOf(relatedTask);
 		
-		String oldTaskName = relatedTask.getName();
-		if (newTaskName == null) {
-			newTaskName = oldTaskName;
-		}
 		Task.TaskType newTaskType;
 		Date newStartDate = null;
 		Date newEndDate = null;
-		
 		if ((newTaskDateTime == null) && existingDateTimeIsToBeRemoved) {	// "none" is a keyword used by the user to indicate, that he wants to change a DatedTask to a FloatingTask
 			newTaskType = Task.TaskType.FLOATING;
 		} else if (newTaskDateTime != null) {
@@ -316,25 +310,20 @@ public class Controller {
 				newTaskType = Task.TaskType.TIMED;
 				newStartDate = newTaskDateTime.get(0);
 				newEndDate = newTaskDateTime.get(1);
-				if ( newEndDate.compareTo(newStartDate) < 0 ) {				// if recognized endDate would be before the startDate; that's the case when the endDate is not on the same day as the startDate.
-					Calendar c = Calendar.getInstance(); 
-					c.setTime(newEndDate); 
-					c.add(Calendar.DATE, 1);
-					newEndDate = c.getTime();
-				}
 			}
 		} else {
 			Task.TaskType oldTaskType = relatedTask.getType();
 			newTaskType = oldTaskType;
 		}
 		
+		int indexOfRelatedTask = TaskCommander.data.getIndexOf(relatedTask);
 		switch (newTaskType) {
 			case FLOATING:
-				return TaskCommander.data.updateToFloatingTask(indexOfRelatedTaskInData, newTaskName);
+				return TaskCommander.data.updateToFloatingTask(indexOfRelatedTask, newTaskName);
 			case DEADLINE:
-				return TaskCommander.data.updateToDeadlineTask(indexOfRelatedTaskInData, newTaskName, newEndDate);
+				return TaskCommander.data.updateToDeadlineTask(indexOfRelatedTask, newTaskName, newEndDate);
 			default:
-				return TaskCommander.data.updateToTimedTask(indexOfRelatedTaskInData, newTaskName, newStartDate, newEndDate);
+				return TaskCommander.data.updateToTimedTask(indexOfRelatedTask, newTaskName, newStartDate, newEndDate);
 		}
 	}
 	
@@ -368,7 +357,7 @@ public class Controller {
 		if (taskDateTimes != null) {
 			if (taskDateTimes.size() == 1) {
 				isDateRestricted = true;
-				startDateRestriction = new Date(Long.MIN_VALUE); 	// returns minimum DateTime
+				startDateRestriction = null; 
 				endDateRestriction = taskDateTimes.get(0);
 			} else if (taskDateTimes.size() == 2) {
 				isDateRestricted = true;

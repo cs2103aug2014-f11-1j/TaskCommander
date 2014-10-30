@@ -1,11 +1,13 @@
 package com.taskcommander;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import com.joestelmach.natty.*;
 
 /**
@@ -153,12 +155,26 @@ public class Parser {
 			userCommandWithoutIndex = userCommand;
 		}
 		
+		List<Date> dateTimes;
 		try {
-			return getDateTimes(userCommandWithoutIndex);
+			dateTimes = getDateTimes(userCommandWithoutIndex);
 		} catch (Exception e) {
 			logger.log(Level.INFO, MESSAGE_NO_DATETIMES, e);
 			return null;
 		}
+		
+		if (dateTimes != null && dateTimes.size() == 2) {	// if recognized endDate would be before the startDate; that's the case when the endDate is not on the same day as the startDate.
+			Date startDate = dateTimes.get(0);
+			Date endDate = dateTimes.get(1);
+			if ( endDate.compareTo(startDate) < 0 ) {
+				Calendar c = Calendar.getInstance(); 
+				c.setTime(endDate); 
+				c.add(Calendar.DATE, 1);
+				endDate = c.getTime();
+				dateTimes.set(1, endDate);
+			}
+		}
+		return dateTimes;
 	}
 	
 	/**
