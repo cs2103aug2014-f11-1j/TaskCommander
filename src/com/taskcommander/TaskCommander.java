@@ -23,6 +23,9 @@ public class TaskCommander {
 		ui.open();
 	}
 	
+	/*
+	 * This method is to create tasks in database for UI testing purpose
+	 */
 	public static void ini(){
 		String userCommand="clear";
 		TaskCommander.controller.executeCommand(userCommand);
