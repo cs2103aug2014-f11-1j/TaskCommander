@@ -291,5 +291,19 @@ public class TaskCommanderTest {
 				TaskCommander.controller.executeCommand(userCommand));
 		TaskCommander.controller.executeCommand("clear");
 	}
+	@Test
+	public void testUndoUpdateTime() throws Exception{
+		String userCommand = "add \"go back to hometown\" 3pm";
+		Date date = new Date();
+		assertEquals("Added: [by "+Global.dayFormat.format(date)+" "+"15:00] \"go back to hometown\"",
+				TaskCommander.controller.executeCommand(userCommand));
+		userCommand = "update 1 5pm ";
+		TaskCommander.controller.getDisplayedTasks();
+		assertEquals("Updated: [by "+Global.dayFormat.format(date)+" "+ "17:00] \"go back to hometown\"", TaskCommander.controller.executeCommand(userCommand));
+		userCommand = "undo";
+		assertEquals("Undone latest command: UPDATE.",
+				TaskCommander.controller.executeCommand(userCommand));
+		TaskCommander.controller.executeCommand("clear");
+	}
 
 }
