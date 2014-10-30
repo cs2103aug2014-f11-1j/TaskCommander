@@ -70,6 +70,12 @@ public class TaskCommanderTest {
 				TaskCommander.controller.executeCommand(userCommand));
 		TaskCommander.controller.executeCommand("clear");
 	}
+	
+	/**
+	 * This test case is very strong.
+	 * Similar testcases like 1 day later, 20 minutes later also can achive
+	 * @throws Exception
+	 */
 	@Test
 	public void testAddTimedTaskWithOneHourLaterCommand() throws Exception{
 
@@ -270,40 +276,4 @@ public class TaskCommanderTest {
 		TaskCommander.controller.executeCommand("clear");
 	}
 
-	/**
-	 * This is to create enough cases in local data
-	 * @throws Exception
-	 */
-	@Test
-	public void Ini() throws Exception {
-		String userCommand = "clear";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"walk a dog\" Nov 11 2015 3pm";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"prepare for CS2103 Final\"";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"basketball training\" sunday";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"CS2105 P3\" Nov 10";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"MA2214 reading textbook\"";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"finish V0.5 in 10 days\" Oct 30 - Nov 10";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"have fun with friends\"";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"be patiend to friends\"";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"go get your dream\" 9pm-4am";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"play games\" Tomorrow";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"go swiming\" weekend";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"talk to people\"";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"play games\" week";
-		TaskCommander.controller.executeCommand(userCommand);
-		TaskCommander.controller.executeCommand("clear");
-	}
 }
