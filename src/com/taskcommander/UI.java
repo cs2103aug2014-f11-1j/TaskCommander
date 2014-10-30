@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 //@author A0112828H
 /**
@@ -143,8 +144,9 @@ public class UI extends Observable implements Observer {
 	private Text viewOutput;
 	private Text output;
 	private Browser browser;
-
-	private String displaySettingText = "Timed tasks only";
+	
+	private static final String []displayMode={"TIMED", "DEADLINE", "FLOATING", "OPEN", "DONE"};
+	private String displaySettingText = displayMode[1];
 	private String code; // For authorisation code from Google
 
 	//@author A0105753J
@@ -180,6 +182,7 @@ public class UI extends Observable implements Observer {
 
 	// Tabs setup
 	private void setupTabFolder() {
+		tabFolder.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		tabFolder.setLayout(new GridLayout(TAB_GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE));
 		tabFolder.setSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
 	}
@@ -204,9 +207,14 @@ public class UI extends Observable implements Observer {
 	}
 
 	private void createTextFieldsForMain() {
-		new Label(mainWindow, SWT.NONE).setText(INFO_DISPLAY);
+		Label lblCurrectDisplaying = new Label(mainWindow, SWT.NONE);
+		lblCurrectDisplaying.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
+		lblCurrectDisplaying.setForeground(SWTResourceManager.getColor(SWT.COLOR_LIST_SELECTION));
+		lblCurrectDisplaying.setText("  Currect Displaying: ");
 		viewOutput = new Text(mainWindow, SWT.WRAP);
 		output = new Text(mainWindow, SWT.BORDER | SWT.WRAP);
+		output.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
+		output.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.ITALIC));
 		new Label(mainWindow, SWT.NONE).setText(INSTRUCTIONS_MAIN);
 		input = new Text(mainWindow, SWT.BORDER);
 	}
@@ -219,10 +227,9 @@ public class UI extends Observable implements Observer {
 	}
 
 	private void setupViewOutput() {
-		GridData viewOutputGridData = new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
-				INPUT_COLUMNS_SPAN, INPUT_ROWS_SPAN);
-		viewOutput.setLayoutData(viewOutputGridData);
-		viewOutput.setForeground(darkCyan);
+		viewOutput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
+				INPUT_COLUMNS_SPAN, INPUT_ROWS_SPAN));
+		viewOutput.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		viewOutput.setText(displaySettingText);
 	}
 
@@ -301,10 +308,8 @@ public class UI extends Observable implements Observer {
 
 	private void createTextFieldsForHelp() {
 		Text helpOutput = new Text(helpWindow, SWT.BORDER | SWT.MULTI | SWT.WRAP);
-		
-		GridData outputGridData = new GridData(SWT.FILL, SWT.FILL, HELP_FIT_HORIZONTAL, HELP_FIT_VERTICAL, 
-				HELP_COLUMNS_SPAN, HELP_ROWS_SPAN);
-		helpOutput.setLayoutData(outputGridData);
+		helpOutput.setLayoutData(new GridData(SWT.FILL, SWT.FILL, HELP_FIT_HORIZONTAL, HELP_FIT_VERTICAL, 
+				HELP_COLUMNS_SPAN, HELP_ROWS_SPAN));
 		helpOutput.setText(INFO_HELP);
 		helpOutput.setEditable(false);
 	}
