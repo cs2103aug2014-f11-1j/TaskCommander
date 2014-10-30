@@ -135,11 +135,11 @@ public class Controller {
 					}
 					
 					boolean existingDateTimeIsToBeRemoved = TaskCommander.parser.containsParameter(userCommand, "none");
-					if ((newTaskDateTime == null) && !existingDateTimeIsToBeRemoved && (newTaskName == null)) {
+					if ((newTaskDateTime == null) && !existingDateTimeIsToBeRemoved && (newTaskName == null)) {		// no changes at all
 						return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 					}
 					
-					return updateTaskInData(relatedTask, indexOfRelatedTaskInData, newTaskName, newTaskDateTime, existingDateTimeIsToBeRemoved);
+					return updateTaskInData(relatedTask, newTaskName, newTaskDateTime, existingDateTimeIsToBeRemoved);
 						
 				} else if (commandType == Global.CommandType.DONE) {
 					return TaskCommander.data.done(indexOfRelatedTaskInData);
@@ -267,15 +267,9 @@ public class Controller {
 		} else if (taskDateTime.size() == 1 ) { 	
 			return TaskCommander.data.addDeadlineTask(taskName, taskDateTime.get(0));
 		} else { 
-			assert taskDateTime.size() <= 2;
+			assert taskDateTime.size() <= 2;	//TODO
 			Date startDate = taskDateTime.get(0);
 			Date endDate = taskDateTime.get(1);
-			if ( endDate.compareTo(startDate) < 0 ) {
-				Calendar c = Calendar.getInstance(); 
-				c.setTime(endDate); 
-				c.add(Calendar.DATE, 1);
-				endDate = c.getTime();
-			}
 			return TaskCommander.data.addTimedTask(taskName, startDate, endDate);
 		}
 	}
@@ -300,7 +294,9 @@ public class Controller {
 	 * 
 	 * @param  TODO
 	 */
-	private String updateTaskInData(Task relatedTask, int indexOfRelatedTaskInData, String newTaskName, List<Date> newTaskDateTime, boolean existingDateTimeIsToBeRemoved) {
+	private String updateTaskInData(Task relatedTask, String newTaskName, List<Date> newTaskDateTime, boolean existingDateTimeIsToBeRemoved) {
+		int indexOfRelatedTaskInData = TaskCommander.data.getIndexOf(relatedTask);
+		
 		String oldTaskName = relatedTask.getName();
 		if (newTaskName == null) {
 			newTaskName = oldTaskName;
