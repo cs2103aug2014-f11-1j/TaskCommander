@@ -156,15 +156,15 @@ public class TaskCommanderTest {
 	}
 
 	//In this test it uses current time, so sometimes the date will have a slite difference
-/*		@Test
+		@Test
 	public void testDisplayDealineInPeriod() throws Exception{
-		String userCommand = "display open deadline 04/11/14 to 18/11/14";
+		String userCommand = "display open deadline 04 Nov to 18 Nov";
 		Date date  = new Date();
-		assertEquals("Displayed: Period: ["+Global.dayFormat.format(date)+" "+ Global.timeFormat.format(date)+"-"+
+		assertEquals("Displayed: Date: [Tue Nov 4 '14 "+ Global.timeFormat.format(date)+"-"+" Tue Nov 18 '14 "+
 				Global.timeFormat.format(date)+ "]  Type: deadline Status: open ", TaskCommander.controller.executeCommand(userCommand));
 
 	}
-*/
+
 	/**Test Update Function
 	 * */
 
@@ -182,7 +182,9 @@ public class TaskCommanderTest {
 
 	@Test
 	public void testUpdateTaskWithTimeAdded() throws Exception{
-		String userCommand = "update 1 3pm";
+		String userCommand = "add \"little boy\" 3pm";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "update 1 3pm";
 		TaskCommander.controller.getDisplayedTasks();
 		Date date  = new Date();
 		assertEquals("Updated: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
@@ -212,7 +214,7 @@ public class TaskCommanderTest {
 
 	@Test
 	public void testUpdateTaskChangeTime() throws Exception{
-		String userCommand = "add \"little boy\" 3pm";
+		String userCommand = "add \"little boy\" 3 pm";
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "update 1 none";
 		TaskCommander.controller.getDisplayedTasks();
@@ -224,9 +226,10 @@ public class TaskCommanderTest {
 	 * */
 	@Test
 	public void testMarkDoneWithTimedTasksAdded() throws Exception{
-		String userCommand = "add \"little boy\" 3pm - 4pm";
+		String userCommand = "add \"little boy\" 3 pm - 4 pm";
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "done 1";
+		TaskCommander.controller.executeCommand("display done");
 		TaskCommander.controller.getDisplayedTasks();
 		Date date = new Date();
 		assertEquals("Done: ["+Global.dayFormat.format(date)+" "+ "15:00-16:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
