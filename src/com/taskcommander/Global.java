@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 /**
  * This class stores global variables for use in the program.
  * 
- * @author Michelle, Andreas, Sean Saito
+ * @author Michelle, Andreas, A0109194A
  */
 public class Global {
 		

@@ -36,36 +36,43 @@ public class Data {
 	
 	/**
 	 * This Array contains all the deleted tasks, needed by the GoogleAPI.
+	 * @author A0109194A
 	 */
 	private ArrayList<Task> deletedTasks;
 	
 	/**
 	 * Stores all the tasks that were deleted in a clear command.
+	 * @author A0109194A
 	 */
 	private Stack<ArrayList<Task>> clearedTasks;
 	
 	/**
 	 * Stores history of added tasks for undo command.
+	 * @author A0109194A
 	 */
 	private Stack<Task> addedTasks;
 	
 	/**
 	 * Stores history of tasks before being updated.
+	 * @author A0109194A
 	 */
 	private Stack<Task> preupdatedTasks;
 	
 	/**
 	 * Stores the history of tasks after being updated.
+	 * @author A0109194A
 	 */
 	private Stack<Task> updatedTasks;
 	
 	/**
 	 * This Stack contains the history of all operations.
+	 * @author A0109194A
 	 */
 	private Stack<CommandType> operationHistory;
 	
 	/**
 	 * This Stack contains the history of all operations.
+	 * @author A0109194A
 	 */
 	private Stack<Global.CommandType> undoHistory;
 	
@@ -77,7 +84,7 @@ public class Data {
 	
 	/**
 	 * Private Constructor, which is only called by the getInstance() method.
-	 * @author A0128620M
+	 * @author A0109194A, A0128620M
 	 */
 	private Data() {
 		tasks = new ArrayList<Task>();
@@ -115,7 +122,7 @@ public class Data {
 	 * @param 	startDate    
 	 * @param 	endDate   
 	 * @return 	feedback for UI
-	 * @author 	A0128620M
+	 * @author 	A0128620M, A0109194A
 	 */
 	public String addTimedTask(String taskName, Date startDate, Date endDate) {
 		TimedTask timedTask = new TimedTask(taskName,startDate,endDate);
@@ -139,7 +146,7 @@ public class Data {
 	 * @param 	taskName     
 	 * @param 	endDate    
 	 * @return 	feedback for UI
-	 * @author 	A0128620M
+	 * @author 	A0128620M, A0109194A
 	 */
 	public String addDeadlineTask(String taskName, Date endDate) {
 		DeadlineTask deadlineTask = new DeadlineTask(taskName, endDate);
@@ -158,7 +165,7 @@ public class Data {
 	 * 
 	 * @param 	taskName        
 	 * @return 	feedback for UI
-	 * @author 	A0128620M
+	 * @author 	A0128620M, A0109194A
 	 */
 	public String addFloatingTask(String taskName) {
 		FloatingTask floatingTask = new FloatingTask(taskName);
@@ -180,6 +187,7 @@ public class Data {
 	 * 
 	 * @param 	task     
 	 * @return 	feedback for UI
+	 * @author A0109194A
 	 */
 	public String addTask(Task task) {
 		logger.log(Level.INFO, "Called addTask(Task task)");
@@ -205,6 +213,7 @@ public class Data {
 	 * @param 	endDate
 	 * @param 	id
 	 * @return 	feedback for UI
+	 * @author A0109194A
 	 */
 	public String addTimedTask(String taskName, Date startDate, Date endDate, String googleID) {	
 		TimedTask timedTask = new TimedTask(taskName,startDate,endDate, googleID);
@@ -225,7 +234,8 @@ public class Data {
 	 * @param taskName
 	 * @param endDate
 	 * @param googleID
-	 * @return
+	 * @return feedback for UI
+	 * @author A0109194A
 	 */
 	public String addDeadlineTask(String taskName, Date endDate, String googleID) {
 		DeadlineTask deadlineTask= new DeadlineTask(taskName, endDate, googleID);
@@ -241,7 +251,8 @@ public class Data {
 	 * 
 	 * @param taskName
 	 * @param googleID
-	 * @return
+	 * @return feeback for UI
+	 * @author A0109194A
 	 */
 	public String addFloatingTask(String taskName, String googleID) {
 		FloatingTask floatingTask = new FloatingTask(taskName, googleID);
@@ -264,7 +275,7 @@ public class Data {
 	 * @param startDate    
 	 * @param endDate      
 	 * @return             feedback for UI
-	 * @author 	A0128620M
+	 * @author 	A0128620M, A0109194A
 	 */
 	public String updateToTimedTask(int index, String name, Date startDate, Date endDate) {
 		assert index < tasks.size();
@@ -335,7 +346,7 @@ public class Data {
 	 * @param taskName     description of task   
 	 * @param endDate      
 	 * @return             feedback for UI
-	 * @author 	A0128620M
+	 * @author 	A0128620M, A0109194A
 	 */
 	public String updateToDeadlineTask(int index, String name, Date endDate) {
 		assert index < tasks.size();
@@ -392,7 +403,7 @@ public class Data {
 	 * @param index   index of the task to delete, as a string
 	 * @param taskName     description of task    
 	 * @return             feedback for UI
-	 * @author 	A0128620M
+	 * @author 	A0128620M, A0109194A
 	 */
 	public String updateToFloatingTask(int index, String name) {
 		assert index < tasks.size();
@@ -446,6 +457,7 @@ public class Data {
 	 * @param 		index
 	 * @param 		task
 	 * @return		Feedback for user
+	 * @author 		A0109194A
 	 */
 	public String updateToTimedTask(int index, TimedTask task) {
 		Task relatedTask = tasks.get(index);
@@ -489,6 +501,7 @@ public class Data {
 	 * @param 		index
 	 * @param 		task
 	 * @return		Feedback for user
+	 * @author 		A0109194A
 	 */
 	public String updateToDeadlineTask(int index, DeadlineTask task) {
 		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
@@ -525,6 +538,7 @@ public class Data {
 	 * @param 		index
 	 * @param 		task
 	 * @return		Feedback for user
+	 * @author 		A0109194A
 	 */
 	public String updateToFloatingTask(int index, FloatingTask task) {
 		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
@@ -642,7 +656,7 @@ public class Data {
 	 * 
 	 * @param index        Index of the task to delete, as a string. 
 	 * @return             Feedback for user.
-	 * @author 	A0128620M
+	 * @author 	A0128620M, A0109194A
 	 */
 	public String deleteTask(int index) {
 		if (tasks.isEmpty()) {
@@ -701,6 +715,7 @@ public class Data {
 	/**
 	 * This operation undoes the latest command
 	 * It supports Add, Delete, Update, and Clear commands
+	 * @return Feedback for UI
 	 * @author A0109194A
 	 */
 	public String undo() {
@@ -739,6 +754,8 @@ public class Data {
 	
 	/**
 	 * This operation undoes the add command
+	 * @return Boolean
+	 * @author A0109194A
 	 */
 	private boolean undoAdd() {
 		Task toDelete = addedTasks.pop();
@@ -758,6 +775,8 @@ public class Data {
 	
 	/**
 	 * This operation undoes the delete command
+	 * @return Boolean
+	 * @author A0109194A
 	 */
 	private boolean undoDelete() {
 		Task toAdd = deletedTasks.get(deletedTasks.size() - 1);
@@ -778,6 +797,8 @@ public class Data {
 	
 	/**
 	 * This operation undoes the update command
+	 * @return Boolean
+	 * @author A0109194A
 	 */
 	private boolean undoUpdate() {
 		Task updated = updatedTasks.pop();
@@ -813,7 +834,12 @@ public class Data {
 		}
 		return false;
 	}
-	
+
+	/**
+	 * This operation undoes the Clear command
+	 * @return Boolean
+	 * @author A0109194A
+	 */
 	private boolean undoClear() {
 		ArrayList<Task> toRestore = clearedTasks.pop();
 		tasks.addAll(toRestore);
@@ -834,7 +860,7 @@ public class Data {
 	 * 
 	 * @param userCommand 
 	 * @return             Feedback for user.
-	 * @author 	A0128620M
+	 * @author 	A0128620M, A0109194A
 	 */
 	public String clearTasks() {
 		ArrayList<Task> cleared = new ArrayList<Task>();
