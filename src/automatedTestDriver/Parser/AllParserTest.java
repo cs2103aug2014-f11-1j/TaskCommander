@@ -14,6 +14,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({  DetermineCommandTypeTest.class, DetermineTaskNameTest.class, DetermineTaskDateTimeTest.class, DetermineIndexTest.class, DetermineSearchedWords.class, ContainsParameterTest.class })
-public class ParserTest {
+public class AllParserTest {
 	
 }

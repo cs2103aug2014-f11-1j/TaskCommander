@@ -20,10 +20,12 @@ import java.util.logging.Logger;
 
 public class Controller {
 	
-	/* 
+	/* ========================= Constructor, Variables and Logger ================================== */
+	
+	/**
 	 * Logger and related logging messages
 	 */
-	private static Logger logger = Logger.getLogger(Controller.class.getName());
+	private static Logger logger = Logger.getLogger(Controller.class.getName());	//TODO add logs
 	
 	/**
 	 * This list contains all tasks which were recently displayed by the UI. Memorizing the 
@@ -53,7 +55,7 @@ public class Controller {
 	boolean isSearchRestricted;
 	ArrayList<String> searchedWordsAndPhrases;
 	
-	/*
+	/**
 	 * This variable is initialized with the one and only instance of the Parser class.
 	 */
 	private static Controller theOne;
@@ -219,6 +221,8 @@ public class Controller {
 
 	/**
 	 * Returns the tasks which are supposed to be displayed by the UI according to the current display settings.
+	 * 
+	 * @return              ArrayList with tasks to be displayed
 	 */
 	public ArrayList<Task> getDisplayedTasks() {
 		if (!isDateRestricted && !isTaskTypeRestricted && !isStatusRestricted  && !isSearchRestricted) {
@@ -230,10 +234,17 @@ public class Controller {
 		return displayedTasks;
 	}
 	
-	/* ================================ Private auxiliary methods =================================== */
+	public String getDisplaySettingsDescription() {
+		return displaySettingsDescription;
+	}
+	
+	/* ================================ Specific auxiliary methods =================================== */
 	
 	/**
-	 * This operation checks whether the given list contains either one or two DateTimes.
+	 * This operation checks whether the given list is valid, that is, contains either one or two DateTimes.
+	 * 
+	 * @param  taskDateTimes  	list containing DateTimes
+	 * @return              	true if invalid, false if invalid
 	 */
 	private boolean isTaskDateTimeInvalid(List<Date> taskDateTimes) {
 		if (taskDateTimes != null && taskDateTimes.size() > 2) {
@@ -245,6 +256,10 @@ public class Controller {
 	
 	/**
 	 * This operation processes the addition of the task to the respective method in Data.
+	 * 
+	 * @param  taskDateTimes  	list containing DateTimes
+	 * @param  taskName  		name of the task
+	 * @return              	feedback to the UI
 	 */
 	private String addTaskToData(String taskName, List<Date> taskDateTime) {
 		if (taskDateTime == null) { 			
@@ -266,7 +281,11 @@ public class Controller {
 	}
 	
 	/**
-	 * This operation checks whether the given index is valid in respect to the recenty displayed tasks list.
+	 * This operation checks whether the given index is valid in respect to the recently displayed tasks list.
+	 * 
+ 	 * @param  indexDisplayedTasks  	index of relating task in displayedTasks list
+	 * @return              			true if invalid, false if invalid
+	 * 
 	 */
 	private boolean isIndexDisplayedTasksInvalid(int indexDisplayedTasks) {
 		if (indexDisplayedTasks > displayedTasks.size() - Global.INDEX_OFFSET || indexDisplayedTasks < 0) {
@@ -278,6 +297,8 @@ public class Controller {
 	
 	/**
 	 * This operation processes the update of the task to the respective method in Data.
+	 * 
+	 * @param  TODO
 	 */
 	private String updateTaskInData(Task relatedTask, int indexOfRelatedTaskInData, String newTaskName, List<Date> newTaskDateTime, boolean existingDateTimeIsToBeRemoved) {
 		String oldTaskName = relatedTask.getName();
@@ -344,6 +365,8 @@ public class Controller {
 	
 	/**
 	 * This operation sets the date restrictions of the display settings.
+	 * 
+	 * @param  taskDateTimes  	list containing DateTimes
 	 */
 	private void setDateRestrictionOfDisplaySettings(List<Date> taskDateTimes) {
 		if (taskDateTimes != null) {
@@ -365,6 +388,8 @@ public class Controller {
 	
 	/**
 	 * This operation sets the task type restrictions of the display settings.
+	 * 
+	 * @param  userCommand  command given by user
 	 */
 	private void setTaskTypeRestrictionsOfDisplaySettings(String userCommand) {
 		areFloatingTasksDisplayed = TaskCommander.parser.containsParameter(userCommand, "none");
@@ -379,6 +404,8 @@ public class Controller {
 	
 	/**
 	 * This operation sets the status restrictions of the display settings.
+	 * 
+	 * @param  userCommand  command given by user
 	 */
 	private void setStatusRestrictionOfDisplaySettings(String userCommand) {
 		areDoneTasksDisplayed = TaskCommander.parser.containsParameter(userCommand, "done");
@@ -462,6 +489,8 @@ public class Controller {
 	
 	/**
 	 * This operation returns the number of words the given String consists of.
+	 * 
+	 * @param  userCommand  command given by user
 	 */
 	private int getNumberOfWords(String userCommand) {
 		String[] allWords = userCommand.trim().split("\\s+");

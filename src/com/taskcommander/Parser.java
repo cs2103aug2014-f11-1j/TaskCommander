@@ -18,7 +18,9 @@ import com.joestelmach.natty.*;
 
 public class Parser {
 	
-	/* 
+	/* ========================= Constructor, Variables and Logger ================================== */
+	
+	/**
 	 * Logger and related logging messages
 	 */
 	private static Logger logger = Logger.getLogger(Parser.class.getName());
@@ -27,12 +29,12 @@ public class Parser {
 	private static final String MESSAGE_NO_INDEX = "No index found.";
 	private static final String MESSAGE_NO_DATETIMES = "No dateTimes found.";
 	
-	/*
+	/**
 	 * This variable is initialized with the one and only instance of the Parser class.
 	 */
 	private static Parser theOne;
 	
-	/*
+	/**
 	 * Private Constructor, only called by the getInstance() method.
 	 */
 	private Parser(){

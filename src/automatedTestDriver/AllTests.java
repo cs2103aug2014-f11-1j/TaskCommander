@@ -15,10 +15,10 @@ import automatedTestDriver.Controller.ControllerTest;
 import automatedTestDriver.Data.DataTest;
 import automatedTestDriver.GoogleIntegration.GoogleAPIConnectorTest;
 import automatedTestDriver.Integrated.TaskCommanderTest;
-import automatedTestDriver.Parser.ParserTest;
+import automatedTestDriver.Parser.AllParserTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({  TaskCommanderTest.class, ControllerTest.class, ParserTest.class, DataTest.class,
+@SuiteClasses({  TaskCommanderTest.class, ControllerTest.class, AllParserTest.class, DataTest.class,
 	GoogleAPIConnectorTest.class })
 public class AllTests {
 
