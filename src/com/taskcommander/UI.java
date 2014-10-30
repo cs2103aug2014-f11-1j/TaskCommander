@@ -124,6 +124,7 @@ public class UI extends Observable implements Observer {
 			"display [timed] [deadline] [floating] [done|open] [date] [start time] [end time] \n" +
 			"open <index> \n" +
 			"done <index> \n" +
+			"edit \"<task title>\" <date> <end time> \n" +
 			"delete <index of string> \n" +
 			"clear \n" +
 			"sort \n" +
@@ -136,6 +137,7 @@ public class UI extends Observable implements Observer {
 	private static Logger logger = Logger.getLogger(UI.class.getName());
 	
 	// Mutable UI element instances
+	private TabItem mainTab;
 	private TabItem browserTab;
 	private Text input;
 	private Text displayOutput;
@@ -184,10 +186,10 @@ public class UI extends Observable implements Observer {
 
 	// Main tab setup
 	private void createMainTab() {
-		TabItem item = new TabItem(tabFolder, SWT.NONE);
-		item.setText(TAB_MAIN_NAME);
+		mainTab = new TabItem(tabFolder, SWT.NONE);
+		mainTab.setText(TAB_MAIN_NAME);
 		setupMainWindow();
-		item.setControl(mainWindow);
+		mainTab.setControl(mainWindow);
 	}
 
 	private void setupMainWindow() {
@@ -360,6 +362,7 @@ public class UI extends Observable implements Observer {
 				if(event.title.contains("Success")) {
 					logger.log(Level.INFO, "Success "+event.title);
 					setCode(event.title.replace("Success code=", ""));
+					tabFolder.setSelection(mainTab);
 					tabFolder.getItem(TAB_BROWSER_INDEX).dispose();
 				}
 			}

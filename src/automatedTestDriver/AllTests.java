@@ -19,7 +19,7 @@ import automatedTestDriver.Parser.AllParserTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({  TaskCommanderTest.class, ControllerTest.class, AllParserTest.class, DataTest.class,
-	GoogleAPIConnectorTest.class })
+	GoogleAPIConnectorTest.class, StorageTest.class})
 public class AllTests {
 
 } 
