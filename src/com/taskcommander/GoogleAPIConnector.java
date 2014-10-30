@@ -598,7 +598,7 @@ public class GoogleAPIConnector {
 	//@author A0109194A
 	// Changes a Google Task to a TaskCommander Task.
 	public com.taskcommander.Task toTask(Task task) {
-		if (task == null) {
+		if (task == null || task.isEmpty()) {
 			return null;
 		}
 		if (task.containsKey("due")) {
@@ -616,9 +616,10 @@ public class GoogleAPIConnector {
 	//@author A0109194A
 	// Changes a Google Calendar Event to a TaskCommander Task.
 	public com.taskcommander.Task toTask(Event event) {
-		if (event == null) {
+		if (event == null || event.isEmpty()) {
 			return null;
 		}
+
 		TimedTask timedTask = new TimedTask(event.getSummary(),
 				toDate(event.getStart().getDateTime()),
 				toDate(event.getEnd().getDateTime()));
