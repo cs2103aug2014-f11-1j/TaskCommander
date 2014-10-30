@@ -88,6 +88,18 @@ public class TaskCommanderTest {
 		assertEquals("Added: [by "+Global.dayFormat.format(onehourlater)+" "+ Global.timeFormat.format(onehourlater)+"] \"onehourlater\"",
 				TaskCommander.controller.executeCommand(userCommand));
 	}
+	@Test
+	public void testAddTimedTaskWithtwentyMinutesLaterCommand() throws Exception{
+
+		String userCommand = "add \"later\" 20 Minutes later";
+		Date now  = new Date();
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(now.getTime());
+		c.add(Calendar.MINUTE, 20);
+		Date later = c.getTime();
+		assertEquals("Added: [by "+Global.dayFormat.format(later)+" "+ Global.timeFormat.format(later)+"] \"later\"",
+				TaskCommander.controller.executeCommand(userCommand));
+	}
 
 	@Test
 	public void testAddTimeTaskWithDifferentDate()throws Exception{
