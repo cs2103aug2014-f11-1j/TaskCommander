@@ -217,6 +217,7 @@ public class TaskCommanderTest {
 		String userCommand = "add \"little boy\" 3 pm";
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "update 1 none";
+		TaskCommander.controller.executeCommand("display deadline");
 		TaskCommander.controller.getDisplayedTasks();
 		assertEquals("Updated: \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
 		TaskCommander.controller.executeCommand("clear");
@@ -229,7 +230,7 @@ public class TaskCommanderTest {
 		String userCommand = "add \"little boy\" 3 pm - 4 pm";
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "done 1";
-		TaskCommander.controller.executeCommand("display done");
+		TaskCommander.controller.executeCommand("display timed");
 		TaskCommander.controller.getDisplayedTasks();
 		Date date = new Date();
 		assertEquals("Done: ["+Global.dayFormat.format(date)+" "+ "15:00-16:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
