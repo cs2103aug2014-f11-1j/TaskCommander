@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 //@author A0112828H
 /**
@@ -120,8 +119,6 @@ public class UI extends Observable implements Observer {
 
 	// String messages for display
 	private static final String INFO_DISPLAY = "Displaying: ";
-	public static final String MESSAGE_HELP = " open <index>, done <index>, delete <index of string>, clear, sort, undo, exit.";
-
 	private static final String INFO_HELP = "You can use these commands: \n" +
 			"add \"<task title>\" <date> <end time> \n" +
 			"display [timed] [deadline] [floating] [done|open] [date] [start time] [end time] \n" +
@@ -141,12 +138,11 @@ public class UI extends Observable implements Observer {
 	// Mutable UI element instances
 	private TabItem browserTab;
 	private Text input;
-	private Text viewOutput;
+	private Text displayOutput;
 	private Text output;
 	private Browser browser;
 	
-	private static final String []displayMode={"TIMED", "DEADLINE", "FLOATING", "OPEN", "DONE"};
-	private String displaySettingText = "";
+	private String displaySettingText;
 	private String code; // For authorisation code from Google
 
 	//@author A0105753J
@@ -182,7 +178,6 @@ public class UI extends Observable implements Observer {
 
 	// Tabs setup
 	private void setupTabFolder() {
-		tabFolder.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		tabFolder.setLayout(new GridLayout(TAB_GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE));
 		tabFolder.setSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
 	}
@@ -207,31 +202,33 @@ public class UI extends Observable implements Observer {
 	}
 
 	private void createTextFieldsForMain() {
-		Label lblCurrectDisplaying = new Label(mainWindow, SWT.NONE);
-		lblCurrectDisplaying.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
-		lblCurrectDisplaying.setForeground(SWTResourceManager.getColor(SWT.COLOR_LIST_SELECTION));
-		lblCurrectDisplaying.setText("  Currect Displaying: ");
-		viewOutput = new Text(mainWindow, SWT.WRAP);
+		new Label(mainWindow, SWT.NONE).setText(INFO_DISPLAY);
+		displayOutput = new Text(mainWindow, SWT.WRAP);
 		output = new Text(mainWindow, SWT.BORDER | SWT.WRAP);
-		output.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
-		output.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.ITALIC));
 		new Label(mainWindow, SWT.NONE).setText(INSTRUCTIONS_MAIN);
 		input = new Text(mainWindow, SWT.BORDER);
 	}
 
 	private void setupMainElements() {
-		setupViewOutput();
+		setupDisplayOutput();
 		setupInput();
 		setupOutput();
 		setupTable();
 	}
 
-	private void setupViewOutput() {
-		viewOutput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
+	private void setupDisplayOutput() {
+		displayOutput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
 				INPUT_COLUMNS_SPAN, INPUT_ROWS_SPAN));
-		viewOutput.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-		displaySettingText=TaskCommander.controller.displaySettingsDescription;
-		viewOutput.setText(displaySettingText);
+		updateDisplaySettings();
+	}
+
+	/**
+	 * Gets the latest display settings in a String from the Controller
+	 * and sets it as the text for the display output.
+	 */
+	private void updateDisplaySettings() {
+		displaySettingText = TaskCommander.controller.displaySettingsDescription;
+		displayOutput.setText(displaySettingText);
 	}
 
 	private void setupInput() {
@@ -281,8 +278,8 @@ public class UI extends Observable implements Observer {
 						clearTableItems();
 						String command = input.getText();
 						String feedback = TaskCommander.controller.executeCommand(command);
-						setupViewOutput();
 						updateDisplay(feedback);
+						updateDisplaySettings();
 						clearInput();
 					}catch (Exception e) {
 						logger.log(Level.WARNING,"Exception while executing command flow", e);
