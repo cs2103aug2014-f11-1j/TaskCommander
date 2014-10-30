@@ -305,5 +305,191 @@ public class TaskCommanderTest {
 				TaskCommander.controller.executeCommand(userCommand));
 		TaskCommander.controller.executeCommand("clear");
 	}
+	@Test
+	public void testUpdateWithMoreTasks() throws Exception{
+		String userCommand;
+		userCommand = "add \"prepare for CS2103 Final\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"basketball training\" sunday";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"CS2105 P3\" Nov 10";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"MA2214 reading textbook\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"finish V0.5 in 10 days\" Oct 30 - Nov 10";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"have fun with friends\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"be patiend to friends\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"go get your dream\" 9pm-4am";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"play games\" Tomorrow";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"go swiming\" weekend";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"talk to people\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"hey relax your neck it is hurt\" 5 minutes later";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Help me come up with 20+ tasks pls\" Winter vacation";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"get married\" in 20 minutes";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"get a baby pls\" 10 years later";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"make friends\" today";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"visit grandma\" 3 month later";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"sing k\" winter vacation";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"make contribution to project\" Oct 30 - Nov 10";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"eat an apple\" today";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"get excersice\" 9pm";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"say hello to tutor\" Friday 11 am";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "update 1 5pm ";
+		Date date  = new Date();
+		TaskCommander.controller.getDisplayedTasks();
+		assertEquals("Updated: [by "+Global.dayFormat.format(date)+" "+ "17:00] \"MA2214 reading textbook\"", TaskCommander.controller.executeCommand(userCommand));
+		
+		userCommand = "update 6 Nov 4 5pm ";
+		TaskCommander.controller.getDisplayedTasks();
+		assertEquals("Updated: [by Tue Nov 4 '14 17:00] \"get excersice\"", TaskCommander.controller.executeCommand(userCommand));
+		TaskCommander.controller.executeCommand("clear");
+		
+	}
+	@Test
+	public void testDeleteWithMoreTasks() throws Exception{
+		String userCommand;
+		userCommand = "add \"prepare for CS2103 Final\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"basketball training\" sunday";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"CS2105 P3\" Nov 10";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"MA2214 reading textbook\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"finish V0.5 in 10 days\" Oct 30 - Nov 10";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"have fun with friends\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"be patiend to friends\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"go get your dream\" 9pm-4am";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"play games\" Tomorrow";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"go swiming\" weekend";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"talk to people\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"hey relax your neck it is hurt\" 5 minutes later";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Help me come up with 20+ tasks pls\" Winter vacation";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"get married\" in 20 minutes";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"get a baby pls\" 10 years later";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"make friends\" today";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"visit grandma\" 3 month later";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"sing k\" winter vacation";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"make contribution to project\" Oct 30 - Nov 10";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"eat an apple\" today";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"get excersice\" 9pm";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"say hello to tutor\" Friday 11 am";
+		TaskCommander.controller.executeCommand(userCommand);
+		
+		Date date  = new Date();
+		
+		userCommand = "delete 6 ";
+		TaskCommander.controller.getDisplayedTasks();
+		assertEquals("Deleted: [by Thu Oct 30 '14 21:00] \"get excersice\"", TaskCommander.controller.executeCommand(userCommand));
+		TaskCommander.controller.executeCommand("clear");
+		
+	}
+	@Test
+	public void testUndoWithMoreTasks() throws Exception{
+		String userCommand;
+		userCommand = "add \"prepare for CS2103 Final\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"basketball training\" sunday";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"CS2105 P3\" Nov 10";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"MA2214 reading textbook\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"finish V0.5 in 10 days\" Oct 30 - Nov 10";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"have fun with friends\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"be patiend to friends\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"go get your dream\" 9pm-4am";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"play games\" Tomorrow";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"go swiming\" weekend";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"talk to people\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"hey relax your neck it is hurt\" 5 minutes later";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Help me come up with 20+ tasks pls\" Winter vacation";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"get married\" in 20 minutes";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"get a baby pls\" 10 years later";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"make friends\" today";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"visit grandma\" 3 month later";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"sing k\" winter vacation";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"make contribution to project\" Oct 30 - Nov 10";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"eat an apple\" today";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"get excersice\" 9pm";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"say hello to tutor\" Friday 11 am";
+		TaskCommander.controller.executeCommand(userCommand);
 
+		Date date  = new Date();
+
+		userCommand = "undo";
+		assertEquals("Undone latest command: ADD.",
+				TaskCommander.controller.executeCommand(userCommand));
+		
+		
+		userCommand = "delete 6 ";
+		TaskCommander.controller.getDisplayedTasks();
+		assertEquals("Deleted: [by Thu Oct 30 '14 21:00] \"get excersice\"", TaskCommander.controller.executeCommand(userCommand));
+		
+		assertEquals("Undone latest command: DELETE.",
+				TaskCommander.controller.executeCommand(userCommand));
+		
+		userCommand = "update 1 5pm ";
+		date  = new Date();
+		TaskCommander.controller.getDisplayedTasks();
+		assertEquals("Updated: [by "+Global.dayFormat.format(date)+" "+ "17:00] \"MA2214 reading textbook\"", TaskCommander.controller.executeCommand(userCommand));
+		assertEquals("Undone latest command: UPDATE.",
+				TaskCommander.controller.executeCommand(userCommand));
+		
+		TaskCommander.controller.executeCommand("clear");
+		
+	}
+	
 }

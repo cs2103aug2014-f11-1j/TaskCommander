@@ -19,7 +19,7 @@ public class TaskCommander {
 	 * @param  args
 	 */
 	public static void main(String[] args) {
-		/*ini();*/
+		ini();
 		ui.open();
 	}
 	
