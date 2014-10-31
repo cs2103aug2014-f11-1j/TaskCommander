@@ -10,12 +10,12 @@ import com.taskcommander.Global.CommandType;
 
 
 /**
- * This class represents the Data component. Besides storing the data temporary, it also contains
- * all of the methods needed to manipulate the task objects within the temporary list. At the beginning 
- * the content of the permanent storage is pulled to the temporary one. After each command the data 
- * will be pushed to the permanent storage.
+ * Stores tasks temporarily. Contains all of the methods needed to manipulate the task 
+ * objects within the temporary list, for internal use and for the Google Integration
+ * component.
  * 
- * @author A0128620M, A0109194A
+ * Upon initialisation, the contents of the permanent storage will be pulled. After each 
+ * command the data will be pushed to the permanent storage.
  */
 
 public class Data {
@@ -946,5 +946,3 @@ public class Data {
 		tasks = TaskCommander.storage.readFromFile(); 
 	}	
 }
-
-	
