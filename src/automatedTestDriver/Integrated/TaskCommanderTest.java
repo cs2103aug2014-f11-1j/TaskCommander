@@ -479,7 +479,7 @@ public class TaskCommanderTest {
 		userCommand = "delete 1 ";
 		TaskCommander.controller.getDisplayedTasks();
 		assertEquals("Deleted: \"MA2214 reading textbook\"", TaskCommander.controller.executeCommand(userCommand));
-		
+		userCommand = "undo";
 		assertEquals("Undone latest command: DELETE.",
 				TaskCommander.controller.executeCommand(userCommand));
 		
@@ -487,6 +487,7 @@ public class TaskCommanderTest {
 		date  = new Date();
 		TaskCommander.controller.getDisplayedTasks();
 		assertEquals("Updated: [by "+Global.dayFormat.format(date)+" "+ "17:00] \"MA2214 reading textbook\"", TaskCommander.controller.executeCommand(userCommand));
+		userCommand = "undo";
 		assertEquals("Undone latest command: UPDATE.",
 				TaskCommander.controller.executeCommand(userCommand));
 		
