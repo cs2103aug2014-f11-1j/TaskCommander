@@ -185,6 +185,7 @@ public class TaskCommanderTest {
 		String userCommand = "add \"little boy\" 3pm";
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "update 1 3pm";
+		TaskCommander.controller.executeCommand("display deadline");
 		TaskCommander.controller.getDisplayedTasks();
 		Date date  = new Date();
 		assertEquals("Updated: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
