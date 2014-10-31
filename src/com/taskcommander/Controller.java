@@ -7,13 +7,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 //@author A0128620M
 /**
- * This class represents the Controller component. After receiving the user's input from the UI, 
- * the Controller determines the exact type of command and its related parameters by means of the Parser. 
- * Then the Controller processes the command to the executing methods in the Data or Google component. 
- * The regained feedback is returned to the UI. In addition, the Controller handles the view settings, 
- * which can be adjusted by the display command.
- * By hiding all other internal components like Parser, Data, Storage and so on, the Controller acts as 
- * a Facade class (Facade pattern).
+ * Singleton class that determines and executes commands from user input, and passes feedback to the UI.
+ * Acts as a facade class and delegates commands to other classes.
+ * 
+ * Delegates data manipulation commands to the Data component. 
+ * Delegates sync commands to the Google Integration component.
+ * Handles view settings adjusted by display commands.
  */
 public class Controller {
 
@@ -61,11 +60,10 @@ public class Controller {
 	}
 
 	/**
-	 * This operation parses the command from the user and executes it if valid. Afterwards a 
+	 * Parses the command from the user and executes it if valid. Afterwards a 
 	 * feedback String is returned.
-	 * 
-	 * @param  userCommand  command given by user
-	 * @return              feedback to the UI
+	 * @param  userCommand  
+	 * @return              Feedback to the UI
 	 */
 	public String executeCommand(String userCommand) {	
 		if (userCommand == null | userCommand == "") {
@@ -107,7 +105,8 @@ public class Controller {
 			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);		
 		}
 	}
-	
+
+	// Command methods
 	private String addTask(String userCommand) {
 		String taskName = TaskCommander.parser.determineTaskName(userCommand);
 		List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
@@ -133,6 +132,7 @@ public class Controller {
 			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 		}
 
+		// "none" is a keyword used by the user to indicate, that he wants to change a DatedTask to a FloatingTask
 		boolean removeExistingDate = TaskCommander.parser.containsParameter(userCommand, "none");
 		if ((newTaskDateTime == null) && !removeExistingDate && (newTaskName == null)) {	// no changes at all
 			//TODO: @Andy: If there are no changes to be made, you can simply do nothing and return a success message
@@ -156,7 +156,7 @@ public class Controller {
 		Task relatedTask = displayedTasks.get(indexOfRelatedTaskInDisplayedTasks);
 		return TaskCommander.data.done(TaskCommander.data.getIndexOf(relatedTask));
 	}
-	
+
 	private String openTask(String userCommand) {
 		if (isSingleWord(userCommand)) {
 			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
@@ -170,7 +170,7 @@ public class Controller {
 		Task relatedTask = displayedTasks.get(indexOfRelatedTaskInDisplayedTasks);
 		return TaskCommander.data.open(TaskCommander.data.getIndexOf(relatedTask));
 	}
-	
+
 	private String deleteTask(String userCommand) {
 		if (isSingleWord(userCommand)) {
 			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
@@ -190,13 +190,13 @@ public class Controller {
 		if (isTaskDateTimeInvalid(taskDateTimes)) {
 			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 		}
-		
+
 		updateDisplayRestrictions(userCommand, taskDateTimes);
 		setDisplaySettingsDescription();
 
 		return String.format(Global.MESSAGE_DISPLAYED, displaySettingsDescription);
 	}
-	
+
 	private String searchForTasks(String userCommand) {
 		searchedWordsAndPhrases = TaskCommander.parser.determineSearchedWords(userCommand);	
 		if (searchedWordsAndPhrases == null) {
@@ -208,7 +208,7 @@ public class Controller {
 
 		return String.format(Global.MESSAGE_SEARCHED, displaySettingsDescription);
 	}
-	
+
 
 	private String clearTasks(String userCommand) {
 		if (isSingleWord(userCommand)) {
@@ -228,7 +228,7 @@ public class Controller {
 			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 		}	
 	}
-	
+
 	private String undoTask(String userCommand) {
 		if (isSingleWord(userCommand)) {
 			return TaskCommander.data.undo();
@@ -237,16 +237,18 @@ public class Controller {
 		}
 	}
 
+	// For displayed tasks
 	/**
 	 * Returns the tasks which are supposed to be displayed by the UI according to the current display settings.
-	 * 
-	 * @return              ArrayList with tasks to be displayed
+	 * @return      ArrayList with tasks to be displayed
 	 */
 	public ArrayList<Task> getDisplayedTasks() {
 		if (!isDateRestricted && !isTaskTypeRestricted && !isStatusRestricted  && !isSearchRestricted) {
 			displayedTasks = TaskCommander.data.getCopiedTasks();
 		} else {
-			displayedTasks = TaskCommander.data.getCopiedTasks(isDateRestricted, startDateRestriction, endDateRestriction, isTaskTypeRestricted, areFloatingTasksDisplayed, areDeadlineTasksDisplayed, areTimedTasksDisplayed, isStatusRestricted, areDoneTasksDisplayed, areOpenTasksDisplayed, isSearchRestricted, searchedWordsAndPhrases);
+			displayedTasks = TaskCommander.data.getCopiedTasks(isDateRestricted, startDateRestriction, endDateRestriction, 
+					isTaskTypeRestricted, areFloatingTasksDisplayed, areDeadlineTasksDisplayed, areTimedTasksDisplayed, 
+					isStatusRestricted, areDoneTasksDisplayed, areOpenTasksDisplayed, isSearchRestricted, searchedWordsAndPhrases);
 		}
 
 		return displayedTasks;
@@ -256,13 +258,11 @@ public class Controller {
 		return displaySettingsDescription;
 	}
 
-	/* ================================ Specific auxiliary methods =================================== */
-
+	// Helper methods
 	/**
-	 * This operation checks whether the given list is valid, that is, contains either one or two DateTimes.
-	 * 
-	 * @param  taskDateTimes  	list containing DateTimes
-	 * @return              	true if invalid, false if invalid
+	 * Checks whether the given list is valid, that is, contains either one or two DateTimes.
+	 * @param  taskDateTimes  	List containing DateTimes
+	 * @return              	If list is valid
 	 */
 	private boolean isTaskDateTimeInvalid(List<Date> taskDateTimes) {
 		if (taskDateTimes != null && taskDateTimes.size() > 2) {
@@ -273,11 +273,10 @@ public class Controller {
 	}
 
 	/**
-	 * This operation processes the addition of the task to the respective method in Data.
-	 * 
-	 * @param  taskDateTimes  	list containing DateTimes
-	 * @param  taskName  		name of the task
-	 * @return              	feedback to the UI
+	 * Processes the addition of the task to the respective method in Data.
+	 * @param  taskDateTimes  	List containing DateTimes
+	 * @param  taskName  		Task name
+	 * @return              	Feedback to the UI
 	 */
 	private String addTaskToData(String taskName, List<Date> taskDateTime) {
 		if (taskDateTime == null) { 			
@@ -293,11 +292,9 @@ public class Controller {
 	}
 
 	/**
-	 * This operation checks whether the given index is valid in respect to the recently displayed tasks list.
-	 * 
-	 * @param  indexDisplayedTasks  	index of relating task in displayedTasks list
-	 * @return              			true if invalid, false if invalid
-	 * 
+	 * Checks whether the given index is valid in respect to the recently displayed tasks list.
+	 * @param  indexDisplayedTasks  	Index of related task in displayedTasks list
+	 * @return              			If valid
 	 */
 	private boolean isIndexDisplayedTasksInvalid(int indexDisplayedTasks) {
 		if (indexDisplayedTasks > displayedTasks.size() - Global.INDEX_OFFSET || indexDisplayedTasks < 0) {
@@ -308,8 +305,7 @@ public class Controller {
 	}
 
 	/**
-	 * This operation processes the update of the task to the respective method in Data.
-	 * 
+	 * Processes the update of the task to the respective method in Data.
 	 * @param  TODO
 	 */
 	private String updateTaskInData(Task relatedTask, String newTaskName, List<Date> newTaskDateTime, boolean removeExistingDate) {
@@ -327,7 +323,7 @@ public class Controller {
 				newStartDate = newTaskDateTime.get(0);
 				newEndDate = newTaskDateTime.get(1);
 			}
-		} else if (removeExistingDate) {	// "none" is a keyword used by the user to indicate, that he wants to change a DatedTask to a FloatingTask
+		} else if (removeExistingDate) {	
 			newTaskType = Task.TaskType.FLOATING;
 		} else {
 			Task.TaskType oldTaskType = relatedTask.getType();
@@ -345,11 +341,9 @@ public class Controller {
 		}
 	}
 
-	/**
-	 * This operation sets the default values of the display settings (upcoming open tasks within the next week). 
-	 */
+	// Sets the default values of the display settings (upcoming open tasks within the next week). 
 	private void setDefaultDisplaySettings() {
-		displaySettingsDescription = "Period: one week from now Status: open";
+		displaySettingsDescription = "Period: one week from now | Status: open";
 
 		isDateRestricted = true;
 		Calendar calendar = Calendar.getInstance();
@@ -365,7 +359,7 @@ public class Controller {
 
 		resetSearchRestrictionOfDisplaySettings();
 	}	
-	
+
 	/**
 	 * Sets date, task type and status restrictions, and resets search restrictions
 	 * for display settings.
@@ -378,7 +372,7 @@ public class Controller {
 		setStatusRestrictionOfDisplaySettings(userCommand);
 		resetSearchRestrictionOfDisplaySettings();
 	}
-	
+
 	/**
 	 * Resets date, task type and status restrictions for display settings.
 	 */
@@ -389,8 +383,7 @@ public class Controller {
 	}
 
 	/**
-	 * This operation sets the date restrictions of the display settings.
-	 * 
+	 * Sets the date restrictions of the display settings.
 	 * @param  taskDateTimes  	list containing DateTimes
 	 */
 	private void setDateRestrictionOfDisplaySettings(List<Date> taskDateTimes) {
@@ -412,9 +405,8 @@ public class Controller {
 	}
 
 	/**
-	 * This operation sets the task type restrictions of the display settings.
-	 * 
-	 * @param  userCommand  command given by user
+	 * Sets the task type restrictions of the display settings.
+	 * @param  userCommand 
 	 */
 	private void setTaskTypeRestrictionsOfDisplaySettings(String userCommand) {
 		areFloatingTasksDisplayed = TaskCommander.parser.containsParameter(userCommand, "none");
@@ -428,9 +420,8 @@ public class Controller {
 	}
 
 	/**
-	 * This operation sets the status restrictions of the display settings.
-	 * 
-	 * @param  userCommand  command given by user
+	 * Sets the status restrictions of the display settings.
+	 * @param  userCommand
 	 */
 	private void setStatusRestrictionOfDisplaySettings(String userCommand) {
 		areDoneTasksDisplayed = TaskCommander.parser.containsParameter(userCommand, "done");
@@ -442,24 +433,22 @@ public class Controller {
 		}
 	}
 
-	/**
-	 * This operation resets the search restrictions of the display settings.
-	 */
+	// Resets the search restrictions of the display settings.
 	private void resetSearchRestrictionOfDisplaySettings() {
 		isSearchRestricted = false;
 		searchedWordsAndPhrases = null;
 	}
 
-	/**
-	 * This operation sets the description of the display settings.
-	 */
+
+	// Sets the description of the display settings.
 	private void setDisplaySettingsDescription() {
 		if (!isDateRestricted && !isTaskTypeRestricted && !isStatusRestricted && !isSearchRestricted) {	// no display restriction
 			displaySettingsDescription = "All";
 		} else {
 			displaySettingsDescription = "";
 			if (isDateRestricted) {
-				displaySettingsDescription += "Date: ["+ Global.dayFormat.format(startDateRestriction)+ " "+ Global.timeFormat.format(startDateRestriction)+ "-"+ Global.timeFormat.format(endDateRestriction) + "]  ";
+				displaySettingsDescription += "Date: ["+ Global.dayFormat.format(startDateRestriction)+ " " +
+						Global.timeFormat.format(startDateRestriction)+ "-"+ Global.timeFormat.format(endDateRestriction) + "]  ";
 			}
 			if (isTaskTypeRestricted) {
 				displaySettingsDescription += "Type: ";
@@ -510,18 +499,15 @@ public class Controller {
 		isDateRestricted = false;
 	}
 
-	/* ================================ General auxiliary methods =================================== */
-
 	/**
-	 * This operation returns the number of words the given String consists of.
-	 * 
-	 * @param  userCommand  command given by user
+	 * Returns the number of words of given String.
+	 * @param  userCommand 
 	 */
 	private int getNumberOfWords(String userCommand) {
 		String[] allWords = userCommand.trim().split("\\s+");
 		return allWords.length;
 	}
-	
+
 	/**
 	 * Returns true if given string is a single word.
 	 * @param userCommand

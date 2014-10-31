@@ -10,8 +10,8 @@ import com.taskcommander.Global.CommandType;
 
 
 /**
- * Stores tasks temporarily. Contains all of the methods needed to manipulate the task 
- * objects within the temporary list, for internal use and for the Google Integration
+ * Singleton class that stores tasks temporarily. Contains all of the methods needed to manipulate 
+ * the task objects within the temporary list, for internal use and for the Google Integration
  * component.
  * 
  * Upon initialisation, the contents of the permanent storage will be pulled. After each 
