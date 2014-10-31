@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+//@author A0128620M
 /**
  * This class represents the Controller component. After receiving the user's input from the UI, 
  * the Controller determines the exact type of command and its related parameters by means of the Parser. 
@@ -14,64 +14,44 @@ import java.util.logging.Logger;
  * which can be adjusted by the display command.
  * By hiding all other internal components like Parser, Data, Storage and so on, the Controller acts as 
  * a Facade class (Facade pattern).
- * 
- * @author A0128620M
  */
-
 public class Controller {
-	
-	/* ========================= Constructor, Variables and Logger ================================== */
-	
-	/**
-	 * Logger and related logging messages
-	 */
+
+	// Constructor, Variables and Logger
 	private static Logger logger = Logger.getLogger(Controller.class.getName());	//TODO add logs
-	
-	/**
-	 * This list contains all tasks which were recently displayed by the UI. Memorizing the 
-	 * tasks which have been displayed recently is needed by the update, delete, done and open commands.
-	 */
+
+	// Contains all tasks recently displayed by the UI. Needed by the update, delete, done and open commands.
 	private ArrayList<Task> displayedTasks;	
-	
-	/**
-	 * This variables represent the display settings, which are set to default values at the beginning of the 
-	 * application, an can be adjusted afterwards using the display command.
-	 */
+
+	// Variables for display settings, adjusted by display command
 	String displaySettingsDescription;
-	
+
 	boolean isDateRestricted;
 	Date startDateRestriction;
 	Date endDateRestriction;
-	
+
 	boolean isTaskTypeRestricted;
 	boolean areFloatingTasksDisplayed;
 	boolean areDeadlineTasksDisplayed;
 	boolean areTimedTasksDisplayed;
-	
+
 	boolean isStatusRestricted;
 	boolean areDoneTasksDisplayed;
 	boolean areOpenTasksDisplayed;
-	
+
 	boolean isSearchRestricted;
 	ArrayList<String> searchedWordsAndPhrases;
-	
-	/**
-	 * This variable is initialized with the one and only instance of the Parser class.
-	 */
+
+	// Singleton instance for Controller
 	private static Controller theOne;
-	
-	/**
-	 * Private Constructor, which is only called by the getInstance() method.
-	 */
+
 	private Controller(){
 		setDefaultDisplaySettings();
 	}
-	
-	/* ============================================ API ============================================= */
-	
+
 	/**
-	 * This operation which returns either a new instance of the Controller or an existing one, if any.
-	 * Therefore, it ensures that there will be only one instance of the Controller (see Singleton pattern)
+	 * Returns the only instance of Controller.
+	 * @return  Controller instance.
 	 */
 	public static Controller getInstance(){
 		if (theOne == null) {    
@@ -79,7 +59,7 @@ public class Controller {
 		}
 		return theOne;
 	}
-	
+
 	/**
 	 * This operation parses the command from the user and executes it if valid. Afterwards a 
 	 * feedback String is returned.
@@ -93,129 +73,167 @@ public class Controller {
 		}
 
 		Global.CommandType commandType = TaskCommander.parser.determineCommandType(userCommand);
-		
+
 		switch (commandType) {
+		case ADD:
+			return addTask(userCommand);
+		case UPDATE: 
+			return updateTask(userCommand);
+		case DONE: 
+			return doneTask(userCommand);
+		case OPEN: 
+			return openTask(userCommand);
+		case DELETE:
+			return deleteTask(userCommand);
+		case DISPLAY:
+			return displayTasks(userCommand);
+		case SEARCH:	
+			return searchForTasks(userCommand);
+		case CLEAR:
+			return clearTasks(userCommand);
+		case HELP:
+			if (isSingleWord(userCommand)) {
+				return String.format(Global.MESSAGE_HELP);		//TODO @Michelle: add new Help Tab here
+			} else {
+				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+			}
+		case SYNC: 
+			return syncTasks(userCommand);			
+		case UNDO: 
+			return undoTask(userCommand);
+		case EXIT:
+			System.exit(0);
+		default:
+			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);		
+		}
+	}
+	
+	private String addTask(String userCommand) {
+		String taskName = TaskCommander.parser.determineTaskName(userCommand);
+		List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
+
+		if (isSingleWord(userCommand) || taskName == null || isTaskDateTimeInvalid(taskDateTime)) {
+			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+		} else {
+			return addTaskToData(taskName, taskDateTime);
+		}
+	}
+
+	private String updateTask(String userCommand) {
+		int indexOfRelatedTaskInDisplayedTasks = TaskCommander.parser.determineIndex(userCommand) - Global.INDEX_OFFSET;
+		if (isIndexDisplayedTasksInvalid(indexOfRelatedTaskInDisplayedTasks)) {
+			return String.format(Global.MESSAGE_NO_INDEX, indexOfRelatedTaskInDisplayedTasks + Global.INDEX_OFFSET);
+		}
+
+		Task relatedTask = displayedTasks.get(indexOfRelatedTaskInDisplayedTasks);
+		String newTaskName = TaskCommander.parser.determineTaskName(userCommand);
+		List<Date> newTaskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
+
+		if (isSingleWord(userCommand) || isTaskDateTimeInvalid(newTaskDateTime)) {
+			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+		}
+
+		boolean removeExistingDate = TaskCommander.parser.containsParameter(userCommand, "none");
+		if ((newTaskDateTime == null) && !removeExistingDate && (newTaskName == null)) {	// no changes at all
+			//TODO: @Andy: If there are no changes to be made, you can simply do nothing and return a success message
+			// because it's not quite an invalid command format, and the user did nothing wrong.
+			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+		}
+
+		return updateTaskInData(relatedTask, newTaskName, newTaskDateTime, removeExistingDate);
+	}
+
+	private String doneTask(String userCommand) {
+		if (isSingleWord(userCommand)) {
+			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+		}
+
+		int indexOfRelatedTaskInDisplayedTasks = TaskCommander.parser.determineIndex(userCommand) - Global.INDEX_OFFSET;
+		if (isIndexDisplayedTasksInvalid(indexOfRelatedTaskInDisplayedTasks)) {
+			return String.format(Global.MESSAGE_NO_INDEX, indexOfRelatedTaskInDisplayedTasks + Global.INDEX_OFFSET);
+		}
+
+		Task relatedTask = displayedTasks.get(indexOfRelatedTaskInDisplayedTasks);
+		return TaskCommander.data.done(TaskCommander.data.getIndexOf(relatedTask));
+	}
+	
+	private String openTask(String userCommand) {
+		if (isSingleWord(userCommand)) {
+			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+		}
+
+		int indexOfRelatedTaskInDisplayedTasks = TaskCommander.parser.determineIndex(userCommand) - Global.INDEX_OFFSET;
+		if (isIndexDisplayedTasksInvalid(indexOfRelatedTaskInDisplayedTasks)) {
+			return String.format(Global.MESSAGE_NO_INDEX, indexOfRelatedTaskInDisplayedTasks + Global.INDEX_OFFSET);
+		}
+
+		Task relatedTask = displayedTasks.get(indexOfRelatedTaskInDisplayedTasks);
+		return TaskCommander.data.open(TaskCommander.data.getIndexOf(relatedTask));
+	}
+	
+	private String deleteTask(String userCommand) {
+		if (isSingleWord(userCommand)) {
+			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+		}
+
+		int indexOfRelatedTaskInDisplayedTasks = TaskCommander.parser.determineIndex(userCommand) - Global.INDEX_OFFSET;
+		if (isIndexDisplayedTasksInvalid(indexOfRelatedTaskInDisplayedTasks)) {
+			return String.format(Global.MESSAGE_NO_INDEX, indexOfRelatedTaskInDisplayedTasks + Global.INDEX_OFFSET);
+		}
+
+		Task relatedTask = displayedTasks.get(indexOfRelatedTaskInDisplayedTasks);
+		return TaskCommander.data.deleteTask(TaskCommander.data.getIndexOf(relatedTask));
+	}
+
+	private String displayTasks(String userCommand) {
+		List<Date> taskDateTimes = TaskCommander.parser.determineTaskDateTime(userCommand);
+		if (isTaskDateTimeInvalid(taskDateTimes)) {
+			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+		}
 		
-			case ADD:
-				if (getNumberOfWords(userCommand) < 2) {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-				}
-				
-				String taskName = TaskCommander.parser.determineTaskName(userCommand);
-				if (taskName == null) {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-				}
-				
-				List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
-				if (isTaskDateTimeInvalid(taskDateTime)) {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-				}
-				
-				return addTaskToData(taskName, taskDateTime);
-				
-			case UPDATE: case DONE: case OPEN: case DELETE:
-				if (getNumberOfWords(userCommand) < 2) {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-				}
-				
-				int indexOfRelatedTaskInDisplayedTasks = TaskCommander.parser.determineIndex(userCommand) - Global.INDEX_OFFSET;
-				if (isIndexDisplayedTasksInvalid(indexOfRelatedTaskInDisplayedTasks)) {
-					return String.format(Global.MESSAGE_NO_INDEX, indexOfRelatedTaskInDisplayedTasks + Global.INDEX_OFFSET);
-				}
-				
-				Task relatedTask = displayedTasks.get(indexOfRelatedTaskInDisplayedTasks);
-				int indexOfRelatedTaskInData = TaskCommander.data.getIndexOf(relatedTask);
-				
-				if (commandType == Global.CommandType.UPDATE) {
-					String newTaskName = TaskCommander.parser.determineTaskName(userCommand);
-					
-					List<Date> newTaskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
-					if (isTaskDateTimeInvalid(newTaskDateTime)) {
-						return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-					}
-					
-					boolean existingDateTimeIsToBeRemoved = TaskCommander.parser.containsParameter(userCommand, "none");
-					if ((newTaskDateTime == null) && !existingDateTimeIsToBeRemoved && (newTaskName == null)) {		// no changes at all
-						return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-					}
-					
-					return updateTaskInData(relatedTask, newTaskName, newTaskDateTime, existingDateTimeIsToBeRemoved);
-						
-				} else if (commandType == Global.CommandType.DONE) {
-					return TaskCommander.data.done(indexOfRelatedTaskInData);
-					
-				} else if (commandType == Global.CommandType.OPEN) {
-					return TaskCommander.data.open(indexOfRelatedTaskInData);
-				
-				} else if (commandType == Global.CommandType.DELETE) {
-					return TaskCommander.data.deleteTask(indexOfRelatedTaskInData);
-				}
-				
-			case DISPLAY:
+		updateDisplayRestrictions(userCommand, taskDateTimes);
+		setDisplaySettingsDescription();
 
-				List<Date> taskDateTimes = TaskCommander.parser.determineTaskDateTime(userCommand);
-				if (isTaskDateTimeInvalid(taskDateTimes)) {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-				}
-				setDateRestrictionOfDisplaySettings(taskDateTimes);
-				
-				setTaskTypeRestrictionsOfDisplaySettings(userCommand);
-				setStatusRestrictionOfDisplaySettings(userCommand);
-				resetSearchRestrictionOfDisplaySettings();
-				setDisplaySettingsDescription();
-				
-				return String.format(Global.MESSAGE_DISPLAYED, displaySettingsDescription);
-			
-			case SEARCH:	
-				
-				searchedWordsAndPhrases = TaskCommander.parser.determineSearchedWords(userCommand);	
-				if (searchedWordsAndPhrases == null) {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-				}
-				isSearchRestricted = true;
-				
-				resetDateRestrictionOfDisplaySettings();
-				resetTaskTypeRestrictionOfDisplaySettings();
-				resetStatusRestrictionOfDisplaySettings();
-				
-				return String.format(Global.MESSAGE_SEARCHED, displaySettingsDescription);
+		return String.format(Global.MESSAGE_DISPLAYED, displaySettingsDescription);
+	}
+	
+	private String searchForTasks(String userCommand) {
+		searchedWordsAndPhrases = TaskCommander.parser.determineSearchedWords(userCommand);	
+		if (searchedWordsAndPhrases == null) {
+			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+		}
+		isSearchRestricted = true;
 
-			case CLEAR:
-				if (getNumberOfWords(userCommand) == 1) {
-					return TaskCommander.data.clearTasks();
-				} else {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-				}
-				
-			case HELP:
-				if (getNumberOfWords(userCommand) == 1) {
-					return String.format(Global.MESSAGE_HELP);		//TODO @Michelle: add new Help Tab here
-				} else {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-				}
-				
-			case SYNC: 
-				if (getNumberOfWords(userCommand) == 1) {
-					if (TaskCommander.syncHandler == null) {		//TODO @Michelle: is this if statement necessary?
-						TaskCommander.getSyncHandler();
-						}
-					return TaskCommander.syncHandler.sync();
-				} else {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-				}				
-				
-			case UNDO: 
-				if (getNumberOfWords(userCommand) == 1) {
-					return TaskCommander.data.undo();
-				} else {
-					return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-				}
-				
-			case EXIT:
-				System.exit(0);
-				
-			default:
-				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);		
+		resetDisplayRestrictions();
+
+		return String.format(Global.MESSAGE_SEARCHED, displaySettingsDescription);
+	}
+	
+
+	private String clearTasks(String userCommand) {
+		if (isSingleWord(userCommand)) {
+			return TaskCommander.data.clearTasks();
+		} else {
+			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+		}
+	}
+
+	private String syncTasks(String userCommand) {
+		if (isSingleWord(userCommand)) {
+			if (TaskCommander.syncHandler == null) {
+				TaskCommander.getSyncHandler();
+			}
+			return TaskCommander.syncHandler.sync();
+		} else {
+			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+		}	
+	}
+	
+	private String undoTask(String userCommand) {
+		if (isSingleWord(userCommand)) {
+			return TaskCommander.data.undo();
+		} else {
+			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 		}
 	}
 
@@ -233,13 +251,13 @@ public class Controller {
 
 		return displayedTasks;
 	}
-	
+
 	public String getDisplaySettingsDescription() {
 		return displaySettingsDescription;
 	}
-	
+
 	/* ================================ Specific auxiliary methods =================================== */
-	
+
 	/**
 	 * This operation checks whether the given list is valid, that is, contains either one or two DateTimes.
 	 * 
@@ -253,7 +271,7 @@ public class Controller {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * This operation processes the addition of the task to the respective method in Data.
 	 * 
@@ -273,11 +291,11 @@ public class Controller {
 			return TaskCommander.data.addTimedTask(taskName, startDate, endDate);
 		}
 	}
-	
+
 	/**
 	 * This operation checks whether the given index is valid in respect to the recently displayed tasks list.
 	 * 
- 	 * @param  indexDisplayedTasks  	index of relating task in displayedTasks list
+	 * @param  indexDisplayedTasks  	index of relating task in displayedTasks list
 	 * @return              			true if invalid, false if invalid
 	 * 
 	 */
@@ -288,66 +306,88 @@ public class Controller {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * This operation processes the update of the task to the respective method in Data.
 	 * 
 	 * @param  TODO
 	 */
-	private String updateTaskInData(Task relatedTask, String newTaskName, List<Date> newTaskDateTime, boolean existingDateTimeIsToBeRemoved) {
-		
+	private String updateTaskInData(Task relatedTask, String newTaskName, List<Date> newTaskDateTime, boolean removeExistingDate) {
 		Task.TaskType newTaskType;
 		Date newStartDate = null;
 		Date newEndDate = null;
-		if ((newTaskDateTime == null) && existingDateTimeIsToBeRemoved) {	// "none" is a keyword used by the user to indicate, that he wants to change a DatedTask to a FloatingTask
-			newTaskType = Task.TaskType.FLOATING;
-		} else if (newTaskDateTime != null) {
+
+		if (newTaskDateTime != null) {
 			if (newTaskDateTime.size() == 1) {
 				newTaskType = Task.TaskType.DEADLINE;
 				newEndDate = newTaskDateTime.get(0);
 			} else {
-				assert newTaskDateTime.size() <= 2;
+				assert newTaskDateTime.size() <= 2; //TODO: @Andy: is this assert used properly? 
 				newTaskType = Task.TaskType.TIMED;
 				newStartDate = newTaskDateTime.get(0);
 				newEndDate = newTaskDateTime.get(1);
 			}
+		} else if (removeExistingDate) {	// "none" is a keyword used by the user to indicate, that he wants to change a DatedTask to a FloatingTask
+			newTaskType = Task.TaskType.FLOATING;
 		} else {
 			Task.TaskType oldTaskType = relatedTask.getType();
 			newTaskType = oldTaskType;
 		}
-		
+
 		int indexOfRelatedTask = TaskCommander.data.getIndexOf(relatedTask);
 		switch (newTaskType) {
-			case FLOATING:
-				return TaskCommander.data.updateToFloatingTask(indexOfRelatedTask, newTaskName);
-			case DEADLINE:
-				return TaskCommander.data.updateToDeadlineTask(indexOfRelatedTask, newTaskName, newEndDate);
-			default:
-				return TaskCommander.data.updateToTimedTask(indexOfRelatedTask, newTaskName, newStartDate, newEndDate);
+		case FLOATING:
+			return TaskCommander.data.updateToFloatingTask(indexOfRelatedTask, newTaskName);
+		case DEADLINE:
+			return TaskCommander.data.updateToDeadlineTask(indexOfRelatedTask, newTaskName, newEndDate);
+		default:
+			return TaskCommander.data.updateToTimedTask(indexOfRelatedTask, newTaskName, newStartDate, newEndDate);
 		}
 	}
-	
+
 	/**
 	 * This operation sets the default values of the display settings (upcoming open tasks within the next week). 
-	*/
+	 */
 	private void setDefaultDisplaySettings() {
 		displaySettingsDescription = "Period: one week from now Status: open";
-	
+
 		isDateRestricted = true;
 		Calendar calendar = Calendar.getInstance();
 		startDateRestriction = calendar.getTime();
 		calendar.add(Calendar.WEEK_OF_YEAR, 1);
 		endDateRestriction = calendar.getTime();
-	
+
 		resetTaskTypeRestrictionOfDisplaySettings();
-	
+
 		isStatusRestricted = true;
 		areDoneTasksDisplayed = false; 
 		areOpenTasksDisplayed = true;
-		
+
 		resetSearchRestrictionOfDisplaySettings();
 	}	
 	
+	/**
+	 * Sets date, task type and status restrictions, and resets search restrictions
+	 * for display settings.
+	 * @param userCommand
+	 * @param taskDateTimes
+	 */
+	private void updateDisplayRestrictions(String userCommand, List<Date> taskDateTimes) {
+		setDateRestrictionOfDisplaySettings(taskDateTimes);
+		setTaskTypeRestrictionsOfDisplaySettings(userCommand);
+		setStatusRestrictionOfDisplaySettings(userCommand);
+		resetSearchRestrictionOfDisplaySettings();
+	}
+	
+	/**
+	 * Resets date, task type and status restrictions for display settings.
+	 */
+	private void resetDisplayRestrictions() {
+		resetDateRestrictionOfDisplaySettings();
+		resetTaskTypeRestrictionOfDisplaySettings();
+		resetStatusRestrictionOfDisplaySettings();
+	}
+
 	/**
 	 * This operation sets the date restrictions of the display settings.
 	 * 
@@ -370,7 +410,7 @@ public class Controller {
 			endDateRestriction = null;
 		}
 	}
-	
+
 	/**
 	 * This operation sets the task type restrictions of the display settings.
 	 * 
@@ -386,7 +426,7 @@ public class Controller {
 			isTaskTypeRestricted = true;
 		}
 	}
-	
+
 	/**
 	 * This operation sets the status restrictions of the display settings.
 	 * 
@@ -401,7 +441,7 @@ public class Controller {
 			isStatusRestricted = true;
 		}
 	}
-	
+
 	/**
 	 * This operation resets the search restrictions of the display settings.
 	 */
@@ -409,13 +449,13 @@ public class Controller {
 		isSearchRestricted = false;
 		searchedWordsAndPhrases = null;
 	}
-	
+
 	/**
 	 * This operation sets the description of the display settings.
 	 */
 	private void setDisplaySettingsDescription() {
 		if (!isDateRestricted && !isTaskTypeRestricted && !isStatusRestricted && !isSearchRestricted) {	// no display restriction
-			displaySettingsDescription = "all";
+			displaySettingsDescription = "All";
 		} else {
 			displaySettingsDescription = "";
 			if (isDateRestricted) {
@@ -424,32 +464,32 @@ public class Controller {
 			if (isTaskTypeRestricted) {
 				displaySettingsDescription += "Type: ";
 				if (areFloatingTasksDisplayed) {
-					displaySettingsDescription += "none";
+					displaySettingsDescription += "None";
 				}
 				if (areDeadlineTasksDisplayed && !areFloatingTasksDisplayed) {
-					displaySettingsDescription += "deadline";
+					displaySettingsDescription += "Deadline";
 				} else if (areDeadlineTasksDisplayed) {
-					displaySettingsDescription += ", deadline";
+					displaySettingsDescription += ", Deadline";
 				}
 				if (areTimedTasksDisplayed && !areFloatingTasksDisplayed && !areDeadlineTasksDisplayed) {
-					displaySettingsDescription += "timed ";
+					displaySettingsDescription += "Timed ";
 				} else if (areTimedTasksDisplayed) {
-					displaySettingsDescription += ", timed";
+					displaySettingsDescription += ", Timed";
 				}
 				displaySettingsDescription += " ";
 			}
 			if (isStatusRestricted) {
 				displaySettingsDescription += "Status: ";
 				if (areDoneTasksDisplayed) {
-					displaySettingsDescription += "done ";
+					displaySettingsDescription += "Done ";
 				} else {
-					displaySettingsDescription += "open ";
+					displaySettingsDescription += "Open ";
 				}
 			}
 			if (isSearchRestricted) {
 				for(String searchedWordOrPhrase : searchedWordsAndPhrases) {
 					if (displaySettingsDescription.equals("")) {
-						displaySettingsDescription = "Words/Phases: "+"\""+searchedWordOrPhrase+"\"";
+						displaySettingsDescription = "Words/Phrases: "+"\""+searchedWordOrPhrase+"\"";
 					} else {
 						displaySettingsDescription += ", "+"\""+searchedWordOrPhrase+"\"";
 					}
@@ -457,7 +497,7 @@ public class Controller {
 			}
 		}
 	}
-	
+
 	private void resetStatusRestrictionOfDisplaySettings() {
 		isStatusRestricted = false;
 	}
@@ -469,9 +509,9 @@ public class Controller {
 	private void resetDateRestrictionOfDisplaySettings() {
 		isDateRestricted = false;
 	}
-	
+
 	/* ================================ General auxiliary methods =================================== */
-	
+
 	/**
 	 * This operation returns the number of words the given String consists of.
 	 * 
@@ -480,5 +520,14 @@ public class Controller {
 	private int getNumberOfWords(String userCommand) {
 		String[] allWords = userCommand.trim().split("\\s+");
 		return allWords.length;
+	}
+	
+	/**
+	 * Returns true if given string is a single word.
+	 * @param userCommand
+	 * @return             If given string is a single word.
+	 */
+	private boolean isSingleWord(String userCommand) {
+		return getNumberOfWords(userCommand) == 1;
 	}
 }
