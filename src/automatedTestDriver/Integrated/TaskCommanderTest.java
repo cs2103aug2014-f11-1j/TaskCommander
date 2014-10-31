@@ -256,6 +256,7 @@ public class TaskCommanderTest {
 		String userCommand = "add \"little boy\" 3 pm";
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "delete 1 ";
+		TaskCommander.controller.executeCommand("display deadline");
 		TaskCommander.controller.getDisplayedTasks();
 		Date date =  new Date();
 		assertEquals("Deleted: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
