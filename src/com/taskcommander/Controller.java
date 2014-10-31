@@ -285,7 +285,7 @@ public class Controller {
 		} else if (taskDateTime.size() == 1 ) { 	
 			return TaskCommander.data.addDeadlineTask(taskName, taskDateTime.get(0));
 		} else { 
-			assert taskDateTime.size() <= 2;	//TODO
+			assert (taskDateTime.size() <= 2);	//TODO
 			Date startDate = taskDateTime.get(0);
 			Date endDate = taskDateTime.get(1);
 			return TaskCommander.data.addTimedTask(taskName, startDate, endDate);
@@ -322,7 +322,7 @@ public class Controller {
 				newTaskType = Task.TaskType.DEADLINE;
 				newEndDate = newTaskDateTime.get(0);
 			} else {
-				assert newTaskDateTime.size() <= 2; //TODO: @Andy: is this assert used properly? 
+				assert (newTaskDateTime.size() <= 2); //TODO: @Andy: is this assert used properly? 
 				newTaskType = Task.TaskType.TIMED;
 				newStartDate = newTaskDateTime.get(0);
 				newEndDate = newTaskDateTime.get(1);
