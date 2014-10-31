@@ -16,6 +16,7 @@ import automatedTestDriver.Data.DataTest;
 import automatedTestDriver.GoogleIntegration.GoogleAPIConnectorTest;
 import automatedTestDriver.Integrated.TaskCommanderTest;
 import automatedTestDriver.Parser.AllParserTest;
+import automatedTestDriver.Storage.StorageTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({  TaskCommanderTest.class, ControllerTest.class, AllParserTest.class, DataTest.class,
