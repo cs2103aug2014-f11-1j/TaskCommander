@@ -14,7 +14,7 @@ import com.taskcommander.TaskCommander;
  * 
  * @author Group F11-1J A0105753J
  */
-
+//@author A0105753J
 public class TaskCommanderTest {
 
 
@@ -185,6 +185,7 @@ public class TaskCommanderTest {
 		String userCommand = "add \"little boy\" 3pm";
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "update 1 3pm";
+		TaskCommander.controller.executeCommand("display deadline");
 		TaskCommander.controller.getDisplayedTasks();
 		Date date  = new Date();
 		assertEquals("Updated: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
@@ -256,6 +257,7 @@ public class TaskCommanderTest {
 		String userCommand = "add \"little boy\" 3 pm";
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "delete 1 ";
+		TaskCommander.controller.executeCommand("display deadline");
 		TaskCommander.controller.getDisplayedTasks();
 		Date date =  new Date();
 		assertEquals("Deleted: [by "+Global.dayFormat.format(date)+" "+ "15:00] \"little boy\"", TaskCommander.controller.executeCommand(userCommand));
@@ -359,7 +361,7 @@ public class TaskCommanderTest {
 		
 		userCommand = "update 6 Nov 4 5pm ";
 		TaskCommander.controller.getDisplayedTasks();
-		assertEquals("Updated: [by Tue Nov 4 '14 17:00] \"get excersice\"", TaskCommander.controller.executeCommand(userCommand));
+		assertEquals("Updated: [by Tue Nov 4 '14 17:00] \"make contribution to project\"", TaskCommander.controller.executeCommand(userCommand));
 		TaskCommander.controller.executeCommand("clear");
 		
 	}
@@ -413,9 +415,9 @@ public class TaskCommanderTest {
 		
 		Date date  = new Date();
 		
-		userCommand = "delete 6 ";
+		userCommand = "delete 12 ";
 		TaskCommander.controller.getDisplayedTasks();
-		assertEquals("Deleted: [by Thu Oct 30 '14 21:00] \"get excersice\"", TaskCommander.controller.executeCommand(userCommand));
+		assertEquals("Deleted: [by "+Global.dayFormat.format(date)+" 21:00] \"get excersice\"", TaskCommander.controller.executeCommand(userCommand));
 		TaskCommander.controller.executeCommand("clear");
 		
 	}
@@ -474,10 +476,10 @@ public class TaskCommanderTest {
 				TaskCommander.controller.executeCommand(userCommand));
 		
 		
-		userCommand = "delete 6 ";
+		userCommand = "delete 1 ";
 		TaskCommander.controller.getDisplayedTasks();
-		assertEquals("Deleted: [by Thu Oct 30 '14 21:00] \"get excersice\"", TaskCommander.controller.executeCommand(userCommand));
-		
+		assertEquals("Deleted: \"MA2214 reading textbook\"", TaskCommander.controller.executeCommand(userCommand));
+		userCommand = "undo";
 		assertEquals("Undone latest command: DELETE.",
 				TaskCommander.controller.executeCommand(userCommand));
 		
@@ -485,6 +487,7 @@ public class TaskCommanderTest {
 		date  = new Date();
 		TaskCommander.controller.getDisplayedTasks();
 		assertEquals("Updated: [by "+Global.dayFormat.format(date)+" "+ "17:00] \"MA2214 reading textbook\"", TaskCommander.controller.executeCommand(userCommand));
+		userCommand = "undo";
 		assertEquals("Undone latest command: UPDATE.",
 				TaskCommander.controller.executeCommand(userCommand));
 		

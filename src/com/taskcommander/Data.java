@@ -19,73 +19,28 @@ import com.taskcommander.Global.CommandType;
  */
 
 public class Data {
-	
-	/* ========================= Constructor, Variables and Logger ================================== */
-
-	/**
-	 * Logger and related logging messages
-	 * @author A0128620M
-	 */
+	//@author A0128620M
+	// Constructor, Variables and Logger
 	private static Logger logger = Logger.getLogger(Controller.class.getName());	//TODO add logs
 	
-	/** 
-	 * This Array contains all available task objects.
-	 * @author A0128620M
-	 */
-	private ArrayList<Task> tasks;
+	private ArrayList<Task> tasks; // Contains all available task objects.
 	
-	/**
-	 * This Array contains all the deleted tasks, needed by the GoogleAPI.
-	 * @author A0109194A
-	 */
-	private ArrayList<Task> deletedTasks;
-	
-	/**
-	 * Stores all the tasks that were deleted in a clear command.
-	 * @author A0109194A
-	 */
+	//@author A0109194A
+	private ArrayList<Task> deletedTasks; // Used by the Google API.
 	private Stack<ArrayList<Task>> clearedTasks;
 	
-	/**
-	 * Stores history of added tasks for undo command.
-	 * @author A0109194A
-	 */
+	// Variables to store history of tasks for undo command.
 	private Stack<Task> addedTasks;
-	
-	/**
-	 * Stores history of tasks before being updated.
-	 * @author A0109194A
-	 */
 	private Stack<Task> preupdatedTasks;
-	
-	/**
-	 * Stores the history of tasks after being updated.
-	 * @author A0109194A
-	 */
 	private Stack<Task> updatedTasks;
-	
-	/**
-	 * This Stack contains the history of all operations.
-	 * @author A0109194A
-	 */
 	private Stack<CommandType> operationHistory;
-	
-	/**
-	 * This Stack contains the history of all operations.
-	 * @author A0109194A
-	 */
 	private Stack<Global.CommandType> undoHistory;
 	
-	/**
-	 * This variable is initialized with the one and only instance of the Parser class.
-	 * @author A0128620M
-	 */
+	//@author A0128620M
+	// Singleton instance for Data
 	private static Data theOne;
 	
-	/**
-	 * Private Constructor, which is only called by the getInstance() method.
-	 * @author A0109194A, A0128620M
-	 */
+	//@author A0128620M, A0109194A
 	private Data() {
 		tasks = new ArrayList<Task>();
 		deletedTasks = new ArrayList<Task>();
@@ -98,13 +53,11 @@ public class Data {
 		
 		loadFromPermanentStorage();
 	}
-
-	/* ============================================ API ============================================= */
 	
+	//@author A0128620M
 	/**
-	 * This operation which returns either a new instance of the Controller or an existing one, if any.
-	 * Therefore, it ensures that there will be only one instance of the Controller (see Singleton pattern)
-	 * @author A0128620M
+	 * Returns the only instance of Data.
+	 * @return  Data instance.
 	 */
 	public static Data getInstance(){
 		if (theOne == null) {    
