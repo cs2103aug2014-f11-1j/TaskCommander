@@ -73,6 +73,12 @@ public class TaskCommander {
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "add \"say hello to tutor\" Friday 11 am";
 		TaskCommander.controller.executeCommand(userCommand);
+		TaskCommander.controller.executeCommand("display");
+		TaskCommander.controller.getDisplayedTasks();
+		userCommand = "done 1";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "done 6";
+		TaskCommander.controller.executeCommand(userCommand);
 	}
 	//Note: only call this when the sync command is used
 	//as user should not be asked to login until they

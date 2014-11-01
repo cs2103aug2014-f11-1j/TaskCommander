@@ -40,7 +40,7 @@ public class IntegratedSyncTest {
 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
-		String syncCommand[] = {"sync","sync", "sync", "sync"};
+		String syncCommand[] = {"sync","SYNC", "Sync", "sYNc"};
 
 
 
