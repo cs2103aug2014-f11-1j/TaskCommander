@@ -40,15 +40,15 @@ public class IntegratedClearTest {
 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
-		String deleteCommand[] = {"clear","Clear", "CLEAR", "cleaR"};
+		String clearCommand[] = {"clear","Clear", "CLEAR", "cleaR"};
 
 
 
 		return Arrays.asList(new Object[][] {
-				{ deleteCommand[0], "All content deleted."},
-				{ deleteCommand[1], "All content deleted."},
-				{ deleteCommand[2], "All content deleted."},
-				{ deleteCommand[3], "All content deleted."},
+				{ clearCommand[0], "All content deleted."},
+				{ clearCommand[1], "All content deleted."},
+				{ clearCommand[2], "All content deleted."},
+				{ clearCommand[3], "All content deleted."},
 				
 
 		
