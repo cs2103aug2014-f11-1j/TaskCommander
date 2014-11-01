@@ -32,30 +32,19 @@ public class IntegratedDisplayTest {
 		this.userCommand = userCommand;
 		this.expectedResult = expectedResult;
 	}
-	
-	@Before
-	public void ini(){
-		TaskCommander.ini();
-		TaskCommander.controller.executeCommand("display");
-		TaskCommander.controller.getDisplayedTasks();
-		System.out.println("This is a ini");
-	}
 
 	/*
-	 * These care test cases for delete method
-	 * Format would be:delete n (index)
+	 * These care test cases for display method
+	 * Format would be:display TimePeriod Status
 	 * 
 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
-		String deleteCommand[] = {"delete","DELETE", "Delete", "deLete"};
-		int noOfTestCases = 25;
-		String index[] = new String[25];
-		for(int i = 0; i < noOfTestCases; i++){
-			index[i] = Integer.toString(i);
-		}
-
-		
+		String deleteCommand[] = {"display","Display", "DISPLAY", "diSPLay"};
+		String Tasktype[] = {"floating", "deadline", "timed"};
+		String TimePeriod = "Oct 31 - Nov 18";
+		String openStatus = "open";
+		String doneStatus = "done";
 
 		Calendar calendar = Calendar.getInstance();
 		Date today = calendar.getTime();
@@ -64,32 +53,37 @@ public class IntegratedDisplayTest {
 		calendar.setTimeInMillis(today.getTime());
 		calendar.add(Calendar.MINUTE, 20);
 		Date later = calendar.getTime();
-		
+
+
 		return Arrays.asList(new Object[][] {
-				{ deleteCommand[0], "Invalid command format: "+deleteCommand[0]+". Type 'help' to see the list of commands."},
-				{ deleteCommand[1], "Invalid command format: "+deleteCommand[1]+". Type 'help' to see the list of commands."},
-				{ deleteCommand[2], "Invalid command format: "+deleteCommand[2]+". Type 'help' to see the list of commands."},
-				{ deleteCommand[3], "Invalid command format: "+deleteCommand[3]+". Type 'help' to see the list of commands."},
-				//{ deleteCommand[0]+" "+index[0], "Index "+index[0]+" does not exist. Please type a valid index."},
-				{ deleteCommand[0]+" "+index[1], "Deleted: \"MA2214 reading textbook\""},
-				{ deleteCommand[0]+" "+index[2], "Deleted: \"be patiend to friends\""},
-				{ deleteCommand[0]+" "+index[3], "Deleted: \"have fun with friends\""},
-				{ deleteCommand[0]+" "+index[4], "Deleted: \"prepare for CS2103 Final\""},
-				{ deleteCommand[0]+" "+index[5], "Deleted: \"talk to people\""},
-				{ deleteCommand[0]+" "+index[6], "Deleted: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"finish V0.5 in 10 days\""},
-				{ deleteCommand[0]+" "+index[7], "Deleted: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"make contribution to project\""},
-				{ deleteCommand[0]+" "+index[8], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"make friends\""},
-				{ deleteCommand[0]+" "+index[9], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"eat an apple\""},
-				{ deleteCommand[0]+" "+index[10], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"hey relax your neck it is hurt\""},
-				{ deleteCommand[0]+" "+index[11], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"get married\""},
-				{ deleteCommand[0]+" "+index[12], "Deleted: [by "+Global.dayFormat.format(today)+" 21:00] \"get excersice\""},
-/*				{ deleteCommand[0]+" "+index[23], "Index "+index[23]+" does not exist. Please type a valid index."},
-				{ deleteCommand[0]+" "+index[24], "Index "+index[24]+" does not exist. Please type a valid index."},*/
-	
+				{ deleteCommand[0], "Displayed: All"},
+				{ deleteCommand[1], "Displayed: All"},
+				{ deleteCommand[2], "Displayed: All"},
+				{ deleteCommand[3], "Displayed: All"},
+				//{ deleteCommand[0]+" " +Tasktype[0], "Displayed: Type: Floating "},
+				{ deleteCommand[0]+" " +Tasktype[1], "Displayed: Type: Deadline "},
+				{ deleteCommand[0]+" " +Tasktype[2], "Displayed: Type: Timed  "},
+				//{ deleteCommand[0]+" " +openStatus, "Displayed: Status: Open "},
+				{ deleteCommand[0]+" " +doneStatus, "Displayed: Status: Done "},
+				{ deleteCommand[0]+" " +TimePeriod, "Displayed:  Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]"},
+				
+				/*
+				{ deleteCommand[0]+" " +Tasktype[0]+" " + " "+openStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
+				{ deleteCommand[0]+" " +Tasktype[1]+" "+ TimePeriod+ " "+openStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
+				{ deleteCommand[0]+" " +Tasktype[2]+" "+ TimePeriod+ " "+openStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
+				
+				{ deleteCommand[0]+" " +Tasktype[0]+" " + " "+doneStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
+				{ deleteCommand[0]+" " +Tasktype[1]+" "+ TimePeriod+ " "+doneStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
+				{ deleteCommand[0]+" " +Tasktype[2]+" "+ TimePeriod+ " "+doneStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
+				*
+				*/
+
+
+		
 		});
 	}
 
-   	@Test
+	@Test
 	public void testcontainsParameter() {
 		assertEquals(expectedResult, TaskCommander.controller.executeCommand(userCommand)); 
 	}
