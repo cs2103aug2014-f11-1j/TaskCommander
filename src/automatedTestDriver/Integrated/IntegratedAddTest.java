@@ -34,11 +34,18 @@ public class IntegratedAddTest {
 	}
 
 
-	/*
+ 	/*
+	 * These care test cases for add method
+	 * Format can be:
+	 * Add "content"
+	 * Add "Content" deadline
+	 * Add "Content" period
 	 * These care test cases for delete method
 	 * Format would be:delete n (index)
-	 * 
-	 */
+ 	 * 
+	 * There are multiple ways to indicate time. Like "in 2o minutes", "in weekend", 
+	 * 	"winter vacation", "5 hours later" and so on
+ 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
 		String addCommand = "add";
