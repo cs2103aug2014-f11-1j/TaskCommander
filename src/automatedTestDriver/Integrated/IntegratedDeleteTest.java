@@ -32,7 +32,14 @@ public class IntegratedDeleteTest {
 		this.userCommand = userCommand;
 		this.expectedResult = expectedResult;
 	}
-
+	
+	@Before
+	public void ini(){
+		TaskCommander.ini();
+		TaskCommander.controller.executeCommand("display");
+		TaskCommander.controller.getDisplayedTasks();
+		System.out.println("This is a ini");
+	}
 
 	/*
 	 * These care test cases for delete method
@@ -41,14 +48,13 @@ public class IntegratedDeleteTest {
 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
-		String addCommand = "add";
-		String addCommandCapital[] = {"Add", "ADD", "AdD"};
-		String q = "\"";
-		String content = "task content";
-		String deadline = "Nov 11 5pm";
-		String period = "3 Dec 5pm - 6 Dec 6pm";
-		String periodLastDaysWithoutDate = "6pm - 3 am";
-		String []deadlineInFormat = {"20 Minutes later","in 20 minutes"};
+		String deleteCommand[] = {"delete","DELETE", "Delete", "deLete"};
+		int noOfTestCases = 25;
+		String index[] = new String[25];
+		for(int i = 0; i < noOfTestCases; i++){
+			index[i] = Integer.toString(i);
+		}
+
 		
 
 		Calendar calendar = Calendar.getInstance();
@@ -60,19 +66,26 @@ public class IntegratedDeleteTest {
 		Date later = calendar.getTime();
 		
 		return Arrays.asList(new Object[][] {
-				{ addCommand, "Invalid command format: "+addCommand+". Type 'help' to see the list of commands."},
-				{ addCommand+" "+q+content+q, "Added: "+q+content+q},
-				{ addCommandCapital[0], "Invalid command format: "+addCommandCapital[0]+". Type 'help' to see the list of commands."},
-				{ addCommandCapital[0]+" "+q+content+q, "Added: "+q+content+q},
-				{ addCommandCapital[1], "Invalid command format: "+addCommandCapital[1]+". Type 'help' to see the list of commands."},
-				{ addCommandCapital[1]+" "+q+content+q, "Added: "+q+content+q},
-				{ addCommandCapital[2], "Invalid command format: "+addCommandCapital[2]+". Type 'help' to see the list of commands."},
-				{ addCommandCapital[2]+" "+q+content+q, "Added: "+q+content+q},
-				{ addCommand+" "+q+content+q+" " + deadline, "Added: [by Tue Nov 11 '14 17:00] "+q+content+q },
-				{ addCommand+" "+q+content+q+" " + period, "Added: [Wed Dec 3 '14 17:00-Sat Dec 6 '14 18:00] "+q+content+q },
-				{ addCommand+" "+q+content+q+" " + periodLastDaysWithoutDate, "Added: ["+Global.dayFormat.format(today)+" "+"18:00-"+ Global.dayFormat.format(tomorrow)+" 03:00] "+q+content+q },
-				{ addCommand+" "+q+content+q+" " + deadlineInFormat[0], "Added: [by "+Global.dayFormat.format(later)+" "+ Global.timeFormat.format(later)+"] "+q+content+q },
-				{ addCommand+" "+q+content+q+" " + deadlineInFormat[1], "Added: [by "+Global.dayFormat.format(later)+" "+ Global.timeFormat.format(later)+"] "+q+content+q },
+				{ deleteCommand[0], "Invalid command format: "+deleteCommand[0]+". Type 'help' to see the list of commands."},
+				{ deleteCommand[1], "Invalid command format: "+deleteCommand[1]+". Type 'help' to see the list of commands."},
+				{ deleteCommand[2], "Invalid command format: "+deleteCommand[2]+". Type 'help' to see the list of commands."},
+				{ deleteCommand[3], "Invalid command format: "+deleteCommand[3]+". Type 'help' to see the list of commands."},
+				//{ deleteCommand[0]+" "+index[0], "Index "+index[0]+" does not exist. Please type a valid index."},
+				{ deleteCommand[0]+" "+index[1], "Deleted: \"MA2214 reading textbook\""},
+				{ deleteCommand[0]+" "+index[2], "Deleted: \"be patiend to friends\""},
+				{ deleteCommand[0]+" "+index[3], "Deleted: \"have fun with friends\""},
+				{ deleteCommand[0]+" "+index[4], "Deleted: \"prepare for CS2103 Final\""},
+				{ deleteCommand[0]+" "+index[5], "Deleted: \"talk to people\""},
+				{ deleteCommand[0]+" "+index[6], "Deleted: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"finish V0.5 in 10 days\""},
+				{ deleteCommand[0]+" "+index[7], "Deleted: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"make contribution to project\""},
+				{ deleteCommand[0]+" "+index[8], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"make friends\""},
+				{ deleteCommand[0]+" "+index[9], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"eat an apple\""},
+				{ deleteCommand[0]+" "+index[10], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"hey relax your neck it is hurt\""},
+				{ deleteCommand[0]+" "+index[11], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"get married\""},
+				{ deleteCommand[0]+" "+index[12], "Deleted: [by "+Global.dayFormat.format(today)+" 21:00] \"get excersice\""},
+/*				{ deleteCommand[0]+" "+index[23], "Index "+index[23]+" does not exist. Please type a valid index."},
+				{ deleteCommand[0]+" "+index[24], "Index "+index[24]+" does not exist. Please type a valid index."},*/
+	
 		});
 	}
 

@@ -51,7 +51,7 @@ public class TaskCommander {
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "add \"talk to people\"";
 		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"hey relax your neck it is hurt\" 5 minutes later";
+		userCommand = "add \"hey relax your neck it is hurt\" 20 minutes later";
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "add \"Help me come up with 20+ tasks pls\" Winter vacation";
 		TaskCommander.controller.executeCommand(userCommand);
