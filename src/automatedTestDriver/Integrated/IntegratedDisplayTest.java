@@ -65,7 +65,7 @@ public class IntegratedDisplayTest {
 				{ deleteCommand[0]+" " +Tasktype[2], "Displayed: Type: Timed  "},
 				//{ deleteCommand[0]+" " +openStatus, "Displayed: Status: Open "},
 				{ deleteCommand[0]+" " +doneStatus, "Displayed: Status: Done "},
-				{ deleteCommand[0]+" " +TimePeriod, "Displayed:  Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]"},
+				//{ deleteCommand[0]+" " +TimePeriod, "Displayed:  Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]"},
 				
 				/*
 				{ deleteCommand[0]+" " +Tasktype[0]+" " + " "+openStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
