@@ -16,7 +16,7 @@ import com.taskcommander.Global;
 import com.taskcommander.TaskCommander;
 
 /**
- * This class contains all test cases for the method display of Integrated Testing.
+ * This class contains all test cases for the method clear of Integrated Testing.
  * 
  * 
  */
