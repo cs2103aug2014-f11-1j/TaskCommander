@@ -16,7 +16,7 @@ import com.taskcommander.Global;
 import com.taskcommander.TaskCommander;
 
 /**
- * This class contains all test cases for the method containsParameter(userCommand:String) of the component Integrated Testing.
+ * This class contains all test cases for the method add of the Integrated Testing.
  * 
  * 
  */

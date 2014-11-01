@@ -16,19 +16,19 @@ import com.taskcommander.Global;
 import com.taskcommander.TaskCommander;
 
 /**
- * This class contains all test cases for the method delete of the Integrated Testing.
+ * This class contains all test cases for the method display of Integrated Testing.
  * 
  * 
  */
 //@author A0105753J
 @RunWith(Parameterized.class)
-public class IntegratedDeleteTest {
+public class IntegratedDisplayTest {
 
 	private String userCommand;
 	private String expectedResult;
 
 
-	public IntegratedDeleteTest(String userCommand, String expectedResult) {
+	public IntegratedDisplayTest(String userCommand, String expectedResult) {
 		this.userCommand = userCommand;
 		this.expectedResult = expectedResult;
 	}
