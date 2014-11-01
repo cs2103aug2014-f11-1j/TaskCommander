@@ -35,18 +35,14 @@ public class IntegratedAddTest {
 
 
 	/*
-	 * These care test cases for add method
-	 * Format can be:
-	 * Add "content"
-	 * Add "Content" deadline
-	 * Add "Content" period
+	 * These care test cases for delete method
+	 * Format would be:delete n (index)
 	 * 
-	 * There are multiple ways to indicate time. Like "in 2o minutes", "in weekend", 
-	 * 	"winter vacation", "5 hours later" and so on
 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
 		String addCommand = "add";
+		String addCommandCapital[] = {"Add", "ADD", "AdD"};
 		String q = "\"";
 		String content = "task content";
 		String deadline = "Nov 11 5pm";
@@ -64,8 +60,14 @@ public class IntegratedAddTest {
 		Date later = calendar.getTime();
 		
 		return Arrays.asList(new Object[][] {
-				{ addCommand, "Invalid command format: add. Type 'help' to see the list of commands."},
+				{ addCommand, "Invalid command format: "+addCommand+". Type 'help' to see the list of commands."},
 				{ addCommand+" "+q+content+q, "Added: "+q+content+q},
+				{ addCommandCapital[0], "Invalid command format: "+addCommandCapital[0]+". Type 'help' to see the list of commands."},
+				{ addCommandCapital[0]+" "+q+content+q, "Added: "+q+content+q},
+				{ addCommandCapital[1], "Invalid command format: "+addCommandCapital[1]+". Type 'help' to see the list of commands."},
+				{ addCommandCapital[1]+" "+q+content+q, "Added: "+q+content+q},
+				{ addCommandCapital[2], "Invalid command format: "+addCommandCapital[2]+". Type 'help' to see the list of commands."},
+				{ addCommandCapital[2]+" "+q+content+q, "Added: "+q+content+q},
 				{ addCommand+" "+q+content+q+" " + deadline, "Added: [by Tue Nov 11 '14 17:00] "+q+content+q },
 				{ addCommand+" "+q+content+q+" " + period, "Added: [Wed Dec 3 '14 17:00-Sat Dec 6 '14 18:00] "+q+content+q },
 				{ addCommand+" "+q+content+q+" " + periodLastDaysWithoutDate, "Added: ["+Global.dayFormat.format(today)+" "+"18:00-"+ Global.dayFormat.format(tomorrow)+" 03:00] "+q+content+q },
