@@ -25,6 +25,7 @@ import com.taskcommander.GoogleAPIConnector;
  */
 public class SyncHandler extends Observable {
 
+	private static final String STATUS_CANCELLED = "cancelled";
 	private static GoogleAPIConnector con = null;
 	private static final Logger logger = Logger.getLogger(SyncHandler.class.getName());
 
@@ -177,7 +178,7 @@ public class SyncHandler extends Observable {
 		
 		//Deleted Case For Events
 		for (Event event : googleEvents) {
-			if ("cancelled".equals(event.getStatus())) {
+			if (event.getStatus().equals(STATUS_CANCELLED)) {
 				TaskCommander.data.deleteTask(con.toTask(event));
 			}
 		}
@@ -185,6 +186,7 @@ public class SyncHandler extends Observable {
 	}
 
 	//@author A0112828H
+	// Methods for keeping track and notifying observers of sync state
 	private void updateTasksComplete(int completed) {
 		tasksComplete = completed;
 		updateSyncMessage();
