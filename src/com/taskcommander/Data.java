@@ -919,6 +919,10 @@ public class Data {
 		return deletedTasks;
 	}
 	
+	public Stack<Task> getPreupdatedTasks() {
+		return preupdatedTasks;
+	}
+	
 	public ArrayList<String> getAllIds() {
 		ArrayList<String> idList = new ArrayList<String>();
 		for (Task t : tasks) {
