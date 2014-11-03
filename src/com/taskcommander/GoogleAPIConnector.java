@@ -100,7 +100,7 @@ public class GoogleAPIConnector {
 	//@author A0112828H
 	/**
 	 * Returns all tasks.
-	 * @return Feedback for user.
+	 * @return All tasks.
 	 */
 	public ArrayList<com.taskcommander.Task> getAllTasks() {
 		if (!isLoggedIn()) {
