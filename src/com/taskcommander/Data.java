@@ -412,34 +412,20 @@ public class Data {
 	 */
 	public String addTask(Task task) {
 		logger.log(Level.INFO, "Called addTask(Task task)");
-<<<<<<< HEAD
 		if (task.getId() != null) {		
 			switch (task.getType()) {
 			case FLOATING:
 				FloatingTask floatingTask = (FloatingTask) task;
-				return addFloatingTask(floatingTask.getName(), task.getId());
+				return addFloatingTask(floatingTask);
 			case DEADLINE:
 				DeadlineTask deadlineTask = (DeadlineTask) task;
-				return addDeadlineTask(deadlineTask.getName(), deadlineTask.getEndDate(), task.getId());
+				return addDeadlineTask(deadlineTask);
 			default:
 				TimedTask timedTask = (TimedTask) task;
-				return addTimedTask(timedTask.getName(), timedTask.getStartDate(), timedTask.getEndDate(), task.getId());
+				return addTimedTask(timedTask);
 			}	
 		} else {
 			return Global.MESSAGE_NULL_ID;
-=======
-		assert (task.getId() != null); //TODO: @Sean: consider changing this to an if-else, otherwise an AssertionError could be thrown
-		switch (task.getType()) {
-		case FLOATING:
-			FloatingTask floatingTask = (FloatingTask) task;
-			return addFloatingTask(floatingTask);
-		case DEADLINE:
-			DeadlineTask deadlineTask = (DeadlineTask) task;
-			return addDeadlineTask(deadlineTask);
-		default:
-			TimedTask timedTask = (TimedTask) task;
-			return addTimedTask(timedTask);
->>>>>>> a1fd3d9999160399e8c5918eb68f54b6b03158fb
 		}
 	}
 
