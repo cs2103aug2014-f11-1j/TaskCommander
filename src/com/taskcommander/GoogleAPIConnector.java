@@ -619,13 +619,23 @@ public class GoogleAPIConnector {
 		if (event == null || event.isEmpty()) {
 			return null;
 		}
-
-		TimedTask timedTask = new TimedTask(event.getSummary(),
-				toDate(event.getStart().getDateTime()),
-				toDate(event.getEnd().getDateTime()));
-		timedTask.setId(event.getId());
-		timedTask.setUpdated(event.getUpdated());
-		return timedTask;
+		
+		if (event.getStart().getDateTime() != null && event.getEnd().getDateTime() != null) {
+			TimedTask timedTask = new TimedTask(event.getSummary(),
+					toDate(event.getStart().getDateTime()),
+					toDate(event.getEnd().getDateTime()));
+			timedTask.setId(event.getId());
+			timedTask.setUpdated(event.getUpdated());
+			return timedTask;
+		} else {
+			//Handle all-day event cases
+			TimedTask timedTask = new TimedTask(event.getSummary(), 
+					toDate(event.getStart().getDate()), 
+					toDate(event.getEnd().getDate()));
+			timedTask.setId(event.getId());
+			timedTask.setUpdated(event.getUpdated());
+			return timedTask;
+		}
 	}
 
 	//@author A0112828H
