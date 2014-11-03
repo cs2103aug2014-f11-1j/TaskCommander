@@ -118,6 +118,7 @@ public class SyncHandler extends Observable {
 
 	//@author A0109194A
 	private void pull() throws IOException {
+		logger.log(Level.INFO, "PULL: Starting Pull");
 		//Get all Tasks
 		ArrayList<Task> tasksToSync = con.getAllTasks();
 		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
