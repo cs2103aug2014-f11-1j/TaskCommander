@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -88,6 +89,7 @@ public class SyncHandler extends Observable {
 	private void push() {
 		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
 		ArrayList<Task> deletedTasks = TaskCommander.data.getDeletedTasks();
+		Stack<Task> preupdatedTasks = TaskCommander.data.getPreupdatedTasks();
 		logger.log(Level.INFO, "PUSH: Retrieved All Tasks");
 		startSyncState(SyncState.PUSH, tasks.size() + deletedTasks.size());
 		
@@ -107,12 +109,19 @@ public class SyncHandler extends Observable {
 		logger.log(Level.INFO, "PUSH: Handled Added Cases");
 
 		// Handle delete cases
-
 		for (Task t : deletedTasks) {
 			if (t.getId() != null) {
 				con.deleteTask(t);
 			}
 		}
+		
+		// Delete tasks that were updated
+		for (Task t: preupdatedTasks) {
+			if (t.getId() != null) {
+				con.deleteTask(t);
+			}
+		}
+		
 		logger.log(Level.INFO, "PUSH: Handled Deleted Cases");
 	}
 
