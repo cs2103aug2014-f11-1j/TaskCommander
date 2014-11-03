@@ -460,17 +460,20 @@ public class Data {
 	 */
 	public String addTask(Task task) {
 		logger.log(Level.INFO, "Called addTask(Task task)");
-		assert (task.getId() != null);
-		switch (task.getType()) {
-		case FLOATING:
-			FloatingTask floatingTask = (FloatingTask) task;
-			return addFloatingTask(floatingTask.getName(), task.getId());
-		case DEADLINE:
-			DeadlineTask deadlineTask = (DeadlineTask) task;
-			return addDeadlineTask(deadlineTask.getName(), deadlineTask.getEndDate(), task.getId());
-		default:
-			TimedTask timedTask = (TimedTask) task;
-			return addTimedTask(timedTask.getName(), timedTask.getStartDate(), timedTask.getEndDate(), task.getId());
+		if (task.getId() != null) {		
+			switch (task.getType()) {
+			case FLOATING:
+				FloatingTask floatingTask = (FloatingTask) task;
+				return addFloatingTask(floatingTask.getName(), task.getId());
+			case DEADLINE:
+				DeadlineTask deadlineTask = (DeadlineTask) task;
+				return addDeadlineTask(deadlineTask.getName(), deadlineTask.getEndDate(), task.getId());
+			default:
+				TimedTask timedTask = (TimedTask) task;
+				return addTimedTask(timedTask.getName(), timedTask.getStartDate(), timedTask.getEndDate(), task.getId());
+			}	
+		} else {
+			return Global.MESSAGE_NULL_ID;
 		}
 	}
 	
