@@ -584,12 +584,11 @@ public class Data {
 	 * @param 	task
 	 * @return 	       If the delete was successful.
 	 */
-	public boolean deleteTask(Task task) {
+	public boolean deleteFromGoogle(int index) {
 		if (tasks.isEmpty()) {
 			return false;
 		} else {
-			deletedTasks.add(task);
-			tasks.remove(task);
+			tasks.remove(index);
 			saveToPermanentStorage();
 			return true;
 		}
