@@ -401,8 +401,11 @@ public class Controller {
         calendar.set(Calendar.MILLISECOND, 99);
         calendar.set(Calendar.SECOND, 59);
         calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.HOUR, 23);
+        calendar.set(Calendar.HOUR, 11);
         endDateRestriction = calendar.getTime();
+        
+        System.out.println(Global.dayFormat.format(endDateRestriction) + " "
+        + Global.timeFormat.format(endDateRestriction));
 
         isStatusRestricted = true;
         areDoneTasksDisplayed = false;

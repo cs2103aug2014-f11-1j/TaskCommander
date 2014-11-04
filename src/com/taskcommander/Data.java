@@ -909,24 +909,9 @@ public class Data {
             }
         }
         Collections.sort(floatingTasks);
-        for (FloatingTask task : floatingTasks) {
-            System.out.println(task.getName());
-            
-        }
         concernedTasks.addAll(floatingTasks);
-        System.out.println("-----");
         Collections.sort(datedTasks);
-        for (DatedTask task : datedTasks) {
-            System.out.println(task.getDate());
-            System.out.println(task.getName());
-        
-        }
-        System.out.println("-----");
         concernedTasks.addAll(datedTasks);
-        
-        for (Task task : concernedTasks) {
-            System.out.println(task.getName());
-        }
         
         return concernedTasks;
     }

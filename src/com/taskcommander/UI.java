@@ -98,15 +98,16 @@ public class UI extends Observable implements Observer {
 
 	// System colours for use to colour UI elements
 	private final Color red = display.getSystemColor(SWT.COLOR_RED);
+	private final Color darkGreen = display.getSystemColor(SWT.COLOR_DARK_GREEN);
 	private final Color blue = display.getSystemColor(SWT.COLOR_BLUE);
 	private final Color darkGray = display.getSystemColor(SWT.COLOR_DARK_GRAY);
-	private final Color yellow = display.getSystemColor(SWT.COLOR_DARK_YELLOW);
+	private final Color darkBlue = display.getSystemColor(SWT.COLOR_DARK_BLUE);
 
 	// Colours set for table columns
 	private final Color COLOR_COL_FIRST = darkGray;
 	private final Color COLOR_COL_SECOND = blue;
-	private final Color COLOR_COL_THIRD = yellow;
-	private final Color COLOR_DONE = darkGray;
+	private final Color COLOR_COL_THIRD = darkBlue;
+	private final Color COLOR_DONE = darkGreen;
 	private final Color COLOR_NOT_DONE = red;
 
 	// String messages for display
@@ -238,6 +239,7 @@ public class UI extends Observable implements Observer {
 		outputGridData.widthHint = OUTPUT_PREFERRED_WIDTH;
 		output.setLayoutData(outputGridData);
 		output.setText(Global.MESSAGE_WELCOME);
+		output.setForeground(darkBlue);
 		output.setEditable(false);
 	}
 
@@ -607,7 +609,7 @@ public class UI extends Observable implements Observer {
 
 	private void displayMessage(String s) {
 		output.setText(s);
-		output.setForeground(blue);
+		output.setForeground(darkBlue);
 	}
 
 	/**
