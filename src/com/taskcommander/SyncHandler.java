@@ -144,16 +144,27 @@ public class SyncHandler extends Observable {
 		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
 		List<com.google.api.services.tasks.model.Task> googleTasks = con.getAllGoogleTasks();
 		List<Event> googleEvents = con.getAllGoogleEvents();
+		ArrayList<String> taskIds = TaskCommander.data.getAllIds();
 		logger.log(Level.INFO, "PULL: Retrieved All Tasks");
 		startSyncState(SyncState.PULL, tasksToSync.size() + tasks.size() + googleTasks.size() + googleEvents.size());
-		
+
 		//Added case
-		ArrayList<String> taskIds = TaskCommander.data.getAllIds();
-		for (Task t: tasksToSync) {
-			if (!taskIds.contains(t.getId())) {
-				TaskCommander.data.addTask(t);
+		//For Tasks
+		for (com.google.api.services.tasks.model.Task task : googleTasks) {
+			if (!taskIds.contains(task.getId()) && task.getDeleted() != null) {
+				TaskCommander.data.addTask(con.toTask(task));
 			}
 		}
+		
+		//For Events
+		for (Event event: googleEvents) {
+			if (!taskIds.contains(event.getId()) && !event.getStatus().equals(STATUS_CANCELLED)) {
+				TaskCommander.data.addTask(con.toTask(event));
+			}
+		}
+		
+		
+		
 		logger.log(Level.INFO, "PULL: Handled Added Tasks");
 
 		//Updated cases
