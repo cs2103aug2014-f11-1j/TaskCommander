@@ -12,7 +12,8 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 //@author A0105753J
 @RunWith(Suite.class)
-@SuiteClasses({  TaskCommanderTest.class})
+@SuiteClasses({ IntegratedAddTest.class, IntegratedOpenTest.class, IntegratedDeleteTest.class,IntegratedMarkTest.class,
+	IntegratedDisplayTest.class, IntegratedSyncTest.class, IntegratedClearTest.class,IntegratedUpdateTest.class})
 public class AllIntegratedTest {
 	
 }

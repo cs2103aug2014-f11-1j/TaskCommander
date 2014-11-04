@@ -51,7 +51,7 @@ public class TaskCommander {
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "add \"talk to people\"";
 		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"hey relax your neck it is hurt\" 5 minutes later";
+		userCommand = "add \"hey relax your neck it is hurt\" 20 minutes later";
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "add \"Help me come up with 20+ tasks pls\" Winter vacation";
 		TaskCommander.controller.executeCommand(userCommand);
@@ -72,6 +72,12 @@ public class TaskCommander {
 		userCommand = "add \"get excersice\" 9pm";
 		TaskCommander.controller.executeCommand(userCommand);
 		userCommand = "add \"say hello to tutor\" Friday 11 am";
+		TaskCommander.controller.executeCommand(userCommand);
+		TaskCommander.controller.executeCommand("display");
+		TaskCommander.controller.getDisplayedTasks();
+		userCommand = "done 1";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "done 6";
 		TaskCommander.controller.executeCommand(userCommand);
 	}
 	//Note: only call this when the sync command is used

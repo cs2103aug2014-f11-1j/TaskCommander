@@ -10,36 +10,36 @@ import com.taskcommander.Global.CommandType;
 
 
 /**
- * This class represents the Data component. Besides storing the data temporary, it also contains
- * all of the methods needed to manipulate the task objects within the temporary list. At the beginning 
- * the content of the permanent storage is pulled to the temporary one. After each command the data 
- * will be pushed to the permanent storage.
+ * Singleton class that stores tasks temporarily. Contains all of the methods needed to manipulate 
+ * the task objects within the temporary list, for internal use and for the Google Integration
+ * component.
  * 
- * @author A0128620M, A0109194A
+ * Upon initialisation, the contents of the permanent storage will be pulled. After each 
+ * command the data will be pushed to the permanent storage.
  */
 
 public class Data {
 	//@author A0128620M
 	// Constructor, Variables and Logger
 	private static Logger logger = Logger.getLogger(Controller.class.getName());	//TODO add logs
-	
+
 	private ArrayList<Task> tasks; // Contains all available task objects.
-	
+
 	//@author A0109194A
 	private ArrayList<Task> deletedTasks; // Used by the Google API.
 	private Stack<ArrayList<Task>> clearedTasks;
-	
+
 	// Variables to store history of tasks for undo command.
 	private Stack<Task> addedTasks;
 	private Stack<Task> preupdatedTasks;
 	private Stack<Task> updatedTasks;
 	private Stack<CommandType> operationHistory;
 	private Stack<Global.CommandType> undoHistory;
-	
+
 	//@author A0128620M
 	// Singleton instance for Data
 	private static Data theOne;
-	
+
 	//@author A0128620M, A0109194A
 	private Data() {
 		tasks = new ArrayList<Task>();
@@ -50,10 +50,10 @@ public class Data {
 		clearedTasks = new Stack<ArrayList<Task>>();
 		operationHistory = new Stack<Global.CommandType>();
 		undoHistory = new Stack<Global.CommandType>();
-		
+
 		loadFromPermanentStorage();
 	}
-	
+
 	//@author A0128620M
 	/**
 	 * Returns the only instance of Data.
@@ -66,40 +66,33 @@ public class Data {
 		return theOne;
 	}
 
-	/* -------------------------------------- Add (Internal) ---------------------------------------- */
+	//@author A0128620M, A0109194A
+	// CRUD methods used internally.
+	// Add methods
+	/**
+	 * Adds a Floating Task to the tasks list.
+	 * 
+	 * @param 	taskName        
+	 * @return 	           Feedback for UI
+	 */
+	public String addFloatingTask(String taskName) {
+		FloatingTask floatingTask = new FloatingTask(taskName);
+
+		saveToOperationHistory(Global.CommandType.ADD);
+		tasks.add(floatingTask);
+		addedTasks.push(floatingTask);
+
+		saveToPermanentStorage();
+
+		return String.format(Global.MESSAGE_ADDED,getTaskInDisplayFormat(floatingTask));
+	}
 
 	/**
-	 * This operation adds a Timed Task to the temporary tasks list.
-	 * 
-	 * @param 	taskName  
-	 * @param 	startDate    
-	 * @param 	endDate   
-	 * @return 	feedback for UI
-	 * @author 	A0128620M, A0109194A
-	 */
-	public String addTimedTask(String taskName, Date startDate, Date endDate) {
-		TimedTask timedTask = new TimedTask(taskName,startDate,endDate);
-		
-		saveToOperationHistory(Global.CommandType.ADD);
-		tasks.add(timedTask);
-		addedTasks.push(timedTask);
-		
-		saveToPermanentStorage();	// TODO: Observer?
-		
-		if(Global.dayFormat.format(timedTask.getStartDate()).equals(Global.dayFormat.format(timedTask.getEndDate()))) {
-			return String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\""); 
-		} else {
-			return String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.dayFormat.format(timedTask.getEndDate()) +" "+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\"");
-		}
-	}
-	
-	/**
-	 * This operation adds a Deadline Task to the tasks list.
+	 * Adds a Deadline Task to the tasks list.
 	 * 
 	 * @param 	taskName     
 	 * @param 	endDate    
-	 * @return 	feedback for UI
-	 * @author 	A0128620M, A0109194A
+	 * @return 	           Feedback for UI
 	 */
 	public String addDeadlineTask(String taskName, Date endDate) {
 		DeadlineTask deadlineTask = new DeadlineTask(taskName, endDate);
@@ -107,166 +100,153 @@ public class Data {
 		saveToOperationHistory(Global.CommandType.ADD);
 		tasks.add(deadlineTask);
 		addedTasks.push(deadlineTask);
-		
+
 		saveToPermanentStorage();
-		
-		return String.format(Global.MESSAGE_ADDED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
+
+		return String.format(Global.MESSAGE_ADDED, getTaskInDisplayFormat(deadlineTask));
 	}
-	
-	/**
-	 * This operation adds a Floating Task to the tasks list.
-	 * 
-	 * @param 	taskName        
-	 * @return 	feedback for UI
-	 * @author 	A0128620M, A0109194A
-	 */
-	public String addFloatingTask(String taskName) {
-		FloatingTask floatingTask = new FloatingTask(taskName);
-		
-		saveToOperationHistory(Global.CommandType.ADD);
-		tasks.add(floatingTask);
-		addedTasks.push(floatingTask);
-		
-		saveToPermanentStorage();
-		
-		return String.format(Global.MESSAGE_ADDED,"\"" + floatingTask.getName() + "\"");
-	}
-	
-	/* --------------------------------------- Add (Google) ----------------------------------------- */
-	
-	/**
-	 * This operation adds a Task to the tasks list by forwarding the task's attributes to the respective
-	 * add method. It is usually called by the SyncHandler class.
-	 * 
-	 * @param 	task     
-	 * @return 	feedback for UI
-	 * @author A0109194A
-	 */
-	public String addTask(Task task) {
-		logger.log(Level.INFO, "Called addTask(Task task)");
-		assert task.getId() != null;
-		switch ( task.getType()) {
-		case FLOATING:
-			FloatingTask floatingTask = (FloatingTask) task;
-			return addFloatingTask(floatingTask.getName(), task.getId());
-		case DEADLINE:
-			DeadlineTask deadlineTask = (DeadlineTask) task;
-			return addDeadlineTask(deadlineTask.getName(), deadlineTask.getEndDate(), task.getId());
-		default:
-			TimedTask timedTask = (TimedTask) task;
-			return addTimedTask(timedTask.getName(), timedTask.getStartDate(), timedTask.getEndDate(), task.getId());
-		}
-	}
-	
-	/**
-	 * This operation adds a Timed Task to the tasks list and sets an ID to it.
-	 * 
-	 * @param 	taskName
-	 * @param 	startDate
-	 * @param 	endDate
-	 * @param 	id
-	 * @return 	feedback for UI
-	 * @author A0109194A
-	 */
-	public String addTimedTask(String taskName, Date startDate, Date endDate, String googleID) {	
-		TimedTask timedTask = new TimedTask(taskName,startDate,endDate, googleID);
-		tasks.add(timedTask);
-		
-		saveToPermanentStorage();
-		
-		if(Global.dayFormat.format(timedTask.getStartDate()).equals(Global.dayFormat.format(timedTask.getEndDate()))) {
-			return String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\""); 
-		} else {
-			return String.format(Global.MESSAGE_ADDED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.dayFormat.format(timedTask.getEndDate()) +" "+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\"");
-		}
-	}
-	
-	/**
-	 * This operation adds a Deadline Task to the tasks list and sets a GoogleID to it.
-	 * 
-	 * @param taskName
-	 * @param endDate
-	 * @param googleID
-	 * @return feedback for UI
-	 * @author A0109194A
-	 */
-	public String addDeadlineTask(String taskName, Date endDate, String googleID) {
-		DeadlineTask deadlineTask= new DeadlineTask(taskName, endDate, googleID);
-		tasks.add(deadlineTask);
-		
-		saveToPermanentStorage();
-		
-		return String.format(Global.MESSAGE_ADDED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
-	}
-	
-	/**
-	 * This operation adds a Floating Task  to the tasks list and sets a GoogleID to it.
-	 * 
-	 * @param taskName
-	 * @param googleID
-	 * @return feeback for UI
-	 * @author A0109194A
-	 */
-	public String addFloatingTask(String taskName, String googleID) {
-		FloatingTask floatingTask = new FloatingTask(taskName, googleID);
-		tasks.add(floatingTask);
-		
-		saveToPermanentStorage();
-		
-		return String.format(Global.MESSAGE_ADDED,"\"" + floatingTask.getName() + "\"");
-	}
-	
-	/* ------------------------------------- Update (Internal) -------------------------------------- */
 
 	/**
-	 * This operation updates a TimedTask with the given index and replaces the old taskName, 
+	 * Adds a Timed Task to the tasks list.
+	 * 
+	 * @param 	taskName  
+	 * @param 	startDate    
+	 * @param 	endDate   
+	 * @return 	           Feedback for UI
+	 */
+	public String addTimedTask(String taskName, Date startDate, Date endDate) {
+		TimedTask timedTask = new TimedTask(taskName,startDate,endDate);
+
+		saveToOperationHistory(Global.CommandType.ADD);
+		tasks.add(timedTask);
+		addedTasks.push(timedTask);
+
+		saveToPermanentStorage();
+
+		return String.format(Global.MESSAGE_ADDED, getTaskInDisplayFormat(timedTask));
+	}
+
+	// Update methods
+	/**
+	 * Updates a FloatingTask with the given index and replaces the old taskName, 
+	 * startDate or endDate respectively and changes the taskType if needed.
+	 * If a given date or name parameter equals null, the old value remains.
+	 *  
+	 * @param index        Index of the task to delete, as a string
+	 * @param taskName     Description of task    
+	 * @return 	           Feedback for UI
+	 */
+	public String updateToFloatingTask(int index, String name) {
+		assert index < tasks.size();  //TODO: @Andy: instead of asserting this, maybe you should do a check and handle errors
+		if (tasks.isEmpty()) {
+			return String.format(Global.MESSAGE_EMPTY);
+		} 
+
+		Task relatedTask = tasks.get(index);
+		FloatingTask floatingTask;
+
+		if  (relatedTask.getType() != Task.TaskType.FLOATING) {
+			if (name == null) {
+				name = relatedTask.getName();
+			}
+			floatingTask = new FloatingTask(name);
+			// floatingTask.setEdited(relatedTask.isEdited());  TODO: @Sean: do we need that?
+			floatingTask.setDone(relatedTask.isDone());
+			deletedTasks.add(relatedTask);
+			tasks.remove(index);
+			tasks.add(index, floatingTask);
+		} else {
+			floatingTask = (FloatingTask) relatedTask;
+			if (name != null) {
+				floatingTask.setName(name);
+			}
+			floatingTask.setEdited(true);
+		}
+		processUpdateHistory(floatingTask);
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_UPDATED, getTaskInDisplayFormat(floatingTask));
+	}
+
+	/**
+	 * Updates a DeadlineTask with the given index and replaces the old taskName, 
 	 * startDate or endDate respectively and changes the taskType if needed.
 	 * If a given date or name parameter equals null, the old value remains.
 	 * 
-	 * @param index  index of the task to delete, as a string
-	 * @param taskName     description of task
+	 * @param index        Index of the task to delete, as a string
+	 * @param taskName     Description of task   
+	 * @param endDate      
+	 * @return 	           Feedback for UI
+	 */
+	public String updateToDeadlineTask(int index, String name, Date endDate) {
+		assert index < tasks.size();
+		if (tasks.isEmpty()) {
+			return String.format(Global.MESSAGE_EMPTY);
+		} 
+
+		Task relatedTask = tasks.get(index);
+		DeadlineTask deadlineTask;
+		if  (relatedTask.getType() != Task.TaskType.DEADLINE) {
+			assert endDate != null;
+			if (name == null) {
+				name = relatedTask.getName();
+			}
+			deadlineTask = new DeadlineTask(name,endDate);
+			// deadlineTask.setEdited(relatedTask.isEdited());  TODO: @Sean: do we need that?
+			deadlineTask.setDone(relatedTask.isDone());
+
+			deletedTasks.add(relatedTask);
+			tasks.remove(index);
+			tasks.add(index, deadlineTask);
+		} else {
+			deadlineTask = (DeadlineTask) relatedTask;
+			if (name != null) {
+				deadlineTask.setName(name);
+			}
+			if (endDate != null) {
+				deadlineTask.setEndDate(endDate);
+			}
+			deadlineTask.setEdited(true);
+		}
+		processUpdateHistory(deadlineTask);
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_UPDATED, getTaskInDisplayFormat(deadlineTask));
+	}
+
+	/**
+	 * Updates a TimedTask with the given index and replaces the old taskName, 
+	 * startDate or endDate respectively and changes the taskType if needed.
+	 * If a given date or name parameter equals null, the old value remains.
+	 * 
+	 * @param index        Index of the task to delete, as a string
+	 * @param taskName     Description of task
 	 * @param startDate    
 	 * @param endDate      
-	 * @return             feedback for UI
-	 * @author 	A0128620M, A0109194A
+	 * @return 	           Feedback for UI
 	 */
 	public String updateToTimedTask(int index, String name, Date startDate, Date endDate) {
 		assert index < tasks.size();
 		if (tasks.isEmpty()) {
 			return String.format(Global.MESSAGE_EMPTY);
 		} 
-		
+
 		Task relatedTask = tasks.get(index);
-		
+		TimedTask timedTask;
 		if  (!relatedTask.getType().equals(Task.TaskType.TIMED)) {
 			assert startDate != null;
 			assert endDate != null;
 			if (name == null) {
 				name = relatedTask.getName();
 			}
-			TimedTask timedTask = new TimedTask(name,startDate,endDate);
+			timedTask = new TimedTask(name,startDate,endDate);
 			// timedTask.setEdited(tasks.get(index).isEdited());  TODO: @Sean: do we need that?
 			timedTask.setDone(relatedTask.isDone());
-		
-			saveToOperationHistory(Global.CommandType.UPDATE);
+
 			deletedTasks.add(relatedTask);
-			preupdatedTasks.push(relatedTask);
 			tasks.remove(index);
 			tasks.add(index, timedTask);
-			updatedTasks.push(timedTask);
-			
-			saveToPermanentStorage();
-			
-			if(Global.dayFormat.format(timedTask.getStartDate()).equals(Global.dayFormat.format(timedTask.getEndDate()))) {
-				return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\""); 
-			} else {
-				return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.dayFormat.format(timedTask.getEndDate()) +" "+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\"");
-			}	
 		} else {
-			TimedTask timedTask = (TimedTask) relatedTask;
-			
-			saveToOperationHistory(Global.CommandType.UPDATE);
-			preupdatedTasks.push(timedTask);
+			timedTask = (TimedTask) relatedTask;
+
 			if (name != null) {
 				timedTask.setName(name);
 			}
@@ -277,256 +257,32 @@ public class Data {
 				timedTask.setEndDate(endDate);
 			}
 			timedTask.setEdited(true);
-			updatedTasks.push(timedTask);
-			
-			saveToPermanentStorage();
-			
-			if(Global.dayFormat.format(timedTask.getStartDate()).equals(Global.dayFormat.format(timedTask.getEndDate()))) {
-				return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\""); 
-			} else {
-				return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.dayFormat.format(timedTask.getEndDate()) +" "+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\"");
-			}	
 		}
-		
-	}
-	
-	/**
-	 * This operation updates a DeadlineTask with the given index and replaces the old taskName, 
-	 * startDate or endDate respectively and changes the taskType if needed.
-	 * If a given date or name parameter equals null, the old value remains.
-	 * 
-	 * @param index   index of the task to delete, as a string
-	 * @param taskName     description of task   
-	 * @param endDate      
-	 * @return             feedback for UI
-	 * @author 	A0128620M, A0109194A
-	 */
-	public String updateToDeadlineTask(int index, String name, Date endDate) {
-		assert index < tasks.size();
-		if (tasks.isEmpty()) {
-			return String.format(Global.MESSAGE_EMPTY);
-		} 
-		
-		Task relatedTask = tasks.get(index);
+		processUpdateHistory(timedTask);
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_ADDED, getTaskInDisplayFormat(timedTask));
 
-		if  (relatedTask.getType() != Task.TaskType.DEADLINE) {
-			assert endDate != null;
-			if (name == null) {
-				name = relatedTask.getName();
-			}
-			DeadlineTask deadlineTask = new DeadlineTask(name,endDate);
-			// deadlineTask.setEdited(relatedTask.isEdited());  TODO: @Sean: do we need that?
-			deadlineTask.setDone(relatedTask.isDone());
-		
-			saveToOperationHistory(Global.CommandType.UPDATE);
-			deletedTasks.add(relatedTask);
-			preupdatedTasks.push(relatedTask);
-			tasks.remove(index);
-			tasks.add(index, deadlineTask);
-			updatedTasks.push(deadlineTask);
-			
-			saveToPermanentStorage();
-			
-			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
-		} else {
-			DeadlineTask deadlineTask = (DeadlineTask) relatedTask;
-			
-			saveToOperationHistory(Global.CommandType.UPDATE);
-			preupdatedTasks.push(deadlineTask);
-			if (name != null) {
-				deadlineTask.setName(name);
-			}
-			if (endDate != null) {
-				deadlineTask.setEndDate(endDate);
-			}
-			deadlineTask.setEdited(true);
-			updatedTasks.push(deadlineTask);
-			
-			saveToPermanentStorage();
-			
-			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
-			}
 	}
-	
-	/**
-	 * This operation updates a FloatingTask with the given index and replaces the old taskName, 
-	 * startDate or endDate respectively and changes the taskType if needed.
-	 * If a given date or name parameter equals null, the old value remains.
-	 * 
-	 * @param index   index of the task to delete, as a string
-	 * @param taskName     description of task    
-	 * @return             feedback for UI
-	 * @author 	A0128620M, A0109194A
-	 */
-	public String updateToFloatingTask(int index, String name) {
-		assert index < tasks.size();
-		if (tasks.isEmpty()) {
-			return String.format(Global.MESSAGE_EMPTY);
-		} 
-		
-		Task relatedTask = tasks.get(index);
-		
-		if  (relatedTask.getType() != Task.TaskType.FLOATING) {
-			if (name == null) {
-				name = relatedTask.getName();
-			}
-			FloatingTask floatingTask = new FloatingTask(name);
-			// floatingTask.setEdited(relatedTask.isEdited());  TODO: @Sean: do we need that?
-			floatingTask.setDone(relatedTask.isDone());
-		
-			saveToOperationHistory(Global.CommandType.UPDATE);
-			deletedTasks.add(relatedTask);
-			preupdatedTasks.push(relatedTask);
-			tasks.remove(index);
-			tasks.add(index, floatingTask);
-			updatedTasks.push(floatingTask);
-			
-			saveToPermanentStorage();
-			
-			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
-		} else {
-			FloatingTask floatingTask = (FloatingTask) relatedTask;
-			
-			saveToOperationHistory(Global.CommandType.UPDATE);
-			preupdatedTasks.push(floatingTask);
-			if (name != null) {
-				floatingTask.setName(name);
-			}
-			floatingTask.setEdited(true);
-			updatedTasks.push(floatingTask);
-			
-			saveToPermanentStorage();
-			
-			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
-			}
-	}
-	
-	/* ------------------------------------- Update (Google) --------------------------------------- */
-	
-	/**
-	 * This operation updates a task with a TimedTask object as a parameter
-	 * It is usually called by the SyncHandler
-	 * 
-	 * @param 		index
-	 * @param 		task
-	 * @return		Feedback for user
-	 * @author 		A0109194A
-	 */
-	public String updateToTimedTask(int index, TimedTask task) {
-		Task relatedTask = tasks.get(index);
-		
-		if (relatedTask.getType() != Task.TaskType.TIMED) {
-			TimedTask timedTask = new TimedTask(task.getName(), task.getStartDate(), task.getEndDate());
-			timedTask.setEdited(relatedTask.isEdited());
-			timedTask.setDone(relatedTask.isDone());
-			timedTask.setUpdated(task.getUpdated());
-			deletedTasks.add(relatedTask);
-			tasks.remove(index);
-			tasks.add(index, timedTask);
-			saveToPermanentStorage();
-			return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate()) + "]"+ " \"" + timedTask.getName() + "\"");
-		} else {
-			TimedTask timedTask = (TimedTask) tasks.get(index);
-			if (task.getName() != null) {
-				timedTask.setName(task.getName());
-			}
-			if (task.getStartDate() != null) {
-				timedTask.setStartDate(task.getStartDate());
-			}
-			if (task.getEndDate() != null) {
-				timedTask.setEndDate(task.getEndDate());
-			}
-			timedTask.setEdited(true);
-			timedTask.setUpdated(task.getUpdated());
-			saveToPermanentStorage();
-			if(Global.dayFormat.format(timedTask.getStartDate()).equals(Global.dayFormat.format(timedTask.getEndDate()))) {
-				return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\""); 
-			} else {
-				return String.format(Global.MESSAGE_UPDATED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.dayFormat.format(timedTask.getEndDate()) +" "+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\"");
-			}		
-		}
-	}
-		
-	/**
-	 * This operation updates a task with a DeadlineTask object as a parameter
-	 * It is usually called by the SyncHandler
-	 * 
-	 * @param 		index
-	 * @param 		task
-	 * @return		Feedback for user
-	 * @author 		A0109194A
-	 */
-	public String updateToDeadlineTask(int index, DeadlineTask task) {
-		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
-			Task toChange = tasks.get(index);
-			DeadlineTask deadlineTask = new DeadlineTask(task.getName(),task.getEndDate());
-			deadlineTask.setEdited(tasks.get(index).isEdited());
-			deadlineTask.setDone(tasks.get(index).isDone());
-			deadlineTask.setUpdated(task.getUpdated());
-			deletedTasks.add(toChange);
-			tasks.remove(index);
-			tasks.add(index, deadlineTask);
-			saveToPermanentStorage();
-			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
-		} else {
-			DeadlineTask deadlineTask = (DeadlineTask) tasks.get(index);
-			preupdatedTasks.push(deadlineTask);
-			if (task.getName() != null) {
-				deadlineTask.setName(task.getName());
-			}
-			if (task.getEndDate() != null) {
-				deadlineTask.setEndDate(task.getEndDate());
-			}
-			deadlineTask.setEdited(true);
-			deadlineTask.setUpdated(task.getUpdated());
-			saveToPermanentStorage();
-			return String.format(Global.MESSAGE_UPDATED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
-			}
-	}
-	
-	/**
-	 * This operation updates a task with a FloatingTask object as a parameter
-	 * It is usually called by the SyncHandler
-	 * 
-	 * @param 		index
-	 * @param 		task
-	 * @return		Feedback for user
-	 * @author 		A0109194A
-	 */
-	public String updateToFloatingTask(int index, FloatingTask task) {
-		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
-			Task toChange = tasks.get(index);
-			FloatingTask floatingTask = new FloatingTask(task.getName());
-			floatingTask.setEdited(tasks.get(index).isEdited());
-			floatingTask.setDone(tasks.get(index).isDone());
-			floatingTask.setUpdated(task.getUpdated());
-			deletedTasks.add(toChange);
-			tasks.remove(index);
-			tasks.add(index, floatingTask);
-			saveToPermanentStorage();
-			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
-		} else {
-			FloatingTask floatingTask = (FloatingTask) tasks.get(index);
-			preupdatedTasks.push(floatingTask);
-			if (task.getName() != null) {
-				floatingTask.setName(task.getName());
-			}
-			floatingTask.setEdited(true);
-			floatingTask.setUpdated(task.getUpdated());
-			saveToPermanentStorage();
-			return String.format(Global.MESSAGE_UPDATED,"\"" + floatingTask.getName() + "\"");
-		}
-	}
-	
 
-	/* -------------------------------------- Done (Internal) --------------------------------------- */
-
+	// Helper method for update
 	/**
-	 * This operation marks a task as done.
+	 * Adds the given task to the arrays for keeping track of updated tasks,
+	 * and adds the update command to history.
+	 * @param task
+	 */
+	private void processUpdateHistory(Task task) {
+		saveToOperationHistory(Global.CommandType.UPDATE);
+		preupdatedTasks.push(task);
+		updatedTasks.push(task);
+	}
+
+	//@author A0128620M
+	//Done, open, delete, clear methods
+	/**
+	 * Marks a task as done.
 	 * 
-	 * @param index        index of the done task 
-	 * @return             feedback for UI
-	 * @author 	A0128620M
+	 * @param index        Index of the done task 
+	 * @return 	           Feedback for UI
 	 */
 	public String done(int index) {
 		if (tasks.isEmpty()) {
@@ -536,38 +292,32 @@ public class Data {
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
 			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
-		
+
 		Task doneTask = tasks.get(index);
 		if (doneTask.isDone()) {
 			return String.format(Global.MESSAGE_ALREADY_DONE);
 		} else {
 			doneTask.markDone();
 			saveToPermanentStorage();
-			switch ( doneTask.getType()) {
+			switch (doneTask.getType()) {
 			case FLOATING:
 				FloatingTask floatingTask = (FloatingTask) doneTask;
-				return String.format(Global.MESSAGE_DONE,"\"" + floatingTask.getName() + "\"");
+				return String.format(Global.MESSAGE_DONE, getTaskInDisplayFormat(floatingTask));
 			case DEADLINE:
 				DeadlineTask deadlineTask = (DeadlineTask) doneTask;
-				return String.format(Global.MESSAGE_DONE,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
+				return String.format(Global.MESSAGE_DONE, getTaskInDisplayFormat(deadlineTask));
 			default:
 				TimedTask timedTask = (TimedTask) doneTask;// TODO: find better solution than default
-				if(Global.dayFormat.format(timedTask.getStartDate()).equals(Global.dayFormat.format(timedTask.getEndDate()))) {
-					return String.format(Global.MESSAGE_DONE,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\""); 
-				} else {
-					return String.format(Global.MESSAGE_DONE,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.dayFormat.format(timedTask.getEndDate()) +" "+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\"");
-				}			
+				return String.format(Global.MESSAGE_DONE, getTaskInDisplayFormat(timedTask));
 			}
 		}
 	}
-	
-	/* ------------------------------------- Open (Internal) -------------------------------------- */
+
 	/**
-	 * This operation marks a task as open.
+	 * Marks a task as open.
 	 * 
-	 * @param index        index of the open tasks   
-	 * @return             feedback for UI
-	 * @author 	A0128620M
+	 * @param index        Index of the open tasks   
+	 * @return             Feedback for UI
 	 */
 	public String open(int index) {
 		if (tasks.isEmpty()) {
@@ -577,39 +327,35 @@ public class Data {
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
 			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
-		
+
 		Task openTask = tasks.get(index);
 		if (!openTask.isDone()) {
 			return String.format(Global.MESSAGE_ALREADY_OPEN);
 		} else {
 			openTask.markOpen();
 			saveToPermanentStorage();
-			switch ( openTask.getType()) {
+			switch (openTask.getType()) {
 			case FLOATING:
 				FloatingTask floatingTask = (FloatingTask) openTask;
-				return String.format(Global.MESSAGE_OPEN,"\"" + floatingTask.getName() + "\"");
+				return String.format(Global.MESSAGE_OPEN, getTaskInDisplayFormat(floatingTask));
 			case DEADLINE:
 				DeadlineTask deadlineTask = (DeadlineTask) openTask;
-				return String.format(Global.MESSAGE_OPEN,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
+				return String.format(Global.MESSAGE_OPEN, getTaskInDisplayFormat(deadlineTask));
 			default:
 				TimedTask timedTask = (TimedTask) openTask;// TODO: find better solution than default
-				if(Global.dayFormat.format(timedTask.getStartDate()).equals(Global.dayFormat.format(timedTask.getEndDate()))) {
-					return String.format(Global.MESSAGE_OPEN,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\""); 
-				} else {
-					return String.format(Global.MESSAGE_OPEN,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.dayFormat.format(timedTask.getEndDate()) +" "+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\"");
-				}	
+				return String.format(Global.MESSAGE_OPEN, getTaskInDisplayFormat(timedTask));
 			}
 		}
 	}
-	
-	/* ------------------------------------- Delete (Internal) -------------------------------------- */
+
+	//@author A0128620M, A0109194A
 	/**
-	 * This operation deletes the task with the given index (as shown with 'display' command).
+	 * Deletes the task with the given index (as shown with 'display' command).
 	 * Does not execute if there are no lines and if a wrong index is given.
 	 * 
 	 * @param index        Index of the task to delete, as a string. 
 	 * @return             Feedback for user.
-	 * @author 	A0128620M, A0109194A
+
 	 */
 	public String deleteTask(int index) {
 		if (tasks.isEmpty()) {
@@ -624,33 +370,210 @@ public class Data {
 			deletedTasks.add(deletedTask);
 			tasks.remove(index);
 			saveToPermanentStorage();
-			switch ( deletedTask.getType()) {		// TODO: Extract to method
+			switch (deletedTask.getType()) {		// TODO: Extract to method
 			case FLOATING:
 				FloatingTask floatingTask = (FloatingTask) deletedTask;
-				return String.format(Global.MESSAGE_DELETED,"\"" + floatingTask.getName() + "\"");
+				return String.format(Global.MESSAGE_DELETED, getTaskInDisplayFormat(floatingTask));
 			case DEADLINE:
 				DeadlineTask deadlineTask = (DeadlineTask) deletedTask;
-				return String.format(Global.MESSAGE_DELETED,"[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"");
+				return String.format(Global.MESSAGE_DELETED, getTaskInDisplayFormat(deadlineTask));
 			default:
 				TimedTask timedTask = (TimedTask) deletedTask;// TODO: find better solution than default
-				if(Global.dayFormat.format(timedTask.getStartDate()).equals(Global.dayFormat.format(timedTask.getEndDate()))) {
-					return String.format(Global.MESSAGE_DELETED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\""); 
-				} else {
-					return String.format(Global.MESSAGE_DELETED,"["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ Global.timeFormat.format(timedTask.getStartDate())+ "-"+ Global.dayFormat.format(timedTask.getEndDate()) +" "+ Global.timeFormat.format(timedTask.getEndDate())+ "]"+ " \"" + timedTask.getName() + "\"");
-				}			
+				return String.format(Global.MESSAGE_DELETED, getTaskInDisplayFormat(timedTask));		
 			}
 		}
 	}
-	
-	/* ------------------------------------- Delete (Google) -------------------------------------- */
-	
+
 	/**
-	 * This operation deletes the task directly from the tasks list without the index.
+	 * Clears all tasks from memory.
+	 * 
+	 * @param userCommand 
+	 * @return             Feedback for user.
+	 */
+	public String clearTasks() {
+		ArrayList<Task> cleared = new ArrayList<Task>();
+		cleared.addAll(tasks);
+		deletedTasks.addAll(tasks);
+		clearedTasks.push(cleared);
+		tasks.clear();
+		saveToOperationHistory(Global.CommandType.CLEAR);
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_CLEARED);
+	}
+
+	//@author A0109194A
+	// CRUD methods used by Google Integration component
+	// Add methods
+	/**
+	 * Adds a Task to the tasks list by forwarding the task's attributes to the respective
+	 * add method. It is usually called by the SyncHandler class.
+	 * @param 	task     
+	 * @return 	           Feedback for UI
+	 */
+	public String addTask(Task task) {
+		logger.log(Level.INFO, "Called addTask(Task task)");
+		if (task.getId() != null) {		
+			switch (task.getType()) {
+			case FLOATING:
+				FloatingTask floatingTask = (FloatingTask) task;
+				return addFloatingTask(floatingTask);
+			case DEADLINE:
+				DeadlineTask deadlineTask = (DeadlineTask) task;
+				return addDeadlineTask(deadlineTask);
+			default:
+				TimedTask timedTask = (TimedTask) task;
+				return addTimedTask(timedTask);
+			}	
+		} else {
+			return Global.MESSAGE_NULL_ID;
+		}
+	}
+
+	/**
+	 * Adds a Floating Task to the tasks list.
+	 * @param floatingTask
+	 * @return 	           Feedback for UI
+	 */
+	public String addFloatingTask(FloatingTask floatingTask) {
+		tasks.add(floatingTask);
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_ADDED, getTaskInDisplayFormat(floatingTask));
+	}
+
+	/**
+	 * Adds a Deadline Task to the tasks list.
+	 * @param deadlineTask
+	 * @return 	           Feedback for UI
+	 */
+	public String addDeadlineTask(DeadlineTask deadlineTask) {
+		tasks.add(deadlineTask);
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_ADDED, getTaskInDisplayFormat(deadlineTask));
+	}
+
+	/**
+	 * Adds a Timed Task to the tasks list.
+	 * @param 	timedTask
+	 * @return 	           Feedback for UI
+	 */
+	public String addTimedTask(TimedTask timedTask) {	
+		tasks.add(timedTask);
+		saveToPermanentStorage();
+		return getTaskInDisplayFormat(timedTask);
+	}
+
+	// Update methods
+	/**
+	 * Updates a task with a FloatingTask object as a parameter.
+	 * It is usually called by the SyncHandler.
+	 * @param 		index
+	 * @param 		task
+	 * @return		Feedback for user
+	 */
+	public String updateToFloatingTask(int index, FloatingTask task) {
+		FloatingTask floatingTask;
+		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
+			Task toChange = tasks.get(index);
+			floatingTask = new FloatingTask(task.getName());
+			floatingTask.setEdited(toChange.isEdited());
+			floatingTask.setDone(toChange.isDone());
+			deletedTasks.add(toChange);
+			tasks.remove(index);
+			tasks.add(index, floatingTask);
+		} else {
+			floatingTask = (FloatingTask) tasks.get(index);
+			preupdatedTasks.push(floatingTask);
+			if (task.getName() != null) {
+				floatingTask.setName(task.getName());
+			}
+			floatingTask.setEdited(true);
+		}
+		floatingTask.setUpdated(task.getUpdated());
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_UPDATED,getTaskInDisplayFormat(floatingTask));
+	}
+
+
+	/**
+	 * Updates a task with a DeadlineTask object as a parameter.
+	 * It is usually called by the SyncHandler.
+	 * 
+	 * @param 		index
+	 * @param 		task
+	 * @return		Feedback for user
+	 */
+	public String updateToDeadlineTask(int index, DeadlineTask task) {
+		DeadlineTask deadlineTask;
+		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
+			Task toChange = tasks.get(index);
+			deadlineTask = new DeadlineTask(task.getName(),task.getEndDate());
+			deadlineTask.setEdited(tasks.get(index).isEdited());
+			deadlineTask.setDone(tasks.get(index).isDone());
+			deadlineTask.setUpdated(task.getUpdated());
+			deletedTasks.add(toChange);
+			tasks.remove(index);
+			tasks.add(index, deadlineTask);
+			saveToPermanentStorage();
+			return String.format(Global.MESSAGE_UPDATED,getTaskInDisplayFormat(deadlineTask));
+		} else {
+			deadlineTask = (DeadlineTask) tasks.get(index);
+			preupdatedTasks.push(deadlineTask);
+			if (task.getName() != null) {
+				deadlineTask.setName(task.getName());
+			}
+			if (task.getEndDate() != null) {
+				deadlineTask.setEndDate(task.getEndDate());
+			}
+			deadlineTask.setEdited(true);
+		}
+		deadlineTask.setUpdated(task.getUpdated());
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_UPDATED,getTaskInDisplayFormat(deadlineTask));
+	}
+
+	/**
+	 * Updates a task with a TimedTask object as a parameter.
+	 * It is usually called by the SyncHandler.
+	 * 
+	 * @param 		index
+	 * @param 		task
+	 * @return		Feedback for user
+	 */
+	public String updateToTimedTask(int index, TimedTask task) {
+		Task relatedTask = tasks.get(index);
+		TimedTask timedTask;
+		if (relatedTask.getType() != Task.TaskType.TIMED) {
+			timedTask = new TimedTask(task.getName(), task.getStartDate(), task.getEndDate());
+			timedTask.setEdited(relatedTask.isEdited());
+			timedTask.setDone(relatedTask.isDone());
+			deletedTasks.add(relatedTask);
+			tasks.remove(index);
+			tasks.add(index, timedTask);
+		} else {
+			timedTask = (TimedTask) tasks.get(index);
+			if (task.getName() != null) {
+				timedTask.setName(task.getName());
+			}
+			if (task.getStartDate() != null) {
+				timedTask.setStartDate(task.getStartDate());
+			}
+			if (task.getEndDate() != null) {
+				timedTask.setEndDate(task.getEndDate());
+			}
+			timedTask.setEdited(true);
+		}
+		timedTask.setUpdated(task.getUpdated());
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_UPDATED, getTaskInDisplayFormat(timedTask));
+	}
+
+	// Delete method
+	/**
+	 * Deletes the task directly from the tasks list without the index.
 	 * Used to delete tasks when syncing.
 	 * 
 	 * @param 	task
-	 * @return 	boolean value on whether the delete was successful.
-	 * @author A0109194A
+	 * @return 	       If the delete was successful.
 	 */
 	public boolean deleteTask(Task task) {
 		if (tasks.isEmpty()) {
@@ -662,53 +585,47 @@ public class Data {
 			return true;
 		}
 	}
-	
-	/* ------------------------------------- Undo (Internal) -------------------------------------- */
-	
+
+	// Undo method
 	/**
-	 * This operation undoes the latest command
-	 * It supports Add, Delete, Update, and Clear commands
+	 * This operation undoes the latest command.
+	 * It supports Add, Delete, Update, and Clear commands.
 	 * @return Feedback for UI
-	 * @author A0109194A
 	 */
 	public String undo() {
 		if (operationHistory.empty()) {
 			return Global.MESSAGE_UNDO_EMPTY;
 		}
 		Global.CommandType type = operationHistory.pop();
-		Global.CommandType undoCommand;
+		Global.CommandType undoCommand = null;
 		switch(type) {
 		case ADD:
 			undoCommand = Global.CommandType.DELETE;
-			saveToUndoHistory(undoCommand);
 			undoAdd();
 			break;
 		case DELETE:
 			undoCommand = Global.CommandType.ADD;
-			saveToUndoHistory(undoCommand);
 			undoDelete();
 			break;
 		case UPDATE:
 			undoCommand = Global.CommandType.UPDATE;
-			saveToUndoHistory(undoCommand);
 			undoUpdate();
 			break;
 		case CLEAR:
 			undoCommand = Global.CommandType.UNCLEAR;
-			saveToUndoHistory(undoCommand);
 			undoClear();
 			break;
 		default:
 			undo(); //Calls undo again to look for one of the four commands above
 		}
+		saveToUndoHistory(undoCommand);
 		saveToPermanentStorage();
 		return String.format(Global.MESSAGE_UNDONE, type);
 	}
-	
+
 	/**
-	 * This operation undoes the add command
-	 * @return Boolean
-	 * @author A0109194A
+	 * Undoes the add command.
+	 * @return           Success of undo.
 	 */
 	private boolean undoAdd() {
 		Task toDelete = addedTasks.pop();
@@ -725,11 +642,10 @@ public class Data {
 		}
 		return false;
 	}
-	
+
 	/**
-	 * This operation undoes the delete command
-	 * @return Boolean
-	 * @author A0109194A
+	 * Undoes the delete command
+	 * @return           Success of undo.
 	 */
 	private boolean undoDelete() {
 		Task toAdd = deletedTasks.get(deletedTasks.size() - 1);
@@ -747,11 +663,10 @@ public class Data {
 		}
 		return false;
 	}
-	
+
 	/**
-	 * This operation undoes the update command
-	 * @return Boolean
-	 * @author A0109194A
+	 * Undoes the update command
+	 * @return           Success of undo.
 	 */
 	private boolean undoUpdate() {
 		Task updated = updatedTasks.pop();
@@ -759,7 +674,7 @@ public class Data {
 		if (updated.getType() != beforeUpdate.getType()) {
 			deletedTasks.remove(deletedTasks.size() - 1);
 		}
-		
+
 		int index = 0;
 		switch (updated.getType()) {
 		case TIMED:
@@ -772,7 +687,7 @@ public class Data {
 			index = tasks.indexOf((FloatingTask) updated);
 			break;
 		}
-		
+
 		tasks.remove(index);
 		switch (beforeUpdate.getType()) {
 		case TIMED:
@@ -789,56 +704,34 @@ public class Data {
 	}
 
 	/**
-	 * This operation undoes the Clear command
-	 * @return Boolean
-	 * @author A0109194A
+	 * Undoes the Clear command
+	 * @return           Success of undo.
 	 */
 	private boolean undoClear() {
 		ArrayList<Task> toRestore = clearedTasks.pop();
 		tasks.addAll(toRestore);
 		return true;
 	}
-	
+
 	public void saveToOperationHistory(Global.CommandType type) {
 		operationHistory.push(type);
 	}
-	
+
 	public void saveToUndoHistory(Global.CommandType type) {
 		undoHistory.push(type);
 	}
-	
-	/* ------------------------------------- Clear (Internal) -------------------------------------- */
+
+	//@author A0128620M
+	// Getter methods
 	/**
-	 * This operation clears all tasks from memory.
-	 * 
-	 * @param userCommand 
-	 * @return             Feedback for user.
-	 * @author 	A0128620M, A0109194A
-	 */
-	public String clearTasks() {
-		ArrayList<Task> cleared = new ArrayList<Task>();
-		cleared.addAll(tasks);
-		deletedTasks.addAll(tasks);
-		clearedTasks.push(cleared);
-		tasks.clear();
-		saveToOperationHistory(Global.CommandType.CLEAR);
-		saveToPermanentStorage();
-		return String.format(Global.MESSAGE_CLEARED);
-	}
-	
-	/* ---------------------------------------- Get Methods ----------------------------------------- */	
-	
-	/**
-	 * This operation returns a sorted list consisting of copies of all tasks of the tasks list.
-	 *  
-	 * @return 	ArrayList<Task>
-	 * @author 	A0128620M
+	 * Returns a sorted list consisting of copies of all tasks of the tasks list.
+	 * @return 	  Copy of tasks list.
 	 */
 	public ArrayList<Task> getCopiedTasks() {
 		ArrayList<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
 		ArrayList<DatedTask> datedTasks = new ArrayList<DatedTask>();
 		ArrayList<Task> allTasks = new ArrayList<Task>();
-		
+
 		for(Task task: tasks) {
 			if(task.getType().equals(Task.TaskType.FLOATING)) {
 				floatingTasks.add(new FloatingTask((FloatingTask) task));
@@ -848,17 +741,17 @@ public class Data {
 				datedTasks.add(new TimedTask((TimedTask) task));
 			}
 		}
-		
+
 		Collections.sort(floatingTasks);
 		allTasks.addAll(floatingTasks);
 		Collections.sort(datedTasks);
 		allTasks.addAll(datedTasks);
-		
+
 		return allTasks;
 	}
-	
+
 	/**
-	 * This operation returns a sorted list consisting of copies of those tasks of the tasks list 
+	 * Returns a sorted list consisting of copies of those tasks of the tasks list 
 	 * which satisfy the given DateTime, TaskType, Status and Search restrictions.
 	 * 
 	 * @param isDateRestricted
@@ -872,76 +765,143 @@ public class Data {
 	 * @param areDoneTasksDisplayed
 	 * @param areOpenTasksDisplayed
 	 * @param isSearchRestricted
-	 * @param searchedWordsAndPhrases
-	 * @return 	ArrayList<Task>
-	 * @author 	A0128620M
+	 * @param searchedWords
+	 * @return 	                        Sorted copy of tasks list satisfying given restrictions.
 	 */
-	public ArrayList<Task> getCopiedTasks(boolean isDateRestricted, Date startDate, Date endDate, boolean isTaskTypeRestricted, boolean areFloatingTasksDisplayed, boolean areDeadlineTasksDisplayed, boolean areTimedTasksDisplayed, boolean isStatusRestricted, boolean areDoneTasksDisplayed, boolean areOpenTasksDisplayed, boolean isSearchedWordRestricted, ArrayList<String> searchedWordsAndPhrases) {
+	public ArrayList<Task> getCopiedTasks(boolean isDateRestricted, Date startDate, Date endDate, 
+			boolean isTaskTypeRestricted, boolean areFloatingTasksDisplayed, 
+			boolean areDeadlineTasksDisplayed, boolean areTimedTasksDisplayed, 
+			boolean isStatusRestricted, boolean areDoneTasksDisplayed, 
+			boolean areOpenTasksDisplayed, boolean isSearchedWordRestricted, 
+			ArrayList<String> searchedWords) {
 		ArrayList<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
 		ArrayList<DatedTask> datedTasks = new ArrayList<DatedTask>();
 		ArrayList<Task> concernedTasks = new ArrayList<Task>();
 		boolean containsSearchedWords = false;
-		
-		for(Task task: tasks) {
 
+		for (Task task: tasks) {
 			// Step 1: Check SearchedWords
 			if (isSearchedWordRestricted) {
-				containsSearchedWords = true;
-				for(String searchedWord : searchedWordsAndPhrases) {
-					if (!task.getName().contains(searchedWord)) {
-						logger.log(Level.INFO, "Doesn't contain the word");
-						containsSearchedWords = false;
-						break;
-					}
-				} 
+				containsSearchedWords = checkStringForWords(searchedWords, task.getName()); 
 			}
-			
-			if (!isSearchedWordRestricted || containsSearchedWords) {	
 
+			if (!isSearchedWordRestricted || containsSearchedWords) {	
 				// Step 2: Check Status
-				if (!isStatusRestricted || (isStatusRestricted && areDoneTasksDisplayed == task.isDone() )) {
+				if (checkStatusRestricted(isStatusRestricted, areDoneTasksDisplayed, task)) {
 					// Step 3: Check Type
-					if(task.getType() == Task.TaskType.FLOATING && (!isTaskTypeRestricted || (isTaskTypeRestricted && areFloatingTasksDisplayed))) {	
-						// Step 4: Check DatePeriod
-						if (!isDateRestricted) {
-							floatingTasks.add(new FloatingTask((FloatingTask) task));
-						}
-					} else if (task.getType() == Task.TaskType.DEADLINE && (!isTaskTypeRestricted || (isTaskTypeRestricted && areDeadlineTasksDisplayed))) {
-						DeadlineTask deadlineTask = (DeadlineTask) task;
-						if (!isDateRestricted || (isDateRestricted && (startDate == null || deadlineTask.getEndDate().compareTo(startDate) >= 0) && (deadlineTask.getEndDate().compareTo(endDate) <= 0) )) { //TODO: Refactor Date Comparison methods
-							datedTasks.add(new DeadlineTask((DeadlineTask) task));
-						}
-					} else if (task.getType() == Task.TaskType.TIMED && (!isTaskTypeRestricted || (isTaskTypeRestricted && areTimedTasksDisplayed))) {
-						TimedTask timedTask = (TimedTask) task;
-						if (!isDateRestricted || (isDateRestricted && (startDate == null || timedTask.getStartDate().compareTo(startDate) >= 0) && (timedTask.getEndDate().compareTo(endDate) <= 0) )) {
-							datedTasks.add(new TimedTask((TimedTask) task));
-						}
-					}				
+					if (isTaskTypeRestricted) {
+						if(task.getType() == Task.TaskType.FLOATING && areFloatingTasksDisplayed) {
+							// Step 4: Check DatePeriod
+							if (checkDateRestrictionForFloatingTask(isDateRestricted)) { 	
+								floatingTasks.add(new FloatingTask((FloatingTask) task));
+							}
+						} else if (task.getType() == Task.TaskType.DEADLINE && areDeadlineTasksDisplayed) { 	
+							DeadlineTask deadlineTask = (DeadlineTask) task;
+							if (checkDateRestrictionForDeadlineTask(isDateRestricted, startDate, endDate, deadlineTask)) { 
+								datedTasks.add(new DeadlineTask((DeadlineTask) task));
+							}
+						} else if (task.getType() == Task.TaskType.TIMED && areTimedTasksDisplayed) {
+							TimedTask timedTask = (TimedTask) task;
+							if (checkDateRestrictionForTimedTask(isDateRestricted, startDate, endDate, timedTask)) {
+								datedTasks.add(new TimedTask((TimedTask) task));
+							}
+						}		
+					} else {
+						//TODO: Task type not restricted 
+						//TODO: Add all tasks?
+					}
 				}	
 			}
 		}
-		
 		Collections.sort(floatingTasks);
 		concernedTasks.addAll(floatingTasks);
 		Collections.sort(datedTasks);
 		concernedTasks.addAll(datedTasks);
-		
+
 		return concernedTasks;
 	}
-	
+
+
+	// Helper methods for getCopiedTasks
 	/**
-	 * This operation returns the index of the given task object within the tasks ArrayList.
+	 * Checks if given string contains any strings from the given ArrayList.
+	 * @param searchedWords
+	 * @param string
+	 * @return
+	 */
+	private boolean checkStringForWords(ArrayList<String> searchedWords, String s) {
+		boolean containsSearchedWords;
+		containsSearchedWords = true;
+		for(String searchedWord : searchedWords) {
+			if (!s.contains(searchedWord)) {
+				logger.log(Level.INFO, "Doesn't contain the word");
+				containsSearchedWords = false;
+				break;
+			}
+		}
+		return containsSearchedWords;
+	}
+
+	/**
+	 * Checks if the status of the given task matches the status parameters.
+	 * @param isStatusRestricted
+	 * @param areDoneTasksDisplayed
+	 * @param task
+	 * @return
+	 */
+	private boolean checkStatusRestricted(boolean isStatusRestricted, boolean areDoneTasksDisplayed, Task task) {
+		return !isStatusRestricted ||
+				(isStatusRestricted && areDoneTasksDisplayed == task.isDone() );
+	}
+
+	// Checks if the date is restricted for FloatingTasks.
+	private boolean checkDateRestrictionForFloatingTask(boolean isDateRestricted) {
+		return !isDateRestricted;
+	}
+
+	/**
+	 * Checks if the date is restricted for DeadlineTasks, and if the DeadlineTask
+	 * matches the parameters given.
+	 * @param isDateRestricted
+	 * @param startDate
+	 * @param endDate
+	 * @param deadlineTask
+	 * @return
+	 */
+	private boolean checkDateRestrictionForDeadlineTask(boolean isDateRestricted, Date startDate, 
+			Date endDate, DeadlineTask deadlineTask) {
+		return !isDateRestricted || (isDateRestricted && 
+				(startDate == null || deadlineTask.getEndDate().compareTo(startDate) >= 0) && 
+				(deadlineTask.getEndDate().compareTo(endDate) <= 0) );
+	}
+
+	/**
+	 * Checks if the date is restricted for TimedTasks, and if the TimedTask
+	 * matches the parameters given.
+	 * @param isDateRestricted
+	 * @param startDate
+	 * @param endDate
+	 * @param timedTask
+	 * @return
+	 */
+	private boolean checkDateRestrictionForTimedTask(boolean isDateRestricted, Date startDate, 
+			Date endDate, TimedTask timedTask) {
+		return !isDateRestricted || (isDateRestricted && 
+				(startDate == null || timedTask.getStartDate().compareTo(startDate) >= 0) && 
+				(timedTask.getEndDate().compareTo(endDate) <= 0) );
+	}
+
+	/**
+	 * Returns the index of the given task object within the tasks ArrayList.
 	 * @return  index
-	 * @author 	A0128620M
 	 */
 	public int getIndexOf(Task task) {
 		return tasks.indexOf(task);
 	}
-	
+
 	/**
-	 * This operation checks if the tasks ArrayList contains the given task.
+	 * Checks if the tasks ArrayList contains the given task.
 	 * @return  index
-	 * @author 	A0128620M
 	 */
 	public boolean contains(Task task) {
 		return tasks.contains(task);
@@ -950,7 +910,11 @@ public class Data {
 	public ArrayList<Task> getDeletedTasks() {
 		return deletedTasks;
 	}
-	
+
+	public Stack<Task> getPreupdatedTasks() {
+		return preupdatedTasks;
+	}
+
 	public ArrayList<String> getAllIds() {
 		ArrayList<String> idList = new ArrayList<String>();
 		for (Task t : tasks) {
@@ -958,31 +922,62 @@ public class Data {
 		}
 		return idList;
 	}
-	
+
 	/**
-	 * This operation returns all
-	 * @return  ArrayList<Task>
-	 * @author 	A0128620M
+	 * Returns all tasks.
+	 * @return        Tasks list.
 	 */
 	public ArrayList<Task> getAllTasks() {		//TODO: @Sean still encessary?
 		return tasks;
 	}
-	
+
+	// Display formatting methods
 	/**
-	 * This operation saves the temporary tasks ArrayList to the permanent storage.
-	 * @author A0112828H
+	 * Returns the given task displayed as a formatted String.
+	 * @param floatingTask
+	 * @return               Task displayed as a formatted String
 	 */
+	private String getTaskInDisplayFormat(FloatingTask floatingTask) {
+		return "\"" + floatingTask.getName() + "\"";
+	}
+
+	/**
+	 * Returns the given task displayed as a formatted String.
+	 * @param deadlineTask
+	 * @return               Task displayed as a formatted String
+	 */
+	private String getTaskInDisplayFormat(DeadlineTask deadlineTask) {
+		return "[by "+ Global.dayFormat.format(deadlineTask.getEndDate())+ " "+ Global.timeFormat.format(deadlineTask.getEndDate()) + "]"+ " \"" + deadlineTask.getName() + "\"";
+	}
+
+	/**
+	 * Returns the given task displayed as a formatted String.
+	 * @param timedTask
+	 * @return               Task displayed as a formatted String
+	 */
+	private String getTaskInDisplayFormat(TimedTask timedTask) {
+		if(Global.dayFormat.format(timedTask.getStartDate()).equals(Global.dayFormat.format(timedTask.getEndDate()))) {
+			return "["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ 
+					Global.timeFormat.format(timedTask.getStartDate())+ "-"+ 
+					Global.timeFormat.format(timedTask.getEndDate())+ "]"+ 
+					" \"" + timedTask.getName() + "\""; 
+		} else {
+			return "["+ Global.dayFormat.format(timedTask.getStartDate())+ " "+ 
+					Global.timeFormat.format(timedTask.getStartDate())+ "-"+ 
+					Global.dayFormat.format(timedTask.getEndDate()) +" "+ 
+					Global.timeFormat.format(timedTask.getEndDate())+ "]"+ 
+					" \"" + timedTask.getName() + "\"";
+		}
+	}
+
+	//@author A0112828H
+	// Saves the temporary tasks ArrayList to the permanent storage.
 	public void saveToPermanentStorage() {
 		TaskCommander.storage.writeToFile(tasks);
 	}
-	
-	/**
-	 * This operation loads the content from the permanent storage to the tasks ArrayList.
-	 * @author A0112828H
-	 */
+
+	// Loads the content from the permanent storage to the tasks ArrayList.
 	public void loadFromPermanentStorage() {
 		tasks = TaskCommander.storage.readFromFile(); 
 	}	
 }
-
-	
