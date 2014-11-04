@@ -923,6 +923,10 @@ public class Data {
 	public Stack<Task> getPreupdatedTasks() {
 		return preupdatedTasks;
 	}
+	
+	public Stack<ArrayList<Task>> getClearedTasks() {
+		return clearedTasks;
+	}
 
 	public ArrayList<String> getAllIds() {
 		ArrayList<String> idList = new ArrayList<String>();
