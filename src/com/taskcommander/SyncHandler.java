@@ -95,6 +95,7 @@ public class SyncHandler extends Observable {
 		logger.log(Level.INFO, "PUSH: Retrieved All Tasks");
 		startSyncState(SyncState.PUSH, tasks.size() + deletedTasks.size());
 		
+		//Handle Added Cases
 		for (Task t : tasks) {
 			if (!t.isSynced()) {
 				if (t.getId() == null) {
@@ -134,6 +135,7 @@ public class SyncHandler extends Observable {
 		}
 		
 		logger.log(Level.INFO, "PUSH: Handled Deleted Cases");
+		logger.log(Level.INFO, "PUSH: End Push");
 	}
 
 	//@author A0109194A
@@ -163,14 +165,17 @@ public class SyncHandler extends Observable {
 			}
 		}
 		
-		
-		
 		logger.log(Level.INFO, "PULL: Handled Added Tasks");
 
 		//Updated cases
-		taskIds = TaskCommander.data.getAllIds(); 
 		for (Task t: tasksToSync) {
+			tasks = TaskCommander.data.getAllTasks();
+			taskIds = TaskCommander.data.getAllIds();
+
 			int index = taskIds.indexOf(t.getId());
+			if (index == -1) {
+				continue;
+			}
 			if (t.getUpdated() != tasks.get(index).getUpdated()) {
 				switch(t.getType()) {
 				case FLOATING:
@@ -189,20 +194,38 @@ public class SyncHandler extends Observable {
 		
 		//Deleted case
 		//For Tasks
-		for (com.google.api.services.tasks.model.Task task : googleTasks) {
-			if (task.getDeleted() != null) {
-				TaskCommander.data.deleteTask(con.toTask(task));
+		for (com.google.api.services.tasks.model.Task t : googleTasks) {
+			tasks = TaskCommander.data.getAllTasks();
+			taskIds = TaskCommander.data.getAllIds();
+
+			if (t.getDeleted() == null) {
+				int index = taskIds.indexOf(t.getId());
+				if (index == -1) {
+					continue;
+				} else {
+					TaskCommander.data.deleteFromGoogle(index);
+				}
 			}
 		}
+		
 		logger.log(Level.INFO, "PULL: Handled Deleted Google Tasks");
 		
 		//Deleted Case For Events
 		for (Event event : googleEvents) {
+			tasks = TaskCommander.data.getAllTasks();
+			taskIds = TaskCommander.data.getAllIds();
+
 			if (event.getStatus().equals(STATUS_CANCELLED)) {
-				TaskCommander.data.deleteTask(con.toTask(event));
+				int index = taskIds.indexOf(event.getId());
+				if (index == -1) {
+					continue;
+				} else {
+					TaskCommander.data.deleteFromGoogle(index);
+				}
 			}
 		}
 		logger.log(Level.INFO, "PULL: Handled Deleted Google Events");
+		logger.log(Level.INFO, "PULL: End Pull");
 	}
 
 	//@author A0112828H
