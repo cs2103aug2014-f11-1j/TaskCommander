@@ -137,11 +137,13 @@ public class Data {
 	 * @return 	           Feedback for UI
 	 */
 	public String updateToFloatingTask(int index, String name) {
-		assert index < tasks.size();  //TODO: @Andy: instead of asserting this, maybe you should do a check and handle errors
 		if (tasks.isEmpty()) {
 			return String.format(Global.MESSAGE_EMPTY);
 		} 
-
+		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
+			return String.format(Global.MESSAGE_ARGUMENTS_INVALID, index);
+		}
+		
 		Task relatedTask = tasks.get(index);
 		FloatingTask floatingTask;
 
@@ -178,15 +180,19 @@ public class Data {
 	 * @return 	           Feedback for UI
 	 */
 	public String updateToDeadlineTask(int index, String name, Date endDate) {
-		assert index < tasks.size();
 		if (tasks.isEmpty()) {
 			return String.format(Global.MESSAGE_EMPTY);
 		} 
+		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
+			return String.format(Global.MESSAGE_ARGUMENTS_INVALID, index);
+		}
+		if (endDate == null ) {
+			return String.format(Global.MESSAGE_ARGUMENTS_INVALID, index);
+		}
 
 		Task relatedTask = tasks.get(index);
 		DeadlineTask deadlineTask;
 		if  (relatedTask.getType() != Task.TaskType.DEADLINE) {
-			assert endDate != null;
 			if (name == null) {
 				name = relatedTask.getName();
 			}
@@ -224,16 +230,19 @@ public class Data {
 	 * @return 	           Feedback for UI
 	 */
 	public String updateToTimedTask(int index, String name, Date startDate, Date endDate) {
-		assert index < tasks.size();
 		if (tasks.isEmpty()) {
 			return String.format(Global.MESSAGE_EMPTY);
 		} 
+		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
+			return String.format(Global.MESSAGE_ARGUMENTS_INVALID, index);
+		}
+		if (startDate == null || endDate == null ) {
+			return String.format(Global.MESSAGE_ARGUMENTS_INVALID, index);
+		}
 
 		Task relatedTask = tasks.get(index);
 		TimedTask timedTask;
 		if  (!relatedTask.getType().equals(Task.TaskType.TIMED)) {
-			assert startDate != null;
-			assert endDate != null;
 			if (name == null) {
 				name = relatedTask.getName();
 			}
