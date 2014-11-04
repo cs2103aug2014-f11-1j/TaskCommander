@@ -91,6 +91,7 @@ public class SyncHandler extends Observable {
 		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
 		ArrayList<Task> deletedTasks = TaskCommander.data.getDeletedTasks();
 		Stack<Task> preupdatedTasks = TaskCommander.data.getPreupdatedTasks();
+		Stack<ArrayList<Task>> clearedTasks = TaskCommander.data.getClearedTasks();
 		logger.log(Level.INFO, "PUSH: Retrieved All Tasks");
 		startSyncState(SyncState.PUSH, tasks.size() + deletedTasks.size());
 		
@@ -123,6 +124,15 @@ public class SyncHandler extends Observable {
 			}
 		}
 		
+		// Delete tasks that were cleared
+		for (ArrayList<Task> list : clearedTasks) {
+			for (Task t : list) {
+				if (t.getId() != null) {
+					con.deleteTask(t);
+				}
+			}
+		}
+		
 		logger.log(Level.INFO, "PUSH: Handled Deleted Cases");
 	}
 
@@ -147,7 +157,6 @@ public class SyncHandler extends Observable {
 		logger.log(Level.INFO, "PULL: Handled Added Tasks");
 
 		//Updated cases
-
 		taskIds = TaskCommander.data.getAllIds(); 
 		for (Task t: tasksToSync) {
 			int index = taskIds.indexOf(t.getId());
