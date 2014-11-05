@@ -141,7 +141,7 @@ public class Data {
 			return String.format(Global.MESSAGE_EMPTY);
 		} 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return String.format(Global.MESSAGE_ARGUMENTS_INVALID, index);
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
 
 		Task relatedTask = tasks.get(index);
@@ -184,10 +184,7 @@ public class Data {
 			return String.format(Global.MESSAGE_EMPTY);
 		} 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return String.format(Global.MESSAGE_ARGUMENTS_INVALID, index);
-		}
-		if (endDate == null ) {
-			return String.format(Global.MESSAGE_ARGUMENTS_INVALID, index);
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
 
 		Task relatedTask = tasks.get(index);
@@ -195,6 +192,9 @@ public class Data {
 		if  (relatedTask.getType() != Task.TaskType.DEADLINE) {
 			if (name == null) {
 				name = relatedTask.getName();
+			}
+			if (endDate == null ) {
+				return Global.MESSAGE_ARGUMENTS_INVALID;
 			}
 			deadlineTask = new DeadlineTask(name,endDate);
 			deadlineTask.setEdited(true);
@@ -234,10 +234,7 @@ public class Data {
 			return String.format(Global.MESSAGE_EMPTY);
 		} 
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
-			return String.format(Global.MESSAGE_ARGUMENTS_INVALID, index);
-		}
-		if (startDate == null || endDate == null ) {
-			return String.format(Global.MESSAGE_ARGUMENTS_INVALID, index);
+			return String.format(Global.MESSAGE_NO_INDEX, index);
 		}
 
 		Task relatedTask = tasks.get(index);
@@ -245,6 +242,9 @@ public class Data {
 		if  (!relatedTask.getType().equals(Task.TaskType.TIMED)) {
 			if (name == null) {
 				name = relatedTask.getName();
+			}
+			if (startDate == null || endDate == null ) {
+				return Global.MESSAGE_ARGUMENTS_INVALID;
 			}
 			timedTask = new TimedTask(name,startDate,endDate);
 			timedTask.setEdited(true);
@@ -269,7 +269,7 @@ public class Data {
 		}
 		processUpdateHistory(timedTask);
 		saveToPermanentStorage();
-		return String.format(Global.MESSAGE_ADDED, getTaskInDisplayFormat(timedTask));
+		return String.format(Global.MESSAGE_UPDATED, getTaskInDisplayFormat(timedTask));
 
 	}
 
