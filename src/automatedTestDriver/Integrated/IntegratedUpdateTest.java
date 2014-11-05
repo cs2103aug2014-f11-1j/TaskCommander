@@ -135,12 +135,11 @@ public class IntegratedUpdateTest {
 				{ updateCommand[0]+" "+index[9]+" "+changeContent+" "+changeTimeToBeFloating, "Updated: \"content\""},
 				
 			
-				/*{ updateCommand[0]+" "+index[23]+" "+changeTimeToBeFloating, "Index "+index[23]+" does not exist. Please type a valid index."},
-				 * updateCommand[0]+" "+index[23]+" "+changeTimeToBeDeadLine, "Index "+index[23]+" does not exist. Please type a valid index."},
-				 * updateCommand[0]+" "+index[23]+" "+changeContent, "Index "+index[23]+" does not exist. Please type a valid index."},
-				 * updateCommand[0]+" "+index[23]+" "+changeTimeToBePeriod, "Index "+index[23]+" does not exist. Please type a valid index."},
-				 * 
-				{ updateCommand[0]+" "+index[24], "Index "+index[24]+" does not exist. Please type a valid index."},*/
+				{ updateCommand[0]+" "+index[23]+" "+changeTimeToBeFloating, "Index does not exist. Please type a valid index."},
+				{ updateCommand[0]+" "+index[23]+" "+changeTimeToBeDeadLine, "Index does not exist. Please type a valid index."},
+				{ updateCommand[0]+" "+index[23]+" "+changeContent, "Index does not exist. Please type a valid index."},
+				{ updateCommand[0]+" "+index[23]+" "+changeTimeToBePeriod, "Index does not exist. Please type a valid index."},
+				{ updateCommand[0]+" "+index[24], "Index does not exist. Please type a valid index."},
 	
 		});
 	}
