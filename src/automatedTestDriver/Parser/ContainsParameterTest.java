@@ -7,10 +7,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import com.taskcommander.TaskCommander;
 
+//@author A0128620M
 /**
  * This class contains all test cases for the method containsParameter(userCommand:String) of the component Parser.
- * 
- * @author A0128620M
  */
 
 @RunWith(Parameterized.class)
@@ -25,43 +24,64 @@ public class ContainsParameterTest {
 		this.expectedResult = expectedResult;
 	}
 	
-	/* 
-	 * Test cases:
+	/* Test structure
 	 * 
-	 * Partition of parameter: 				[any searched string], [empty string], [null]
+	 * Initial partition of parameter "userCommand":
+	 * - [commandType]+[space(s)]+[quoted taskName]+[space(s)]+[any string]						depends	on [any string]
+	 * - [commandType]+[space(s)]+[any string]													depends	on [any string]								
+	 * - [any string]																			depends	on [any string]																					
+	 * - [null]																					invalid
+	 * Further partition of [any string]:
+	 * - [string which exactly represents the searched string]									valid
+	 * - [string exactly containing the searched string (surrounded by spaces)]					valid
+	 * - [string not exactly containing the searched string (not surrounded by spaces)]			invalid
+	 * - [string not containing the searched string at all]										invalid
+	 * - [empty string]																			invalid
 	 * 
-	 * Initial partition of userCommand: 	[string with at least one word], [empty string], [null]
-	 * 	For strings with at least one word:
-	 * 	- One word:							[exact searched string], [String containing the searched string], [any other string],	
-	 * 	- Two words: 						[exact searched string]+[any other string], [any other string]+[exact searched string]
-	 *  - Three words:						[any other string]+[exact searched string]+[any other string]
+	 * Initial partition of parameter "parameter":
+	 * - [any string]																			valid
+	 * - [empty string]																			invalid
+	 * - [null]																					invalid
 	 */
+	
+	// Test parameters
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
-		String searchedString = "timed";
-		String stringContainingSearchedString = "anytimed";
-		String anyOtherString = "anyOtherString";
+		String commandType = "update";
+		String taskName = "meeting";
+		String searchedString = "none";
+		String stringExactlyContainingSearchedString = "none timed";
+		String stringNotExactlyContainingSearchedString = "nonetimed";
+		String stringNotContainingSearchedString = "other";
+		String emptyString = "";
 		
 		return Arrays.asList(new Object[][] {
-				{ anyOtherString, null, false},
-				{ anyOtherString, "", false},
+				{ commandType+" "+taskName+" "+searchedString, searchedString, true },
+				{ commandType+" "+taskName+" "+stringExactlyContainingSearchedString, searchedString, true },
+				{ commandType+" "+taskName+" "+stringNotExactlyContainingSearchedString, searchedString, false },
+				{ commandType+" "+taskName+" "+stringNotContainingSearchedString, searchedString, false },
+				{ commandType+" "+taskName+" "+emptyString, searchedString, false },
+				
+				{ commandType+" "+searchedString, searchedString, true },
+				{ commandType+" "+stringExactlyContainingSearchedString, searchedString, true },
+				{ commandType+" "+stringNotExactlyContainingSearchedString, searchedString, false },
+				{ commandType+" "+stringNotContainingSearchedString, searchedString, false },
+				{ commandType+" "+emptyString, searchedString, false },
+				
+				{ searchedString, searchedString, true },
+				{ stringExactlyContainingSearchedString, searchedString, true },
+				{ stringNotExactlyContainingSearchedString, searchedString, false },
+				{ stringNotContainingSearchedString, searchedString, false },
+				{ emptyString, searchedString, false },
 				
 				{ null, searchedString, false },
-				{ "", searchedString, false },
 				
-				{ searchedString, searchedString, true},
-				{ stringContainingSearchedString, searchedString, false},
-				{ anyOtherString, searchedString, false},
-				
-				{ searchedString + " " + anyOtherString, searchedString, true},
-				{ anyOtherString + " " + searchedString, searchedString, true},
-				
-				{ anyOtherString + " " + searchedString + " " + anyOtherString, searchedString, true},
-
-				
+				{ commandType+" "+taskName+" "+searchedString, emptyString, false },
+				{ commandType+" "+taskName+" "+searchedString, null, false },
 		});
 	}
 
+	// Test run
    	@Test
 	public void testcontainsParameter() {
 		assertEquals(expectedResult, TaskCommander.parser.containsParameter(userCommand, parameter)); 

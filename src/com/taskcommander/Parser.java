@@ -129,8 +129,7 @@ public class Parser {
 			return null;
 		}
 
-		Global.CommandType commandType = TaskCommander.parser.determineCommandType(userCommand);
-		String userCommandWithoutIndex = removeIndex(userCommand, commandType);
+		String userCommandWithoutIndex = removeIndex(userCommand);
 
 		List<Date> dateTimes;
 		try {
@@ -167,11 +166,11 @@ public class Parser {
 	/**
 	 * Remove the index, if it exists in the given string.
 	 * @param  userCommand
-	 * @param  commandType
 	 * @return              Given string without index
 	 */
-	private String removeIndex(String userCommand, Global.CommandType commandType) {
+	private String removeIndex(String userCommand) {
 		String result;
+		Global.CommandType commandType = TaskCommander.parser.determineCommandType(userCommand);
 		if (commandType.equals(Global.CommandType.UPDATE) || commandType.equals(Global.CommandType.DONE) || 
 			commandType.equals(Global.CommandType.OPEN) || commandType.equals(Global.CommandType.DELETE)) {
 			try {
@@ -221,13 +220,7 @@ public class Parser {
 			return null;
 		}
 
-		String userCommandWithoutCommandType;
-		try {
-			userCommandWithoutCommandType = removeFirstWord(userCommand);
-		} catch (Exception e) {
-			logger.log(Level.INFO, MESSAGE_NO_COMMANDTYPE);
-			return null;
-		}
+		String userCommandWithoutCommandType = removeCommandType(userCommand);
 
 		ArrayList<String> searchedWords = new ArrayList<String>();
 		Pattern pattern = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"");
@@ -244,27 +237,56 @@ public class Parser {
 	}
 
 	/**
-	 * Determines if the user command contains exactly the given string, e.g. "none", "timed", "deadline"
-	 * (case sensitive).
+	 * Determines if the user command contains exactly the given string, 
+	 * e.g. "none", "timed", "deadline" (case sensitive).
 	 * @param	userCommand 
-	 * @param	parameter    Search keyword
-	 * @return	             If user command contains given String
+	 * @param	parameter
+	 * @return	true if user command contains given parameter
 	 */
 	public boolean containsParameter(String userCommand, String parameter) {	
 		if (userCommand == null || userCommand.equals("") || parameter == null || parameter.equals("")) {
 			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
 			return false;
 		}
-		String userCommandWithoutTaskName;
+		String userCommandWithoutCommandType = removeCommandType(userCommand);
+		String userCommandWithoutTaskNameAndCommandType = removeTaskName(userCommandWithoutCommandType);
+
+		return userCommandWithoutTaskNameAndCommandType.matches(".*\\b" + parameter + "\\b.*");
+	}	
+	
+	/**
+	 * Removes the commandType if existing.
+	 * @param  userCommand
+	 * @return given string without commandType
+	 */
+	private String removeCommandType(String userCommand) {
+		Global.CommandType commandType = TaskCommander.parser.determineCommandType(userCommand);
+		if (!commandType.equals(Global.CommandType.INVALID)) {
+			try {
+				return removeFirstWord(userCommand);
+			} catch (Exception e) {
+				logger.log(Level.INFO, MESSAGE_NO_COMMANDTYPE);
+				return userCommand;
+			}
+		} else {
+			return userCommand;
+		}
+	}
+	
+	/**
+	 * Removes the quoted task name if existing.
+	 * @param  userCommand
+	 * @return given string without quoted taskName
+	 */
+	private String removeTaskName(String userCommand) {
 		try {
-			userCommandWithoutTaskName = removeQuotedSubstring(userCommand);
+			return removeQuotedSubstring(userCommand);
 		} catch (Exception e) {
 			logger.log(Level.INFO, MESSAGE_NO_TASKNAME);
-			userCommandWithoutTaskName = userCommand;
+			return userCommand;
 		}
-		return userCommandWithoutTaskName.matches(".*\\b" + parameter + "\\b.*");
-	}	
-
+	}
+	
 	// Helper methods
 	private String getFirstWord(String str) throws Exception {
 		return str.trim().split("\\s+")[0];	
