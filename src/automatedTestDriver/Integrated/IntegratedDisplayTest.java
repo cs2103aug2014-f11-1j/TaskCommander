@@ -40,7 +40,7 @@ public class IntegratedDisplayTest {
 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
-		String deleteCommand[] = {"display","Display", "DISPLAY", "diSPLay"};
+		String displayCommand[] = {"display","Display", "DISPLAY", "diSPLay"};
 		String Tasktype[] = {"floating", "deadline", "timed"};
 		String TimePeriod = "Oct 31 - Nov 18";
 		String openStatus = "open";
@@ -56,16 +56,16 @@ public class IntegratedDisplayTest {
 
 
 		return Arrays.asList(new Object[][] {
-				{ deleteCommand[0], "Displayed: All"},
-				{ deleteCommand[1], "Displayed: All"},
-				{ deleteCommand[2], "Displayed: All"},
-				{ deleteCommand[3], "Displayed: All"},
+				{ displayCommand[0], "Displayed: All"},
+				{ displayCommand[1], "Displayed: All"},
+				{ displayCommand[2], "Displayed: All"},
+				{ displayCommand[3], "Displayed: All"},
 				//{ deleteCommand[0]+" " +Tasktype[0], "Displayed: Type: Floating "},
-				{ deleteCommand[0]+" " +Tasktype[1], "Displayed: Type: Deadline "},
-				{ deleteCommand[0]+" " +Tasktype[2], "Displayed: Type: Timed  "},
+				{ displayCommand[0]+" " +Tasktype[1], "Displayed: Type: Deadline "},
+				{ displayCommand[0]+" " +Tasktype[2], "Displayed: Type: Timed  "},
 				//{ deleteCommand[0]+" " +openStatus, "Displayed: Status: Open "},
-				{ deleteCommand[0]+" " +doneStatus, "Displayed: Status: Done "},
-				//{ deleteCommand[0]+" " +TimePeriod, "Displayed:  Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]"},
+				{ displayCommand[0]+" " +doneStatus, "Displayed: Status: Done "},
+				{ displayCommand[0]+" " +TimePeriod, "Displayed:  Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]"},
 				
 				/*
 				{ deleteCommand[0]+" " +Tasktype[0]+" " + " "+openStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
