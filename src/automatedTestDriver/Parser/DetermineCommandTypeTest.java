@@ -8,10 +8,9 @@ import org.junit.runners.Parameterized;
 import com.taskcommander.Global;
 import com.taskcommander.TaskCommander;
 
+//@author A0128620M
 /**
  * This class contains all test cases for the method determineCommandType(userCommand:String) of the component Parser.
- * 
- * @author A0128620M
  */
 
 @RunWith(Parameterized.class)
@@ -24,52 +23,57 @@ public class DetermineCommandTypeTest {
 		this.expectedResult = expectedResult;
 	}
 	
-	/* 
-	 * Test cases:
+	/* Test structure
 	 * 
-	 * Initial partition of userCommand: 	[string with at least one word], [empty string], [null]
-	 * 	For strings with at least one word:
-	 * 	- One word:							[valid commandType], [valid commandType with leading/following/surrounding spaces], [any word]	
-	 * 	- Two words: 						[valid commandType]+[any word], [valid commandType with leading/following/surrounding spaces]+[any word], 
-	 * 										[any non-commandType word]+[valid commandType]
-	 * 		For valid commandType: 			["Help", "help", "HELP", ..., "Synch", "synch", "SYNCH"]
+	 * Initial partition of parameter "userCommand":
+	 * - [commandType]+[space(s)]+[any non-empty string]										valid
+	 * - [commandType]																			valid	 * 
+	 * - [space(s)]+[commandType]+[space(s)]+[any non-empty string]								valid
+	 * - [space(s)]+[commandType]																valid 
+	 * - [commandType]+[any non-empty string]													invalid	 
+	 * - [any non-empty string]+[space(s)]+[commandType]										invalid	
+	 * - [any non-empty string]+[commandType]													invalid			
+	 * - [any non-empty string]																	invalid		
+	 * - [empty string]																			invalid
+	 * - [null]																					invalid
 	 */
+
+	// Test parameters
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
 		Global.CommandType validCommandType = Global.CommandType.ADD;
-		String validCommandTypeFirstLetterCapitalized = "Add";
-		String validCommandTypeCompletelyUncapitalized = "add";
-		String validCommandTypeCompletelyCapitalized = "ADD";
-		String validCommandTypeCompletelyUncapitalizedWithLeadingSpace = " add ";
-		String validCommandTypeCompletelyUncapitalizedWithFollowingSpace = "add ";
-		String validCommandTypeCompletelyUncapitalizedWithSurrounding = " add ";
-		String anyWord = "anyWord";
+		String[] commandType = {"Add", "add", "ADD"};
+		Global.CommandType invalidCommandType = Global.CommandType.INVALID;
+		String anyNonEmptyString = "/\"meeting\" Nov 3rd 2pm";
+		String emptyString = "";
 		
 		return Arrays.asList(new Object[][] {
-				{ null, Global.CommandType.INVALID },
-				{ "", Global.CommandType.INVALID },
 				
-				{ validCommandTypeFirstLetterCapitalized, validCommandType },
-				{ validCommandTypeCompletelyUncapitalized, validCommandType },
-				{ validCommandTypeCompletelyCapitalized, validCommandType },
-				{ validCommandTypeCompletelyUncapitalizedWithLeadingSpace, validCommandType },
-				{ validCommandTypeCompletelyUncapitalizedWithFollowingSpace, validCommandType },
-				{ validCommandTypeCompletelyUncapitalizedWithSurrounding, validCommandType },
-				{ anyWord, Global.CommandType.INVALID },
+				{ commandType[0]+" "+anyNonEmptyString, validCommandType },
+				{ commandType[0], validCommandType },
+				{ " "+commandType[0]+" "+anyNonEmptyString, validCommandType },
+				{ " "+commandType[0], validCommandType },
 				
-				{ validCommandTypeFirstLetterCapitalized + " " + anyWord, validCommandType },
-				{ validCommandTypeCompletelyUncapitalized + " " + anyWord, validCommandType },
-				{ validCommandTypeCompletelyCapitalized + " " + anyWord, validCommandType },
-				{ validCommandTypeCompletelyUncapitalizedWithLeadingSpace + " " + anyWord, validCommandType },
-				{ validCommandTypeCompletelyUncapitalizedWithFollowingSpace + " " + anyWord, validCommandType },
-				{ validCommandTypeCompletelyUncapitalizedWithSurrounding + " " + anyWord, validCommandType },
-				{ anyWord + " " + validCommandTypeFirstLetterCapitalized, Global.CommandType.INVALID },
-				{ anyWord + " " + validCommandTypeCompletelyUncapitalized, Global.CommandType.INVALID },
-				{ anyWord + " " + validCommandTypeCompletelyCapitalized, Global.CommandType.INVALID },
-
+				{ commandType[1]+" "+anyNonEmptyString, validCommandType },
+				{ commandType[1], validCommandType },
+				{ " "+commandType[1]+" "+anyNonEmptyString, validCommandType },
+				{ " "+commandType[1], validCommandType },
+				
+				{ commandType[2]+" "+anyNonEmptyString, validCommandType },
+				{ commandType[2], validCommandType },
+				{ " "+commandType[2]+" "+anyNonEmptyString, validCommandType },
+				{ " "+commandType[2], validCommandType },
+				
+				{ commandType[0]+anyNonEmptyString, invalidCommandType },		
+				{ anyNonEmptyString+" "+commandType[0], invalidCommandType },
+				{ anyNonEmptyString+commandType[0], invalidCommandType },
+				{ anyNonEmptyString, invalidCommandType },
+				{ emptyString, invalidCommandType },
+				{ null, invalidCommandType },
 				});
 	}
 
+	// Test run
    	@Test
 	public void testDetermineCommandType() {
 		assertEquals(expectedResult, TaskCommander.parser.determineCommandType(userCommand)); 

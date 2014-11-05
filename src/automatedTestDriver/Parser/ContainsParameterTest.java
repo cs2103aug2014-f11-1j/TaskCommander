@@ -26,7 +26,7 @@ public class ContainsParameterTest {
 	
 	/* Test structure
 	 * 
-	 * Initial partition of parameter "userCommand":
+	 * Initial partition of 1st parameter "userCommand":
 	 * - [commandType]+[space(s)]+[quoted taskName]+[space(s)]+[any string]						depends	on [any string]
 	 * - [commandType]+[space(s)]+[any string]													depends	on [any string]								
 	 * - [any string]																			depends	on [any string]																					
@@ -38,7 +38,7 @@ public class ContainsParameterTest {
 	 * - [string not containing the searched string at all]										invalid
 	 * - [empty string]																			invalid
 	 * 
-	 * Initial partition of parameter "parameter":
+	 * Initial partition of 2nd parameter "parameter":
 	 * - [any string]																			valid
 	 * - [empty string]																			invalid
 	 * - [null]																					invalid
