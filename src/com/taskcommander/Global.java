@@ -60,7 +60,6 @@ public class Global {
 	//@author A0112828H
 	// Possible command types
 	public static enum CommandType {
-		HELP,
 		ADD, 
 		UPDATE,
 		DONE,

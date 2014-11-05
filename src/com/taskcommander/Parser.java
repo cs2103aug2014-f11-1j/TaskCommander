@@ -12,7 +12,7 @@ import com.joestelmach.natty.*;
 
 //@author A0128620M
 /**
- * Analyses the user's input and extracts values. Provides several methods to parse the user's
+ * Analyzes the user's input and extracts values. Provides several methods to parse the user's
  * command and extract the command type and its related command parameters like index, name or 
  * date, etc.
  */
@@ -66,9 +66,7 @@ public class Parser {
 			return Global.CommandType.INVALID;
 		}
 
-		if (commandTypeString.equalsIgnoreCase("help")) {
-			return Global.CommandType.HELP;
-		} else if (commandTypeString.equalsIgnoreCase("add")) {
+		if (commandTypeString.equalsIgnoreCase("add")) {
 			return Global.CommandType.ADD;
 		} else if (commandTypeString.equalsIgnoreCase("update")) {
 			return Global.CommandType.UPDATE;

@@ -89,12 +89,6 @@ public class Controller {
 			return searchForTasks(userCommand);
 		case CLEAR:
 			return clearTasks(userCommand);
-		case HELP:
-			if (isSingleWord(userCommand)) {
-				return String.format(Global.MESSAGE_HELP);		//TODO @Michelle: add new Help Tab here
-			} else {
-				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-			}
 		case SYNC: 
 			return syncTasks(userCommand);			
 		case UNDO: 
@@ -426,7 +420,7 @@ public class Controller {
 	private void setStatusRestrictionOfDisplaySettings(String userCommand) {
 		areDoneTasksDisplayed = TaskCommander.parser.containsParameter(userCommand, "done");
 		areOpenTasksDisplayed = TaskCommander.parser.containsParameter(userCommand, "open");
-		if ((!areDoneTasksDisplayed && !areDoneTasksDisplayed) || (areDoneTasksDisplayed && areOpenTasksDisplayed) ) {
+		if ((!areDoneTasksDisplayed && !areOpenTasksDisplayed) || (areDoneTasksDisplayed && areOpenTasksDisplayed) ) {
 			resetStatusRestrictionOfDisplaySettings();
 		} else {
 			isStatusRestricted = true;
@@ -485,7 +479,9 @@ public class Controller {
 				}
 			}
 		}
+	logger.log(Level.INFO, displaySettingsDescription);	
 	}
+	
 
 	private void resetStatusRestrictionOfDisplaySettings() {
 		isStatusRestricted = false;
