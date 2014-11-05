@@ -5,10 +5,8 @@ import java.util.Date;
  * A task that has a name, a start date and an end date.
  * May also hold a Google API ID.
  * Related Google API: Calendar
- * 
- * @author Michelle Tan, ANDREAS, Sean Saito
  */
-
+//@author A0128620M, A0109194A
 public class TimedTask extends DatedTask {
 	private Date _startDate;
 	private Date _endDate;
@@ -56,6 +54,7 @@ public class TimedTask extends DatedTask {
 			this.setEdited(otherTimedTask.isEdited());
 	}
 	
+	//@author A0112828H
 	public Date getStartDate() {
 		return _startDate;
 	}
@@ -72,12 +71,12 @@ public class TimedTask extends DatedTask {
 		_endDate = endDate;
 	}
 	
-
 	@Override
 	public int compareTo(TimedTask otherTask) {
 		return (_startDate.compareTo(otherTask.getStartDate()));
 	}
 	
+	//@author A0128620M, A0109194A
 	@Override
 	public boolean equals(Object otherObject) {
 		if (otherObject == null) {

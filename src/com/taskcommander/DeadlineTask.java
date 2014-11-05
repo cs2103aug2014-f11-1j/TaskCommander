@@ -5,14 +5,12 @@ import java.util.Date;
  * A task that has a name and a deadline.
  * May also hold a Google API ID.
  * Related Google API: Tasks
- * 
- * @author Michelle Tan, ANDREAS, Sean Saito
  */
 
 public class DeadlineTask extends DatedTask {
-	private Date _endDate;	// Remark by Andi: Format yyyy-mm-ddTHH:MM:ss
+	private Date _endDate;	// Format yyyy-mm-ddTHH:MM:ss
 
-	/*
+	/**
 	 * Creates a new DatedTask with given name and end time.
 	 * Throws IllegalArgumentException if null arguments are given.
 	 */
@@ -25,6 +23,7 @@ public class DeadlineTask extends DatedTask {
 		}
 	}
 	
+	//@author Sean?
 	/**
 	 * Overload of the constructor. Allows for a googleID to be passed
 	 * @param name
@@ -41,8 +40,8 @@ public class DeadlineTask extends DatedTask {
 		}
 	}
 	
+	//@author A0128620M
 	// Constructor for Cloning
-	// A0128620M
 	public DeadlineTask(DeadlineTask otherDeadlineTask){
 		super(otherDeadlineTask.getName(),TaskType.DEADLINE, otherDeadlineTask.getEndDate());
 		_endDate = otherDeadlineTask.getEndDate();
@@ -60,13 +59,11 @@ public class DeadlineTask extends DatedTask {
 	}
 	
 	@Override
-	// A0128620M
 	public int compareTo(DeadlineTask otherTask) {
 		return (_endDate.compareTo(otherTask.getEndDate()));
 	}
 	
 	@Override
-	// A0128620M
 	public boolean equals(Object otherObject) {
 		if (otherObject == null) {
 			return false;

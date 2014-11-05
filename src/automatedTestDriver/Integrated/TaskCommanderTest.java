@@ -11,8 +11,6 @@ import com.taskcommander.TaskCommander;
 
 /**
  * This class is supposed to test the program integrated.
- * 
- * @author Group F11-1J A0105753J
  */
 //@author A0105753J
 public class TaskCommanderTest {

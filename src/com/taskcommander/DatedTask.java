@@ -1,14 +1,12 @@
 package com.taskcommander;
 import java.util.Date;
 
+//@author A0128620M
 /**
  * A task with a date, the TimedTask and DeadlineTask inherit from;
  * needed to compare TimedTask and DeadlineTasks by their respective 
  * startDate and endDate.
- * 
- * @author A0128620M
  */
-
 public abstract class DatedTask extends Task implements Comparable<DatedTask>{
 	private Date _date;
 	
