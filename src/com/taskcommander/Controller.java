@@ -171,8 +171,6 @@ public class Controller {
 		}
 
 		int indexOfRelatedTaskInDisplayedTasks = TaskCommander.parser.determineIndex(userCommand) - Global.INDEX_OFFSET;
-		System.out.println("Index is:");
-		System.out.println(indexOfRelatedTaskInDisplayedTasks);
 		if (isIndexDisplayedTasksInvalid(indexOfRelatedTaskInDisplayedTasks)) {
 			return Global.MESSAGE_NO_INDEX;
 		}
@@ -336,14 +334,16 @@ public class Controller {
 		}
 	}
 
-	// Sets the default values of the display settings (upcoming open tasks within the next week). 
+	/**
+	 * Sets the default values of the display settings (overdue and upcoming open tasks of the  next two weeks). 
+	 * @param  TODO
+	 */ 
 	private void setDefaultDisplaySettings() {
-		displaySettingsDescription = "Period: one week from now | Status: open";
 
 		isDateRestricted = true;
 		Calendar calendar = Calendar.getInstance();
-		startDateRestriction = calendar.getTime();
-		calendar.add(Calendar.WEEK_OF_YEAR, 1);
+		startDateRestriction = null;
+		calendar.add(Calendar.WEEK_OF_YEAR, 2);
 		endDateRestriction = calendar.getTime();
 
 		resetTaskTypeRestrictionOfDisplaySettings();
@@ -353,6 +353,8 @@ public class Controller {
 		areOpenTasksDisplayed = true;
 
 		resetSearchRestrictionOfDisplaySettings();
+		
+		setDisplaySettingsDescription();
 	}	
 
 	/**
