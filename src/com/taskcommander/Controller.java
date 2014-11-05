@@ -420,7 +420,7 @@ public class Controller {
 	private void setStatusRestrictionOfDisplaySettings(String userCommand) {
 		areDoneTasksDisplayed = TaskCommander.parser.containsParameter(userCommand, "done");
 		areOpenTasksDisplayed = TaskCommander.parser.containsParameter(userCommand, "open");
-		if ((!areDoneTasksDisplayed && !areDoneTasksDisplayed) || (areDoneTasksDisplayed && areOpenTasksDisplayed) ) {
+		if ((!areDoneTasksDisplayed && !areOpenTasksDisplayed) || (areDoneTasksDisplayed && areOpenTasksDisplayed) ) {
 			resetStatusRestrictionOfDisplaySettings();
 		} else {
 			isStatusRestricted = true;
@@ -479,7 +479,9 @@ public class Controller {
 				}
 			}
 		}
+	logger.log(Level.INFO, displaySettingsDescription);	
 	}
+	
 
 	private void resetStatusRestrictionOfDisplaySettings() {
 		isStatusRestricted = false;
