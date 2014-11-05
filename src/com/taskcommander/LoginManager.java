@@ -154,7 +154,6 @@ public class LoginManager implements Observer {
 		if(hasStoredCredential()) {
 			logger.log(Level.INFO,"Using stored credential.");
 			setTokensFromStoredCredential();
-			logger.log(Level.INFO,"Saving credential...");
 			saveCredential();
 		} else {
 			logger.log(Level.INFO,"Getting new credential from login.");
@@ -220,6 +219,7 @@ public class LoginManager implements Observer {
 	 * Saves the local credential in the datastore.
 	 */
 	private void saveCredential(){
+		logger.log(Level.INFO, "Saving credential.");
 		StoredCredential storedCredential = new StoredCredential();
 		storedCredential.setAccessToken(credential.getAccessToken());
 		storedCredential.setRefreshToken(credential.getRefreshToken());
@@ -251,6 +251,7 @@ public class LoginManager implements Observer {
 	 * @return      Token response
 	 */
 	private GoogleTokenResponse getTokenResponse(String code) {
+		logger.log(Level.INFO, "Get token response from Google with code "+code);
 		try {
 			GoogleTokenResponse response = flow.newTokenRequest(code)
 					.setRedirectUri(REDIRECT_URI).execute();
@@ -278,6 +279,7 @@ public class LoginManager implements Observer {
 	 * Creates the authorisation URL and passes it to the UI.
 	 */
 	private void getAuthorisationCode() {
+		logger.log(Level.INFO, "Request user to login.");
 		String url = flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build();
 		TaskCommander.ui.addObserver(LoginManager.getInstance());
 		TaskCommander.ui.getCodeFromUser(url);

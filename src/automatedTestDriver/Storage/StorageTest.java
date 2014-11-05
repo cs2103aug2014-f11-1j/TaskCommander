@@ -24,6 +24,14 @@ import com.taskcommander.TaskCommander;
 *
 */
 public class StorageTest {
+	
+	@Test
+	public void testWritingNullTask() {
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		tasks.add(null);
+		TaskCommander.storage.writeToFile(tasks);
+		assertEquals("Make sure there are no lines", countLinesInFile(), 0);
+	}
 
 	@Test
 	public void testWritingOneTask() {
@@ -60,5 +68,4 @@ public class StorageTest {
 		}
 		return 0;
 	}
-
 }

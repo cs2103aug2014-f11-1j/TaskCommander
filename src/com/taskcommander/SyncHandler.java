@@ -245,6 +245,7 @@ public class SyncHandler extends Observable {
 	}
 
 	private void startSyncState(SyncState state, int total) {
+		logger.log(Level.INFO, "Starting sync state " + state + " with " + total + " tasks.");
 		syncState = state;
 		tasksTotal = total;
 		tasksComplete = 0;
