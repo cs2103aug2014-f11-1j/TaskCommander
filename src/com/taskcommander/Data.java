@@ -867,7 +867,7 @@ public class Data {
 	 */
 	private boolean checkStatusRestricted(boolean isStatusRestricted, boolean areDoneTasksDisplayed, Task task) {
 		return !isStatusRestricted ||
-				(isStatusRestricted && areDoneTasksDisplayed == task.isDone() );
+				(isStatusRestricted && areDoneTasksDisplayed == task.isDone());
 	}
 
 	// Checks if the date is restricted for FloatingTasks.
