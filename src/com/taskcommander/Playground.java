@@ -17,6 +17,17 @@ import com.joestelmach.natty.*;
  */
 
 public class Playground {
+	
+	
+	/**
+	 * Determines the index which is provided with the update, delete, done or open command.
+	 * Returns INVALID_INDEX if not found.
+	 * @param	userCommand 
+	 * @return	index
+	 */
+	public static int determineIndex(String userCommand) {
+		return 1;
+	}
 /*
 	public static void main(String[] args) {
 		String command = "add \"Walk the dog\" Oktober 4th 9pm to 10pm";

@@ -18,8 +18,6 @@ import com.joestelmach.natty.*;
  */
 public class Parser {
 
-	private static final int INVALID_INDEX = -1;
-
 	// Constructor, Variables and Logger
 	private static Logger logger = Logger.getLogger(Parser.class.getName());
 	
@@ -27,6 +25,7 @@ public class Parser {
 	private static final String MESSAGE_NO_TASKNAME = "User command doesn't contain a task name.";
 	private static final String MESSAGE_NO_INDEX = "User command doesn't contain an index.";
 	private static final String MESSAGE_NO_DATETIMES = "User command doesn't contain any dateTimes.";
+	private static final int INVALID_INDEX = -1;
 
 	// Singleton instance for Data
 	private static Parser theOne;
@@ -36,7 +35,7 @@ public class Parser {
 
 	/**
 	 * Returns the only instance of Parser.
-	 * @return  Parser instance.
+	 * @return  Parser instance
 	 */
 	public static Parser getInstance(){
 		if (theOne == null) {    
@@ -46,10 +45,9 @@ public class Parser {
 	}
 
 	/**
-	 * Determines a supported command type from given String
-	 * (not case sensitive).
+	 * Determines a supported command type from given String (not case sensitive).
 	 * @param	userCommand 
-	 * @return	             Command type
+	 * @return	commandType
 	 */
 	public Global.CommandType determineCommandType(String userCommand) {
 		if (userCommand == null || userCommand.equals("")) {
@@ -97,7 +95,7 @@ public class Parser {
 	 * Determines the name of the task which has to be put in quotation marks.
 	 * Returns null if name not found.
 	 * @param	userCommand 
-	 * @return	             Task name
+	 * @return	taskName
 	 */
 	public String determineTaskName(String userCommand) {
 		if (userCommand == null || userCommand.equals("")) {
@@ -116,12 +114,11 @@ public class Parser {
 	/**
 	 * Determines the end date and/or start date of the stated task within given command string. 
 	 * Returns null if no date found. 
-	 * 
 	 * If the user command contains a numeric command parameter like an index in second place, 
 	 * it will be removed before parsing the dates and times in order to avoid mix ups.
 	 * 
 	 * @param	userCommand 
-	 * @return	             DateTimes of task
+	 * @return	dateTimes
 	 */
 	public List<Date> determineTaskDateTime(String userCommand) {
 		if (userCommand == null || userCommand.equals("")) {
@@ -164,9 +161,9 @@ public class Parser {
 	}
 
 	/**
-	 * Remove the index, if it exists in the given string.
+	 * Removes the index, if it exists in the given string.
 	 * @param  userCommand
-	 * @return              Given string without index
+	 * @return given string without index
 	 */
 	private String removeIndex(String userCommand) {
 		String result;
@@ -186,11 +183,10 @@ public class Parser {
 	}
 
 	/**
-	 * Determines the index which is provided with the update, delete, done or open command 
-	 * and represents the position of the task within the recently displayed task table.
-	 * Returns INVALID_INDEX if not found or if the index < 1.
+	 * Determines the index which is provided with the update, delete, done or open command.
+	 * Returns INVALID_INDEX if not found.
 	 * @param	userCommand 
-	 * @return	             Task index
+	 * @return	index
 	 */
 	public int determineIndex(String userCommand) {
 		if (userCommand == null || userCommand.equals("")) {
@@ -212,7 +208,7 @@ public class Parser {
 	 * Determines the single words and phrases one searches for and returns them as an ArrayList.
 	 * Returns null if no word or phrase found.
 	 * @param	userCommand 
-	 * @return	             ArrayList containing the searched words and phrases
+	 * @return	ArrayList containing the searched words and phrases
 	 */
 	public ArrayList<String> determineSearchedWords(String userCommand) {
 		if (userCommand == null || userCommand.equals("")) {
@@ -304,7 +300,7 @@ public class Parser {
 	/**
 	 * Returns dateTimes within the given string. 
 	 * @param 	str
-	 * @return	       DateTimes in given string
+	 * @return	dateTimes in given string
 	 */
 	private List<Date> getDateTimes(String str)  throws Exception {
 		List<Date> dates = null;
@@ -331,7 +327,7 @@ public class Parser {
 	 * It is assumed that all quotation marks between the first quote 
 	 * and the last quote belong to the substring.
 	 * @param 	str
-	 * @return	      String without quoted substring
+	 * @return	string without quoted substring
 	 */
 	private String removeQuotedSubstring(String str)  throws Exception {
 		return str.replaceFirst(str.substring(str.indexOf("\"") + 1,str.lastIndexOf("\"")), "");
