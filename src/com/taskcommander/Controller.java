@@ -171,8 +171,10 @@ public class Controller {
 		}
 
 		int indexOfRelatedTaskInDisplayedTasks = TaskCommander.parser.determineIndex(userCommand) - Global.INDEX_OFFSET;
+		System.out.println("Index is:");
+		System.out.println(indexOfRelatedTaskInDisplayedTasks);
 		if (isIndexDisplayedTasksInvalid(indexOfRelatedTaskInDisplayedTasks)) {
-			return String.format(Global.MESSAGE_NO_INDEX, indexOfRelatedTaskInDisplayedTasks + Global.INDEX_OFFSET);
+			return Global.MESSAGE_NO_INDEX;
 		}
 
 		Task relatedTask = displayedTasks.get(indexOfRelatedTaskInDisplayedTasks);
