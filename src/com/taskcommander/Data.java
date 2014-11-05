@@ -14,7 +14,7 @@ import com.taskcommander.Global.CommandType;
  * the task objects within the temporary list, for internal use and for the Google Integration
  * component.
  * 
- * Upon initialisation, the contents of the permanent storage will be pulled. After each 
+ * Upon initialization, the contents of the permanent storage will be pulled. After each 
  * command the data will be pushed to the permanent storage.
  */
 
@@ -66,8 +66,8 @@ public class Data {
 		return theOne;
 	}
 
-	//@author A0128620M, A0109194A
-	// CRUD methods used internally.
+	//@author A0128620M
+	// CRUD methods used internally (see methods used by Google Integration below)
 	// Add methods
 	/**
 	 * Adds a Floating Task to the tasks list.
@@ -152,7 +152,7 @@ public class Data {
 				name = relatedTask.getName();
 			}
 			floatingTask = new FloatingTask(name);
-			// floatingTask.setEdited(relatedTask.isEdited());  TODO: @Sean: do we need that?
+			floatingTask.setEdited(true); 
 			floatingTask.setDone(relatedTask.isDone());
 			deletedTasks.add(relatedTask);
 			tasks.remove(index);
@@ -197,7 +197,7 @@ public class Data {
 				name = relatedTask.getName();
 			}
 			deadlineTask = new DeadlineTask(name,endDate);
-			// deadlineTask.setEdited(relatedTask.isEdited());  TODO: @Sean: do we need that?
+			deadlineTask.setEdited(true);
 			deadlineTask.setDone(relatedTask.isDone());
 
 			deletedTasks.add(relatedTask);
@@ -247,7 +247,7 @@ public class Data {
 				name = relatedTask.getName();
 			}
 			timedTask = new TimedTask(name,startDate,endDate);
-			// timedTask.setEdited(tasks.get(index).isEdited());  TODO: @Sean: do we need that?
+			timedTask.setEdited(true);
 			timedTask.setDone(relatedTask.isDone());
 
 			deletedTasks.add(relatedTask);
@@ -888,11 +888,6 @@ public class Data {
 	 */
 	private boolean checkDateRestrictionForDeadlineTask(boolean isDateRestricted, Date startDate, 
 			Date endDate, DeadlineTask deadlineTask) {
-			System.out.println("halooooooooooooooooooooo" );
-			System.out.println(isDateRestricted );
-			System.out.println(startDate );
-			System.out.println(endDate );
-			
 		return !isDateRestricted || (isDateRestricted && 
 				(startDate == null || deadlineTask.getEndDate().compareTo(startDate) >= 0) && 
 				(deadlineTask.getEndDate().compareTo(endDate) <= 0) );
