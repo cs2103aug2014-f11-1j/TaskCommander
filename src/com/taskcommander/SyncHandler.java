@@ -160,7 +160,7 @@ public class SyncHandler extends Observable {
 		//Added case
 		//For Tasks
 		for (com.google.api.services.tasks.model.Task task : googleTasks) {
-			if (!taskIds.contains(task.getId()) && task.getDeleted() != null && task.getTitle() != null) {
+			if (!taskIds.contains(task.getId()) && task.getDeleted() == null) {
 				TaskCommander.data.addTask(con.toTask(task));
 			}
 			updateTasksComplete(tasksComplete+1);
@@ -205,7 +205,10 @@ public class SyncHandler extends Observable {
 		//Deleted case
 		//For Tasks
 		for (com.google.api.services.tasks.model.Task t : googleTasks) {
-			if (t.getDeleted() == null) {
+			tasks = TaskCommander.data.getAllTasks();
+			taskIds = TaskCommander.data.getAllIds();
+
+			if (t.getDeleted() != null) {
 				int index = taskIds.indexOf(t.getId());
 				if (index == -1) {
 					continue;
