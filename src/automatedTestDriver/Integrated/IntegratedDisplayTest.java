@@ -41,7 +41,7 @@ public class IntegratedDisplayTest {
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
 		String displayCommand[] = {"display","Display", "DISPLAY", "diSPLay"};
-		String Tasktype[] = {"floating", "deadline", "timed"};
+		String Tasktype[] = {"none", "deadline", "timed"};
 		String TimePeriod = "Oct 31 - Nov 18";
 		String openStatus = "open";
 		String doneStatus = "done";
@@ -60,26 +60,22 @@ public class IntegratedDisplayTest {
 				{ displayCommand[1], "Displayed: All"},
 				{ displayCommand[2], "Displayed: All"},
 				{ displayCommand[3], "Displayed: All"},
-				//{ deleteCommand[0]+" " +Tasktype[0], "Displayed: Type: Floating "},
-				{ displayCommand[0]+" " +Tasktype[1], "Displayed: Type: Deadline "},
-				{ displayCommand[0]+" " +Tasktype[2], "Displayed: Type: Timed  "},
-				//{ deleteCommand[0]+" " +openStatus, "Displayed: Status: Open "},
-				{ displayCommand[0]+" " +doneStatus, "Displayed: Status: Done "},
-				{ displayCommand[0]+" " +TimePeriod, "Displayed:  Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]"},
+				{ displayCommand[0]+" " +Tasktype[0], "Displayed: Type: none"},
+				{ displayCommand[0]+" " +Tasktype[1], "Displayed: Type: deadline"},
+				{ displayCommand[0]+" " +Tasktype[2], "Displayed: Type: timed"},
+				{ displayCommand[0]+" " +openStatus, "Displayed: Status: open"},
+				{ displayCommand[0]+" " +doneStatus, "Displayed: Status: done"},
+				{ displayCommand[0]+" " +TimePeriod, "Displayed: Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" - "+"Tue Nov 18 '14 "+Global.timeFormat.format(today)},
 				
-				/*
-				{ deleteCommand[0]+" " +Tasktype[0]+" " + " "+openStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
-				{ deleteCommand[0]+" " +Tasktype[1]+" "+ TimePeriod+ " "+openStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
-				{ deleteCommand[0]+" " +Tasktype[2]+" "+ TimePeriod+ " "+openStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
 				
-				{ deleteCommand[0]+" " +Tasktype[0]+" " + " "+doneStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
-				{ deleteCommand[0]+" " +Tasktype[1]+" "+ TimePeriod+ " "+doneStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
-				{ deleteCommand[0]+" " +Tasktype[2]+" "+ TimePeriod+ " "+doneStatus, "Displayed: Date: [Fri Oct 31 '14 "+ Global.timeFormat.format(today)+"-"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ "]  Type: deadline Status: open "},
-				*
-				*/
+				{ displayCommand[0]+" " +Tasktype[0]+" " + " "+openStatus, "Displayed: Type: none Status: open"},
+				{ displayCommand[0]+" " +Tasktype[1]+" "+ TimePeriod+ " "+openStatus, "Displayed: Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: deadline Status: open"},
+				{ displayCommand[0]+" " +Tasktype[2]+" "+ TimePeriod+ " "+openStatus, "Displayed: Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: timed Status: open"},
+				
+				{ displayCommand[0]+" " +Tasktype[0]+" " + " "+doneStatus, "Displayed: Type: none Status: done"},
+				{ displayCommand[0]+" " +Tasktype[1]+" "+ TimePeriod+ " "+doneStatus, "Displayed: Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: deadline Status: done"},
+				{ displayCommand[0]+" " +Tasktype[2]+" "+ TimePeriod+ " "+doneStatus, "Displayed: Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: timed Status: done"},
 
-
-		
 		});
 	}
 
