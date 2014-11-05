@@ -1,17 +1,16 @@
 package com.taskcommander;
 import java.util.Date;
 
-/*
+/**
  * A task that has a name and a deadline.
  * May also hold a Google API ID.
  * Related Google API: Tasks
  */
-
 public class DeadlineTask extends DatedTask {
 	private Date _endDate;	// Format yyyy-mm-ddTHH:MM:ss
 
 	/**
-	 * Creates a new DatedTask with given name and end time.
+	 * Creates a new DeadlineTask with given name and end time.
 	 * Throws IllegalArgumentException if null arguments are given.
 	 */
 	public DeadlineTask(String name, Date endTime) {
@@ -25,10 +24,8 @@ public class DeadlineTask extends DatedTask {
 	
 	//@author Sean?
 	/**
-	 * Overload of the constructor. Allows for a googleID to be passed
-	 * @param name
-	 * @param endTime
-	 * @param googleID
+	 * Creates a new DeadlineTask with given name, end time and a Google ID.
+	 * Throws IllegalArgumentException if null arguments are given.
 	 */
 	public DeadlineTask(String name, Date endTime, String googleID){
 		super(name,TaskType.DEADLINE, endTime);
@@ -41,7 +38,10 @@ public class DeadlineTask extends DatedTask {
 	}
 	
 	//@author A0128620M
-	// Constructor for Cloning
+	/**
+	 * Creates a new DeadlineTask from a given DeadlineTask.
+	 * Used for cloning.
+	 */
 	public DeadlineTask(DeadlineTask otherDeadlineTask){
 		super(otherDeadlineTask.getName(),TaskType.DEADLINE, otherDeadlineTask.getEndDate());
 		_endDate = otherDeadlineTask.getEndDate();
@@ -73,7 +73,10 @@ public class DeadlineTask extends DatedTask {
 		}
 		DeadlineTask otherDeadlineTask = (DeadlineTask) otherObject;
 
-		if (this.getType().equals(otherDeadlineTask.getType()) && this.getName().equals(otherDeadlineTask.getName()) && this.getId() == otherDeadlineTask.getId() && this.getEndDate().equals(otherDeadlineTask.getEndDate())) {
+		if (this.getType().equals(otherDeadlineTask.getType()) && 
+			this.getName().equals(otherDeadlineTask.getName()) && 
+			this.getId() == otherDeadlineTask.getId() && 
+			this.getEndDate().equals(otherDeadlineTask.getEndDate())) {
 			return true;
 		} else {
 			return false;

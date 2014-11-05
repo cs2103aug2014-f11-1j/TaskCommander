@@ -1,7 +1,7 @@
 package com.taskcommander;
 import java.util.Date;
 
-/*
+/**
  * A task that has a name, a start date and an end date.
  * May also hold a Google API ID.
  * Related Google API: Calendar
@@ -11,7 +11,7 @@ public class TimedTask extends DatedTask {
 	private Date _startDate;
 	private Date _endDate;
 	
-	/*
+	/**
 	 * Creates a new TimedTask with given name, start time and end time.
 	 * Throws IllegalArgumentException if null arguments are given.
 	 */
@@ -26,12 +26,8 @@ public class TimedTask extends DatedTask {
 	}
 	
 	/**
-	 * Overload of the constructor. Allows for GoogleID to be passed.
-	 * 
-	 * @param name
-	 * @param startTime
-	 * @param endTime
-	 * @param googleID
+	 * Creates a new TimedTask with given name, start time, end time and a Google ID.
+	 * Throws IllegalArgumentException if null arguments are given.
 	 */
 	public TimedTask(String name, Date startTime, Date endTime, String googleID) {
 		super(name, TaskType.TIMED, startTime);
@@ -44,7 +40,10 @@ public class TimedTask extends DatedTask {
 		}
 	}
 	
-	// Constructor for Cloning
+	/**
+	 * Creates a new TimedTask from a given TimedTask.
+	 * Used for cloning.
+	 */
 	public TimedTask(TimedTask otherTimedTask){
 		super(otherTimedTask.getName(), TaskType.TIMED, otherTimedTask.getStartDate() );
 			_startDate = otherTimedTask.getStartDate();
@@ -87,7 +86,11 @@ public class TimedTask extends DatedTask {
 		}
 		TimedTask otherTimedTask = (TimedTask) otherObject;
 
-		if (this.getType().equals(otherTimedTask.getType()) && this.getName().equals(otherTimedTask.getName()) && this.getId() == otherTimedTask.getId() && this.getStartDate().equals(otherTimedTask.getStartDate()) && this.getEndDate().equals(otherTimedTask.getEndDate())) {
+		if (this.getType().equals(otherTimedTask.getType()) && 
+			this.getName().equals(otherTimedTask.getName()) && 
+			this.getId() == otherTimedTask.getId() && 
+			this.getStartDate().equals(otherTimedTask.getStartDate()) && 
+			this.getEndDate().equals(otherTimedTask.getEndDate())) {
 			return true;
 		} else {
 			return false;

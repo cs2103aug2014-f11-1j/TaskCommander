@@ -1,20 +1,21 @@
 package com.taskcommander;
 
 
-/*
+/**
  * A floating task that has no deadline. 
  * Has a name. May also hold a Google API ID.
  * Related Google API: Tasks
  */
 public class FloatingTask extends Task implements Comparable<FloatingTask>{
+	/**
+	 * Creates a new FloatingTask.
+	 */
 	public FloatingTask(String name){
 		super(name, TaskType.FLOATING);
 	}
 	
 	/**
-	 * Overload of constructor. Allows for GoogleID to be passed
-	 * @param name
-	 * @param googleID
+	 * Creates a new FloatingTask with given name and a Google ID.
 	 */
 	public FloatingTask(String name, String googleID) {
 		super(name, TaskType.FLOATING);
@@ -22,7 +23,10 @@ public class FloatingTask extends Task implements Comparable<FloatingTask>{
 	}
 	
 	//@author A0128620M, A0109194A
-	// Constructor for Cloning
+	/**
+	 * Creates a new FloatingTask from a given FloatingTask.
+	 * Used for cloning.
+	 */
 	public FloatingTask(FloatingTask otherFloatingTask) {
 		super(otherFloatingTask.getName(), TaskType.FLOATING);
 		this.setId(otherFloatingTask.getId());
@@ -49,10 +53,9 @@ public class FloatingTask extends Task implements Comparable<FloatingTask>{
 			return false;
 		}
 		FloatingTask otherFloatingTask = (FloatingTask) otherObject;
-		System.out.println(this);
-		System.out.println(otherFloatingTask);
-		System.out.println("vor Abfrage");
-		if (this.getType().equals(otherFloatingTask.getType()) && this.getName().equals(otherFloatingTask.getName()) && this.getId() == otherFloatingTask.getId()) {	
+		if (this.getType().equals(otherFloatingTask.getType()) && 
+			this.getName().equals(otherFloatingTask.getName()) && 
+			this.getId() == otherFloatingTask.getId()) {	
 			return true;
 		} else {
 			return false;

@@ -3,13 +3,15 @@ import java.util.Date;
 
 //@author A0128620M
 /**
- * A task with a date, the TimedTask and DeadlineTask inherit from;
- * needed to compare TimedTask and DeadlineTasks by their respective 
- * startDate and endDate.
+ * A task with a date. Compares DatedTasks by date in chronological order.
  */
 public abstract class DatedTask extends Task implements Comparable<DatedTask>{
 	private Date _date;
-	
+
+	/**
+	 * Creates a new DatedTask with given name, task type and date.
+	 * Throws IllegalArgumentException if null arguments are given.
+	 */
 	public DatedTask(String name, TaskType taskType, Date date) {
 		super(name, taskType);
 		if (date != null) {
@@ -27,9 +29,9 @@ public abstract class DatedTask extends Task implements Comparable<DatedTask>{
 		_date = date;
 	}
 	
-	/*
+	/**
 	 * Compares the date of this task to the given task 
-	 * in a chronological manner.
+	 * in chronological order.
 	 */
 	@Override
 	public int compareTo(DatedTask otherTask) {

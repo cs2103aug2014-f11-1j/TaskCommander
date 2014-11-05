@@ -22,7 +22,6 @@ public abstract class Task {
 	private boolean _edited;
 	private DateTime _updated;
 	
-	
 	// Possible task types
 	public enum TaskType {
 		@SerializedName("0") FLOATING("FloatingTask"), 
@@ -40,7 +39,7 @@ public abstract class Task {
 	     }
 	}
 
-	/*
+	/**
 	 * Creates a new Task with given name.
 	 * Throws IllegalArgumentException if name is not given.
 	 */
@@ -79,7 +78,10 @@ public abstract class Task {
 		return _updated;
 	}
 	
-	// Returns true if task has a google id and has not been edited since last sync
+	/**
+	 * Returns true if task has a google id and has not been edited since last sync
+	 * @return  If task is synced.
+	 */
 	public boolean isSynced() {
 		return _id != null && !_edited; 
 	}
@@ -120,7 +122,7 @@ public abstract class Task {
 		_edited = false;
 	}
 
-	// A0128620M
+	//@author A0128620M
 	@Override
 	public boolean equals(Object otherObject) {
 		if (otherObject == null) {
