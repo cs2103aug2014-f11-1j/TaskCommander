@@ -441,8 +441,13 @@ public class Controller {
 		} else {
 			displaySettingsDescription = "";
 			if (isDateRestricted) {
-				displaySettingsDescription += "Date: ["+ Global.dayFormat.format(startDateRestriction)+ " " +
-						Global.timeFormat.format(startDateRestriction)+ "-"+ Global.timeFormat.format(endDateRestriction) + "]  ";
+				if (startDateRestriction == null) {
+					displaySettingsDescription += "Date: by "+ Global.dayFormat.format(endDateRestriction)+ " " + Global.timeFormat.format(endDateRestriction);
+				} else {
+					displaySettingsDescription += "Date: "+ Global.dayFormat.format(startDateRestriction)+ " " +
+							Global.timeFormat.format(startDateRestriction)+ "-"+ Global.dayFormat.format(endDateRestriction)+ " " + Global.timeFormat.format(endDateRestriction);
+				}
+				displaySettingsDescription += " ";
 			}
 			if (isTaskTypeRestricted) {
 				displaySettingsDescription += "Type: ";

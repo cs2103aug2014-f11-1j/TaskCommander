@@ -795,12 +795,12 @@ public class Data {
 			if (!isSearchedWordRestricted || containsSearchedWords) {	
 				// Step 2: Check if task status matches status restriction
 				if (checkStatusRestricted(isStatusRestricted, areDoneTasksDisplayed, task)) {
-					// Step 3: Process tasks by type
+					// Step 3: Process tasks by type and check date restrictions
 					switch (task.getType()) {
 					case FLOATING:
-						if (!isTaskTypeRestricted) {
+						if (!isTaskTypeRestricted && 
+								checkDateRestrictionForFloatingTask(isDateRestricted)) {
 							floatingTasks.add(new FloatingTask((FloatingTask) task));
-						// Step 4: Check for date restrictions
 						} else if (areFloatingTasksDisplayed && 
 								checkDateRestrictionForFloatingTask(isDateRestricted)) {
 							floatingTasks.add(new FloatingTask((FloatingTask) task));
@@ -808,7 +808,8 @@ public class Data {
 						break;
 					case DEADLINE:
 						DeadlineTask deadlineTask = (DeadlineTask) task;
-						if (!isTaskTypeRestricted) {
+						if (!isTaskTypeRestricted && 
+								checkDateRestrictionForDeadlineTask(isDateRestricted, startDate, endDate, deadlineTask)) {
 							datedTasks.add(deadlineTask);
 						} else if (areDeadlineTasksDisplayed && 
 								checkDateRestrictionForDeadlineTask(isDateRestricted, startDate, endDate, deadlineTask)) {
@@ -817,7 +818,8 @@ public class Data {
 						break;
 					case TIMED:
 						TimedTask timedTask = (TimedTask) task;
-						if (!isTaskTypeRestricted) {
+						if (!isTaskTypeRestricted && 
+								checkDateRestrictionForTimedTask(isDateRestricted, startDate, endDate, timedTask)) {
 							datedTasks.add(timedTask);
 						} else if (areTimedTasksDisplayed && 
 								checkDateRestrictionForTimedTask(isDateRestricted, startDate, endDate, timedTask)) {
@@ -885,6 +887,11 @@ public class Data {
 	 */
 	private boolean checkDateRestrictionForDeadlineTask(boolean isDateRestricted, Date startDate, 
 			Date endDate, DeadlineTask deadlineTask) {
+			System.out.println("halooooooooooooooooooooo" );
+			System.out.println(isDateRestricted );
+			System.out.println(startDate );
+			System.out.println(endDate );
+			
 		return !isDateRestricted || (isDateRestricted && 
 				(startDate == null || deadlineTask.getEndDate().compareTo(startDate) >= 0) && 
 				(deadlineTask.getEndDate().compareTo(endDate) <= 0) );
