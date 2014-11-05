@@ -137,7 +137,7 @@ public class Parser {
 			logger.log(Level.INFO, MESSAGE_NO_DATETIMES);
 			return null;
 		}
-		checkDateContinuesToNextDay(dateTimes);
+		dateTimes = checkDateContinuesToNextDay(dateTimes);
 		return dateTimes;
 	}
 
@@ -146,9 +146,10 @@ public class Parser {
 	 * end date occurs before the start date. If true, it indicates that the
 	 * time period starts from one day and ends the next day, and the end date
 	 * will be incremented by 1 day.
-	 * @param dateTimes
+	 * @param  dateTimes
+	 * @return corrected dateTimes
 	 */
-	private void checkDateContinuesToNextDay(List<Date> dateTimes) {
+	private List<Date> checkDateContinuesToNextDay(List<Date> dateTimes) {
 		if (dateTimes != null && dateTimes.size() == 2) {	
 			Date startDate = dateTimes.get(0);
 			Date endDate = dateTimes.get(1);
@@ -160,6 +161,7 @@ public class Parser {
 				dateTimes.set(1, endDate);
 			}
 		}
+		return dateTimes;
 	}
 
 	/**

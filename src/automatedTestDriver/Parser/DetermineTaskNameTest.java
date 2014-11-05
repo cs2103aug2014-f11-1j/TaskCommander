@@ -28,7 +28,7 @@ public class DetermineTaskNameTest {
 	
 	/* Test structure
 	 * 
-	 * Initial partition of 1st parameter "userCommand":
+	 * Initial partition of parameter "userCommand":
 	 * - [commandType]+[space(s)]+[any string]+[space(s)]+[quoted taskName]+[space(s)]+[any string]			valid
 	 * - [commandType]+[space(s)]+[any string]+[space(s)]+[quoted taskName]									valid
 	 * - [commandType]+[space(s)]+[quoted taskName]															valid
