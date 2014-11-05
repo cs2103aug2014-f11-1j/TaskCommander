@@ -1,7 +1,6 @@
 package com.taskcommander;
 
 public class TaskCommander {
-	
 	/**
 	 * Components
 	 * (Please note: All components except for the framework class "TaskCommander" are  instantiated. 
@@ -15,7 +14,7 @@ public class TaskCommander {
 	public static UI ui = UI.getInstance();
 
 	/**
-	 * Launch the application
+	 * Launches the application.
 	 * @param  args
 	 */
 	public static void main(String[] args) {
@@ -23,63 +22,6 @@ public class TaskCommander {
 		ui.open();
 	}
 	
-	/*
-	 * This method is to create tasks in database for UI testing purpose
-	 */
-	public static void ini(){
-		String userCommand="clear";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"prepare for CS2103 Final\"";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"basketball training\" sunday";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"CS2105 P3\" Nov 10";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"MA2214 reading textbook\"";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"finish V0.5 in 10 days\" Oct 30 - Nov 10";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"have fun with friends\"";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"be patiend to friends\"";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"go get your dream\" 9pm-4am";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"play games\" Tomorrow";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"go swiming\" weekend";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"talk to people\"";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"hey relax your neck it is hurt\" 20 minutes later";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"Help me come up with 20+ tasks pls\" Winter vacation";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"get married\" in 20 minutes";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"get a baby pls\" 10 years later";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"make friends\" today";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"visit grandma\" 3 month later";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"sing k\" winter vacation";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"make contribution to project\" Oct 30 - Nov 10";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"eat an apple\" today";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"get excersice\" 9pm";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "add \"say hello to tutor\" Friday 11 am";
-		TaskCommander.controller.executeCommand(userCommand);
-		TaskCommander.controller.executeCommand("display");
-		TaskCommander.controller.getDisplayedTasks();
-		userCommand = "done 1";
-		TaskCommander.controller.executeCommand(userCommand);
-		userCommand = "done 6";
-		TaskCommander.controller.executeCommand(userCommand);
-	}
 	//Note: only call this when the sync command is used
 	//as user should not be asked to login until they
 	//execute a sync command
@@ -90,5 +32,63 @@ public class TaskCommander {
 	 */
 	public static void getSyncHandler() {
 		syncHandler = new SyncHandler();
+	}
+	
+	/**
+	 * Create tasks in the database for UI testing purposes.
+	 */
+	public static void ini(){
+		String userCommand="clear";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Prepare for CS2103 Final\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Basketball training\" sunday";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Do CS2105 P3\" Nov 10";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Read MA2214 textbook\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Finish V0.5 in 10 days\" Oct 30 - Nov 10";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Have fun with friends\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Be patient with friends\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Go for my dream\" 9pm-4am";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Play games\" Tomorrow";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Go swimming\" weekend";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Talk to people\"";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Relax!\" 20 minutes later";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Come up with 20+ tasks\" Winter vacation";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Get married\" in 20 minutes";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Get a baby\" 10 years later";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Make friends\" today";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Visit grandma\" 3 month later";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Sing karaoke\" winter vacation";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Contribute to our project\" Oct 30 - Nov 10";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Eat an apple\" today";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Get some exercise\" 9pm";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "add \"Say hello to tutor\" Friday 11 am";
+		TaskCommander.controller.executeCommand(userCommand);
+		TaskCommander.controller.executeCommand("display");
+		TaskCommander.controller.getDisplayedTasks();
+		userCommand = "done 1";
+		TaskCommander.controller.executeCommand(userCommand);
+		userCommand = "done 6";
+		TaskCommander.controller.executeCommand(userCommand);
 	}
 }

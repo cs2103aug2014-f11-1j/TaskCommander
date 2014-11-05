@@ -16,9 +16,7 @@ import com.taskcommander.Global;
 import com.taskcommander.TaskCommander;
 
 /**
- * This class contains all test cases for the method clear of Integrated Testing.
- * 
- * 
+ * This class contains all test cases for the Integrated Testing of the clear method.
  */
 //@author A0105753J
 @RunWith(Parameterized.class)
@@ -27,31 +25,24 @@ public class IntegratedClearTest {
 	private String userCommand;
 	private String expectedResult;
 
-
 	public IntegratedClearTest(String userCommand, String expectedResult) {
 		this.userCommand = userCommand;
 		this.expectedResult = expectedResult;
 	}
 
 	/*
-	 * These care test cases for clear method
-	 * Format would be:clear
+	 * Test cases for clear.
+	 * Format: clear
 	 * 
 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
 		String clearCommand[] = {"clear","Clear", "CLEAR", "cleaR"};
-
-
-
 		return Arrays.asList(new Object[][] {
 				{ clearCommand[0], "All content deleted."},
 				{ clearCommand[1], "All content deleted."},
 				{ clearCommand[2], "All content deleted."},
 				{ clearCommand[3], "All content deleted."},
-				
-
-		
 		});
 	}
 

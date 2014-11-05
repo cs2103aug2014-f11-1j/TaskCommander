@@ -16,9 +16,7 @@ import com.taskcommander.Global;
 import com.taskcommander.TaskCommander;
 
 /**
- * This class contains all test cases for the method add of the Integrated Testing.
- * 
- * 
+ * This class contains all test cases for the Integrated Testing of the add method.
  */
 //@author A0105753J
 @RunWith(Parameterized.class)
@@ -27,23 +25,19 @@ public class IntegratedAddTest {
 	private String userCommand;
 	private String expectedResult;
 
-
 	public IntegratedAddTest(String userCommand, String expectedResult) {
 		this.userCommand = userCommand;
 		this.expectedResult = expectedResult;
 	}
 
-
  	/*
-	 * These care test cases for add method
-	 * Format can be:
-	 * Add "content"
-	 * Add "Content" deadline
-	 * Add "Content" period
-	 * These care test cases for delete method
-	 * Format would be:delete n (index)
+	 * Test cases for add
+	 * Formats:
+	 * add "content"
+	 * add "content" deadline
+	 * add "content" period
  	 * 
-	 * There are multiple ways to indicate time. Like "in 2o minutes", "in weekend", 
+	 * There are multiple ways to indicate time. Like "in 20 minutes", "weekend", 
 	 * 	"winter vacation", "5 hours later" and so on
  	 */
 	@Parameterized.Parameters
@@ -56,7 +50,6 @@ public class IntegratedAddTest {
 		String period = "3 Dec 5pm - 6 Dec 6pm";
 		String periodLastDaysWithoutDate = "6pm - 3 am";
 		String []deadlineInFormat = {"20 Minutes later","in 20 minutes"};
-		
 
 		Calendar calendar = Calendar.getInstance();
 		Date today = calendar.getTime();
