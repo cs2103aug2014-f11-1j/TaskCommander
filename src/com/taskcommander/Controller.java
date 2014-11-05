@@ -89,12 +89,6 @@ public class Controller {
 			return searchForTasks(userCommand);
 		case CLEAR:
 			return clearTasks(userCommand);
-		case HELP:
-			if (isSingleWord(userCommand)) {
-				return String.format(Global.MESSAGE_HELP);		//TODO @Michelle: add new Help Tab here
-			} else {
-				return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-			}
 		case SYNC: 
 			return syncTasks(userCommand);			
 		case UNDO: 

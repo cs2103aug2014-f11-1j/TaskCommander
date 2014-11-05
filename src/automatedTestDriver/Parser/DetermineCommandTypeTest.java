@@ -36,13 +36,13 @@ public class DetermineCommandTypeTest {
 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
-		Global.CommandType validCommandType = Global.CommandType.HELP;
-		String validCommandTypeFirstLetterCapitalized = "Help";
-		String validCommandTypeCompletelyUncapitalized = "help";
-		String validCommandTypeCompletelyCapitalized = "HELP";
-		String validCommandTypeCompletelyUncapitalizedWithLeadingSpace = " help ";
-		String validCommandTypeCompletelyUncapitalizedWithFollowingSpace = "help ";
-		String validCommandTypeCompletelyUncapitalizedWithSurrounding = " help ";
+		Global.CommandType validCommandType = Global.CommandType.ADD;
+		String validCommandTypeFirstLetterCapitalized = "Add";
+		String validCommandTypeCompletelyUncapitalized = "add";
+		String validCommandTypeCompletelyCapitalized = "ADD";
+		String validCommandTypeCompletelyUncapitalizedWithLeadingSpace = " add ";
+		String validCommandTypeCompletelyUncapitalizedWithFollowingSpace = "add ";
+		String validCommandTypeCompletelyUncapitalizedWithSurrounding = " add ";
 		String anyWord = "anyWord";
 		
 		return Arrays.asList(new Object[][] {
