@@ -81,8 +81,8 @@ public class IntegratedMarkTest {
 				{ doneCommand[0]+" "+index[10], "Done: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"hey relax your neck it is hurt\""},
 				{ doneCommand[0]+" "+index[11], "Done: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"get married\""},
 				{ doneCommand[0]+" "+index[12], "Done: [by "+Global.dayFormat.format(today)+" 21:00] \"get excersice\""},
-				{ doneCommand[0]+" "+index[23], "Index "+index[23]+" does not exist. Please type a valid index."},
-				{ doneCommand[0]+" "+index[24], "Index "+index[24]+" does not exist. Please type a valid index."},
+				{ doneCommand[0]+" "+index[23], "Index does not exist. Please type a valid index."},
+				{ doneCommand[0]+" "+index[24], "Index does not exist. Please type a valid index."},
 	
 		});
 	}

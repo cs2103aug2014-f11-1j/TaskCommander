@@ -56,31 +56,32 @@ public class IntegratedDisplayTest {
 
 
 		return Arrays.asList(new Object[][] {
-				{ displayCommand[0], "Displayed: All"},
-				{ displayCommand[1], "Displayed: All"},
-				{ displayCommand[2], "Displayed: All"},
-				{ displayCommand[3], "Displayed: All"},
-				{ displayCommand[0]+" " +Tasktype[0], "Displayed: Type: none"},
-				{ displayCommand[0]+" " +Tasktype[1], "Displayed: Type: deadline"},
-				{ displayCommand[0]+" " +Tasktype[2], "Displayed: Type: timed"},
-				{ displayCommand[0]+" " +openStatus, "Displayed: Status: open"},
-				{ displayCommand[0]+" " +doneStatus, "Displayed: Status: done"},
-				{ displayCommand[0]+" " +TimePeriod, "Displayed: Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" - "+"Tue Nov 18 '14 "+Global.timeFormat.format(today)},
+				{ displayCommand[0], "All"},
+				{ displayCommand[1], "All"},
+				{ displayCommand[2], "All"},
+				{ displayCommand[3], "All"},
+				{ displayCommand[0]+" " +Tasktype[0], "Type: none"},
+				{ displayCommand[0]+" " +Tasktype[1], "Type: deadline"},
+				{ displayCommand[0]+" " +Tasktype[2], "Type: timed"},
+				{ displayCommand[0]+" " +openStatus, "Status: open"},
+				{ displayCommand[0]+" " +doneStatus, "Status: done"},
+				{ displayCommand[0]+" " +TimePeriod, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" - "+"Tue Nov 18 '14 "+Global.timeFormat.format(today)},
 				
 				
-				{ displayCommand[0]+" " +Tasktype[0]+" " + " "+openStatus, "Displayed: Type: none Status: open"},
-				{ displayCommand[0]+" " +Tasktype[1]+" "+ TimePeriod+ " "+openStatus, "Displayed: Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: deadline Status: open"},
-				{ displayCommand[0]+" " +Tasktype[2]+" "+ TimePeriod+ " "+openStatus, "Displayed: Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: timed Status: open"},
+				{ displayCommand[0]+" " +Tasktype[0]+" " + " "+openStatus, "Type: none Status: open"},
+				{ displayCommand[0]+" " +Tasktype[1]+" "+ TimePeriod+ " "+openStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: deadline Status: open"},
+				{ displayCommand[0]+" " +Tasktype[2]+" "+ TimePeriod+ " "+openStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: timed Status: open"},
 				
-				{ displayCommand[0]+" " +Tasktype[0]+" " + " "+doneStatus, "Displayed: Type: none Status: done"},
-				{ displayCommand[0]+" " +Tasktype[1]+" "+ TimePeriod+ " "+doneStatus, "Displayed: Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: deadline Status: done"},
-				{ displayCommand[0]+" " +Tasktype[2]+" "+ TimePeriod+ " "+doneStatus, "Displayed: Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: timed Status: done"},
+				{ displayCommand[0]+" " +Tasktype[0]+" " + " "+doneStatus, "Type: none Status: done"},
+				{ displayCommand[0]+" " +Tasktype[1]+" "+ TimePeriod+ " "+doneStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: deadline Status: done"},
+				{ displayCommand[0]+" " +Tasktype[2]+" "+ TimePeriod+ " "+doneStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: timed Status: done"},
 
 		});
 	}
 
 	@Test
 	public void testcontainsParameter() {
-		assertEquals(expectedResult, TaskCommander.controller.executeCommand(userCommand)); 
+		TaskCommander.controller.executeCommand(userCommand);
+		assertEquals(expectedResult, TaskCommander.controller.getDisplaySettingsDescription()); 
 	}
 }
