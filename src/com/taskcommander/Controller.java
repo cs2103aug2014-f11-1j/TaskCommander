@@ -188,7 +188,7 @@ public class Controller {
 		updateDisplayRestrictions(userCommand, taskDateTimes);
 		setDisplaySettingsDescription();
 
-		return String.format(Global.MESSAGE_DISPLAYED, displaySettingsDescription);
+		return Global.MESSAGE_DISPLAYED;
 	}
 
 	private String searchForTasks(String userCommand) {
