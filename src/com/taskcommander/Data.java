@@ -420,7 +420,6 @@ public class Data {
 	 */
 	public String addTask(Task task) {
 		logger.log(Level.INFO, "Called addTask(Task task)");
-		task.setEdited(false);
 		if (task.getId() != null) {		
 			switch (task.getType()) {
 			case FLOATING:
@@ -444,6 +443,7 @@ public class Data {
 	 * @return 	           Feedback for UI
 	 */
 	public String addFloatingTask(FloatingTask floatingTask) {
+		floatingTask.setEdited(false);
 		tasks.add(floatingTask);
 		saveToPermanentStorage();
 		return String.format(Global.MESSAGE_ADDED, getTaskInDisplayFormat(floatingTask));
@@ -455,6 +455,7 @@ public class Data {
 	 * @return 	           Feedback for UI
 	 */
 	public String addDeadlineTask(DeadlineTask deadlineTask) {
+		deadlineTask.setEdited(false);
 		tasks.add(deadlineTask);
 		saveToPermanentStorage();
 		return String.format(Global.MESSAGE_ADDED, getTaskInDisplayFormat(deadlineTask));
@@ -466,6 +467,7 @@ public class Data {
 	 * @return 	           Feedback for UI
 	 */
 	public String addTimedTask(TimedTask timedTask) {	
+		timedTask.setEdited(false);
 		tasks.add(timedTask);
 		saveToPermanentStorage();
 		return getTaskInDisplayFormat(timedTask);
@@ -484,7 +486,7 @@ public class Data {
 		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
 			Task toChange = tasks.get(index);
 			floatingTask = new FloatingTask(task.getName());
-			floatingTask.setEdited(toChange.isEdited());
+			floatingTask.setEdited(false);
 			floatingTask.setDone(toChange.isDone());
 			deletedTasks.add(toChange);
 			tasks.remove(index);
@@ -495,7 +497,7 @@ public class Data {
 			if (task.getName() != null) {
 				floatingTask.setName(task.getName());
 			}
-			floatingTask.setEdited(true);
+			floatingTask.setEdited(false);
 		}
 		floatingTask.setUpdated(task.getUpdated());
 		saveToPermanentStorage();
@@ -516,7 +518,7 @@ public class Data {
 		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
 			Task toChange = tasks.get(index);
 			deadlineTask = new DeadlineTask(task.getName(),task.getEndDate());
-			deadlineTask.setEdited(tasks.get(index).isEdited());
+			deadlineTask.setEdited(false);
 			deadlineTask.setDone(tasks.get(index).isDone());
 			deadlineTask.setUpdated(task.getUpdated());
 			deletedTasks.add(toChange);
@@ -533,7 +535,7 @@ public class Data {
 			if (task.getEndDate() != null) {
 				deadlineTask.setEndDate(task.getEndDate());
 			}
-			deadlineTask.setEdited(true);
+			deadlineTask.setEdited(false);
 		}
 		deadlineTask.setUpdated(task.getUpdated());
 		saveToPermanentStorage();
@@ -553,7 +555,7 @@ public class Data {
 		TimedTask timedTask;
 		if (relatedTask.getType() != Task.TaskType.TIMED) {
 			timedTask = new TimedTask(task.getName(), task.getStartDate(), task.getEndDate());
-			timedTask.setEdited(relatedTask.isEdited());
+			timedTask.setEdited(false);
 			timedTask.setDone(relatedTask.isDone());
 			deletedTasks.add(relatedTask);
 			tasks.remove(index);
@@ -569,7 +571,7 @@ public class Data {
 			if (task.getEndDate() != null) {
 				timedTask.setEndDate(task.getEndDate());
 			}
-			timedTask.setEdited(true);
+			timedTask.setEdited(false);
 		}
 		timedTask.setUpdated(task.getUpdated());
 		saveToPermanentStorage();
