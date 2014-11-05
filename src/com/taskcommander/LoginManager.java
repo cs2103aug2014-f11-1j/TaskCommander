@@ -285,6 +285,7 @@ public class LoginManager implements Observer {
 
 	@Override
 	public void update(Observable obs, Object obj) {
+		logger.log(Level.INFO, "Login Manager updated, setting credential...");
 		credential.setFromTokenResponse(getTokenResponse((String) obj));
 		saveCredential();
 	}
