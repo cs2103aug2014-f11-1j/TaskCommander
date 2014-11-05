@@ -1,5 +1,6 @@
 package com.taskcommander;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 /**
  * Stores global variables for use in the program.
@@ -54,8 +55,8 @@ public class Global {
 
 	//@author A0128620M
 	// Global Date Format
-	public static final SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy");
-	public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+	public static final SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy", Locale.ENGLISH);
+	public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
 
 	//@author A0112828H
 	// Possible command types
