@@ -438,6 +438,7 @@ public class GoogleAPIConnector {
 		} else if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
+			logger.log(Level.INFO, "Trying to delete task");
 			try {
 				if (getTask(task) != null) {
 					Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
