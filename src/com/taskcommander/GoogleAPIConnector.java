@@ -17,6 +17,7 @@ import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.model.Task;
 import com.taskcommander.LoginManager;
 
+//@author A0112828H
 /**
  * This class is used to connect to the Google API and
  * invoke the Calendar and Tasks services.
@@ -39,6 +40,7 @@ public class GoogleAPIConnector {
 	private static final String OPERATION_DELETE = "delete";
 
 	private static final String PRIMARY_CALENDAR_ID = "primary";
+	private static final String DONE_CALENDAR_ID = "done";
 	private static final String PRIMARY_TASKS_ID = "@default";
 
 	private static GoogleAPIConnector instance;
@@ -98,7 +100,6 @@ public class GoogleAPIConnector {
 		return eventDataStore;
 	}
 
-	//@author A0112828H
 	/**
 	 * Returns all tasks.
 	 * @return All tasks.
@@ -117,8 +118,8 @@ public class GoogleAPIConnector {
 		}
 	}
 
+	//@author A0109194A
 	/**
-	 * @author A0109194A
 	 * Returns all Google Tasks
 	 * @return List of Google Tasks
 	 */
@@ -168,8 +169,8 @@ public class GoogleAPIConnector {
 		return null;
 	}
 
+	//@author A0109194A
 	/**
-	 * @author A0109194A
 	 * Returns a List object which holds a request that would be sent to Google
 	 * @return	List object
 	 */
@@ -184,7 +185,6 @@ public class GoogleAPIConnector {
 	}
 
 	/**
-	 * @author A0109194A
 	 * Gets all events from Calendar API starting from
 	 * current system time.
 	 * @return   Arraylist of TaskCommander Tasks.
@@ -218,7 +218,6 @@ public class GoogleAPIConnector {
 	}
 
 	/**
-	 * @author A0109194A
 	 * Returns all Events
 	 * @return List of Events
 	 */
@@ -235,7 +234,6 @@ public class GoogleAPIConnector {
 	}
 
 	/**
-	 * @author A0109194A
 	 * Returns a request for listing all the events from Google Calendar
 	 * @return A Google Calendar request
 	 */
@@ -277,7 +275,8 @@ public class GoogleAPIConnector {
 		return null;
 	}
 
-	/**@author A0109194A
+	//@author A0109194A
+	/**
 	 * Adds a Task to the Task API, given a DeadlineTask object.
 	 * Returns the Google ID if successful.
 	 * 
@@ -305,7 +304,6 @@ public class GoogleAPIConnector {
 		return null;
 	}
 
-	//@author A0109194A
 	/**
 	 * Adds an Event to the Calendar API, given a TimedTask object.
 	 * Returns the Google ID if successful.
@@ -399,6 +397,7 @@ public class GoogleAPIConnector {
 		return null;
 	}
 
+	//@author A0109194A
 	/**
 	 * Gets an event from the Calendar API, given a TimedTask object.
 	 * The given task must have a Google ID.
@@ -488,7 +487,8 @@ public class GoogleAPIConnector {
 		return false;
 	}
 
-	/**@author A0109194A
+	//@author A0109194A
+	/**
 	 * Deletes an event from the Calendar API, given a TimedTask object.
 	 * The given task must have a Google ID.
 	 * Returns true if successful. 
@@ -567,7 +567,8 @@ public class GoogleAPIConnector {
 		return false;
 	}
 
-	/**@author A0109194A
+	//@author A0109194A
+	/**
 	 * Updates an event from the Calendar API, given a TimedTask object.
 	 * The given task must have a Google ID.
 	 * Returns true if successful.  
