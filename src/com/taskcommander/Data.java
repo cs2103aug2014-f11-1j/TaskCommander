@@ -14,7 +14,7 @@ import com.taskcommander.Global.CommandType;
  * the task objects within the temporary list, for internal use and for the Google Integration
  * component.
  * 
- * Upon initialisation, the contents of the permanent storage will be pulled. After each 
+ * Upon initialization, the contents of the permanent storage will be pulled. After each 
  * command the data will be pushed to the permanent storage.
  */
 
@@ -66,8 +66,8 @@ public class Data {
 		return theOne;
 	}
 
-	//@author A0128620M, A0109194A
-	// CRUD methods used internally.
+	//@author A0128620M
+	// CRUD methods used internally (see methods used by Google Integration below)
 	// Add methods
 	/**
 	 * Adds a Floating Task to the tasks list.
@@ -152,7 +152,7 @@ public class Data {
 				name = relatedTask.getName();
 			}
 			floatingTask = new FloatingTask(name);
-			// floatingTask.setEdited(relatedTask.isEdited());  TODO: @Sean: do we need that?
+			floatingTask.setEdited(true); 
 			floatingTask.setDone(relatedTask.isDone());
 			deletedTasks.add(relatedTask);
 			tasks.remove(index);
@@ -197,7 +197,7 @@ public class Data {
 				name = relatedTask.getName();
 			}
 			deadlineTask = new DeadlineTask(name,endDate);
-			// deadlineTask.setEdited(relatedTask.isEdited());  TODO: @Sean: do we need that?
+			deadlineTask.setEdited(true);
 			deadlineTask.setDone(relatedTask.isDone());
 
 			deletedTasks.add(relatedTask);
@@ -247,7 +247,7 @@ public class Data {
 				name = relatedTask.getName();
 			}
 			timedTask = new TimedTask(name,startDate,endDate);
-			// timedTask.setEdited(tasks.get(index).isEdited());  TODO: @Sean: do we need that?
+			timedTask.setEdited(true);
 			timedTask.setDone(relatedTask.isDone());
 
 			deletedTasks.add(relatedTask);
@@ -402,7 +402,6 @@ public class Data {
 	public String clearTasks() {
 		ArrayList<Task> cleared = new ArrayList<Task>();
 		cleared.addAll(tasks);
-		deletedTasks.addAll(tasks);
 		clearedTasks.push(cleared);
 		tasks.clear();
 		saveToOperationHistory(Global.CommandType.CLEAR);
@@ -444,6 +443,7 @@ public class Data {
 	 * @return 	           Feedback for UI
 	 */
 	public String addFloatingTask(FloatingTask floatingTask) {
+		floatingTask.setEdited(false);
 		tasks.add(floatingTask);
 		saveToPermanentStorage();
 		return String.format(Global.MESSAGE_ADDED, getTaskInDisplayFormat(floatingTask));
@@ -455,6 +455,7 @@ public class Data {
 	 * @return 	           Feedback for UI
 	 */
 	public String addDeadlineTask(DeadlineTask deadlineTask) {
+		deadlineTask.setEdited(false);
 		tasks.add(deadlineTask);
 		saveToPermanentStorage();
 		return String.format(Global.MESSAGE_ADDED, getTaskInDisplayFormat(deadlineTask));
@@ -466,6 +467,7 @@ public class Data {
 	 * @return 	           Feedback for UI
 	 */
 	public String addTimedTask(TimedTask timedTask) {	
+		timedTask.setEdited(false);
 		tasks.add(timedTask);
 		saveToPermanentStorage();
 		return getTaskInDisplayFormat(timedTask);
@@ -484,7 +486,7 @@ public class Data {
 		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
 			Task toChange = tasks.get(index);
 			floatingTask = new FloatingTask(task.getName());
-			floatingTask.setEdited(toChange.isEdited());
+			floatingTask.setEdited(false);
 			floatingTask.setDone(toChange.isDone());
 			deletedTasks.add(toChange);
 			tasks.remove(index);
@@ -495,7 +497,7 @@ public class Data {
 			if (task.getName() != null) {
 				floatingTask.setName(task.getName());
 			}
-			floatingTask.setEdited(true);
+			floatingTask.setEdited(false);
 		}
 		floatingTask.setUpdated(task.getUpdated());
 		saveToPermanentStorage();
@@ -516,7 +518,7 @@ public class Data {
 		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
 			Task toChange = tasks.get(index);
 			deadlineTask = new DeadlineTask(task.getName(),task.getEndDate());
-			deadlineTask.setEdited(tasks.get(index).isEdited());
+			deadlineTask.setEdited(false);
 			deadlineTask.setDone(tasks.get(index).isDone());
 			deadlineTask.setUpdated(task.getUpdated());
 			deletedTasks.add(toChange);
@@ -533,7 +535,7 @@ public class Data {
 			if (task.getEndDate() != null) {
 				deadlineTask.setEndDate(task.getEndDate());
 			}
-			deadlineTask.setEdited(true);
+			deadlineTask.setEdited(false);
 		}
 		deadlineTask.setUpdated(task.getUpdated());
 		saveToPermanentStorage();
@@ -553,7 +555,7 @@ public class Data {
 		TimedTask timedTask;
 		if (relatedTask.getType() != Task.TaskType.TIMED) {
 			timedTask = new TimedTask(task.getName(), task.getStartDate(), task.getEndDate());
-			timedTask.setEdited(relatedTask.isEdited());
+			timedTask.setEdited(false);
 			timedTask.setDone(relatedTask.isDone());
 			deletedTasks.add(relatedTask);
 			tasks.remove(index);
@@ -569,7 +571,7 @@ public class Data {
 			if (task.getEndDate() != null) {
 				timedTask.setEndDate(task.getEndDate());
 			}
-			timedTask.setEdited(true);
+			timedTask.setEdited(false);
 		}
 		timedTask.setUpdated(task.getUpdated());
 		saveToPermanentStorage();
@@ -796,12 +798,12 @@ public class Data {
 			if (!isSearchedWordRestricted || containsSearchedWords) {	
 				// Step 2: Check if task status matches status restriction
 				if (checkStatusRestricted(isStatusRestricted, areDoneTasksDisplayed, task)) {
-					// Step 3: Process tasks by type
+					// Step 3: Process tasks by type and check date restrictions
 					switch (task.getType()) {
 					case FLOATING:
-						if (!isTaskTypeRestricted) {
+						if (!isTaskTypeRestricted && 
+								checkDateRestrictionForFloatingTask(isDateRestricted)) {
 							floatingTasks.add(new FloatingTask((FloatingTask) task));
-						// Step 4: Check for date restrictions
 						} else if (areFloatingTasksDisplayed && 
 								checkDateRestrictionForFloatingTask(isDateRestricted)) {
 							floatingTasks.add(new FloatingTask((FloatingTask) task));
@@ -809,7 +811,8 @@ public class Data {
 						break;
 					case DEADLINE:
 						DeadlineTask deadlineTask = (DeadlineTask) task;
-						if (!isTaskTypeRestricted) {
+						if (!isTaskTypeRestricted && 
+								checkDateRestrictionForDeadlineTask(isDateRestricted, startDate, endDate, deadlineTask)) {
 							datedTasks.add(deadlineTask);
 						} else if (areDeadlineTasksDisplayed && 
 								checkDateRestrictionForDeadlineTask(isDateRestricted, startDate, endDate, deadlineTask)) {
@@ -818,7 +821,8 @@ public class Data {
 						break;
 					case TIMED:
 						TimedTask timedTask = (TimedTask) task;
-						if (!isTaskTypeRestricted) {
+						if (!isTaskTypeRestricted && 
+								checkDateRestrictionForTimedTask(isDateRestricted, startDate, endDate, timedTask)) {
 							datedTasks.add(timedTask);
 						} else if (areTimedTasksDisplayed && 
 								checkDateRestrictionForTimedTask(isDateRestricted, startDate, endDate, timedTask)) {

@@ -1,6 +1,5 @@
 package com.taskcommander;
 import java.util.ArrayList;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -13,7 +12,7 @@ import com.joestelmach.natty.*;
 
 //@author A0128620M
 /**
- * Analyses the user's input and extracts values. Provides several methods to parse the user's
+ * Analyzes the user's input and extracts values. Provides several methods to parse the user's
  * command and extract the command type and its related command parameters like index, name or 
  * date, etc.
  */
@@ -24,10 +23,10 @@ public class Parser {
 	// Constructor, Variables and Logger
 	private static Logger logger = Logger.getLogger(Parser.class.getName());
 	
-	private static final String MESSAGE_NO_COMMANDTYPE = "No command type found.";
-	private static final String MESSAGE_NO_TASKNAME = "No task name found.";
-	private static final String MESSAGE_NO_INDEX = "No index found.";
-	private static final String MESSAGE_NO_DATETIMES = "No dateTimes found.";
+	private static final String MESSAGE_NO_COMMANDTYPE = "User command doesn't contain a command type.";
+	private static final String MESSAGE_NO_TASKNAME = "User command doesn't contain a task name.";
+	private static final String MESSAGE_NO_INDEX = "User command doesn't contain an index.";
+	private static final String MESSAGE_NO_DATETIMES = "User command doesn't contain any dateTimes.";
 
 	// Singleton instance for Data
 	private static Parser theOne;
@@ -63,13 +62,11 @@ public class Parser {
 		try {
 			commandTypeString = getFirstWord(userCommand);
 		} catch (Exception e) {
-			logger.log(Level.INFO, MESSAGE_NO_COMMANDTYPE, e);
+			logger.log(Level.INFO, MESSAGE_NO_COMMANDTYPE);
 			return Global.CommandType.INVALID;
 		}
 
-		if (commandTypeString.equalsIgnoreCase("help")) {
-			return Global.CommandType.HELP;
-		} else if (commandTypeString.equalsIgnoreCase("add")) {
+		if (commandTypeString.equalsIgnoreCase("add")) {
 			return Global.CommandType.ADD;
 		} else if (commandTypeString.equalsIgnoreCase("update")) {
 			return Global.CommandType.UPDATE;
@@ -111,7 +108,7 @@ public class Parser {
 		try {
 			return getQuotedSubstring(userCommand);
 		} catch (Exception e) {
-			logger.log(Level.INFO, MESSAGE_NO_TASKNAME, e);
+			logger.log(Level.INFO, MESSAGE_NO_TASKNAME);
 			return null;
 		}
 	}
@@ -139,7 +136,7 @@ public class Parser {
 		try {
 			dateTimes = getDateTimes(userCommandWithoutIndex);
 		} catch (Exception e) {
-			logger.log(Level.INFO, MESSAGE_NO_DATETIMES, e);
+			logger.log(Level.INFO, MESSAGE_NO_DATETIMES);
 			return null;
 		}
 		checkDateContinuesToNextDay(dateTimes);
@@ -180,7 +177,7 @@ public class Parser {
 			try {
 				result = removeSecondWord(userCommand);
 			} catch (Exception e) {
-				logger.log(Level.INFO, MESSAGE_NO_INDEX, e);
+				logger.log(Level.INFO, MESSAGE_NO_INDEX);
 				return null;
 			}
 		} else {
@@ -211,7 +208,7 @@ public class Parser {
 				return INVALID_INDEX;
 			}
 		} catch (Exception e) {
-			logger.log(Level.INFO, MESSAGE_NO_INDEX, e);
+			logger.log(Level.INFO, MESSAGE_NO_INDEX);
 			return INVALID_INDEX;
 		} 
 	}
@@ -232,7 +229,7 @@ public class Parser {
 		try {
 			userCommandWithoutCommandType = removeFirstWord(userCommand);
 		} catch (Exception e) {
-			logger.log(Level.INFO, MESSAGE_NO_COMMANDTYPE, e);
+			logger.log(Level.INFO, MESSAGE_NO_COMMANDTYPE);
 			return null;
 		}
 
@@ -266,7 +263,7 @@ public class Parser {
 		try {
 			userCommandWithoutTaskName = removeQuotedSubstring(userCommand);
 		} catch (Exception e) {
-			logger.log(Level.INFO, MESSAGE_NO_TASKNAME, e);
+			logger.log(Level.INFO, MESSAGE_NO_TASKNAME);
 			userCommandWithoutTaskName = userCommand;
 		}
 		return userCommandWithoutTaskName.matches(".*\\b" + parameter + "\\b.*");
