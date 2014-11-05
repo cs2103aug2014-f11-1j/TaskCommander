@@ -17,10 +17,10 @@ import com.google.gson.GsonBuilder;
 
 //@author A0112828H
 public class Storage {
-	
+
 	private static String _fileName = Global.FILENAME;
 	private static Gson gson;
-	
+
 	/**
 	 * Returns a Storage object.
 	 */
@@ -29,7 +29,7 @@ public class Storage {
 		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
 		gson = gsonBuilder.create();
 	}
-	
+
 	/**
 	 * Returns the contents of the file as an arraylist of Tasks.
 	 */
@@ -50,20 +50,22 @@ public class Storage {
 		} 
 		return new ArrayList<Task>();
 	}
-	
+
 	/**
 	 * Writes the content of the data array into storage.
 	 */
 	public void writeToFile(ArrayList<Task> tasks){
 		BufferedWriter bw;
 		try {
-		  bw = new BufferedWriter(new FileWriter(new File(_fileName)));
-		  
-		  for (Task t : tasks) {
-			  bw.write(gson.toJson(t));
-			  bw.newLine();
-		  }
-		  bw.close();
+			bw = new BufferedWriter(new FileWriter(new File(_fileName)));
+
+			for (Task t : tasks) {
+				if (t != null) {
+					bw.write(gson.toJson(t));
+					bw.newLine();
+				}
+			}
+			bw.close();
 		} catch (Exception e) {
 			System.out.println(Global.MESSAGE_EXCEPTION_IO);
 		}

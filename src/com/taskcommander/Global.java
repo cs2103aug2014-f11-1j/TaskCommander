@@ -1,5 +1,6 @@
 package com.taskcommander;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 /**
  * Stores global variables for use in the program.
@@ -25,7 +26,7 @@ public class Global {
 	public static final String MESSAGE_UNDONE = "Undone latest command: %1$s.";
 	public static final String MESSAGE_INVALID_FORMAT = "Invalid command format: %1$s. " + "Type 'help' to see the list of commands.";
 	public static final String MESSAGE_NO_COMMAND = "No command given.";
-	public static final String MESSAGE_NO_INDEX = "Index %1$s does not exist. Please type a valid index.";
+	public static final String MESSAGE_NO_INDEX = "Index does not exist. Please type a valid index.";
 	public static final String MESSAGE_NULL_ID = "Task has no ID.";
 	public static final String MESSAGE_EMPTY = "No tasks available";
 	public static final String MESSAGE_UNDO_EMPTY = "No commands to undo";
@@ -54,8 +55,8 @@ public class Global {
 
 	//@author A0128620M
 	// Global Date Format
-	public static final SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy");
-	public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+	public static final SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy", Locale.ENGLISH);
+	public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
 
 	//@author A0112828H
 	// Possible command types

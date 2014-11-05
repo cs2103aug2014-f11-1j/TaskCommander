@@ -4,6 +4,7 @@ import com.google.api.services.calendar.model.Event;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Observable;
 import java.util.Stack;
@@ -42,9 +43,8 @@ public class SyncHandler extends Observable {
 	}
 
 	/**
-	 * Syncs the tasks in memory to Google. Checks if
-	 * tasks have been edited since previous sync and
-	 * executes respective function.
+	 * Syncs the tasks in memory to Google. Checks if tasks have been edited 
+	 * since previous sync and executes respective functions.
 	 * @return   Feedback for user
 	 */
 	public String sync() {
@@ -61,24 +61,28 @@ public class SyncHandler extends Observable {
 			}
 		};
 		Thread thread = new Thread() {
+			long startTime = System.currentTimeMillis(); // gets current system time
+			long endTime = 0;
 			@Override
 			public void run() {
+				logger.log(Level.INFO, "Waiting for login...");
 				while (!con.getServices()) {
 					try {
-						logger.log(Level.WARNING, "Waiting for login...");
 						sleep(10);  // milliseconds
+						endTime = System.currentTimeMillis();
 					} catch (InterruptedException e) {
 						logger.log(Level.WARNING, "Error while trying to sleep in SyncHandler", e);
 					}
 				}
 
-				push();
-				try {
-					pull();
-				} catch (Exception e) {
-					logger.log(Level.WARNING, Global.MESSAGE_SYNC_FAILED, e);
-				}
-				resetSyncState();
+					logger.log(Level.INFO, "Trying to sync...");
+					push();
+					try {
+						pull();
+						resetSyncState(SyncState.DONE);
+					} catch (Exception e) {
+						logger.log(Level.WARNING, Global.MESSAGE_SYNC_FAILED, e);
+					}
 			}
 		};
 		thread.setUncaughtExceptionHandler(h);
@@ -93,7 +97,8 @@ public class SyncHandler extends Observable {
 		Stack<Task> preupdatedTasks = TaskCommander.data.getPreupdatedTasks();
 		Stack<ArrayList<Task>> clearedTasks = TaskCommander.data.getClearedTasks();
 		logger.log(Level.INFO, "PUSH: Retrieved All Tasks");
-		startSyncState(SyncState.PUSH, tasks.size() + deletedTasks.size());
+		startSyncState(SyncState.PUSH, tasks.size() + deletedTasks.size() + 
+				preupdatedTasks.size() + clearedTasks.size());
 
 		//Handle Added Cases
 		for (Task t : tasks) {
@@ -103,7 +108,7 @@ public class SyncHandler extends Observable {
 					if (result != null) {
 						t.setId(result);
 					}
-				} else {
+				} else if (t.isEdited()) {
 					con.updateTask(t);
 				}
 			}
@@ -124,6 +129,7 @@ public class SyncHandler extends Observable {
 				con.deleteTask(t);
 			}
 		}
+
 
 		// Delete tasks that were cleared
 		for (ArrayList<Task> list : clearedTasks) {
@@ -148,12 +154,17 @@ public class SyncHandler extends Observable {
 		List<Event> googleEvents = con.getAllGoogleEvents();
 		ArrayList<String> taskIds = TaskCommander.data.getAllIds();
 		logger.log(Level.INFO, "PULL: Retrieved All Tasks");
-		startSyncState(SyncState.PULL, tasksToSync.size() + tasks.size() + googleTasks.size() + googleEvents.size());
+		startSyncState(SyncState.PULL, tasksToSync.size() + tasks.size() + 
+				googleTasks.size() + googleEvents.size());
 
 		//Added case
 		//For Tasks
 		for (com.google.api.services.tasks.model.Task task : googleTasks) {
+<<<<<<< HEAD
 			if (!taskIds.contains(task.getId()) && task.getDeleted() == null) {
+=======
+			if (!taskIds.contains(task.getId()) && task.getDeleted() != null && task.getTitle() != null) {
+>>>>>>> b003441329cf2a910bc4312b6c53873cb6ba91ee
 				TaskCommander.data.addTask(con.toTask(task));
 			}
 			updateTasksComplete(tasksComplete+1);
@@ -169,11 +180,11 @@ public class SyncHandler extends Observable {
 
 		logger.log(Level.INFO, "PULL: Handled Added Tasks");
 
+		tasks = TaskCommander.data.getAllTasks();
+		taskIds = TaskCommander.data.getAllIds();
+
 		//Updated cases
 		for (Task t: tasksToSync) {
-			tasks = TaskCommander.data.getAllTasks();
-			taskIds = TaskCommander.data.getAllIds();
-
 			int index = taskIds.indexOf(t.getId());
 			if (index == -1) {
 				continue;
@@ -198,10 +209,14 @@ public class SyncHandler extends Observable {
 		//Deleted case
 		//For Tasks
 		for (com.google.api.services.tasks.model.Task t : googleTasks) {
+<<<<<<< HEAD
 			tasks = TaskCommander.data.getAllTasks();
 			taskIds = TaskCommander.data.getAllIds();
 
 			if (t.getDeleted() != null) {
+=======
+			if (t.getDeleted() == null) {
+>>>>>>> b003441329cf2a910bc4312b6c53873cb6ba91ee
 				int index = taskIds.indexOf(t.getId());
 				if (index == -1) {
 					continue;
@@ -241,15 +256,16 @@ public class SyncHandler extends Observable {
 	}
 
 	private void startSyncState(SyncState state, int total) {
+		logger.log(Level.INFO, "Starting sync state " + state + " with " + total + " tasks.");
 		syncState = state;
 		tasksTotal = total;
 		tasksComplete = 0;
 		updateSyncMessage();
 	}
 
-	private void resetSyncState() {
+	private void resetSyncState(SyncState state) {
 		Global.syncing = false;
-		syncState = SyncState.DONE;
+		syncState = state;
 		tasksTotal = 0;
 		tasksComplete = 0;
 		updateSyncMessage();
@@ -274,7 +290,7 @@ public class SyncHandler extends Observable {
 	}
 
 	/**
-	 * @return
+	 * Returns the percentage of task completion as a float.
 	 */
 	private float getTaskCompletion() {
 		if (tasksTotal == 0) {

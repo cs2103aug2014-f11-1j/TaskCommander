@@ -201,12 +201,8 @@ public class Parser {
 
 		try {
 			String indexString = getSecondWord(userCommand);
-			int indexInteger = Integer.parseInt(indexString); 
-			if (indexInteger > 0) {
-				return indexInteger;
-			} else {
-				return INVALID_INDEX;
-			}
+			int indexInteger = Integer.parseInt(indexString);
+			return indexInteger;
 		} catch (Exception e) {
 			logger.log(Level.INFO, MESSAGE_NO_INDEX);
 			return INVALID_INDEX;

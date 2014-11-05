@@ -362,11 +362,16 @@ public class UI extends Observable implements Observer {
 				if(event.title.contains("Success")) {
 					logger.log(Level.INFO, "Success "+event.title);
 					setCode(event.title.replace("Success code=", ""));
-					tabFolder.setSelection(mainTab);
-					tabFolder.getItem(TAB_BROWSER_INDEX).dispose();
+					closeBrowserTab();
 				}
 			}
 		});
+	}
+
+	// Closes browser tab and resets focus to main tab.
+	private void closeBrowserTab() {
+		tabFolder.setSelection(mainTab);
+		tabFolder.getItem(TAB_BROWSER_INDEX).dispose();
 	}
 
 	/**
@@ -400,6 +405,9 @@ public class UI extends Observable implements Observer {
 		shell.open();
 		while (!shell.isDisposed()) {
 			if (!Global.syncing && !input.getEditable()) {
+				if (tabFolder.getItemCount() == 3) { // Tab folder has 3 tabs -> browser tab is open
+					closeBrowserTab();
+				}
 				// Accept user input when not syncing
 				input.setEditable(true);
 				updateDisplay();

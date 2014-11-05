@@ -171,8 +171,10 @@ public class Controller {
 		}
 
 		int indexOfRelatedTaskInDisplayedTasks = TaskCommander.parser.determineIndex(userCommand) - Global.INDEX_OFFSET;
+		System.out.println("Index is:");
+		System.out.println(indexOfRelatedTaskInDisplayedTasks);
 		if (isIndexDisplayedTasksInvalid(indexOfRelatedTaskInDisplayedTasks)) {
-			return String.format(Global.MESSAGE_NO_INDEX, indexOfRelatedTaskInDisplayedTasks + Global.INDEX_OFFSET);
+			return Global.MESSAGE_NO_INDEX;
 		}
 
 		Task relatedTask = displayedTasks.get(indexOfRelatedTaskInDisplayedTasks);
@@ -244,7 +246,6 @@ public class Controller {
 					isTaskTypeRestricted, areFloatingTasksDisplayed, areDeadlineTasksDisplayed, areTimedTasksDisplayed, 
 					isStatusRestricted, areDoneTasksDisplayed, areOpenTasksDisplayed, isSearchRestricted, searchedWordsAndPhrases);
 		}
-		logger.log(Level.INFO, "tasks"+ displayedTasks.toString());
 		return displayedTasks;
 	}
 
@@ -441,35 +442,47 @@ public class Controller {
 		} else {
 			displaySettingsDescription = "";
 			if (isDateRestricted) {
-				displaySettingsDescription += "Date: ["+ Global.dayFormat.format(startDateRestriction)+ " " +
-						Global.timeFormat.format(startDateRestriction)+ "-"+ Global.timeFormat.format(endDateRestriction) + "]  ";
+				if (startDateRestriction == null) {
+					displaySettingsDescription += "Date: by "+ Global.dayFormat.format(endDateRestriction)+ " " + Global.timeFormat.format(endDateRestriction);
+				} else {
+					displaySettingsDescription += "Date: "+ Global.dayFormat.format(startDateRestriction)+ " " +
+							Global.timeFormat.format(startDateRestriction)+ " - "+ Global.dayFormat.format(endDateRestriction)+ " " + Global.timeFormat.format(endDateRestriction);
+				}
 			}
 			if (isTaskTypeRestricted) {
+				if (!displaySettingsDescription.equals("")) {
+					displaySettingsDescription += " ";
+				}
 				displaySettingsDescription += "Type: ";
 				if (areFloatingTasksDisplayed) {
-					displaySettingsDescription += "None";
+					displaySettingsDescription += "none";
 				}
 				if (areDeadlineTasksDisplayed && !areFloatingTasksDisplayed) {
-					displaySettingsDescription += "Deadline";
+					displaySettingsDescription += "deadline";
 				} else if (areDeadlineTasksDisplayed) {
-					displaySettingsDescription += ", Deadline";
+					displaySettingsDescription += ", deadline";
 				}
 				if (areTimedTasksDisplayed && !areFloatingTasksDisplayed && !areDeadlineTasksDisplayed) {
-					displaySettingsDescription += "Timed ";
+					displaySettingsDescription += "timed";
 				} else if (areTimedTasksDisplayed) {
-					displaySettingsDescription += ", Timed";
+					displaySettingsDescription += ", timed";
 				}
-				displaySettingsDescription += " ";
 			}
 			if (isStatusRestricted) {
+				if (!displaySettingsDescription.equals("")) {
+					displaySettingsDescription += " ";
+				}
 				displaySettingsDescription += "Status: ";
 				if (areDoneTasksDisplayed) {
-					displaySettingsDescription += "Done ";
+					displaySettingsDescription += "done";
 				} else {
-					displaySettingsDescription += "Open ";
+					displaySettingsDescription += "open";
 				}
 			}
 			if (isSearchRestricted) {
+				if (!displaySettingsDescription.equals("")) {
+					displaySettingsDescription += " ";
+				}
 				for(String searchedWordOrPhrase : searchedWordsAndPhrases) {
 					if (displaySettingsDescription.equals("")) {
 						displaySettingsDescription = "Words/Phrases: "+"\""+searchedWordOrPhrase+"\"";
