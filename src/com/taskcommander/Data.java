@@ -420,6 +420,7 @@ public class Data {
 	 */
 	public String addTask(Task task) {
 		logger.log(Level.INFO, "Called addTask(Task task)");
+		task.setEdited(false);
 		if (task.getId() != null) {		
 			switch (task.getType()) {
 			case FLOATING:
