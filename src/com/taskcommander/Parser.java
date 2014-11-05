@@ -224,9 +224,9 @@ public class Parser {
 
 		while (matcher.find()) {
 			if (matcher.group(1) != null) {
-				searchedWords.add(matcher.group(1)); // Phrase in double quotes
+				searchedWords.add(matcher.group(1)); 	// Phrase in double quotes
 			} else {
-				searchedWords.add(matcher.group()); // Single word
+				searchedWords.add(matcher.group()); 	// Single word
 			}
 		}
 		return searchedWords;
