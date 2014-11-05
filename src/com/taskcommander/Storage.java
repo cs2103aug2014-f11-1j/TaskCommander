@@ -41,7 +41,9 @@ public class Storage {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				Task task = gson.fromJson(line, Task.class);
-				tasks.add(task);
+				if (task != null) {
+					tasks.add(task);
+				}
 			}
 			reader.close();
 			return tasks;
@@ -53,11 +55,12 @@ public class Storage {
 
 	/**
 	 * Writes the content of the data array into storage.
+	 * Will replace any existing content in the storage file.
 	 */
 	public void writeToFile(ArrayList<Task> tasks){
 		BufferedWriter bw;
 		try {
-			bw = new BufferedWriter(new FileWriter(new File(_fileName)));
+			bw = new BufferedWriter(new FileWriter(new File(_fileName), false));
 
 			for (Task t : tasks) {
 				if (t != null) {
