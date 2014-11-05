@@ -29,8 +29,8 @@ public class SyncHandler extends Observable {
 	private static GoogleAPIConnector con = null;
 	private static final Logger logger = Logger.getLogger(SyncHandler.class.getName());
 
-	private static final String MESSAGE_SYNC_PUSH = "Sending data to Google... %1$s/%2$s completed.";
-	private static final String MESSAGE_SYNC_PULL = "Getting data from Google... %1$s/%2$s completed.";
+	private static final String MESSAGE_SYNC_PUSH = "Sending data to Google... %.2f percent completed.";
+	private static final String MESSAGE_SYNC_PULL = "Getting data from Google... %.2f percent completed.";
 	private static final String MESSAGE_SYNC_DONE = "Sync completed.";
 
 	public int tasksTotal;
@@ -94,7 +94,7 @@ public class SyncHandler extends Observable {
 		Stack<ArrayList<Task>> clearedTasks = TaskCommander.data.getClearedTasks();
 		logger.log(Level.INFO, "PUSH: Retrieved All Tasks");
 		startSyncState(SyncState.PUSH, tasks.size() + deletedTasks.size());
-		
+
 		//Handle Added Cases
 		for (Task t : tasks) {
 			if (!t.isSynced()) {
@@ -117,14 +117,14 @@ public class SyncHandler extends Observable {
 				con.deleteTask(t);
 			}
 		}
-		
+
 		// Delete tasks that were updated
 		for (Task t: preupdatedTasks) {
 			if (t.getId() != null) {
 				con.deleteTask(t);
 			}
 		}
-		
+
 		// Delete tasks that were cleared
 		for (ArrayList<Task> list : clearedTasks) {
 			for (Task t : list) {
@@ -133,7 +133,7 @@ public class SyncHandler extends Observable {
 				}
 			}
 		}
-		
+
 		logger.log(Level.INFO, "PUSH: Handled Deleted Cases");
 		logger.log(Level.INFO, "PUSH: End Push");
 	}
@@ -156,15 +156,17 @@ public class SyncHandler extends Observable {
 			if (!taskIds.contains(task.getId()) && task.getDeleted() != null) {
 				TaskCommander.data.addTask(con.toTask(task));
 			}
+			updateTasksComplete(tasksComplete+1);
 		}
-		
+
 		//For Events
 		for (Event event: googleEvents) {
 			if (!taskIds.contains(event.getId()) && !event.getStatus().equals(STATUS_CANCELLED)) {
 				TaskCommander.data.addTask(con.toTask(event));
 			}
+			updateTasksComplete(tasksComplete+1);
 		}
-		
+
 		logger.log(Level.INFO, "PULL: Handled Added Tasks");
 
 		//Updated cases
@@ -189,9 +191,10 @@ public class SyncHandler extends Observable {
 					break;
 				}		
 			}
+			updateTasksComplete(tasksComplete+1);
 		}
 		logger.log(Level.INFO, "PULL: Handled Updated Cases");
-		
+
 		//Deleted case
 		//For Tasks
 		for (com.google.api.services.tasks.model.Task t : googleTasks) {
@@ -206,10 +209,11 @@ public class SyncHandler extends Observable {
 					TaskCommander.data.deleteFromGoogle(index);
 				}
 			}
+			updateTasksComplete(tasksComplete+1);
 		}
-		
+
 		logger.log(Level.INFO, "PULL: Handled Deleted Google Tasks");
-		
+
 		//Deleted Case For Events
 		for (Event event : googleEvents) {
 			tasks = TaskCommander.data.getAllTasks();
@@ -223,6 +227,7 @@ public class SyncHandler extends Observable {
 					TaskCommander.data.deleteFromGoogle(index);
 				}
 			}
+			updateTasksComplete(tasksComplete+1);
 		}
 		logger.log(Level.INFO, "PULL: Handled Deleted Google Events");
 		logger.log(Level.INFO, "PULL: End Pull");
@@ -257,14 +262,25 @@ public class SyncHandler extends Observable {
 			message = MESSAGE_SYNC_DONE;
 			break;
 		case PUSH:
-			message = String.format(MESSAGE_SYNC_PUSH, tasksComplete, tasksTotal);
+			message = String.format(MESSAGE_SYNC_PUSH, getTaskCompletion());
 			break;
 		case PULL:
-			message = String.format(MESSAGE_SYNC_PULL, tasksComplete, tasksTotal);
+			message = String.format(MESSAGE_SYNC_PULL, getTaskCompletion());
 			break;
 		}
 
 		setChanged();
 		notifyObservers(message);
+	}
+
+	/**
+	 * @return
+	 */
+	private float getTaskCompletion() {
+		if (tasksTotal == 0) {
+			return 0;
+		} else {
+			return (float) tasksComplete / (float) tasksTotal * (float) 100;
+		}
 	}
 }

@@ -143,7 +143,7 @@ public class Data {
 		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
 			return String.format(Global.MESSAGE_ARGUMENTS_INVALID, index);
 		}
-		
+
 		Task relatedTask = tasks.get(index);
 		FloatingTask floatingTask;
 
@@ -788,37 +788,45 @@ public class Data {
 		boolean containsSearchedWords = false;
 
 		for (Task task: tasks) {
-			// Step 1: Check SearchedWords
+			// Step 1: Check if task contains search keywords
 			if (isSearchedWordRestricted) {
 				containsSearchedWords = checkStringForWords(searchedWords, task.getName()); 
 			}
 
 			if (!isSearchedWordRestricted || containsSearchedWords) {	
-				// Step 2: Check Status
+				// Step 2: Check if task status matches status restriction
 				if (checkStatusRestricted(isStatusRestricted, areDoneTasksDisplayed, task)) {
-					// Step 3: Check Type
-					if (isTaskTypeRestricted) {
-						if(task.getType() == Task.TaskType.FLOATING && areFloatingTasksDisplayed) {
-							// Step 4: Check DatePeriod
-							if (checkDateRestrictionForFloatingTask(isDateRestricted)) { 	
-								floatingTasks.add(new FloatingTask((FloatingTask) task));
-							}
-						} else if (task.getType() == Task.TaskType.DEADLINE && areDeadlineTasksDisplayed) { 	
-							DeadlineTask deadlineTask = (DeadlineTask) task;
-							if (checkDateRestrictionForDeadlineTask(isDateRestricted, startDate, endDate, deadlineTask)) { 
-								datedTasks.add(new DeadlineTask((DeadlineTask) task));
-							}
-						} else if (task.getType() == Task.TaskType.TIMED && areTimedTasksDisplayed) {
-							TimedTask timedTask = (TimedTask) task;
-							if (checkDateRestrictionForTimedTask(isDateRestricted, startDate, endDate, timedTask)) {
-								datedTasks.add(new TimedTask((TimedTask) task));
-							}
-						}		
-					} else {
-						//TODO: Task type not restricted 
-						//TODO: Add all tasks?
+					// Step 3: Process tasks by type
+					switch (task.getType()) {
+					case FLOATING:
+						if (!isTaskTypeRestricted) {
+							floatingTasks.add(new FloatingTask((FloatingTask) task));
+						// Step 4: Check for date restrictions
+						} else if (areFloatingTasksDisplayed && 
+								checkDateRestrictionForFloatingTask(isDateRestricted)) {
+							floatingTasks.add(new FloatingTask((FloatingTask) task));
+						}
+						break;
+					case DEADLINE:
+						DeadlineTask deadlineTask = (DeadlineTask) task;
+						if (!isTaskTypeRestricted) {
+							datedTasks.add(deadlineTask);
+						} else if (areDeadlineTasksDisplayed && 
+								checkDateRestrictionForDeadlineTask(isDateRestricted, startDate, endDate, deadlineTask)) {
+							datedTasks.add(deadlineTask);
+						}
+						break;
+					case TIMED:
+						TimedTask timedTask = (TimedTask) task;
+						if (!isTaskTypeRestricted) {
+							datedTasks.add(timedTask);
+						} else if (areTimedTasksDisplayed && 
+								checkDateRestrictionForTimedTask(isDateRestricted, startDate, endDate, timedTask)) {
+							datedTasks.add(timedTask);
+						}
+						break;
 					}
-				}	
+				}
 			}
 		}
 		Collections.sort(floatingTasks);
@@ -922,7 +930,7 @@ public class Data {
 	public Stack<Task> getPreupdatedTasks() {
 		return preupdatedTasks;
 	}
-	
+
 	public Stack<ArrayList<Task>> getClearedTasks() {
 		return clearedTasks;
 	}

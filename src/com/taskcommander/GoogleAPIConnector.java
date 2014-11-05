@@ -31,6 +31,7 @@ public class GoogleAPIConnector {
 	private static final String MESSAGE_SERVICES_NULL = "Services null, getting services.";
 	private static final String MESSAGE_NULL_TASK = "Null task given.";
 	private static final String MESSAGE_NO_ID = "Task has not been synced to Google API.";
+	private static final String MESSAGE_NOT_FOUND = "Task was not found.";
 
 	private static final String OPERATION_GET = "get";
 	private static final String OPERATION_ADD = "add";
@@ -438,11 +439,14 @@ public class GoogleAPIConnector {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
 			try {
-				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
-				request.execute();
-				return (getTask(task) == null);
+				if (getTask(task) != null) {
+					Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
+					request.execute();
+					return (getTask(task) == null);
+				}
 			} catch (IOException e) {
-				if (e.getMessage().contains("404 Not Found")) {
+				if (e.getMessage().contains("404 Not Found") || e.getMessage().contains("410 Gone")) {
+					logger.log(Level.INFO, MESSAGE_NOT_FOUND);
 					return true;
 				} else {
 					logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_DELETE), e);

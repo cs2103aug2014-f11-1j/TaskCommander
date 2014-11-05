@@ -250,7 +250,7 @@ public class Controller {
 					isTaskTypeRestricted, areFloatingTasksDisplayed, areDeadlineTasksDisplayed, areTimedTasksDisplayed, 
 					isStatusRestricted, areDoneTasksDisplayed, areOpenTasksDisplayed, isSearchRestricted, searchedWordsAndPhrases);
 		}
-
+		logger.log(Level.INFO, "tasks"+ displayedTasks.toString());
 		return displayedTasks;
 	}
 
