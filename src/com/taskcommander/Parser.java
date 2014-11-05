@@ -102,9 +102,11 @@ public class Parser {
 			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
 			return null;
 		}
-
+		
+		String userCommandWithoutCommandType = removeCommandType(userCommand);
+		
 		try {
-			return getQuotedSubstring(userCommand);
+			return getQuotedSubstring(userCommandWithoutCommandType);
 		} catch (Exception e) {
 			logger.log(Level.INFO, MESSAGE_NO_TASKNAME);
 			return null;

@@ -1,10 +1,13 @@
 package automatedTestDriver.Parser;
 import static org.junit.Assert.*;
+
 import java.util.Arrays;
 import java.util.Collection;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
 import com.taskcommander.TaskCommander;
 
 //@author A0128620M
@@ -48,7 +51,7 @@ public class ContainsParameterTest {
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
 		String commandType = "update";
-		String taskName = "meeting";
+		String taskName = "\"meeting\"";
 		String searchedString = "none";
 		String stringExactlyContainingSearchedString = "none timed";
 		String stringNotExactlyContainingSearchedString = "nonetimed";
