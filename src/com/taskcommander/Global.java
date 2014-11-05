@@ -79,7 +79,8 @@ public class Global {
 	public static enum SyncState {
 		PUSH,
 		PULL,
-		DONE
+		DONE,
+		FAILED
 	}
 	
 	// Name of Storage File

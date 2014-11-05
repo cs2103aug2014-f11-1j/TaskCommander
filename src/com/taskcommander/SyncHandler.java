@@ -33,6 +33,7 @@ public class SyncHandler extends Observable {
 	private static final String MESSAGE_SYNC_PUSH = "Sending data to Google... %.2f%% completed.";
 	private static final String MESSAGE_SYNC_PULL = "Getting data from Google... %.2f%% completed.";
 	private static final String MESSAGE_SYNC_DONE = "Sync completed.";
+	private static final String MESSAGE_SYNC_FAILED = "Sync failed, please try again.";
 
 	public int tasksTotal;
 	public int tasksComplete;
@@ -58,31 +59,29 @@ public class SyncHandler extends Observable {
 			public void uncaughtException(Thread th, Throwable ex) {
 				logger.log(Level.WARNING, Global.MESSAGE_SYNC_FAILED, ex);
 				th.interrupt();
+				resetSyncState(SyncState.FAILED);
 			}
 		};
 		Thread thread = new Thread() {
-			long startTime = System.currentTimeMillis(); // gets current system time
-			long endTime = 0;
 			@Override
 			public void run() {
 				logger.log(Level.INFO, "Waiting for login...");
 				while (!con.getServices()) {
 					try {
 						sleep(10);  // milliseconds
-						endTime = System.currentTimeMillis();
 					} catch (InterruptedException e) {
 						logger.log(Level.WARNING, "Error while trying to sleep in SyncHandler", e);
 					}
 				}
 
-					logger.log(Level.INFO, "Trying to sync...");
-					push();
-					try {
-						pull();
-						resetSyncState(SyncState.DONE);
-					} catch (Exception e) {
-						logger.log(Level.WARNING, Global.MESSAGE_SYNC_FAILED, e);
-					}
+				logger.log(Level.INFO, "Trying to sync...");
+				push();
+				try {
+					pull();
+					resetSyncState(SyncState.DONE);
+				} catch (Exception e) {
+					logger.log(Level.WARNING, Global.MESSAGE_SYNC_FAILED, e);
+				}
 			}
 		};
 		thread.setUncaughtExceptionHandler(h);
@@ -154,90 +153,122 @@ public class SyncHandler extends Observable {
 		List<Event> googleEvents = con.getAllGoogleEvents();
 		ArrayList<String> taskIds = TaskCommander.data.getAllIds();
 		logger.log(Level.INFO, "PULL: Retrieved All Tasks");
-		startSyncState(SyncState.PULL, tasksToSync.size() + tasks.size() + 
-				googleTasks.size() + googleEvents.size());
+		startSyncState(SyncState.PULL, getTotalTasks(tasksToSync, tasks, googleTasks, googleEvents));
 
 		//Added case
 		//For Tasks
-		for (com.google.api.services.tasks.model.Task task : googleTasks) {
-			if (!taskIds.contains(task.getId()) && task.getDeleted() == null) {
-				TaskCommander.data.addTask(con.toTask(task));
+		if (googleTasks != null) {
+			for (com.google.api.services.tasks.model.Task task : googleTasks) {
+				if (!taskIds.contains(task.getId()) && task.getDeleted() == null) {
+					TaskCommander.data.addTask(con.toTask(task));
+				}
+				updateTasksComplete(tasksComplete+1);
 			}
-			updateTasksComplete(tasksComplete+1);
 		}
 
-		//For Events
-		for (Event event: googleEvents) {
-			if (!taskIds.contains(event.getId()) && !event.getStatus().equals(STATUS_CANCELLED)) {
-				TaskCommander.data.addTask(con.toTask(event));
+		if (googleEvents != null) {
+			//For Events
+			for (Event event: googleEvents) {
+				if (!taskIds.contains(event.getId()) && !event.getStatus().equals(STATUS_CANCELLED)) {
+					TaskCommander.data.addTask(con.toTask(event));
+				}
+				updateTasksComplete(tasksComplete+1);
 			}
-			updateTasksComplete(tasksComplete+1);
 		}
 
 		logger.log(Level.INFO, "PULL: Handled Added Tasks");
 
-		tasks = TaskCommander.data.getAllTasks();
-		taskIds = TaskCommander.data.getAllIds();
 
-		//Updated cases
-		for (Task t: tasksToSync) {
-			int index = taskIds.indexOf(t.getId());
-			if (index == -1) {
-				continue;
+
+		if (tasksToSync != null) {
+			//Updated cases
+			tasks = TaskCommander.data.getAllTasks();
+			taskIds = TaskCommander.data.getAllIds();
+			for (Task t: tasksToSync) {
+				int index = taskIds.indexOf(t.getId());
+				if (index == -1) {
+					continue;
+				}
+				if (t.getUpdated() != tasks.get(index).getUpdated()) {
+					switch(t.getType()) {
+					case FLOATING:
+						TaskCommander.data.updateToFloatingTask(index, (FloatingTask) t);
+						break;
+					case TIMED:
+						TaskCommander.data.updateToTimedTask(index, (TimedTask) t);
+						break;
+					case DEADLINE:
+						TaskCommander.data.updateToDeadlineTask(index, (DeadlineTask) t);
+						break;
+					}		
+				}
+				updateTasksComplete(tasksComplete+1);
 			}
-			if (t.getUpdated() != tasks.get(index).getUpdated()) {
-				switch(t.getType()) {
-				case FLOATING:
-					TaskCommander.data.updateToFloatingTask(index, (FloatingTask) t);
-					break;
-				case TIMED:
-					TaskCommander.data.updateToTimedTask(index, (TimedTask) t);
-					break;
-				case DEADLINE:
-					TaskCommander.data.updateToDeadlineTask(index, (DeadlineTask) t);
-					break;
-				}		
-			}
-			updateTasksComplete(tasksComplete+1);
 		}
 		logger.log(Level.INFO, "PULL: Handled Updated Cases");
 
 		//Deleted case
 		//For Tasks
-		for (com.google.api.services.tasks.model.Task t : googleTasks) {
+		if (googleTasks != null) {
 			tasks = TaskCommander.data.getAllTasks();
 			taskIds = TaskCommander.data.getAllIds();
-
-			if (t.getDeleted() != null) {
-				int index = taskIds.indexOf(t.getId());
-				if (index == -1) {
-					continue;
-				} else {
-					TaskCommander.data.deleteFromGoogle(index);
+			for (com.google.api.services.tasks.model.Task t : googleTasks) {
+				if (t.getDeleted() != null) {
+					int index = taskIds.indexOf(t.getId());
+					if (index == -1) {
+						continue;
+					} else {
+						TaskCommander.data.deleteFromGoogle(index);
+					}
 				}
+				updateTasksComplete(tasksComplete+1);
 			}
-			updateTasksComplete(tasksComplete+1);
 		}
 
 		logger.log(Level.INFO, "PULL: Handled Deleted Google Tasks");
 
-		//Deleted Case For Events
-		for (Event event : googleEvents) {
+		if (googleEvents != null) {
 			tasks = TaskCommander.data.getAllTasks();
 			taskIds = TaskCommander.data.getAllIds();
-
-			if (event.getStatus().equals(STATUS_CANCELLED)) {
-				int index = taskIds.indexOf(event.getId());
-				if (index == -1) {
-					continue;
-				} else {
-					TaskCommander.data.deleteFromGoogle(index);
+			//Deleted Case For Events
+			for (Event event : googleEvents) {
+				if (event.getStatus().equals(STATUS_CANCELLED)) {
+					int index = taskIds.indexOf(event.getId());
+					if (index == -1) {
+						continue;
+					} else {
+						TaskCommander.data.deleteFromGoogle(index);
+					}
 				}
+				updateTasksComplete(tasksComplete+1);
 			}
-			updateTasksComplete(tasksComplete+1);
 		}
 		logger.log(Level.INFO, "PULL: Handled Deleted Google Events");
 		logger.log(Level.INFO, "PULL: End Pull");
+	}
+
+	private int getTotalTasks(ArrayList<Task> tasksToSync,
+			ArrayList<Task> tasks,
+			List<com.google.api.services.tasks.model.Task> googleTasks,
+			List<Event> googleEvents) {
+		int total = 0;
+		if (tasksToSync != null) {
+			total += tasksToSync.size();
+		}
+
+		if (tasks != null) {
+			total += tasks.size();
+		}
+
+		if (googleTasks != null) {
+			total += googleTasks.size();
+		}
+
+		if (googleEvents != null) {
+			total += googleEvents.size();
+		}
+		return total;
+
 	}
 
 	//@author A0112828H
@@ -274,6 +305,9 @@ public class SyncHandler extends Observable {
 			break;
 		case PULL:
 			message = String.format(MESSAGE_SYNC_PULL, getTaskCompletion());
+			break;
+		case FAILED:
+			message = MESSAGE_SYNC_FAILED;
 			break;
 		}
 

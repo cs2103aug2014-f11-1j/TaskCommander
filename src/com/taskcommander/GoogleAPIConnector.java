@@ -146,7 +146,9 @@ public class GoogleAPIConnector {
 			if (tasks != null) {
 				ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
 				for (Task task : tasks) {
-					taskList.add(toTask(task));
+					if (task.getTitle() != null || !task.getTitle().equals("")) {
+						taskList.add(toTask(task));
+					}
 				}
 				return taskList;
 			} else {
@@ -624,7 +626,7 @@ public class GoogleAPIConnector {
 		if (event == null || event.isEmpty()) {
 			return null;
 		}
-		
+
 		if (event.getStart().getDateTime() != null && event.getEnd().getDateTime() != null) {
 			TimedTask timedTask = new TimedTask(event.getSummary(),
 					toDate(event.getStart().getDateTime()),
