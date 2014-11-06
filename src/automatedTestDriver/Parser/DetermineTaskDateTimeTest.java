@@ -4,8 +4,6 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
-import org.junit.Test;
-
 import com.taskcommander.TaskCommander;
 
 //@author A0128620M
@@ -270,6 +268,7 @@ public class DetermineTaskDateTimeTest {
  		testCase(null, userCommand);
 	}
  	*/
+	@SuppressWarnings("unused")
 	private void testCase(ArrayList<String> expectedSearchedWordsAndPhrases,
 			String userCommand) {
 		ArrayList<String> resultingSearchedWordsAndPhrases = TaskCommander.parser.determineSearchedWords(userCommand);

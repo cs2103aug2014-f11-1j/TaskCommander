@@ -82,9 +82,7 @@ public class UI extends Observable implements Observer {
 	private static final int BROWSER_PREFERRED_WIDTH = 500;
 	private static final int BROWSER_PREFERRED_HEIGHT = 120;
 
-	private static final int TAB_MAIN_INDEX = 0; // First tab item
 	private static final String TAB_MAIN_NAME = "Tasks";
-	private static final int TAB_HELP_INDEX = 1; // Second tab item
 	private static final String TAB_HELP_NAME = "Help";
 	private static final int TAB_BROWSER_INDEX = 2; // Third tab item
 	private static final String TAB_BROWSER_NAME = "Google Login";
@@ -100,15 +98,9 @@ public class UI extends Observable implements Observer {
 
 	// System colours for use to colour UI elements
 	private final Color red = display.getSystemColor(SWT.COLOR_RED);
-	private final Color gray = display.getSystemColor(SWT.COLOR_GRAY);
 	private final Color blue = display.getSystemColor(SWT.COLOR_BLUE);
-	private final Color black = display.getSystemColor(SWT.COLOR_BLACK);
-	private final Color darkRed = display.getSystemColor(SWT.COLOR_DARK_RED);
 	private final Color darkGray = display.getSystemColor(SWT.COLOR_DARK_GRAY);
-	private final Color darkBlue = display.getSystemColor(SWT.COLOR_DARK_BLUE);
 	private final Color yellow = display.getSystemColor(SWT.COLOR_DARK_YELLOW);
-	private final Color darkCyan = display.getSystemColor(SWT.COLOR_DARK_CYAN);
-	private final Color darkMagenta = display.getSystemColor(SWT.COLOR_DARK_MAGENTA);
 
 	// Colours set for table columns
 	private final Color COLOR_COL_FIRST = darkGray;

@@ -16,9 +16,7 @@ import com.taskcommander.Global;
 import com.taskcommander.TaskCommander;
 
 /**
- * This class contains all test cases for the method Update of the Integrated Testing.
- * 
- * 
+ * This class contains all test cases for the Integrated Testing of the update method.
  */
 //@author A0105753J
 @RunWith(Parameterized.class)
@@ -42,11 +40,11 @@ public class IntegratedUpdateTest {
 	}
 
 	/*
-	 * These care test cases for delete method
-	 * Format would be:
+	 * Test cases for update.
+	 * Format:
 	 * Update n "content"
 	 * Update n "content" time
-	 * Update n none (remove time constrain)
+	 * Update n none (remove time constraint)
 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
@@ -61,15 +59,11 @@ public class IntegratedUpdateTest {
 			index[i] = Integer.toString(i);
 		}
 
-		
-
 		Calendar calendar = Calendar.getInstance();
 		Date today = calendar.getTime();
 		calendar.add(Calendar.DAY_OF_YEAR, 1);
-		Date tomorrow = calendar.getTime();
 		calendar.setTimeInMillis(today.getTime());
 		calendar.add(Calendar.MINUTE, 20);
-		Date later = calendar.getTime();
 		
 		return Arrays.asList(new Object[][] {
 				/*{ updateCommand[0], "Invalid command format: "+updateCommand[0]+". Type 'help' to see the list of commands."},
@@ -78,27 +72,22 @@ public class IntegratedUpdateTest {
 				{ updateCommand[3], "Invalid command format: "+updateCommand[3]+". Type 'help' to see the list of commands."},				
 				{ updateCommand[0]+" "+index[0], "Index "+index[0]+" does not exist. Please type a valid index."},*/
 				
-				//Tasks 1-5 are floating tasks. Task 6 and 7 are timed tasks. Task 8 till the end are deadline task
-				//This can be get from Ini function after sorting
+				//Tasks 1-5 are floating tasks. Tasks 6 and 7 are timed tasks. Task 8 till the end are deadline tasks
+				//Get from Ini function after sorting
 				{ updateCommand[0]+" "+index[1], "Invalid command format: "+updateCommand[0]+" "+index[1] +". Type 'help' to see the list of commands."},
 				{ updateCommand[0]+" "+index[1]+" "+changeTimeToBeFloating, "Updated: \"Be patient with friends\""},
 				{ updateCommand[0]+" "+index[2]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Have fun with friends\""},
 				{ updateCommand[0]+" "+index[3]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Prepare for CS2103 Final\""},
 				{ updateCommand[0]+" "+index[4]+" "+changeContent, "Updated: \"content\""},
-			
-				
-				
+
 				{ updateCommand[0]+" "+index[5]+" "+changeTimeToBeFloating, "Updated: \"Talk to people\""},
 				{ updateCommand[0]+" "+index[5]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Talk to people\""},
 				{ updateCommand[0]+" "+index[5]+" "+changeContent, "Updated: \"content\""},
 				{ updateCommand[0]+" "+index[5]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Talk to people\""},
 				{ updateCommand[0]+" "+index[5]+" "+changeContent+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"content\""},
 				{ updateCommand[0]+" "+index[5]+" "+changeContent+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"content\""},
-				
-				
-				
-				//Update timed task
 
+				//Update timed task
 				{ updateCommand[0]+" "+index[6]+" "+changeTimeToBeFloating, "Updated: \"Finish V0.5 in 10 days\""},
 				{ updateCommand[0]+" "+index[6]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Finish V0.5 in 10 days\""},
 				{ updateCommand[0]+" "+index[6]+" "+changeContent, "Updated: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"content\""},
@@ -123,9 +112,6 @@ public class IntegratedUpdateTest {
 				{ updateCommand[0]+" "+index[8]+" "+changeContent+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"content\""},
 				{ updateCommand[0]+" "+index[8]+" "+changeContent+" "+changeTimeToBeFloating, "Updated: \"content\""},
 				
-				
-				
-				
 				{ updateCommand[0]+" "+index[9]+" "+changeTimeToBeFloating, "Updated: \"Eat an apple\""},
 				{ updateCommand[0]+" "+index[9]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Eat an apple\""},
 				{ updateCommand[0]+" "+index[9]+" "+changeContent, "Updated: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"content\""},
@@ -133,14 +119,12 @@ public class IntegratedUpdateTest {
 				{ updateCommand[0]+" "+index[9]+" "+changeContent+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"content\""},
 				{ updateCommand[0]+" "+index[9]+" "+changeContent+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"content\""},
 				{ updateCommand[0]+" "+index[9]+" "+changeContent+" "+changeTimeToBeFloating, "Updated: \"content\""},
-				
 			
 				{ updateCommand[0]+" "+index[23]+" "+changeTimeToBeFloating, "Index does not exist. Please type a valid index."},
 				{ updateCommand[0]+" "+index[23]+" "+changeTimeToBeDeadLine, "Index does not exist. Please type a valid index."},
 				{ updateCommand[0]+" "+index[23]+" "+changeContent, "Index does not exist. Please type a valid index."},
 				{ updateCommand[0]+" "+index[23]+" "+changeTimeToBePeriod, "Index does not exist. Please type a valid index."},
 				{ updateCommand[0]+" "+index[24], "Index does not exist. Please type a valid index."},
-	
 		});
 	}
 

@@ -7,7 +7,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -33,7 +32,6 @@ public class IntegratedDisplayTest {
 	/*
 	 * Test cases for display.
 	 * Format: display timePeriod status
-	 * 
 	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
@@ -46,10 +44,8 @@ public class IntegratedDisplayTest {
 		Calendar calendar = Calendar.getInstance();
 		Date today = calendar.getTime();
 		calendar.add(Calendar.DAY_OF_YEAR, 1);
-		Date tomorrow = calendar.getTime();
 		calendar.setTimeInMillis(today.getTime());
 		calendar.add(Calendar.MINUTE, 20);
-		Date later = calendar.getTime();
 
 		return Arrays.asList(new Object[][] {
 				{ displayCommand[0], "All"},

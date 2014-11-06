@@ -52,7 +52,6 @@ public class IntegratedMarkTest {
 		Calendar calendar = Calendar.getInstance();
 		Date today = calendar.getTime();
 		calendar.add(Calendar.DAY_OF_YEAR, 1);
-		Date tomorrow = calendar.getTime();
 		calendar.setTimeInMillis(today.getTime());
 		calendar.add(Calendar.MINUTE, 20);
 		Date later = calendar.getTime();
