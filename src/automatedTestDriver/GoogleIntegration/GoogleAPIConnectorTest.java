@@ -1,19 +1,13 @@
 package automatedTestDriver.GoogleIntegration;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
 import com.taskcommander.DeadlineTask;
 import com.taskcommander.FloatingTask;
 import com.taskcommander.GoogleAPIConnector;
-import com.taskcommander.LoginManager;
 import com.taskcommander.TimedTask;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-
-import com.google.api.services.calendar.Calendar;
-import com.google.api.services.tasks.Tasks;
 
 //@author A0112828H
 /**
@@ -30,12 +24,8 @@ public class GoogleAPIConnectorTest {
 			con = GoogleAPIConnector.getInstance();
 		}
 		
-		if (!con.getServices()) {
-			try {
-				wait(10);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		while (!con.getServices()) {
+			System.out.println("Waiting for login...");
 		}
 	}
 
@@ -233,42 +223,4 @@ public class GoogleAPIConnectorTest {
 		assertTrue(con.deleteTask(task));
 		assertNull(con.getTask(task));
 	}
-	
-	// Test marking tasks as done
-	@Test
-	public void testMarkDoneOneFloatingTask() {
-		login();
-		FloatingTask task = new FloatingTask("Update Floating Task");
-		String id = con.addTask(task);
-		assertNotNull(id);
-		task.setId(id);
-		task.setName("Mark Done Floating Task");
-		assertTrue(con.updateTask(task));
-		assertTrue(con.deleteTask(task));
-	}
-
-	@Test
-	public void testMarkDoneOneDeadlineTask() {
-		login();
-		DeadlineTask task = new DeadlineTask("Update Deadline Task", new Date(System.currentTimeMillis()));
-		String id = con.addTask(task);
-		assertNotNull(id);
-		task.setId(id);
-		task.setName("Mark Done Deadline Task");
-		assertTrue(con.updateTask(task));
-		assertTrue(con.deleteTask(task));
-	}
-
-	@Test
-	public void testMarkDoneOneTimedTask() {
-		login();
-		TimedTask task = new TimedTask("Update Timed Task", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
-		String id = con.addTask(task);
-		assertNotNull(id);
-		task.setId(id);
-		task.setName("Mark Done Timed Task");
-		assertTrue(con.updateTask(task));
-		assertTrue(con.deleteTask(task));
-	}
-
 }

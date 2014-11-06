@@ -5,7 +5,6 @@ import com.google.api.services.calendar.model.Event;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Observable;
 import java.util.Stack;

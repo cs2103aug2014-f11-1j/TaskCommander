@@ -11,8 +11,6 @@ import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Lists;
 import com.google.api.client.util.store.DataStore;
 import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.model.CalendarList;
-import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.tasks.Tasks;
@@ -29,7 +27,6 @@ import com.taskcommander.LoginManager;
  * and calendar events for the given Google account.
  */
 public class GoogleAPIConnector {
-	private static final String DONE_CALENDAR_NULL = "Done calendar doesn't exist.";
 	private static final String MESSAGE_ERROR_GETTING_SERVICES = "Error getting services.";
 	private static final String MESSAGE_ERROR_OPERATION = "Error performing %1$s operation.";
 	private static final String MESSAGE_SERVICES_NULL = "Services null, getting services.";
@@ -43,13 +40,10 @@ public class GoogleAPIConnector {
 	private static final String OPERATION_DELETE = "delete";
 
 	private static final String PRIMARY_CALENDAR_ID = "primary";
-	private static final String DONE_CALENDAR_SUMMARY = "Done Tasks";
 	private static final String PRIMARY_TASKS_ID = "@default";
 
 	private static GoogleAPIConnector instance;
 	private static LoginManager loginManager;
-
-	private static String doneCalendarId = "done";
 
 	//Global instances
 	private static Calendar calendar;
@@ -108,29 +102,6 @@ public class GoogleAPIConnector {
 
 	public DataStore<String> getEventDataStore() {
 		return eventDataStore;
-	}
-
-	/**
-	 * Checks through all calendars in the main calendar list,
-	 * tries to find the done calendar by matching the summary
-	 * to the Done calendar summary.
-	 * @return    Done calendar ID
-	 */
-	private String getIdForDoneCalendar() {
-		logger.log(Level.INFO, "Trying to find the Done calendar and get the ID...");
-		try {
-			CalendarList newEntry = calendar.calendarList().list().execute();
-			String result = null;
-			for (CalendarListEntry c : newEntry.getItems()) {
-				if (c.getSummary().equals(DONE_CALENDAR_SUMMARY)) {
-					result = c.getId();
-				}
-			}
-			return result;
-		} catch (IOException e) {
-			logger.log(Level.WARNING, "Unable to get ID for Done calendar.", e);
-		}
-		return null;
 	}
 
 	/**
@@ -260,26 +231,13 @@ public class GoogleAPIConnector {
 			List<Event> events = calendar.events().list(PRIMARY_CALENDAR_ID)
 					.setTimeMin(new DateTime(System.currentTimeMillis()))
 					.execute().getItems();
-			List<Event> doneEvents = calendar.events().list(doneCalendarId)
-					.setTimeMin(new DateTime(System.currentTimeMillis()))
-					.execute().getItems();
 			if (events != null) {
-				if (doneEvents != null) {
-					events.addAll(doneEvents);
-				}
 				return events;
-			} else {
-				if (doneEvents != null) {
-					return doneEvents;
-				}
-				// All null
-				return null;
 			}
-
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
-			return null;
 		}
+		return null;
 	}
 
 	/**
@@ -926,6 +884,23 @@ public class GoogleAPIConnector {
 				return false;
 			}
 		}
+	}
+	
+	private String getIdForDoneCalendar() {
+		logger.log(Level.INFO, "Trying to find the Done calendar and get the ID...");
+		try {
+			CalendarList newEntry = calendar.calendarList().list().execute();
+			String result = null;
+			for (CalendarListEntry c : newEntry.getItems()) {
+				if (c.getSummary().equals(DONE_CALENDAR_SUMMARY)) {
+					result = c.getId();
+				}
+			}
+			return result;
+		} catch (IOException e) {
+			logger.log(Level.WARNING, "Unable to get ID for Done calendar.", e);
+		}
+		return null;
 	}
 	 */
 }
