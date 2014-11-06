@@ -81,17 +81,17 @@ public class IntegratedUpdateTest {
 				//Tasks 1-5 are floating tasks. Task 6 and 7 are timed tasks. Task 8 till the end are deadline task
 				//This can be get from Ini function after sorting
 				{ updateCommand[0]+" "+index[1], "Invalid command format: "+updateCommand[0]+" "+index[1] +". Type 'help' to see the list of commands."},
-				{ updateCommand[0]+" "+index[1]+" "+changeTimeToBeFloating, "Updated: \"MA2214 reading textbook\""},
-				{ updateCommand[0]+" "+index[2]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"be patiend to friends\""},
-				{ updateCommand[0]+" "+index[3]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"have fun with friends\""},
+				{ updateCommand[0]+" "+index[1]+" "+changeTimeToBeFloating, "Updated: \"Be patient with friends\""},
+				{ updateCommand[0]+" "+index[2]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Have fun with friends\""},
+				{ updateCommand[0]+" "+index[3]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Prepare for CS2103 Final\""},
 				{ updateCommand[0]+" "+index[4]+" "+changeContent, "Updated: \"content\""},
 			
 				
 				
-				{ updateCommand[0]+" "+index[5]+" "+changeTimeToBeFloating, "Updated: \"talk to people\""},
-				{ updateCommand[0]+" "+index[5]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"talk to people\""},
+				{ updateCommand[0]+" "+index[5]+" "+changeTimeToBeFloating, "Updated: \"Talk to people\""},
+				{ updateCommand[0]+" "+index[5]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Talk to people\""},
 				{ updateCommand[0]+" "+index[5]+" "+changeContent, "Updated: \"content\""},
-				{ updateCommand[0]+" "+index[5]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"talk to people\""},
+				{ updateCommand[0]+" "+index[5]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Talk to people\""},
 				{ updateCommand[0]+" "+index[5]+" "+changeContent+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"content\""},
 				{ updateCommand[0]+" "+index[5]+" "+changeContent+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"content\""},
 				
@@ -99,26 +99,26 @@ public class IntegratedUpdateTest {
 				
 				//Update timed task
 
-				{ updateCommand[0]+" "+index[6]+" "+changeTimeToBeFloating, "Updated: \"finish V0.5 in 10 days\""},
-				{ updateCommand[0]+" "+index[6]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"finish V0.5 in 10 days\""},
+				{ updateCommand[0]+" "+index[6]+" "+changeTimeToBeFloating, "Updated: \"Finish V0.5 in 10 days\""},
+				{ updateCommand[0]+" "+index[6]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Finish V0.5 in 10 days\""},
 				{ updateCommand[0]+" "+index[6]+" "+changeContent, "Updated: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"content\""},
-				{ updateCommand[0]+" "+index[6]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"finish V0.5 in 10 days\""},
+				{ updateCommand[0]+" "+index[6]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Finish V0.5 in 10 days\""},
 				{ updateCommand[0]+" "+index[6]+" "+changeContent+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"content\""},
 				{ updateCommand[0]+" "+index[6]+" "+changeContent+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"content\""},
 				{ updateCommand[0]+" "+index[6]+" "+changeContent+" "+changeTimeToBeFloating, "Updated: \"content\""},
 				
-				{ updateCommand[0]+" "+index[7]+" "+changeTimeToBeFloating, "Updated: \"make contribution to project\""},
-				{ updateCommand[0]+" "+index[7]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"make contribution to project\""},
+				{ updateCommand[0]+" "+index[7]+" "+changeTimeToBeFloating, "Updated: \"Contribute to our project\""},
+				{ updateCommand[0]+" "+index[7]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Contribute to our project\""},
 				{ updateCommand[0]+" "+index[7]+" "+changeContent, "Updated: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"content\""},
-				{ updateCommand[0]+" "+index[7]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"make contribution to project\""},
+				{ updateCommand[0]+" "+index[7]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Contribute to our project\""},
 				{ updateCommand[0]+" "+index[7]+" "+changeContent+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"content\""},
 				{ updateCommand[0]+" "+index[7]+" "+changeContent+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"content\""},
 				{ updateCommand[0]+" "+index[7]+" "+changeContent+" "+changeTimeToBeFloating, "Updated: \"content\""},
 				
-				{ updateCommand[0]+" "+index[8]+" "+changeTimeToBeFloating, "Updated: \"make friends\""},
-				{ updateCommand[0]+" "+index[8]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"make friends\""},
+				{ updateCommand[0]+" "+index[8]+" "+changeTimeToBeFloating, "Updated: \"Make friends\""},
+				{ updateCommand[0]+" "+index[8]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Make friends\""},
 				{ updateCommand[0]+" "+index[8]+" "+changeContent, "Updated: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"content\""},
-				{ updateCommand[0]+" "+index[8]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"make friends\""},
+				{ updateCommand[0]+" "+index[8]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Make friends\""},
 				{ updateCommand[0]+" "+index[8]+" "+changeContent+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"content\""},
 				{ updateCommand[0]+" "+index[8]+" "+changeContent+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"content\""},
 				{ updateCommand[0]+" "+index[8]+" "+changeContent+" "+changeTimeToBeFloating, "Updated: \"content\""},
@@ -126,10 +126,10 @@ public class IntegratedUpdateTest {
 				
 				
 				
-				{ updateCommand[0]+" "+index[9]+" "+changeTimeToBeFloating, "Updated: \"eat an apple\""},
-				{ updateCommand[0]+" "+index[9]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"eat an apple\""},
+				{ updateCommand[0]+" "+index[9]+" "+changeTimeToBeFloating, "Updated: \"Eat an apple\""},
+				{ updateCommand[0]+" "+index[9]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Eat an apple\""},
 				{ updateCommand[0]+" "+index[9]+" "+changeContent, "Updated: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"content\""},
-				{ updateCommand[0]+" "+index[9]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"eat an apple\""},
+				{ updateCommand[0]+" "+index[9]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Eat an apple\""},
 				{ updateCommand[0]+" "+index[9]+" "+changeContent+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"content\""},
 				{ updateCommand[0]+" "+index[9]+" "+changeContent+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"content\""},
 				{ updateCommand[0]+" "+index[9]+" "+changeContent+" "+changeTimeToBeFloating, "Updated: \"content\""},
