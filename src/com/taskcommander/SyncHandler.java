@@ -200,8 +200,8 @@ public class SyncHandler extends Observable {
 		//Get all Tasks
 		ArrayList<Task> tasksToSync = con.getAllTasks();
 		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
-		List<com.google.api.services.tasks.model.Task> googleTasks = con.getAllGoogleTasks();
-		List<Event> googleEvents = con.getAllGoogleEvents();
+		List<com.google.api.services.tasks.model.Task> googleTasks = con.getAllGoogleTasks(true);
+		List<Event> googleEvents = con.getAllGoogleEvents(true);
 		ArrayList<String> taskIds = TaskCommander.data.getAllIds();
 		logger.log(Level.INFO, "PULL: Retrieved All Tasks");
 
