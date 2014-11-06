@@ -150,7 +150,6 @@ public class LoginManager implements Observer {
 	 */
 	private GoogleCredential getCredential() {
 		logger.log(Level.INFO,"Attempting to get credentials.");
-		credential = buildCredential();
 		if(hasStoredCredential()) {
 			logger.log(Level.INFO,"Using stored credential.");
 			setTokensFromStoredCredential();
@@ -166,6 +165,7 @@ public class LoginManager implements Observer {
 	 * Requests the user to login and requests authorisation
 	 * tokens. Has to wait for user to login in the UI and 
 	 * retrieve token.
+	 * @param newCredential 
 	 */
 	private void setTokensFromLogin() {
 		requestAuthorisation();
@@ -174,13 +174,16 @@ public class LoginManager implements Observer {
 	/**
 	 * Gets stored credential from data store and sets the tokens 
 	 * in the local credential.
+	 * @param newCredential 
 	 */
 	private void setTokensFromStoredCredential() {
 		StoredCredential storedCredential;
 		try {
 			storedCredential = dataStore.get(USERNAME);
-			credential.setAccessToken(storedCredential.getAccessToken());
-			credential.setRefreshToken(storedCredential.getRefreshToken());
+			GoogleCredential newCredential = buildCredential();
+			newCredential.setAccessToken(storedCredential.getAccessToken());
+			newCredential.setRefreshToken(storedCredential.getRefreshToken());
+			credential = newCredential;
 		} catch (IOException e) {
 			logger.log(Level.WARNING,"IOException: Unable to retrieve StoredCredential.", e);
 		}
@@ -288,7 +291,9 @@ public class LoginManager implements Observer {
 	@Override
 	public void update(Observable obs, Object obj) {
 		logger.log(Level.INFO, "Login Manager updated, setting credential...");
-		credential.setFromTokenResponse(getTokenResponse((String) obj));
+		GoogleCredential newCredential = buildCredential();
+		newCredential.setFromTokenResponse(getTokenResponse((String) obj));
+		credential = newCredential;
 		saveCredential();
 	}
 
