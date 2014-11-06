@@ -73,6 +73,7 @@ public class IntegratedAddTest {
 				{ addCommand+" "+q+content+q+" " + periodLastDaysWithoutDate, "Added: ["+Global.dayFormat.format(today)+" "+"18:00-"+ Global.dayFormat.format(tomorrow)+" 03:00] "+q+content+q },
 				{ addCommand+" "+q+content+q+" " + deadlineInFormat[0], "Added: [by "+Global.dayFormat.format(later)+" "+ Global.timeFormat.format(later)+"] "+q+content+q },
 				{ addCommand+" "+q+content+q+" " + deadlineInFormat[1], "Added: [by "+Global.dayFormat.format(later)+" "+ Global.timeFormat.format(later)+"] "+q+content+q },
+				{ addCommand +" "+q+"Read ma2214 textbook"+q, "Added: \"Read ma2214 textbook\""}
 		});
 	}
 
