@@ -129,10 +129,12 @@ public class Parser {
 		}
 
 		String userCommandWithoutIndex = removeIndex(userCommand);
+		String userCommandWithoutCommandType = removeCommandType(userCommandWithoutIndex);
+		String userCommandWithoutTaskNameAndCommandType = removeTaskName(userCommandWithoutCommandType);
 
 		List<Date> dateTimes;
 		try {
-			dateTimes = getDateTimes(userCommandWithoutIndex);
+			dateTimes = getDateTimes(userCommandWithoutTaskNameAndCommandType);
 		} catch (Exception e) {
 			logger.log(Level.INFO, MESSAGE_NO_DATETIMES);
 			return null;
