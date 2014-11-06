@@ -62,7 +62,7 @@ public class IntegratedMarkTest {
 				{ doneCommand[1], "Invalid command format: "+doneCommand[1]+". Type 'help' to see the list of commands."},
 				{ doneCommand[2], "Invalid command format: "+doneCommand[2]+". Type 'help' to see the list of commands."},
 				{ doneCommand[3], "Invalid command format: "+doneCommand[3]+". Type 'help' to see the list of commands."},
-				//{ doneCommand[0]+" "+index[0], "Index "+index[0]+" does not exist. Please type a valid index."},
+				{ doneCommand[0]+" "+index[0], "Index does not exist. Please type a valid index."},
 				{ doneCommand[0]+" "+index[1], "Already done."},
 				{ doneCommand[0]+" "+index[2], "Done: \"Be patient with friends\""},
 				{ doneCommand[0]+" "+index[3], "Done: \"Have fun with friends\""},

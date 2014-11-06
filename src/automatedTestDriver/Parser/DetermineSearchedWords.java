@@ -13,7 +13,7 @@ public class DetermineSearchedWords {
 	
 	/* Test structure
 	 * 
-	 * Initial partition of 1st parameter "userCommand":
+	 * Initial partition of parameter "userCommand":
 	 * 1. [commandType]+[space(s)]+[string containing the searched words and/or phrases]			depends on [string containing the searched words and/or phrases]
 	 * 2. [string containing the searched words and/or phrases]										depends	on [string containing the searched words and/or phrases]
 	 * 3. [space(s)]+[string containing the searched words and/or phrases]							depends	on [string containing the searched words and/or phrases]

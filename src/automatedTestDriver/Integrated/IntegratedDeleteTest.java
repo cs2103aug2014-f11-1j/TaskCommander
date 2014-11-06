@@ -63,7 +63,7 @@ public class IntegratedDeleteTest {
 				{ deleteCommand[1], "Invalid command format: "+deleteCommand[1]+". Type 'help' to see the list of commands."},
 				{ deleteCommand[2], "Invalid command format: "+deleteCommand[2]+". Type 'help' to see the list of commands."},
 				{ deleteCommand[3], "Invalid command format: "+deleteCommand[3]+". Type 'help' to see the list of commands."},
-				//{ deleteCommand[0]+" "+index[0], "Index "+index[0]+" does not exist. Please type a valid index."},
+				{ deleteCommand[0]+" "+index[0], "Index does not exist. Please type a valid index."},
 				{ deleteCommand[0]+" "+index[1], "Deleted: \"Read MA2214 textbook\""},
 				{ deleteCommand[0]+" "+index[2], "Deleted: \"Be patient with friends\""},
 				{ deleteCommand[0]+" "+index[3], "Deleted: \"Have fun with friends\""},
@@ -76,8 +76,8 @@ public class IntegratedDeleteTest {
 				{ deleteCommand[0]+" "+index[10], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Relax!\""},
 				{ deleteCommand[0]+" "+index[11], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Get married\""},
 				{ deleteCommand[0]+" "+index[12], "Deleted: [by "+Global.dayFormat.format(today)+" 21:00] \"Get some exercise\""},
-/*				{ deleteCommand[0]+" "+index[23], "Index "+index[23]+" does not exist. Please type a valid index."},
-				{ deleteCommand[0]+" "+index[24], "Index "+index[24]+" does not exist. Please type a valid index."},*/
+				{ deleteCommand[0]+" "+index[23], "Index does not exist. Please type a valid index."},
+				{ deleteCommand[0]+" "+index[24], "Index does not exist. Please type a valid index."},
 	
 		});
 	}
