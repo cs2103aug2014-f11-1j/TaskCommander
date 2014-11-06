@@ -29,6 +29,7 @@ import com.taskcommander.LoginManager;
  * and calendar events for the given Google account.
  */
 public class GoogleAPIConnector {
+	private static final String DONE_CALENDAR_NULL = "Done calendar doesn't exist.";
 	private static final String MESSAGE_ERROR_GETTING_SERVICES = "Error getting services.";
 	private static final String MESSAGE_ERROR_OPERATION = "Error performing %1$s operation.";
 	private static final String MESSAGE_SERVICES_NULL = "Services null, getting services.";
@@ -47,7 +48,7 @@ public class GoogleAPIConnector {
 
 	private static GoogleAPIConnector instance;
 	private static LoginManager loginManager;
-	
+
 	private static String doneCalendarId = "done";
 
 	//Global instances
@@ -118,7 +119,7 @@ public class GoogleAPIConnector {
 			return !(calendar.calendarList().get(getIdForDoneCalendar()).execute().isEmpty());
 		} catch (IOException e) {
 			if (e.getMessage().contains("404 Not Found")) {
-				logger.log(Level.INFO, "Done calendar doesn't exist.");
+				logger.log(Level.INFO, DONE_CALENDAR_NULL);
 			} else {
 				logger.log(Level.WARNING, "Unable to check for Done calendar.", e);
 			}
@@ -137,7 +138,7 @@ public class GoogleAPIConnector {
 						calendar.calendars().insert(cal).execute();
 				doneCalendarId = createdCal.getId();
 				logger.log(Level.INFO, "Done calendar created with ID: " + doneCalendarId);
-				
+
 				CalendarListEntry calendarListEntry = new CalendarListEntry();
 				calendarListEntry.setId(doneCalendarId);
 				CalendarListEntry newEntry = calendar.calendarList().insert(calendarListEntry).execute();
@@ -149,8 +150,8 @@ public class GoogleAPIConnector {
 		} else {
 			doneCalendarId = getIdForDoneCalendar();
 			if (doneCalendarId != null) {
-			logger.log(Level.INFO, "Done calendar exists.");
-			return true;
+				logger.log(Level.INFO, "Done calendar exists.");
+				return true;
 			} else {
 				return false;
 			}
@@ -322,6 +323,8 @@ public class GoogleAPIConnector {
 		}  catch (GoogleJsonResponseException e) {
 			if (e.getMessage().contains("401 Unauthorized")) {
 				// If not logged in, login attempt handled outside of this class
+			} else if (e.getMessage().contains("404 Not Found")) {
+				logger.log(Level.WARNING, DONE_CALENDAR_NULL);
 			} else {
 				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
 			}
@@ -807,30 +810,52 @@ public class GoogleAPIConnector {
 		} else if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
-			if (task.isDone()) {
-				return updateEventToCalendar(task, doneCalendarId);
-			} else {
-				return updateEventToCalendar(task, PRIMARY_CALENDAR_ID);
-			}
+			return updateEventToCalendar(task);
 		}
 		return false;
 	}
 
 	//@author A0112828H
 	/**
-	 * Updates an event from a calendar with the given calendar ID, given a TimedTask.
+	 * Updates an event from a calendar, given a TimedTask.
+	 * May move event to another calendar depending on its done status.
 	 * @param task
-	 * @param calendarId
-	 * @return            TaskCommander task
+	 * @return       Success of action
 	 */
-	private boolean updateEventToCalendar(TimedTask task, String calendarId) {
+	private boolean updateEventToCalendar(TimedTask task) {
+		logger.log(Level.INFO, "Trying to update task...");
 		try {
-			Event result = calendar.events().update(calendarId, task.getId(), toGoogleTask(task)).execute();
-			return result != null;
+			String calId = getCalendarOfTask(task);
+			if (calId != null) {
+				logger.log(Level.INFO, "Calendar ID not null.");
+				// Move event to calendar based on done status
+				if (task.isDone() && calId == PRIMARY_CALENDAR_ID) {
+					logger.log(Level.INFO, "Move to Done calendar.");
+					calendar.events().move(PRIMARY_CALENDAR_ID, task.getId(), doneCalendarId).execute();
+					calId = doneCalendarId;
+				} else if (!task.isDone() && calId == doneCalendarId) {
+					logger.log(Level.INFO, "Move to Main calendar.");
+					calendar.events().move(doneCalendarId, task.getId(), PRIMARY_CALENDAR_ID).execute();
+					calId = PRIMARY_CALENDAR_ID;
+				}
+				// Update the rest of the event info
+				Event result = calendar.events().update(calId, task.getId(), toGoogleTask(task)).execute();
+				logger.log(Level.INFO, "Update success: "+(result!=null));
+				return result != null;
+			}
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_UPDATE), e);
 		}
 		return false;
+	}
+
+	private String getCalendarOfTask(TimedTask task) {
+		if (getEventFromCalendar(task, PRIMARY_CALENDAR_ID) != null) {
+			return PRIMARY_CALENDAR_ID;
+		} else if (getEventFromCalendar(task, doneCalendarId) != null) {
+			return doneCalendarId;
+		}
+		return null;
 	}
 
 	// Changes a Date to a DateTime object.
