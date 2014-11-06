@@ -92,8 +92,6 @@ public class GoogleAPIConnectorTest {
 		assertFalse(con.updateTask(task));
 	}
 	
-	// null or false credentials
-	
 	// Test special case inputs for CRUD
 
 	// Test normal task inputs for each task type for CRUD
@@ -234,6 +232,43 @@ public class GoogleAPIConnectorTest {
 		assertNotNull(task.getId());
 		assertTrue(con.deleteTask(task));
 		assertNull(con.getTask(task));
+	}
+	
+	// Test marking tasks as done
+	@Test
+	public void testMarkDoneOneFloatingTask() {
+		login();
+		FloatingTask task = new FloatingTask("Update Floating Task");
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		task.setName("Mark Done Floating Task");
+		assertTrue(con.updateTask(task));
+		assertTrue(con.deleteTask(task));
+	}
+
+	@Test
+	public void testMarkDoneOneDeadlineTask() {
+		login();
+		DeadlineTask task = new DeadlineTask("Update Deadline Task", new Date(System.currentTimeMillis()));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		task.setName("Mark Done Deadline Task");
+		assertTrue(con.updateTask(task));
+		assertTrue(con.deleteTask(task));
+	}
+
+	@Test
+	public void testMarkDoneOneTimedTask() {
+		login();
+		TimedTask task = new TimedTask("Update Timed Task", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		task.setName("Mark Done Timed Task");
+		assertTrue(con.updateTask(task));
+		assertTrue(con.deleteTask(task));
 	}
 
 }
