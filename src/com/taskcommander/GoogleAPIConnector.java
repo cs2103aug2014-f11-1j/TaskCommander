@@ -89,12 +89,12 @@ public class GoogleAPIConnector {
 
 	public boolean getServices() {
 		if (isLoggedIn()) {
+			createDoneCalendar();
 			return true;
 		} else {
 			tasks = loginManager.getTasksService();
 			calendar = loginManager.getCalendarService();
-			createDoneCalendar();
-			return isLoggedIn();
+			return false;
 		}
 	}
 
@@ -116,7 +116,12 @@ public class GoogleAPIConnector {
 	private boolean hasDoneCalendar() {
 		logger.log(Level.INFO, "Checking for Done calendar.");
 		try {
-			return !(calendar.calendarList().get(getIdForDoneCalendar()).execute().isEmpty());
+			String calId = getIdForDoneCalendar();
+			if (calId == null) {
+				return false;
+			} else {
+				return !(calendar.calendarList().get(calId).execute().isEmpty());
+			}
 		} catch (IOException e) {
 			if (e.getMessage().contains("404 Not Found")) {
 				logger.log(Level.INFO, DONE_CALENDAR_NULL);
@@ -229,7 +234,7 @@ public class GoogleAPIConnector {
 			if (tasks != null) {
 				ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
 				for (Task task : tasks) {
-					if (task.getTitle() != null || !task.getTitle().equals("")) {
+					if (task.getTitle() != null && !task.getTitle().equals("")) {
 						taskList.add(toTask(task));
 					}
 				}
