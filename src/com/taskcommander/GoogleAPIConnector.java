@@ -89,7 +89,6 @@ public class GoogleAPIConnector {
 
 	public boolean getServices() {
 		if (isLoggedIn()) {
-			createDoneCalendar();
 			return true;
 		} else {
 			tasks = loginManager.getTasksService();
@@ -109,58 +108,6 @@ public class GoogleAPIConnector {
 
 	public DataStore<String> getEventDataStore() {
 		return eventDataStore;
-	}
-
-	//@author A0112828H
-	// Methods for done calendar
-	private boolean hasDoneCalendar() {
-		logger.log(Level.INFO, "Checking for Done calendar.");
-		try {
-			String calId = getIdForDoneCalendar();
-			if (calId == null) {
-				return false;
-			} else {
-				return !(calendar.calendarList().get(calId).execute().isEmpty());
-			}
-		} catch (IOException e) {
-			if (e.getMessage().contains("404 Not Found")) {
-				logger.log(Level.INFO, DONE_CALENDAR_NULL);
-			} else {
-				logger.log(Level.WARNING, "Unable to check for Done calendar.", e);
-			}
-		}
-		return false;
-	}
-
-	private boolean createDoneCalendar() {
-		logger.log(Level.INFO, "Trying to create Done calendar.");
-		if (!hasDoneCalendar()) {
-			try {
-				com.google.api.services.calendar.model.Calendar cal = 
-						new com.google.api.services.calendar.model.Calendar();
-				cal.setSummary(DONE_CALENDAR_SUMMARY);
-				com.google.api.services.calendar.model.Calendar createdCal = 
-						calendar.calendars().insert(cal).execute();
-				doneCalendarId = createdCal.getId();
-				logger.log(Level.INFO, "Done calendar created with ID: " + doneCalendarId);
-
-				CalendarListEntry calendarListEntry = new CalendarListEntry();
-				calendarListEntry.setId(doneCalendarId);
-				CalendarListEntry newEntry = calendar.calendarList().insert(calendarListEntry).execute();
-				return !newEntry.isEmpty();
-			} catch (IOException e) {
-				logger.log(Level.WARNING, "Unable to create Done calendar.", e);
-				return false;
-			}
-		} else {
-			doneCalendarId = getIdForDoneCalendar();
-			if (doneCalendarId != null) {
-				logger.log(Level.INFO, "Done calendar exists.");
-				return true;
-			} else {
-				return false;
-			}
-		}
 	}
 
 	/**
@@ -199,9 +146,6 @@ public class GoogleAPIConnector {
 			ArrayList<com.taskcommander.Task> result = getAllFloatingTasks();
 			if (result != null) {
 				result.addAll(getAllEvents());
-				if (getAllDoneEvents() != null) {
-					result.addAll(getAllDoneEvents());
-				}
 			}
 			return result;
 		}
@@ -287,7 +231,8 @@ public class GoogleAPIConnector {
 			if (events != null) {
 				ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
 				for (Event event : events) {
-					taskList.add(toTask(event));
+					com.taskcommander.Task task = toTask(event);
+					taskList.add(task);
 				}
 				return taskList;
 			} else {
@@ -296,40 +241,6 @@ public class GoogleAPIConnector {
 		}  catch (GoogleJsonResponseException e) {
 			if (e.getMessage().contains("401 Unauthorized")) {
 				// If not logged in, login attempt handled outside of this class
-			} else {
-				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
-			}
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
-		}
-		return null;
-	}
-
-	//@author A0112828H
-	/**
-	 * Gets all events from Calendar API from the done calendar,
-	 * starting from current system time.
-	 * @return   Arraylist of TaskCommander Tasks.
-	 */
-	private ArrayList<com.taskcommander.Task> getAllDoneEvents() {
-		try {
-			// Gets all done events
-			List<Event> events = calendar.events().list(doneCalendarId)
-					.execute().getItems();
-			if (events != null) {
-				ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
-				for (Event event : events) {
-					taskList.add(toTask(event));
-				}
-				return taskList;
-			} else {
-				return null;
-			}
-		}  catch (GoogleJsonResponseException e) {
-			if (e.getMessage().contains("401 Unauthorized")) {
-				// If not logged in, login attempt handled outside of this class
-			} else if (e.getMessage().contains("404 Not Found")) {
-				logger.log(Level.WARNING, DONE_CALENDAR_NULL);
 			} else {
 				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
 			}
@@ -349,7 +260,22 @@ public class GoogleAPIConnector {
 			List<Event> events = calendar.events().list(PRIMARY_CALENDAR_ID)
 					.setTimeMin(new DateTime(System.currentTimeMillis()))
 					.execute().getItems();
-			return events;
+			List<Event> doneEvents = calendar.events().list(doneCalendarId)
+					.setTimeMin(new DateTime(System.currentTimeMillis()))
+					.execute().getItems();
+			if (events != null) {
+				if (doneEvents != null) {
+					events.addAll(doneEvents);
+				}
+				return events;
+			} else {
+				if (doneEvents != null) {
+					return doneEvents;
+				}
+				// All null
+				return null;
+			}
+
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
 			return null;
@@ -507,26 +433,22 @@ public class GoogleAPIConnector {
 			event.setSummary(task.getName());
 			event.setStart(new EventDateTime().setDateTime(toDateTime(task.getStartDate())));			
 			event.setEnd(new EventDateTime().setDateTime(toDateTime(task.getEndDate())));		
-			if (task.isDone()) {
-				return addEventToCalendar(task, event, doneCalendarId);
-			} else {
-				return addEventToCalendar(task, event, PRIMARY_CALENDAR_ID);
-			}
+			return addEventToCalendar(task, event);
+
 		}
 		return null;
 	}
 
 	//@author A0112828H
 	/**
-	 * Adds the given TimedTask as an event to a calendar with the given calendar ID.
+	 * Adds the given TimedTask as an event to the primary calendar.
 	 * @param task
 	 * @param event
-	 * @param calendarId
 	 * @return            Google ID of task
 	 */
-	private String addEventToCalendar(TimedTask task, Event event, String calendarId) {
+	private String addEventToCalendar(TimedTask task, Event event) {
 		try {
-			Event createdEvent = calendar.events().insert(calendarId, event).execute();
+			Event createdEvent = calendar.events().insert(PRIMARY_CALENDAR_ID, event).execute();
 			if (createdEvent != null) {
 				task.setUpdated(createdEvent.getUpdated());
 				return createdEvent.getId();
@@ -615,24 +537,20 @@ public class GoogleAPIConnector {
 		} else if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
-			if (task.isDone()) {
-				return getEventFromCalendar(task, doneCalendarId);
-			} else {
-				return getEventFromCalendar(task, PRIMARY_CALENDAR_ID);
-			}
+			return getEventFromCalendar(task);
+
 		}
 		return null;
 	}
 
 	/**
-	 * Gets an event from a calendar with the given calendar ID, given a TimedTask.
+	 * Gets an event from the primary calendar, given a TimedTask.
 	 * @param task
-	 * @param calendarId
 	 * @return            TaskCommander task
 	 */
-	private com.taskcommander.Task getEventFromCalendar(TimedTask task, String calendarId) {
+	private com.taskcommander.Task getEventFromCalendar(TimedTask task) {
 		try {
-			Event check = calendar.events().get(calendarId, task.getId()).execute();
+			Event check = calendar.events().get(PRIMARY_CALENDAR_ID, task.getId()).execute();
 			if (check != null && check.getStatus().equals("confirmed")) {
 				return toTask(check);
 			}
@@ -720,25 +638,20 @@ public class GoogleAPIConnector {
 		} else if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
-			if (task.isDone()) {
-				return deleteEventFromCalendar(task, doneCalendarId);
-			} else {
-				return deleteEventFromCalendar(task, PRIMARY_CALENDAR_ID);
-			}
+			return deleteEventFromCalendar(task);
 		}
 		return false;
 	}
 
 	//@author A0112828H
 	/**
-	 * Deletes an event from a calendar with the given calendar ID, given a TimedTask.
+	 * Deletes an event from the primary calendar, given a TimedTask.
 	 * @param task
-	 * @param calendarId
 	 * @return            TaskCommander task
 	 */
-	private boolean deleteEventFromCalendar(TimedTask task, String calendarId) {
+	private boolean deleteEventFromCalendar(TimedTask task) {
 		try {
-			calendar.events().delete(calendarId, task.getId()).execute();
+			calendar.events().delete(PRIMARY_CALENDAR_ID, task.getId()).execute();
 			return (getTask(task) == null);
 		} catch (IOException e) {
 			if (e.getMessage().contains("404 Not Found")) {
@@ -822,45 +735,19 @@ public class GoogleAPIConnector {
 
 	//@author A0112828H
 	/**
-	 * Updates an event from a calendar, given a TimedTask.
-	 * May move event to another calendar depending on its done status.
+	 * Updates an event in the primary calendar, given a TimedTask.
 	 * @param task
 	 * @return       Success of action
 	 */
 	private boolean updateEventToCalendar(TimedTask task) {
 		logger.log(Level.INFO, "Trying to update task...");
 		try {
-			String calId = getCalendarOfTask(task);
-			if (calId != null) {
-				logger.log(Level.INFO, "Calendar ID not null.");
-				// Move event to calendar based on done status
-				if (task.isDone() && calId == PRIMARY_CALENDAR_ID) {
-					logger.log(Level.INFO, "Move to Done calendar.");
-					calendar.events().move(PRIMARY_CALENDAR_ID, task.getId(), doneCalendarId).execute();
-					calId = doneCalendarId;
-				} else if (!task.isDone() && calId == doneCalendarId) {
-					logger.log(Level.INFO, "Move to Main calendar.");
-					calendar.events().move(doneCalendarId, task.getId(), PRIMARY_CALENDAR_ID).execute();
-					calId = PRIMARY_CALENDAR_ID;
-				}
-				// Update the rest of the event info
-				Event result = calendar.events().update(calId, task.getId(), toGoogleTask(task)).execute();
-				logger.log(Level.INFO, "Update success: "+(result!=null));
-				return result != null;
-			}
+			Event result = calendar.events().update(PRIMARY_CALENDAR_ID, task.getId(), toGoogleTask(task)).execute();
+			return result != null;
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_UPDATE), e);
 		}
 		return false;
-	}
-
-	private String getCalendarOfTask(TimedTask task) {
-		if (getEventFromCalendar(task, PRIMARY_CALENDAR_ID) != null) {
-			return PRIMARY_CALENDAR_ID;
-		} else if (getEventFromCalendar(task, doneCalendarId) != null) {
-			return doneCalendarId;
-		}
-		return null;
 	}
 
 	// Changes a Date to a DateTime object.
@@ -898,22 +785,21 @@ public class GoogleAPIConnector {
 			return null;
 		}
 
+		TimedTask timedTask;
 		if (event.getStart().getDateTime() != null && event.getEnd().getDateTime() != null) {
-			TimedTask timedTask = new TimedTask(event.getSummary(),
+			timedTask = new TimedTask(event.getSummary(),
 					toDate(event.getStart().getDateTime()),
 					toDate(event.getEnd().getDateTime()));
-			timedTask.setId(event.getId());
-			timedTask.setUpdated(event.getUpdated());
-			return timedTask;
+
 		} else {
 			//Handle all-day event cases
-			TimedTask timedTask = new TimedTask(event.getSummary(), 
+			timedTask = new TimedTask(event.getSummary(), 
 					toDate(event.getStart().getDate()), 
 					toDate(event.getEnd().getDate()));
-			timedTask.setId(event.getId());
-			timedTask.setUpdated(event.getUpdated());
-			return timedTask;
 		}
+		timedTask.setId(event.getId());
+		timedTask.setUpdated(event.getUpdated());
+		return timedTask;
 	}
 
 	//@author A0112828H
@@ -951,4 +837,95 @@ public class GoogleAPIConnector {
 			newTask.setStatus("needsAction");
 		}
 	}
+
+
+	//@author A0112828H-unused
+	// Methods for done calendar
+	/**
+	 * Gets all events from Calendar API from the done calendar,
+	 * starting from current system time.
+	 * @return   Arraylist of TaskCommander Tasks.
+	 */
+	/*
+	private ArrayList<com.taskcommander.Task> getAllDoneEvents() {
+		try {
+			// Gets all done events
+			List<Event> events = calendar.events().list(doneCalendarId)
+					.execute().getItems();
+			if (events != null) {
+				ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
+				for (Event event : events) {
+					com.taskcommander.Task task = toTask(event);
+					task.setDone(true);
+					taskList.add(task);
+				}
+				logger.log(Level.INFO, taskList.toString());
+				return taskList;
+			} else {
+				return null;
+			}
+		}  catch (GoogleJsonResponseException e) {
+			if (e.getMessage().contains("401 Unauthorized")) {
+				// If not logged in, login attempt handled outside of this class
+			} else if (e.getMessage().contains("404 Not Found")) {
+				logger.log(Level.WARNING, DONE_CALENDAR_NULL);
+			} else {
+				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+		}
+		return null;
+	}
+
+	private boolean hasDoneCalendar() {
+		logger.log(Level.INFO, "Checking for Done calendar.");
+		try {
+			String calId = getIdForDoneCalendar();
+			if (calId == null) {
+				return false;
+			} else {
+				return !(calendar.calendarList().get(calId).execute().isEmpty());
+			}
+		} catch (IOException e) {
+			if (e.getMessage().contains("404 Not Found")) {
+				logger.log(Level.INFO, DONE_CALENDAR_NULL);
+			} else {
+				logger.log(Level.WARNING, "Unable to check for Done calendar.", e);
+			}
+		}
+		return false;
+	}
+
+	private boolean createDoneCalendar() {
+		logger.log(Level.INFO, "Trying to create Done calendar.");
+		if (!hasDoneCalendar()) {
+			try {
+				com.google.api.services.calendar.model.Calendar cal = 
+						new com.google.api.services.calendar.model.Calendar();
+				cal.setSummary(DONE_CALENDAR_SUMMARY);
+				com.google.api.services.calendar.model.Calendar createdCal = 
+						calendar.calendars().insert(cal).execute();
+				doneCalendarId = createdCal.getId();
+				logger.log(Level.INFO, "Done calendar created with ID: " + doneCalendarId);
+
+				CalendarListEntry calendarListEntry = new CalendarListEntry();
+				calendarListEntry.setId(doneCalendarId);
+				CalendarListEntry newEntry = calendar.calendarList().insert(calendarListEntry).execute();
+				return !newEntry.isEmpty();
+			} catch (IOException e) {
+				logger.log(Level.WARNING, "Unable to create Done calendar.", e);
+				return false;
+			}
+		} else {
+			doneCalendarId = getIdForDoneCalendar();
+			if (doneCalendarId != null) {
+				logger.log(Level.INFO, "Done calendar exists.");
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+	 */
 }
