@@ -127,15 +127,26 @@ public class GoogleAPIConnector {
 	 * Returns all Google Tasks
 	 * @return List of Google Tasks
 	 */
-	public List<Task> getAllGoogleTasks() {
+	public List<Task> getAllGoogleTasks(boolean showDeleted) {
 		try {
-			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
-			List<Task> tasks = request.execute().getItems();
-			return tasks;
+			if (showDeleted) {
+				Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID)
+						.setShowDeleted(showDeleted);
+				List<Task> tasks = request.execute().getItems();
+				if (tasks != null) {
+					return tasks;					
+				}
+			} else {			
+				Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
+				List<Task> tasks = request.execute().getItems();
+				if (tasks != null) {
+					return tasks;					
+				}
+			}
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
-			return null;
 		}
+		return null;
 	}
 
 	//@author A0112828H
@@ -226,13 +237,23 @@ public class GoogleAPIConnector {
 	 * Returns all Events
 	 * @return List of Events
 	 */
-	public List<Event> getAllGoogleEvents() {
+	public List<Event> getAllGoogleEvents(boolean showDeleted) {
 		try {
-			List<Event> events = calendar.events().list(PRIMARY_CALENDAR_ID)
-					.setTimeMin(new DateTime(System.currentTimeMillis()))
-					.execute().getItems();
-			if (events != null) {
-				return events;
+			if (showDeleted) {
+				List<Event> events = calendar.events().list(PRIMARY_CALENDAR_ID)
+						.setTimeMin(new DateTime(System.currentTimeMillis()))
+						.setShowDeleted(showDeleted)
+						.execute().getItems();
+				if (events != null) {
+					return events;
+				}
+			} else {
+				List<Event> events = calendar.events().list(PRIMARY_CALENDAR_ID)
+						.setTimeMin(new DateTime(System.currentTimeMillis()))
+						.execute().getItems();
+				if (events != null) {
+					return events;
+				}
 			}
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
