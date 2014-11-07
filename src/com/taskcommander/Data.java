@@ -202,7 +202,6 @@ public class Data {
 			deadlineTask.setEdited(true);
 			deadlineTask.setDone(relatedTask.isDone());
 			changedTypeTasks.add(relatedTask);
-			deletedTasks.add(relatedTask);
 			tasks.remove(index);
 			tasks.add(index, deadlineTask);
 		} else {
@@ -252,7 +251,6 @@ public class Data {
 			timedTask.setEdited(true);
 			timedTask.setDone(relatedTask.isDone());
 			changedTypeTasks.add(relatedTask);
-			deletedTasks.add(relatedTask);
 			tasks.remove(index);
 			tasks.add(index, timedTask);
 		} else {
@@ -379,6 +377,7 @@ public class Data {
 			Task deletedTask = tasks.get(index);
 			saveToOperationHistory(Global.CommandType.DELETE);
 			deletedTasks.add(deletedTask);
+			deletedTask.setEdited(true);
 			tasks.remove(index);
 			saveToPermanentStorage();
 			switch (deletedTask.getType()) {		// TODO: Extract to method
