@@ -112,15 +112,15 @@ public class SyncHandler extends Observable {
 	private void push() {
 		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
 		ArrayList<Task> deletedTasks = TaskCommander.data.getDeletedTasks();
-		Stack<Task> preupdatedTasks = TaskCommander.data.getPreupdatedTasks();
+		Stack<Task> changedTypeTasks = TaskCommander.data.getChangedTypeTasks();
 		Stack<ArrayList<Task>> clearedTasks = TaskCommander.data.getClearedTasks();
 		logger.log(Level.INFO, "PUSH: Retrieved All Tasks");
 		startSyncState(SyncState.PUSH, tasks.size() + deletedTasks.size() + 
-				preupdatedTasks.size() + clearedTasks.size());
+				changedTypeTasks.size() + clearedTasks.size());
 
 		pushUnsyncedTasks(tasks);
 		pushDeletedTasks(deletedTasks);
-		pushPreupdatedTasks(preupdatedTasks);
+		pushChangedTypeTasks(changedTypeTasks);
 		pushClearedTasks(clearedTasks);
 
 		logger.log(Level.INFO, "PUSH: End Push");
@@ -168,9 +168,9 @@ public class SyncHandler extends Observable {
 	 * since last sync to Google services.
 	 * @param preupdatedTasks
 	 */
-	private void pushPreupdatedTasks(Stack<Task> preupdatedTasks) {
+	private void pushChangedTypeTasks(Stack<Task> changedTypeTasks) {
 		// Delete tasks that were updated to a different type
-		for (Task t: preupdatedTasks) {
+		for (Task t: changedTypeTasks) {
 			if (t.getId() != null) {
 				con.deleteTask(t);
 			}
