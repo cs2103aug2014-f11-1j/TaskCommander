@@ -156,8 +156,9 @@ public class SyncHandler extends Observable {
 	private void pushDeletedTasks(ArrayList<Task> deletedTasks) {
 		// Handle delete cases
 		for (Task t : deletedTasks) {
-			if (t.getId() != null) {
+			if (!t.isSynced()) {
 				con.deleteTask(t);
+				t.setEdited(false);
 			}
 		}
 		logger.log(Level.INFO, "PUSH: Handled Deleted Cases");
@@ -284,6 +285,7 @@ public class SyncHandler extends Observable {
 					continue;
 				}
 				if (t.getUpdated() != tasks.get(index).getUpdated()) {
+					logger.log(Level.INFO, "Caught updated case");
 					switch(t.getType()) {
 					case FLOATING:
 						TaskCommander.data.updateToFloatingTask(index, (FloatingTask) t);
