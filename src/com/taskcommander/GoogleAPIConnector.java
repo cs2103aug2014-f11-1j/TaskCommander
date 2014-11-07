@@ -115,9 +115,10 @@ public class GoogleAPIConnector {
 			return null;
 		} else {
 			ArrayList<com.taskcommander.Task> result = getAllFloatingTasks();
-			if (result != null) {
-				result.addAll(getAllEvents());
+			if (result == null) {
+				return getAllEvents();
 			}
+			result.addAll(getAllEvents());
 			return result;
 		}
 	}
