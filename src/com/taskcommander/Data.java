@@ -164,7 +164,7 @@ public class Data {
 			}
 			floatingTask.setEdited(true);
 		}
-		processUpdateHistory(floatingTask);
+		processUpdateHistory(relatedTask, floatingTask);
 		saveToPermanentStorage();
 		return String.format(Global.MESSAGE_UPDATED, getTaskInDisplayFormat(floatingTask));
 	}
@@ -213,7 +213,7 @@ public class Data {
 			}
 			deadlineTask.setEdited(true);
 		}
-		processUpdateHistory(deadlineTask);
+		processUpdateHistory(relatedTask, deadlineTask);
 		saveToPermanentStorage();
 		return String.format(Global.MESSAGE_UPDATED, getTaskInDisplayFormat(deadlineTask));
 	}
@@ -267,7 +267,7 @@ public class Data {
 			}
 			timedTask.setEdited(true);
 		}
-		processUpdateHistory(timedTask);
+		processUpdateHistory(relatedTask, timedTask);
 		saveToPermanentStorage();
 		return String.format(Global.MESSAGE_UPDATED, getTaskInDisplayFormat(timedTask));
 
@@ -279,9 +279,9 @@ public class Data {
 	 * and adds the update command to history.
 	 * @param task
 	 */
-	private void processUpdateHistory(Task task) {
+	private void processUpdateHistory(Task relatedTask, Task task) {
 		saveToOperationHistory(Global.CommandType.UPDATE);
-		preupdatedTasks.push(task);
+		preupdatedTasks.push(relatedTask);
 		updatedTasks.push(task);
 	}
 
