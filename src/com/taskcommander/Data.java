@@ -33,6 +33,7 @@ public class Data {
 	private Stack<Task> addedTasks;
 	private Stack<Task> preupdatedTasks;
 	private Stack<Task> updatedTasks;
+	private Stack<Task> changedTypeTasks;
 	private Stack<CommandType> operationHistory;
 	private Stack<Global.CommandType> undoHistory;
 
@@ -48,6 +49,7 @@ public class Data {
 		preupdatedTasks = new Stack<Task>();
 		updatedTasks = new Stack<Task>();
 		clearedTasks = new Stack<ArrayList<Task>>();
+		changedTypeTasks = new Stack<Task>();
 		operationHistory = new Stack<Global.CommandType>();
 		undoHistory = new Stack<Global.CommandType>();
 
@@ -154,7 +156,7 @@ public class Data {
 			floatingTask = new FloatingTask(name);
 			floatingTask.setEdited(true); 
 			floatingTask.setDone(relatedTask.isDone());
-			deletedTasks.add(relatedTask);
+			changedTypeTasks.add(relatedTask);
 			tasks.remove(index);
 			tasks.add(index, floatingTask);
 		} else {
@@ -199,7 +201,7 @@ public class Data {
 			deadlineTask = new DeadlineTask(name,endDate);
 			deadlineTask.setEdited(true);
 			deadlineTask.setDone(relatedTask.isDone());
-
+			changedTypeTasks.add(relatedTask);
 			deletedTasks.add(relatedTask);
 			tasks.remove(index);
 			tasks.add(index, deadlineTask);
@@ -249,7 +251,7 @@ public class Data {
 			timedTask = new TimedTask(name,startDate,endDate);
 			timedTask.setEdited(true);
 			timedTask.setDone(relatedTask.isDone());
-
+			changedTypeTasks.add(relatedTask);
 			deletedTasks.add(relatedTask);
 			tasks.remove(index);
 			tasks.add(index, timedTask);
@@ -484,16 +486,13 @@ public class Data {
 	public String updateToFloatingTask(int index, FloatingTask task) {
 		FloatingTask floatingTask;
 		if  (tasks.get(index).getType() != Task.TaskType.FLOATING) {
-			Task toChange = tasks.get(index);
 			floatingTask = new FloatingTask(task.getName());
 			floatingTask.setEdited(false);
-			floatingTask.setDone(toChange.isDone());
-			deletedTasks.add(toChange);
+			floatingTask.setDone(tasks.get(index).isDone());
 			tasks.remove(index);
 			tasks.add(index, floatingTask);
 		} else {
 			floatingTask = (FloatingTask) tasks.get(index);
-			preupdatedTasks.push(floatingTask);
 			if (task.getName() != null) {
 				floatingTask.setName(task.getName());
 			}
@@ -516,19 +515,16 @@ public class Data {
 	public String updateToDeadlineTask(int index, DeadlineTask task) {
 		DeadlineTask deadlineTask;
 		if  (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
-			Task toChange = tasks.get(index);
 			deadlineTask = new DeadlineTask(task.getName(),task.getEndDate());
 			deadlineTask.setEdited(false);
 			deadlineTask.setDone(tasks.get(index).isDone());
 			deadlineTask.setUpdated(task.getUpdated());
-			deletedTasks.add(toChange);
 			tasks.remove(index);
 			tasks.add(index, deadlineTask);
 			saveToPermanentStorage();
 			return String.format(Global.MESSAGE_UPDATED,getTaskInDisplayFormat(deadlineTask));
 		} else {
 			deadlineTask = (DeadlineTask) tasks.get(index);
-			preupdatedTasks.push(deadlineTask);
 			if (task.getName() != null) {
 				deadlineTask.setName(task.getName());
 			}
@@ -557,7 +553,6 @@ public class Data {
 			timedTask = new TimedTask(task.getName(), task.getStartDate(), task.getEndDate());
 			timedTask.setEdited(false);
 			timedTask.setDone(relatedTask.isDone());
-			deletedTasks.add(relatedTask);
 			tasks.remove(index);
 			tasks.add(index, timedTask);
 		} else {
@@ -934,7 +929,11 @@ public class Data {
 	public Stack<Task> getPreupdatedTasks() {
 		return preupdatedTasks;
 	}
-
+	
+	public Stack<Task> getChangedTypeTasks() {
+		return changedTypeTasks;
+	}
+	
 	public Stack<ArrayList<Task>> getClearedTasks() {
 		return clearedTasks;
 	}
