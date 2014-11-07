@@ -200,6 +200,7 @@ public class SyncHandler extends Observable {
 		logger.log(Level.INFO, "PULL: Starting Pull");
 		//Get all Tasks
 		ArrayList<Task> tasksToSync = con.getAllTasks();
+		logger.log(Level.INFO, "Tasks to sync: " + tasksToSync.size());
 		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
 		List<com.google.api.services.tasks.model.Task> googleTasks = con.getAllGoogleTasks(true);
 		List<Event> googleEvents = con.getAllGoogleEvents(true);
@@ -276,6 +277,7 @@ public class SyncHandler extends Observable {
 		ArrayList<Task> tasks;
 		ArrayList<String> taskIds;
 		if (tasksToSync != null) {
+			logger.log(Level.INFO, "PULL: Starting Updated Cases");
 			//Updated cases
 			tasks = TaskCommander.data.getAllTasks();
 			taskIds = TaskCommander.data.getAllIds();
