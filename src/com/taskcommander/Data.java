@@ -28,7 +28,8 @@ public class Data {
 	//@author A0109194A
 	private ArrayList<Task> deletedTasks; // Used by the Google API.
 	private Stack<ArrayList<Task>> clearedTasks;
-
+	
+	//@author A0109194A
 	// Variables to store history of tasks for undo command.
 	private Stack<Task> addedTasks;
 	private Stack<Task> preupdatedTasks;
@@ -41,7 +42,8 @@ public class Data {
 	// Singleton instance for Data
 	private static Data theOne;
 
-	//@author A0128620M, A0109194A
+	//@author A0128620M 
+	//@author A0109194A
 	private Data() {
 		tasks = new ArrayList<Task>();
 		deletedTasks = new ArrayList<Task>();
@@ -356,8 +358,9 @@ public class Data {
 			}
 		}
 	}
-
-	//@author A0128620M, A0109194A
+	
+	//@author A0109194A
+	//@author A0128620M
 	/**
 	 * Deletes the task with the given index (as shown with 'display' command).
 	 * Does not execute if there are no lines and if a wrong index is given.
@@ -393,7 +396,9 @@ public class Data {
 			}
 		}
 	}
-
+	
+	//@author A0109194A
+	//@author A0128620M
 	/**
 	 * Clears all tasks from memory.
 	 * 
@@ -401,6 +406,9 @@ public class Data {
 	 * @return             Feedback for user.
 	 */
 	public String clearTasks() {
+		if (tasks.isEmpty()) {
+			return String.format(Global.MESSAGE_EMPTY);
+		}
 		ArrayList<Task> cleared = new ArrayList<Task>();
 		cleared.addAll(tasks);
 		clearedTasks.push(cleared);
@@ -589,7 +597,8 @@ public class Data {
 			return true;
 		}
 	}
-
+	
+	//@author A0109194A
 	// Undo method
 	/**
 	 * This operation undoes the latest command.
@@ -904,7 +913,9 @@ public class Data {
 				(startDate == null || timedTask.getStartDate().compareTo(startDate) >= 0) && 
 				(timedTask.getEndDate().compareTo(endDate) <= 0) );
 	}
-
+	
+	//@author A0109194A
+	//Further getter methods
 	/**
 	 * Returns the index of the given task object within the tasks ArrayList.
 	 * @return  index
@@ -912,7 +923,7 @@ public class Data {
 	public int getIndexOf(Task task) {
 		return tasks.indexOf(task);
 	}
-
+	
 	/**
 	 * Checks if the tasks ArrayList contains the given task.
 	 * @return  index
@@ -921,12 +932,20 @@ public class Data {
 		return tasks.contains(task);
 	}
 
+	public Stack<Task> getAddedTasks() {
+		return addedTasks;
+	}
+	
 	public ArrayList<Task> getDeletedTasks() {
 		return deletedTasks;
 	}
 
 	public Stack<Task> getPreupdatedTasks() {
 		return preupdatedTasks;
+	}
+	
+	public Stack<Task> getUpdatedTasks() {
+		return updatedTasks;
 	}
 	
 	public Stack<Task> getChangedTypeTasks() {
@@ -949,7 +968,7 @@ public class Data {
 	 * Returns all tasks.
 	 * @return        Tasks list.
 	 */
-	public ArrayList<Task> getAllTasks() {		//TODO: @Sean still encessary?
+	public ArrayList<Task> getAllTasks() {
 		return tasks;
 	}
 
