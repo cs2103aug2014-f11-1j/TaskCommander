@@ -192,15 +192,17 @@ public class Controller {
 	}
 
 	private String searchForTasks(String userCommand) {
+		resetDisplayRestrictions();
+		
 		searchedWordsAndPhrases = TaskCommander.parser.determineSearchedWords(userCommand);	
 		if (searchedWordsAndPhrases == null) {
 			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
 		}
+		
 		isSearchRestricted = true;
+		setDisplaySettingsDescription();
 
-		resetDisplayRestrictions();
-
-		return String.format(Global.MESSAGE_SEARCHED, displaySettingsDescription);
+		return Global.MESSAGE_SEARCHED;
 	}
 
 
