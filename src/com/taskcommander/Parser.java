@@ -144,10 +144,12 @@ public class Parser {
 	}
 
 	/**
-	 * Checks if the given list contains a start and an end date, and if the
-	 * end date occurs before the start date. If true, it indicates that the
-	 * time period starts from one day and ends the next day, and the end date
-	 * will be incremented by 1 day.
+	 * Checks if the given list contains a start and an end date, and if the 
+	 * parsed end date occurs before the start date. If true and if both dates 
+	 * are on the same day, it indicates that the time period should actually 
+	 * start from one day and end the next day. However, if the end date is on
+	 * a different day before the start date, it switches both days so that the
+	 * prior one comes first.
 	 * @param  dateTimes
 	 * @return corrected dateTimes
 	 */
@@ -156,11 +158,23 @@ public class Parser {
 			Date startDate = dateTimes.get(0);
 			Date endDate = dateTimes.get(1);
 			if (endDate.compareTo(startDate) < 0 ) {
-				Calendar c = Calendar.getInstance(); 
-				c.setTime(endDate); 
-				c.add(Calendar.DATE, 1);
-				endDate = c.getTime();
-				dateTimes.set(1, endDate);
+				Calendar startCal = Calendar.getInstance();
+				startCal.setTime(startDate);
+				startCal.set(Calendar.HOUR_OF_DAY, 0);
+				Calendar endCal = Calendar.getInstance();
+				endCal.setTime(endDate);
+				endCal.set(Calendar.HOUR_OF_DAY, 0);
+
+				if (endCal.compareTo(startCal) == 0) {
+					Calendar c = Calendar.getInstance(); 
+					c.setTime(endDate); 
+					c.add(Calendar.DATE, 1);
+					endDate = c.getTime();
+					dateTimes.set(1, endDate);
+				} else {
+					dateTimes.set(0, endDate);
+					dateTimes.set(1, startDate);
+				}
 			}
 		}
 		return dateTimes;
