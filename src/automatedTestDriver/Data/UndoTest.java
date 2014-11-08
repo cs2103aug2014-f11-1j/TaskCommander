@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Stack;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -22,6 +24,10 @@ public class UndoTest {
 	//Test Parameters
 	@Parameterized.Parameters
 	public static Collection<Object[]> cases() {
+		TaskCommander.data.clearTasks();
+		Stack<CommandType> operationHistory = TaskCommander.data.getOperationsHistory();
+		operationHistory.clear();
+		
 		TaskCommander.data.addFloatingTask("hello");
 		TaskCommander.data.updateToFloatingTask(0,"konnichiwa");
 		TaskCommander.data.deleteTask(0);

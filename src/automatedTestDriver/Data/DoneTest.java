@@ -35,8 +35,11 @@ public class DoneTest {
 		String title = "Watch a Movie";
 		
 		TaskCommander.data.addFloatingTask(title);
+		TaskCommander.data.open(0);
 		TaskCommander.data.addDeadlineTask(title, start);
+		TaskCommander.data.open(1);
 		TaskCommander.data.addTimedTask(title, start, end);
+		TaskCommander.data.open(2);
 		
 		return Arrays.asList(new Object[][] {
 				{ 0, "Done: \"Watch a Movie\"" },

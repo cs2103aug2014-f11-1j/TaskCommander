@@ -12,12 +12,13 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+	UndoTest.class,
+	OpenTest.class,
 	DoneTest.class,
 	InternalAddTest.class,
 	InternalClearTest.class,
 	InternalDeleteTest.class,
-	InternalUpdateTest.class,
-	UndoTest.class
+	InternalUpdateTest.class
 })
 
 public class DataTest {
