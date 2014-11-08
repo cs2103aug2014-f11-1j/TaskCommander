@@ -955,6 +955,10 @@ public class Data {
 	public Stack<ArrayList<Task>> getClearedTasks() {
 		return clearedTasks;
 	}
+	
+	public Stack<Global.CommandType> getOperationsHistory() {
+		return operationHistory;
+	}
 
 	public ArrayList<String> getAllIds() {
 		ArrayList<String> idList = new ArrayList<String>();
