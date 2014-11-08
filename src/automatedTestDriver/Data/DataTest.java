@@ -1,29 +1,25 @@
 package automatedTestDriver.Data;
 
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import com.taskcommander.Data;
-import com.taskcommander.Global;
-import com.taskcommander.Task;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * This class contains all test cases for the Data class of the Logic Component.
  * 
- * @author A0128620M
+ * @author A0109194A
  */
 
+@RunWith(Suite.class)
+@SuiteClasses({
+	DoneTest.class,
+	InternalAddTest.class,
+	InternalClearTest.class,
+	InternalDeleteTest.class,
+	InternalUpdateTest.class,
+	UndoTest.class
+})
+
 public class DataTest {
-
-	@Test
-	public void test() {
-		fail("Not yet implemented");
-	}
-
+	
 }
