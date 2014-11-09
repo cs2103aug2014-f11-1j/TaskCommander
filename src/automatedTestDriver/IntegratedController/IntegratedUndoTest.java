@@ -32,12 +32,12 @@ public class IntegratedUndoTest {
 		this.userCommand = userCommand;
 		this.expectedResult = expectedResult;
 	}
-/*
+
 	@Before
 	public void ini(){
 		TaskCommander.ini();
 	}
-*/
+
 	/*
 	 * Test cases for undo.
 	 * Format: undo n (index)
@@ -47,16 +47,21 @@ public class IntegratedUndoTest {
 		
 		return Arrays.asList(new Object[][] {
 				//{ openCommand[0]+" "+index[6], "Opened: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"Finish V0.5 in 10 days\""},
-				{"add \"Content\"", "Undo: Add"},
+				{"add \"Content\"", "Undone latest command: ADD."},
+				{"delete 1", "Undone latest command: DELETE."},
+				{"update 1 \"Content\"", "Undone latest command: UPDATE."},
+				{"open 1", "Undone latest command: OPEN."},
+				{"Done 2", "Undone latest command: DONE."},
+				{"clear", "Undone latest command: CLEAR."},
 	
-				
+						
 				
 
 		});
 	}
 
 	@Test
-	public void testUndoAdd() {
+	public void testUndo() {
 		TaskCommander.controller.executeCommand(userCommand);
 		assertEquals(expectedResult, TaskCommander.controller.executeCommand("undo")); 
 	}
