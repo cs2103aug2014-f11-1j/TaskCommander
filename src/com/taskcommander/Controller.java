@@ -1,5 +1,4 @@
 package com.taskcommander;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -390,7 +389,6 @@ public class Controller {
     private boolean hasParamters(String userCommand) {
         return getNumberOfWords(userCommand) > 1;
     }
-
 
     // Sets default display settings, that is, overdue and upcoming open tasks
     // of the next two weeks.
