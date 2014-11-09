@@ -58,11 +58,11 @@ public class IntegratedMarkTest {
 		
 		return Arrays.asList(new Object[][] {
 				
-				{ doneCommand[0]+" "+index[7], "Done: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"Contribute to our project\""},
+				/*{ doneCommand[0]+" "+index[7], "Done: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"Contribute to our project\""},
 				{ doneCommand[0]+" "+index[8], "Done: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"Make friends\""},
 				{ doneCommand[0]+" "+index[9], "Done: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"Eat an apple\""},
 				{ doneCommand[0]+" "+index[10], "Done: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Relax!\""},
-				{ doneCommand[0]+" "+index[11], "Done: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Get married\""},
+				{ doneCommand[0]+" "+index[11], "Done: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Get married\""},*/
 				{ doneCommand[0]+" "+index[12], "Done: [by "+Global.dayFormat.format(today)+" 21:00] \"Get some exercise\""},
 				
 				
