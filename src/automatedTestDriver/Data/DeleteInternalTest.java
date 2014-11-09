@@ -42,6 +42,7 @@ public class DeleteInternalTest {
 	
 	@Test
 	public void deleteTest() {
+		tester.clearTasks();
 		tester.addFloatingTask("Meet Richard");
 		String expected = "Deleted: \"Meet Richard\"";
 		assertEquals(expected, tester.deleteTask(0));
