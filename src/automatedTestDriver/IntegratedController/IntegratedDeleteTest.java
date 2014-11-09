@@ -64,7 +64,7 @@ public class IntegratedDeleteTest {
 				//{ deleteCommand[0]+" "+index[9], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"Eat an apple\""},
 				//{ deleteCommand[0]+" "+index[10], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Relax!\""},
 				//{ deleteCommand[0]+" "+index[11], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Get married\""},
-				{ deleteCommand[0]+" "+index[12], "Deleted: [by "+Global.dayFormat.format(today)+" 21:00] \"Get some exercise\""},
+				{ deleteCommand[0]+" "+index[13], "Deleted: [by "+Global.dayFormat.format(today)+" 21:00] \"Get some exercise\""},
 				{ deleteCommand[0], "Invalid command format: \""+deleteCommand[0]+"\". Refer to help tab to see the list of commands."},
 				{ deleteCommand[1], "Invalid command format: \""+deleteCommand[1]+"\". Refer to help tab to see the list of commands."},
 				{ deleteCommand[2], "Invalid command format: \""+deleteCommand[2]+"\". Refer to help tab to see the list of commands."},
