@@ -1,18 +1,16 @@
 package automatedTestDriver.Parser;
 import static org.junit.Assert.*;
-
 import java.util.Arrays;
 import java.util.Collection;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
 import com.taskcommander.TaskCommander;
 
 //@author A0128620M
 /**
- * This class contains all test cases for the method containsParameter(userCommand:String) of the component Parser.
+ * This class is part of the unit test of the component Parser and contains all test cases 
+ * for the method containsParameter(userCommand:String, parameter:String).
  */
 
 @RunWith(Parameterized.class)
@@ -30,21 +28,21 @@ public class ContainsParameterTest {
 	/* Test structure
 	 * 
 	 * Initial partition of 1st parameter "userCommand":
-	 * - [commandType]+[space(s)]+[quoted taskName]+[space(s)]+[any string]						depends	on [any string]
-	 * - [commandType]+[space(s)]+[any string]													depends	on [any string]								
-	 * - [any string]																			depends	on [any string]																					
-	 * - [null]																					invalid
+	 * 1. [commandType]+[space(s)]+[quoted taskName]+[space(s)]+[any string]					
+	 * 2. [commandType]+[space(s)]+[any string]																				
+	 * 3. [any string]																																								
+	 * 4. [null]																					
 	 * Further partition of [any string]:
-	 * - [string which exactly represents the searched string]									valid
-	 * - [string exactly containing the searched string (surrounded by spaces)]					valid
-	 * - [string not exactly containing the searched string (not surrounded by spaces)]			invalid
-	 * - [string not containing the searched string at all]										invalid
-	 * - [empty string]																			invalid
+	 * a. [string which exactly represents the searched string]							
+	 * b. [string exactly containing the searched string (surrounded by spaces)]					
+	 * c. [string not exactly containing the searched string (not surrounded by spaces)]		
+	 * d. [string not containing the searched string at all]				
+	 * e. [empty string]														
 	 * 
 	 * Initial partition of 2nd parameter "parameter":
-	 * - [any string]																			valid
-	 * - [empty string]																			invalid
-	 * - [null]																					invalid
+	 * i.   [any string]																			
+	 * ii.  [empty string]																		
+	 * iii. [null]																				
 	 */
 	
 	// Test parameters
@@ -52,35 +50,67 @@ public class ContainsParameterTest {
 	public static Collection<Object[]>  cases() {
 		String commandType = "update";
 		String taskName = "\"meeting\"";
-		String searchedString = "none";
+		String stringExactlyRepresentingSearchedString = "none";
 		String stringExactlyContainingSearchedString = "none timed";
 		String stringNotExactlyContainingSearchedString = "nonetimed";
 		String stringNotContainingSearchedString = "other";
 		String emptyString = "";
 		
 		return Arrays.asList(new Object[][] {
-				{ commandType+" "+taskName+" "+searchedString, searchedString, true },
-				{ commandType+" "+taskName+" "+stringExactlyContainingSearchedString, searchedString, true },
-				{ commandType+" "+taskName+" "+stringNotExactlyContainingSearchedString, searchedString, false },
-				{ commandType+" "+taskName+" "+stringNotContainingSearchedString, searchedString, false },
-				{ commandType+" "+taskName+" "+emptyString, searchedString, false },
 				
-				{ commandType+" "+searchedString, searchedString, true },
-				{ commandType+" "+stringExactlyContainingSearchedString, searchedString, true },
-				{ commandType+" "+stringNotExactlyContainingSearchedString, searchedString, false },
-				{ commandType+" "+stringNotContainingSearchedString, searchedString, false },
-				{ commandType+" "+emptyString, searchedString, false },
-				
-				{ searchedString, searchedString, true },
-				{ stringExactlyContainingSearchedString, searchedString, true },
-				{ stringNotExactlyContainingSearchedString, searchedString, false },
-				{ stringNotContainingSearchedString, searchedString, false },
-				{ emptyString, searchedString, false },
-				
-				{ null, searchedString, false },
-				
-				{ commandType+" "+taskName+" "+searchedString, emptyString, false },
-				{ commandType+" "+taskName+" "+searchedString, null, false },
+			// 1ai
+			{ commandType+" "+taskName+" "+stringExactlyRepresentingSearchedString, stringExactlyRepresentingSearchedString, true },
+			
+			// 1bi
+			{ commandType+" "+taskName+" "+stringExactlyContainingSearchedString, stringExactlyRepresentingSearchedString, true },
+			
+			// 1ci
+			{ commandType+" "+taskName+" "+stringNotExactlyContainingSearchedString, stringExactlyRepresentingSearchedString, false },
+			
+			// 1di
+			{ commandType+" "+taskName+" "+stringNotContainingSearchedString, stringExactlyRepresentingSearchedString, false },
+			
+			// 1ei
+			{ commandType+" "+taskName+" "+emptyString, stringExactlyRepresentingSearchedString, false },
+			
+			// 2ai
+			{ commandType+" "+stringExactlyRepresentingSearchedString, stringExactlyRepresentingSearchedString, true },
+			
+			// 2bi
+			{ commandType+" "+stringExactlyContainingSearchedString, stringExactlyRepresentingSearchedString, true },
+			
+			// 2ci
+			{ commandType+" "+stringNotExactlyContainingSearchedString, stringExactlyRepresentingSearchedString, false },
+			
+			// 2di
+			{ commandType+" "+stringNotContainingSearchedString, stringExactlyRepresentingSearchedString, false },
+			
+			// 2ei
+			{ commandType+" "+emptyString, stringExactlyRepresentingSearchedString, false },
+			
+			// 3ai
+			{ stringExactlyRepresentingSearchedString, stringExactlyRepresentingSearchedString, true },
+			
+			// 3bi
+			{ stringExactlyContainingSearchedString, stringExactlyRepresentingSearchedString, true },
+			
+			// 3ci
+			{ stringNotExactlyContainingSearchedString, stringExactlyRepresentingSearchedString, false },
+			
+			// 3di
+			{ stringNotContainingSearchedString, stringExactlyRepresentingSearchedString, false },
+			
+			// 3ei
+			{ emptyString, stringExactlyRepresentingSearchedString, false },
+			
+			// 4i
+			{ null, stringExactlyRepresentingSearchedString, false },
+			
+			// 1aii
+			{ commandType+" "+taskName+" "+stringExactlyRepresentingSearchedString, emptyString, false },
+			
+			// 1aiii
+			{ commandType+" "+taskName+" "+stringExactlyRepresentingSearchedString, null, false },
 		});
 	}
 
