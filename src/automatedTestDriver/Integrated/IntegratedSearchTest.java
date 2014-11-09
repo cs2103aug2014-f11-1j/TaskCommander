@@ -47,10 +47,10 @@ public class IntegratedSearchTest {
 				{ searchCommand[1]+" "+searchPhrase, String.format(Global.MESSAGE_INVALID_FORMAT, searchCommand[1]+" "+searchPhrase)},
 				{ searchCommand[2]+" "+searchPhrase, String.format(Global.MESSAGE_INVALID_FORMAT, searchCommand[2]+" "+searchPhrase)},
 				{ searchCommand[3]+" "+searchPhrase, String.format(Global.MESSAGE_INVALID_FORMAT, searchCommand[3]+" "+searchPhrase)},
-				{ searchCommand[0]+" "+searchString, "search task with keywords "+searchString},
-				{ searchCommand[1]+" "+searchString, "search task with keywords "+searchString},
-				{ searchCommand[2]+" "+searchString, "search task with keywords "+searchString},
-				{ searchCommand[3]+" "+searchString, "search task with keywords "+searchString},
+				{ searchCommand[0]+" "+searchString, String.format(Global.MESSAGE_SEARCHED,searchString)},
+				{ searchCommand[1]+" "+searchString, String.format(Global.MESSAGE_SEARCHED,searchString)},
+				{ searchCommand[2]+" "+searchString, String.format(Global.MESSAGE_SEARCHED,searchString)},
+				{ searchCommand[3]+" "+searchString, String.format(Global.MESSAGE_SEARCHED,searchString)},
 		});
 	}
 
