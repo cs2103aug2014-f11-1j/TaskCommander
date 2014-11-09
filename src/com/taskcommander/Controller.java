@@ -202,7 +202,7 @@ public class Controller {
 		isSearchRestricted = true;
 		setDisplaySettingsDescription();
 
-		return Global.MESSAGE_SEARCHED;
+		return String.format(Global.MESSAGE_SEARCHED,searchedWordsAndPhrases);
 	}
 
 
