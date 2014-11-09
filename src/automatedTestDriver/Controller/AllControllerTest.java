@@ -2,6 +2,10 @@ package automatedTestDriver.Controller;
 
 import static org.junit.Assert.*;
 
+import java.util.Calendar;
+import java.util.Date;
+
+import org.junit.Before;
 import org.junit.Test;
 
 //@author A0128620M
@@ -10,9 +14,16 @@ import org.junit.Test;
 */
 
 public class AllControllerTest {
+    DataStub dataStub;
+
+    
+    @Before
+    public void setTestEnvironment() {
+        dataStub = new DataStub();
+    }
 
 	@Test
-	public void test() {
+	public void testGetDisplayedTasks() {
 		fail("Not yet implemented");
 	}
 

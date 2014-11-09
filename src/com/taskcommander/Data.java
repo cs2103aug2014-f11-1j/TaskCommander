@@ -23,7 +23,7 @@ public class Data {
 	// Constructor, Variables and Logger
 	private static Logger logger = Logger.getLogger(Controller.class.getName());	//TODO add logs
 
-	private ArrayList<Task> tasks; // Contains all available task objects.
+	protected ArrayList<Task> tasks; // Contains all available task objects.
 
 	//@author A0109194A
 	private ArrayList<Task> deletedTasks; // Used by the Google API.
@@ -44,7 +44,7 @@ public class Data {
 
 	//@author A0128620M 
 	//@author A0109194A
-	private Data() {
+	protected Data() {
 		tasks = new ArrayList<Task>();
 		deletedTasks = new ArrayList<Task>();
 		addedTasks = new Stack<Task>();
