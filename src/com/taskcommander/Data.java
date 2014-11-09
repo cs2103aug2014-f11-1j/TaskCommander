@@ -479,7 +479,7 @@ public class Data {
 		timedTask.setEdited(false);
 		tasks.add(timedTask);
 		saveToPermanentStorage();
-		return getTaskInDisplayFormat(timedTask);
+		return String.format(Global.MESSAGE_ADDED, getTaskInDisplayFormat(timedTask));
 	}
 
 	// Update methods
