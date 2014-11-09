@@ -1,5 +1,4 @@
 package com.taskcommander;
-
 import java.util.Date;
 
 //@author A0112828H
@@ -23,6 +22,14 @@ public class DeadlineTask extends DatedTask {
         }
     }
 
+    public Date getEndDate() {
+        return _endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        _endDate = endDate;
+    }
+    
     //@author A0109194A
     /**
      * Creates a new DeadlineTask with given name, end time and a Google ID.
@@ -37,7 +44,7 @@ public class DeadlineTask extends DatedTask {
             throw new IllegalArgumentException();
         }
     }
-
+    
     //@author A0128620M
     /**
      * Creates a new DeadlineTask from a given DeadlineTask. Used for cloning.
@@ -49,14 +56,6 @@ public class DeadlineTask extends DatedTask {
         this.setId(otherDeadlineTask.getId());
         this.setDone(otherDeadlineTask.isDone());
         this.setEdited(otherDeadlineTask.isEdited());
-    }
-
-    public Date getEndDate() {
-        return _endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        _endDate = endDate;
     }
 
     /**
