@@ -63,7 +63,7 @@ public class IntegratedMarkTest {
 				{ doneCommand[0]+" "+index[9], "Done: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"Eat an apple\""},
 				{ doneCommand[0]+" "+index[10], "Done: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Relax!\""},
 				{ doneCommand[0]+" "+index[11], "Done: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Get married\""},*/
-				{ doneCommand[0]+" "+index[12], "Done: [by "+Global.dayFormat.format(today)+" 21:00] \"Get some exercise\""},
+				{ doneCommand[0]+" "+index[13], "Done: [by "+Global.dayFormat.format(today)+" 21:00] \"Get some exercise\""},
 				
 				
 				{ doneCommand[0], "Invalid command format: \""+doneCommand[0]+"\". Refer to help tab to see the list of commands."},

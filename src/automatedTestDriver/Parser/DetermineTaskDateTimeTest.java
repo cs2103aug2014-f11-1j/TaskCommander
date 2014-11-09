@@ -130,6 +130,8 @@ public class DetermineTaskDateTimeTest {
             int days = (Calendar.SATURDAY - weekday + 2) % 7;
             calendar.add(Calendar.DAY_OF_YEAR, days);
         }
+        else
+        	calendar.add(Calendar.DAY_OF_YEAR, 7);
         Date dateTime9 = calendar.getTime();
         List<Date> expectedDateTimes9 = new ArrayList<Date>();
         expectedDateTimes9.add(dateTime9);
