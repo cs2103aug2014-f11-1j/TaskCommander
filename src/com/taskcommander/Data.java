@@ -924,6 +924,10 @@ public class Data {
 		return tasks.indexOf(task);
 	}
 	
+	public void clearOperationHistory() {
+		operationHistory.clear();
+	}
+	
 	/**
 	 * Checks if the tasks ArrayList contains the given task.
 	 * @return  index
