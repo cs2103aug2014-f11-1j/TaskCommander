@@ -267,7 +267,7 @@ public class Parser {
 		String userCommandWithoutCommandType = removeCommandType(userCommand);
 		String userCommandWithoutTaskNameAndCommandType = removeTaskName(userCommandWithoutCommandType);
 
-		return userCommandWithoutTaskNameAndCommandType.matches(".*\\b" + parameter + "\\b.*");
+		return userCommandWithoutTaskNameAndCommandType.matches("(?i).*\\b" + parameter + "\\b.*");
 	}	
 	
 	/**

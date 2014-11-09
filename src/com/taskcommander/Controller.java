@@ -1,532 +1,616 @@
 package com.taskcommander;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 //@author A0128620M
 /**
- * Singleton class that determines and executes commands from user input, and passes feedback to the UI.
- * Acts as a facade class and delegates commands to other classes.
- * 
- * Delegates data manipulation commands to the Data component. 
- * Delegates sync commands to the Google Integration component.
- * Handles view settings adjusted by display commands.
+ * Singleton class that determines and executes commands from user input, and
+ * passes feedback to the UI. Acts as a facade class and delegates commands to
+ * other classes. Delegates data manipulation commands to the Data component.
+ * Delegates sync commands to the Google Integration component. Handles view
+ * settings adjusted by display commands.
  */
+
 public class Controller {
+    private static Logger logger = Logger.getLogger(Controller.class.getName());
+    
+    // Tasks currently displayed by the UI needed by commands with index.
+    private ArrayList<Task> displayedTasks;
 
-	// Constructor, Variables and Logger
-	private static Logger logger = Logger.getLogger(Controller.class.getName());	//TODO add logs
+    // Display settings, adjusted by display command.
+    String displaySettingsDescription;
 
-	// Contains all tasks recently displayed by the UI. Needed by the update, delete, done and open commands.
-	private ArrayList<Task> displayedTasks;	
+    boolean isDateRestricted;
+    Date startDateRestriction;
+    Date endDateRestriction;
 
-	// Variables for display settings, adjusted by display command
-	String displaySettingsDescription;
+    boolean isTaskTypeRestricted;
+    boolean areFloatingTasksDisplayed;
+    boolean areDeadlineTasksDisplayed;
+    boolean areTimedTasksDisplayed;
 
-	boolean isDateRestricted;
-	Date startDateRestriction;
-	Date endDateRestriction;
+    boolean isStatusRestricted;
+    boolean areDoneTasksDisplayed;
+    boolean areOpenTasksDisplayed;
 
-	boolean isTaskTypeRestricted;
-	boolean areFloatingTasksDisplayed;
-	boolean areDeadlineTasksDisplayed;
-	boolean areTimedTasksDisplayed;
+    boolean isSearchRestricted;
+    ArrayList<String> searchedWordsAndPhrases;
 
-	boolean isStatusRestricted;
-	boolean areDoneTasksDisplayed;
-	boolean areOpenTasksDisplayed;
+    // Singleton instance of Controller.
+    private static Controller theOne;
 
-	boolean isSearchRestricted;
-	ArrayList<String> searchedWordsAndPhrases;
+    private Controller() {
+        setDefaultDisplaySettings();
+    }
 
-	// Singleton instance for Controller
-	private static Controller theOne;
+    /**
+     * Returns the only instance of Controller.
+     * 
+     * @return Controller instance
+     */
+    public static Controller getInstance() {
+        if (theOne == null) {
+            theOne = new Controller();
+        }
+        return theOne;
+    }
 
-	private Controller(){
-		setDefaultDisplaySettings();
-	}
+    /**
+     * Parses the command from the user and executes it if valid. Afterwards a
+     * feedback String is returned.
+     * 
+     * @param userCommand
+     * @return feedback for UI
+     */
+    public String executeCommand(String userCommand) {
+        if (userCommand == null | userCommand == "") {
+            return String.format(Global.MESSAGE_NO_COMMAND);
+        }
 
-	/**
-	 * Returns the only instance of Controller.
-	 * @return  Controller instance.
-	 */
-	public static Controller getInstance(){
-		if (theOne == null) {    
-			theOne = new Controller();
-		}
-		return theOne;
-	}
+        Global.CommandType commandType = TaskCommander.parser
+            .determineCommandType(userCommand);
 
-	/**
-	 * Parses the command from the user and executes it if valid. Afterwards a 
-	 * feedback String is returned.
-	 * @param  userCommand  
-	 * @return              Feedback to the UI
-	 */
-	public String executeCommand(String userCommand) {	
-		if (userCommand == null | userCommand == "") {
-			return String.format(Global.MESSAGE_NO_COMMAND);
-		}
-
-		Global.CommandType commandType = TaskCommander.parser.determineCommandType(userCommand);
-
-		switch (commandType) {
-		case ADD:
-			return addTask(userCommand);
-		case UPDATE: 
-			return updateTask(userCommand);
-		case DONE: 
-			return doneTask(userCommand);
-		case OPEN: 
-			return openTask(userCommand);
-		case DELETE:
-			return deleteTask(userCommand);
-		case DISPLAY:
-			return displayTasks(userCommand);
-		case SEARCH:	
-			return searchForTasks(userCommand);
-		case CLEAR:
-			return clearTasks(userCommand);
-		case SYNC: 
-			return syncTasks(userCommand);			
-		case UNDO: 
-			return undoTask(userCommand);
-		case EXIT:
-			System.exit(0);
-		default:
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);		
-		}
-	}
-
-	// Command methods
-	private String addTask(String userCommand) {
-		String taskName = TaskCommander.parser.determineTaskName(userCommand);
-		List<Date> taskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
-
-		if (isSingleWord(userCommand) || taskName == null || isTaskDateTimeInvalid(taskDateTime)) {
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-		} else {
-			return addTaskToData(taskName, taskDateTime);
-		}
-	}
-
-	private String updateTask(String userCommand) {
-		int indexOfRelatedTaskInDisplayedTasks = TaskCommander.parser.determineIndex(userCommand) - Global.INDEX_OFFSET;
-		if (isIndexDisplayedTasksInvalid(indexOfRelatedTaskInDisplayedTasks)) {
-			return String.format(Global.MESSAGE_NO_INDEX, indexOfRelatedTaskInDisplayedTasks + Global.INDEX_OFFSET);
-		}
-
-		Task relatedTask = displayedTasks.get(indexOfRelatedTaskInDisplayedTasks);
-		String newTaskName = TaskCommander.parser.determineTaskName(userCommand);
-		List<Date> newTaskDateTime = TaskCommander.parser.determineTaskDateTime(userCommand);
-
-		if (isSingleWord(userCommand) || isTaskDateTimeInvalid(newTaskDateTime)) {
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-		}
-
-		// "none" is a keyword used by the user to indicate, that he wants to change a DatedTask to a FloatingTask
-		boolean removeExistingDate = TaskCommander.parser.containsParameter(userCommand, "none");
-		if ((newTaskDateTime == null) && !removeExistingDate && (newTaskName == null)) {	// no changes at all
-			//TODO: @Andy: If there are no changes to be made, you can simply do nothing and return a success message
-			// because it's not quite an invalid command format, and the user did nothing wrong.
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-		}
-
-		return updateTaskInData(relatedTask, newTaskName, newTaskDateTime, removeExistingDate);
-	}
-
-	private String doneTask(String userCommand) {
-		if (isSingleWord(userCommand)) {
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-		}
-
-		int indexOfRelatedTaskInDisplayedTasks = TaskCommander.parser.determineIndex(userCommand) - Global.INDEX_OFFSET;
-		if (isIndexDisplayedTasksInvalid(indexOfRelatedTaskInDisplayedTasks)) {
-			return String.format(Global.MESSAGE_NO_INDEX, indexOfRelatedTaskInDisplayedTasks + Global.INDEX_OFFSET);
-		}
-
-		Task relatedTask = displayedTasks.get(indexOfRelatedTaskInDisplayedTasks);
-		return TaskCommander.data.done(TaskCommander.data.getIndexOf(relatedTask));
-	}
-
-	private String openTask(String userCommand) {
-		if (isSingleWord(userCommand)) {
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-		}
-
-		int indexOfRelatedTaskInDisplayedTasks = TaskCommander.parser.determineIndex(userCommand) - Global.INDEX_OFFSET;
-		if (isIndexDisplayedTasksInvalid(indexOfRelatedTaskInDisplayedTasks)) {
-			return String.format(Global.MESSAGE_NO_INDEX, indexOfRelatedTaskInDisplayedTasks + Global.INDEX_OFFSET);
-		}
-
-		Task relatedTask = displayedTasks.get(indexOfRelatedTaskInDisplayedTasks);
-		return TaskCommander.data.open(TaskCommander.data.getIndexOf(relatedTask));
-	}
-
-	private String deleteTask(String userCommand) {
-		if (isSingleWord(userCommand)) {
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-		}
-
-		int indexOfRelatedTaskInDisplayedTasks = TaskCommander.parser.determineIndex(userCommand) - Global.INDEX_OFFSET;
-		if (isIndexDisplayedTasksInvalid(indexOfRelatedTaskInDisplayedTasks)) {
-			return Global.MESSAGE_NO_INDEX;
-		}
-
-		Task relatedTask = displayedTasks.get(indexOfRelatedTaskInDisplayedTasks);
-		return TaskCommander.data.deleteTask(TaskCommander.data.getIndexOf(relatedTask));
-	}
-
-	private String displayTasks(String userCommand) {
-		List<Date> taskDateTimes = TaskCommander.parser.determineTaskDateTime(userCommand);
-		if (isTaskDateTimeInvalid(taskDateTimes)) {
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-		}
-
-		updateDisplayRestrictions(userCommand, taskDateTimes);
-		setDisplaySettingsDescription();
-
-		return Global.MESSAGE_DISPLAYED;
-	}
-
-	private String searchForTasks(String userCommand) {
-		resetDisplayRestrictions();
-		
-		searchedWordsAndPhrases = TaskCommander.parser.determineSearchedWords(userCommand);	
-		if (searchedWordsAndPhrases == null) {
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-		}
-		
-		isSearchRestricted = true;
-		setDisplaySettingsDescription();
-
-		return String.format(Global.MESSAGE_SEARCHED,searchedWordsAndPhrases);
-	}
-
-
-	private String clearTasks(String userCommand) {
-		if (isSingleWord(userCommand)) {
-			return TaskCommander.data.clearTasks();
-		} else {
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-		}
-	}
-
-	private String syncTasks(String userCommand) {
-		if (isSingleWord(userCommand)) {
-			if (TaskCommander.syncHandler == null) {
-				TaskCommander.getSyncHandler();
-			}
-			return TaskCommander.syncHandler.sync();
-		} else {
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-		}	
-	}
-
-	private String undoTask(String userCommand) {
-		if (isSingleWord(userCommand)) {
-			return TaskCommander.data.undo();
-		} else {
-			return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
-		}
-	}
-
-	// For displayed tasks
-	/**
-	 * Returns the tasks which are supposed to be displayed by the UI according to the current display settings.
-	 * @return      ArrayList with tasks to be displayed
-	 */
-	public ArrayList<Task> getDisplayedTasks() {
-		if (!isDateRestricted && !isTaskTypeRestricted && !isStatusRestricted  && !isSearchRestricted) {
-			displayedTasks = TaskCommander.data.getCopiedTasks();
-		} else {
-			displayedTasks = TaskCommander.data.getCopiedTasks(isDateRestricted, startDateRestriction, endDateRestriction, 
-					isTaskTypeRestricted, areFloatingTasksDisplayed, areDeadlineTasksDisplayed, areTimedTasksDisplayed, 
-					isStatusRestricted, areDoneTasksDisplayed, areOpenTasksDisplayed, isSearchRestricted, searchedWordsAndPhrases);
-		}
-		return displayedTasks;
-	}
-
-	public String getDisplaySettingsDescription() {
-		return displaySettingsDescription;
-	}
-
-	// Helper methods
-	/**
-	 * Checks whether the given list is valid, that is, contains either one or two DateTimes.
-	 * @param  taskDateTimes  	List containing DateTimes
-	 * @return              	If list is valid
-	 */
-	private boolean isTaskDateTimeInvalid(List<Date> taskDateTimes) {
-		if (taskDateTimes != null && taskDateTimes.size() > 2) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Processes the addition of the task to the respective method in Data.
-	 * @param  taskDateTimes  	List containing DateTimes
-	 * @param  taskName  		Task name
-	 * @return              	Feedback to the UI
-	 */
-	private String addTaskToData(String taskName, List<Date> taskDateTime) {
-		if (taskDateTime == null) { 			
-			return TaskCommander.data.addFloatingTask(taskName);
-		} else if (taskDateTime.size() == 1 ) { 	
-			return TaskCommander.data.addDeadlineTask(taskName, taskDateTime.get(0));
-		} else { 
-			assert (taskDateTime.size() <= 2);	//TODO
-			Date startDate = taskDateTime.get(0);
-			Date endDate = taskDateTime.get(1);
-			return TaskCommander.data.addTimedTask(taskName, startDate, endDate);
-		}
-	}
-
-	/**
-	 * Checks whether the given index is valid in respect to the recently displayed tasks list.
-	 * @param  indexDisplayedTasks  	Index of related task in displayedTasks list
-	 * @return              			If valid
-	 */
-	private boolean isIndexDisplayedTasksInvalid(int indexDisplayedTasks) {
-		if (indexDisplayedTasks > displayedTasks.size() - Global.INDEX_OFFSET || indexDisplayedTasks < 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Processes the update of the task to the respective method in Data.
-	 * @param  TODO
-	 */
-	private String updateTaskInData(Task relatedTask, String newTaskName, List<Date> newTaskDateTime, boolean removeExistingDate) {
-		Task.TaskType newTaskType;
-		Date newStartDate = null;
-		Date newEndDate = null;
-
-		if (newTaskDateTime != null) {
-			if (newTaskDateTime.size() == 1) {
-				newTaskType = Task.TaskType.DEADLINE;
-				newEndDate = newTaskDateTime.get(0);
-			} else {
-				assert (newTaskDateTime.size() <= 2); //TODO: @Andy: is this assert used properly? 
-				newTaskType = Task.TaskType.TIMED;
-				newStartDate = newTaskDateTime.get(0);
-				newEndDate = newTaskDateTime.get(1);
-			}
-		} else if (removeExistingDate) {	
-			newTaskType = Task.TaskType.FLOATING;
-		} else {
-			Task.TaskType oldTaskType = relatedTask.getType();
-			newTaskType = oldTaskType;
-		}
-
-		int indexOfRelatedTask = TaskCommander.data.getIndexOf(relatedTask);
-		switch (newTaskType) {
-		case FLOATING:
-			return TaskCommander.data.updateToFloatingTask(indexOfRelatedTask, newTaskName);
-		case DEADLINE:
-			return TaskCommander.data.updateToDeadlineTask(indexOfRelatedTask, newTaskName, newEndDate);
-		default:
-			return TaskCommander.data.updateToTimedTask(indexOfRelatedTask, newTaskName, newStartDate, newEndDate);
-		}
-	}
-
-	/**
-	 * Sets the default values of the display settings (overdue and upcoming open tasks of the  next two weeks). 
-	 * @param  TODO
-	 */ 
-	private void setDefaultDisplaySettings() {
-
-		isDateRestricted = true;
-		Calendar calendar = Calendar.getInstance();
-		startDateRestriction = null;
-		calendar.add(Calendar.WEEK_OF_YEAR, 2);
-		endDateRestriction = calendar.getTime();
-
-		resetTaskTypeRestrictionOfDisplaySettings();
-
-		isStatusRestricted = true;
-		areDoneTasksDisplayed = false; 
-		areOpenTasksDisplayed = true;
-
-		resetSearchRestrictionOfDisplaySettings();
-		
-		setDisplaySettingsDescription();
-	}	
-
-	/**
-	 * Sets date, task type and status restrictions, and resets search restrictions
-	 * for display settings.
-	 * @param userCommand
-	 * @param taskDateTimes
-	 */
-	private void updateDisplayRestrictions(String userCommand, List<Date> taskDateTimes) {
-		setDateRestrictionOfDisplaySettings(taskDateTimes);
-		setTaskTypeRestrictionsOfDisplaySettings(userCommand);
-		setStatusRestrictionOfDisplaySettings(userCommand);
-		resetSearchRestrictionOfDisplaySettings();
-	}
-
-	/**
-	 * Resets date, task type and status restrictions for display settings.
-	 */
-	private void resetDisplayRestrictions() {
-		resetDateRestrictionOfDisplaySettings();
-		resetTaskTypeRestrictionOfDisplaySettings();
-		resetStatusRestrictionOfDisplaySettings();
-	}
-
-	/**
-	 * Sets the date restrictions of the display settings.
-	 * @param  taskDateTimes  	list containing DateTimes
-	 */
-	private void setDateRestrictionOfDisplaySettings(List<Date> taskDateTimes) {
-		if (taskDateTimes != null) {
-			if (taskDateTimes.size() == 1) {
-				isDateRestricted = true;
-				startDateRestriction = null; 
-				endDateRestriction = taskDateTimes.get(0);
-			} else if (taskDateTimes.size() == 2) {
-				isDateRestricted = true;
-				startDateRestriction = taskDateTimes.get(0);
-				endDateRestriction = taskDateTimes.get(1);
-			}
-		} else {
-			resetDateRestrictionOfDisplaySettings();
-			startDateRestriction = null;
-			endDateRestriction = null;
-		}
-	}
-
-	/**
-	 * Sets the task type restrictions of the display settings.
-	 * @param  userCommand 
-	 */
-	private void setTaskTypeRestrictionsOfDisplaySettings(String userCommand) {
-		areFloatingTasksDisplayed = TaskCommander.parser.containsParameter(userCommand, "none");
-		areDeadlineTasksDisplayed = TaskCommander.parser.containsParameter(userCommand, "deadline");
-		areTimedTasksDisplayed = TaskCommander.parser.containsParameter(userCommand, "timed");
-		if ((!areFloatingTasksDisplayed && !areDeadlineTasksDisplayed && !areTimedTasksDisplayed) || (areFloatingTasksDisplayed && areDeadlineTasksDisplayed && areTimedTasksDisplayed)) {
-			resetTaskTypeRestrictionOfDisplaySettings();
-		} else {
-			isTaskTypeRestricted = true;
-		}
-	}
-
-	/**
-	 * Sets the status restrictions of the display settings.
-	 * @param  userCommand
-	 */
-	private void setStatusRestrictionOfDisplaySettings(String userCommand) {
-		areDoneTasksDisplayed = TaskCommander.parser.containsParameter(userCommand, "done");
-		areOpenTasksDisplayed = TaskCommander.parser.containsParameter(userCommand, "open");
-		if ((!areDoneTasksDisplayed && !areOpenTasksDisplayed) || (areDoneTasksDisplayed && areOpenTasksDisplayed) ) {
-			resetStatusRestrictionOfDisplaySettings();
-		} else {
-			isStatusRestricted = true;
-		}
-	}
-
-	// Resets the search restrictions of the display settings.
-	private void resetSearchRestrictionOfDisplaySettings() {
-		isSearchRestricted = false;
-		searchedWordsAndPhrases = null;
-	}
-
-
-	// Sets the description of the display settings.
-	private void setDisplaySettingsDescription() {
-		if (!isDateRestricted && !isTaskTypeRestricted && !isStatusRestricted && !isSearchRestricted) {	// no display restriction
-			displaySettingsDescription = "All";
-		} else {
-			displaySettingsDescription = "";
-			if (isDateRestricted) {
-				if (startDateRestriction == null) {
-					displaySettingsDescription += "Date: by "+ Global.dayFormat.format(endDateRestriction)+ " " + Global.timeFormat.format(endDateRestriction);
-				} else {
-					displaySettingsDescription += "Date: "+ Global.dayFormat.format(startDateRestriction)+ " " +
-							Global.timeFormat.format(startDateRestriction)+ " - "+ Global.dayFormat.format(endDateRestriction)+ " " + Global.timeFormat.format(endDateRestriction);
-				}
-			}
-			if (isTaskTypeRestricted) {
-				if (!displaySettingsDescription.equals("")) {
-					displaySettingsDescription += " ";
-				}
-				displaySettingsDescription += "Type: ";
-				if (areFloatingTasksDisplayed) {
-					displaySettingsDescription += "none";
-				}
-				if (areDeadlineTasksDisplayed && !areFloatingTasksDisplayed) {
-					displaySettingsDescription += "deadline";
-				} else if (areDeadlineTasksDisplayed) {
-					displaySettingsDescription += ", deadline";
-				}
-				if (areTimedTasksDisplayed && !areFloatingTasksDisplayed && !areDeadlineTasksDisplayed) {
-					displaySettingsDescription += "timed";
-				} else if (areTimedTasksDisplayed) {
-					displaySettingsDescription += ", timed";
-				}
-			}
-			if (isStatusRestricted) {
-				if (!displaySettingsDescription.equals("")) {
-					displaySettingsDescription += " ";
-				}
-				displaySettingsDescription += "Status: ";
-				if (areDoneTasksDisplayed) {
-					displaySettingsDescription += "done";
-				} else {
-					displaySettingsDescription += "open";
-				}
-			}
-			if (isSearchRestricted) {
-				if (!displaySettingsDescription.equals("")) {
-					displaySettingsDescription += " ";
-				}
-				for(String searchedWordOrPhrase : searchedWordsAndPhrases) {
-					if (displaySettingsDescription.equals("")) {
-						displaySettingsDescription = "Words/Phrases: "+"\""+searchedWordOrPhrase+"\"";
-					} else {
-						displaySettingsDescription += ", "+"\""+searchedWordOrPhrase+"\"";
-					}
-				}
-			}
-		}
-	logger.log(Level.INFO, displaySettingsDescription);	
-	}
+        switch (commandType) {
+          case ADD:
+              return addTask(userCommand);
+  
+          case UPDATE:
+              return updateTask(userCommand);
+  
+          case DONE:
+              return doneTask(userCommand);
+  
+          case OPEN:
+              return openTask(userCommand);
+          case DELETE:
+              return deleteTask(userCommand);
+  
+          case DISPLAY:
+              return displayTasks(userCommand);
+  
+          case SEARCH:
+              return searchForTasks(userCommand);
+  
+          case CLEAR:
+              return clearTasks(userCommand);
+  
+          case SYNC:
+              return syncTasks(userCommand);
+  
+          case UNDO:
+              return undoTask(userCommand);
+  
+          case EXIT:
+              System.exit(0);
+  
+          default:
+              return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+    }
 	
+    /**
+     * Returns the tasks which are supposed to be displayed by the UI according
+     * to the current display settings.
+     * 
+     * @return tasks to be displayed
+     */
+    public ArrayList<Task> getDisplayedTasks() {
+        if (noDisplayRestrictions()) {
+            displayedTasks = TaskCommander.data.getCopiedTasks();
+        } else {
+            displayedTasks = TaskCommander.data.getCopiedTasks(
+                isDateRestricted, startDateRestriction, endDateRestriction,
+                isTaskTypeRestricted, areFloatingTasksDisplayed,
+                areDeadlineTasksDisplayed, areTimedTasksDisplayed,
+                isStatusRestricted, areDoneTasksDisplayed,
+                areOpenTasksDisplayed, isSearchRestricted,
+                searchedWordsAndPhrases);
+        }
+        return displayedTasks;
+    }
 
-	private void resetStatusRestrictionOfDisplaySettings() {
-		isStatusRestricted = false;
-	}
+    /**
+     * Returns the current display settings consolidated as a String.
+     * 
+     * @return description of display settings
+     */
+    public String getDisplaySettingsDescription() {
+        return displaySettingsDescription;
+    }
+	
+    // Checks the add command from the user and forwards it to Data.
+    String addTask(String userCommand) {
+        if (hasNoParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
 
-	private void resetTaskTypeRestrictionOfDisplaySettings() {
-		isTaskTypeRestricted = false;
-	}
+        String taskName = TaskCommander.parser.determineTaskName(userCommand);
+        List<Date> taskDateTime = TaskCommander.parser
+            .determineTaskDateTime(userCommand);
 
-	private void resetDateRestrictionOfDisplaySettings() {
-		isDateRestricted = false;
-	}
+        if (taskName == null || isTaskDateTimeInvalid(taskDateTime)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        } else {
+            return addTaskToData(taskName, taskDateTime);
+        }
+    }
 
-	/**
-	 * Returns the number of words of given String.
-	 * @param  userCommand 
-	 */
-	private int getNumberOfWords(String userCommand) {
-		String[] allWords = userCommand.trim().split("\\s+");
-		return allWords.length;
-	}
+    // Checks the update command from the user and forwards it to Data.
+    private String updateTask(String userCommand) {
+        if (hasNoParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
 
-	/**
-	 * Returns true if given string is a single word.
-	 * @param userCommand
-	 * @return             If given string is a single word.
-	 */
-	private boolean isSingleWord(String userCommand) {
-		return getNumberOfWords(userCommand) == 1;
-	}
+        int indexDisplayedTasks = TaskCommander.parser
+            .determineIndex(userCommand) - Global.INDEX_OFFSET;
+        if (isIndexDisplayedTasksInvalid(indexDisplayedTasks)) {
+            return String.format(Global.MESSAGE_NO_INDEX, indexDisplayedTasks
+                + Global.INDEX_OFFSET);
+        }
+
+        String newTaskName = TaskCommander.parser
+            .determineTaskName(userCommand);
+
+        List<Date> newTaskDateTime = TaskCommander.parser
+            .determineTaskDateTime(userCommand);
+        if (isTaskDateTimeInvalid(newTaskDateTime)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        boolean removeExistingDate = TaskCommander.parser.containsParameter(
+            userCommand, Global.PARAMETER_FLOATING);
+        if (noChangesToTaskGiven(newTaskName, newTaskDateTime, removeExistingDate)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        Task relatedTask = displayedTasks.get(indexDisplayedTasks);
+        return updateTaskInData(relatedTask, newTaskName, newTaskDateTime,
+            removeExistingDate);
+    }
+
+    // Checks the done command from the user and forwards it to Data.
+    private String doneTask(String userCommand) {
+        if (hasNoParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        int indexDisplayedTasks = TaskCommander.parser
+            .determineIndex(userCommand) - Global.INDEX_OFFSET;
+        if (isIndexDisplayedTasksInvalid(indexDisplayedTasks)) {
+            return String.format(Global.MESSAGE_NO_INDEX, indexDisplayedTasks
+                + Global.INDEX_OFFSET);
+        }
+
+        Task relatedTask = displayedTasks.get(indexDisplayedTasks);
+        return TaskCommander.data.done(TaskCommander.data
+            .getIndexOf(relatedTask));
+    }
+
+
+    // Checks the open command from the user and forwards it to Data.
+    private String openTask(String userCommand) {
+        if (hasNoParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        int indexDisplayedTasks = TaskCommander.parser
+            .determineIndex(userCommand) - Global.INDEX_OFFSET;
+        if (isIndexDisplayedTasksInvalid(indexDisplayedTasks)) {
+            return String.format(Global.MESSAGE_NO_INDEX, indexDisplayedTasks
+                + Global.INDEX_OFFSET);
+        }
+
+        Task relatedTask = displayedTasks.get(indexDisplayedTasks);
+        return TaskCommander.data.open(TaskCommander.data
+            .getIndexOf(relatedTask));
+    }
+
+    // Checks the delete command from the user and forwards it to the Data.
+    private String deleteTask(String userCommand) {
+        if (hasNoParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        int indexDisplayedTasks = TaskCommander.parser
+            .determineIndex(userCommand) - Global.INDEX_OFFSET;
+        if (isIndexDisplayedTasksInvalid(indexDisplayedTasks)) {
+            return Global.MESSAGE_NO_INDEX;
+        }
+
+        Task relatedTask = displayedTasks
+            .get(indexDisplayedTasks);
+        return TaskCommander.data.deleteTask(TaskCommander.data
+            .getIndexOf(relatedTask));
+    }
+
+    // Checks the display command from the user and adjusts the settings.
+    private String displayTasks(String userCommand) {
+        List<Date> taskDateTimes = TaskCommander.parser
+            .determineTaskDateTime(userCommand);
+        if (isTaskDateTimeInvalid(taskDateTimes)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        updateDisplayRestrictions(userCommand, taskDateTimes);
+        setDisplaySettingsDescription();
+
+        return Global.MESSAGE_DISPLAYED;
+    }
+
+    // Checks the search command from the user and forwards it to the Data.
+    private String searchForTasks(String userCommand) {
+        if (hasNoParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        searchedWordsAndPhrases = TaskCommander.parser
+            .determineSearchedWords(userCommand);
+        if (searchedWordsAndPhrases == null) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        resetDisplayRestrictions();
+        isSearchRestricted = true;
+        setDisplaySettingsDescription();
+
+        return String.format(Global.MESSAGE_SEARCHED, searchedWordsAndPhrases);
+    }
+
+    // Checks the clear command from the user and forwards it to the Data.
+    private String clearTasks(String userCommand) {
+        if (hasParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+        return TaskCommander.data.clearTasks();
+    }
+
+    // Checks the clear command from the user and forwards it to the Data.
+    private String syncTasks(String userCommand) {
+        if (hasParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+        if (TaskCommander.syncHandler == null) {
+            TaskCommander.getSyncHandler();
+        }
+        return TaskCommander.syncHandler.sync();
+    }
+
+    // Checks the undo command from the user and forwards it to the Data.
+    private String undoTask(String userCommand) {
+        if (hasParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+        return TaskCommander.data.undo();
+    }
+
+    // Processes the addition of the task to the respective method in Data.
+    private String addTaskToData(String taskName, List<Date> taskDateTime) {
+        if (taskDateTime == null) {
+            return TaskCommander.data.addFloatingTask(taskName);
+        } else if (taskDateTime.size() == 1) {
+            return TaskCommander.data.addDeadlineTask(taskName,
+                taskDateTime.get(0));
+        } else {
+            assert (taskDateTime.size() >= 2);
+            Date startDate = taskDateTime.get(0);
+            Date endDate = taskDateTime.get(1);
+            return TaskCommander.data
+                .addTimedTask(taskName, startDate, endDate);
+        }
+    }
+
+    // Processes the update of the task to the respective method in Data.
+    private String updateTaskInData(Task relatedTask, String newTaskName,
+        List<Date> newTaskDateTime, boolean removeExistingDate) {
+        Task.TaskType newTaskType;
+        Date newStartDate = null;
+        Date newEndDate = null;
+
+        if (newTaskDateTime != null) {
+            if (newTaskDateTime.size() == 1) {
+                newTaskType = Task.TaskType.DEADLINE;
+                newEndDate = newTaskDateTime.get(0);
+            } else {
+                assert (newTaskDateTime.size() >= 2);
+                newTaskType = Task.TaskType.TIMED;
+                newStartDate = newTaskDateTime.get(0);
+                newEndDate = newTaskDateTime.get(1);
+            }
+        } else if (removeExistingDate) {
+            newTaskType = Task.TaskType.FLOATING;
+        } else {
+            Task.TaskType oldTaskType = relatedTask.getType();
+            newTaskType = oldTaskType;
+        }
+
+        int indexOfRelatedTask = TaskCommander.data.getIndexOf(relatedTask);
+        switch (newTaskType) {
+        case FLOATING:
+            return TaskCommander.data.updateToFloatingTask(indexOfRelatedTask,
+                newTaskName);
+        case DEADLINE:
+            return TaskCommander.data.updateToDeadlineTask(indexOfRelatedTask,
+                newTaskName, newEndDate);
+        default:
+            return TaskCommander.data.updateToTimedTask(indexOfRelatedTask,
+                newTaskName, newStartDate, newEndDate);
+        }
+    }
+    
+    // Checks if given list is valid, i.e. contains either one or two DateTimes.
+    private boolean isTaskDateTimeInvalid(List<Date> taskDateTimes) {
+        if (taskDateTimes != null && taskDateTimes.size() > 2) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+	
+    // Checks if given index for displayed tasks list is valid.
+    private boolean isIndexDisplayedTasksInvalid(int indexDisplayedTasks) {
+        if (indexDisplayedTasks > displayedTasks.size() - Global.INDEX_OFFSET
+            || indexDisplayedTasks < 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Checks if userCommand has no parameters, i.e. only contains commandType.
+    private boolean hasNoParamters(String userCommand) {
+        return getNumberOfWords(userCommand) == 1;
+    }
+
+    // Checks if userCommand has parameters, i.e. not only contains commandType.
+    private boolean hasParamters(String userCommand) {
+        return getNumberOfWords(userCommand) > 1;
+    }
+
+
+    // Sets default display settings, that is, overdue and upcoming open tasks
+    // of the next two weeks.
+    private void setDefaultDisplaySettings() {
+        resetDisplayRestrictions();
+
+        isDateRestricted = true;
+        startDateRestriction = null;
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.WEEK_OF_YEAR, 2);
+        endDateRestriction = calendar.getTime();
+
+        isStatusRestricted = true;
+        areDoneTasksDisplayed = false;
+        areOpenTasksDisplayed = true;
+
+        setDisplaySettingsDescription();
+    }	
+
+    // Sets date, task type, status restrictions and resets search restrictions
+    // of display settings.
+    private void updateDisplayRestrictions(String userCommand,
+        List<Date> taskDateTimes) {
+        setDateRestrictionOfDisplaySettings(taskDateTimes);
+        setTaskTypeRestrictionsOfDisplaySettings(userCommand);
+        setStatusRestrictionOfDisplaySettings(userCommand);
+        resetSearchRestrictionOfDisplaySettings();
+    }
+
+    // Resets date, task type and status restrictions of display settings.
+    private void resetDisplayRestrictions() {
+        resetDateRestrictionOfDisplaySettings();
+        resetTaskTypeRestrictionOfDisplaySettings();
+        resetStatusRestrictionOfDisplaySettings();
+        resetSearchRestrictionOfDisplaySettings();
+    }
+
+    // Sets the date restrictions of the display settings.
+    private void setDateRestrictionOfDisplaySettings(List<Date> taskDateTimes) {
+        if (taskDateTimes != null) {
+            if (taskDateTimes.size() == 1) {
+                isDateRestricted = true;
+                startDateRestriction = null;
+                endDateRestriction = taskDateTimes.get(0);
+            } else {
+                assert (taskDateTimes.size() >= 2);
+                isDateRestricted = true;
+                startDateRestriction = taskDateTimes.get(0);
+                endDateRestriction = taskDateTimes.get(1);
+            }
+        } else {
+            resetDateRestrictionOfDisplaySettings();
+            startDateRestriction = null;
+            endDateRestriction = null;
+        }
+    }
+
+    // Sets the task type restrictions of the display settings.
+    private void setTaskTypeRestrictionsOfDisplaySettings(String userCommand) {
+        areFloatingTasksDisplayed = TaskCommander.parser.containsParameter(
+            userCommand, Global.PARAMETER_FLOATING);
+        areDeadlineTasksDisplayed = TaskCommander.parser.containsParameter(
+            userCommand, Global.PARAMETER_DEADLINE);
+        areTimedTasksDisplayed = TaskCommander.parser.containsParameter(
+            userCommand, Global.PARAMETER_TIMED);
+        
+        if (noTypeRestrictionGiven()) {
+            resetTaskTypeRestrictionOfDisplaySettings();
+        } else {
+            isTaskTypeRestricted = true;
+        }
+    }
+
+    // Sets the status restrictions of the display settings.
+    private void setStatusRestrictionOfDisplaySettings(String userCommand) {
+        areDoneTasksDisplayed = TaskCommander.parser.containsParameter(
+            userCommand, Global.PARAMETER_DONE);
+        areOpenTasksDisplayed = TaskCommander.parser.containsParameter(
+            userCommand, Global.PARAMETER_OPEN);
+        
+        if (noStatusRestrictionGiven()) {
+            resetStatusRestrictionOfDisplaySettings();
+        } else {
+            isStatusRestricted = true;
+        }
+    }
+
+    // Sets the description of display settings by consolidating it to a string.
+    private void setDisplaySettingsDescription() {
+        if (noDisplayRestrictions()) {
+            displaySettingsDescription = Global.DESCRIPTION_ALL;
+        } else {
+            displaySettingsDescription = "";
+
+            if (isDateRestricted) {
+                displaySettingsDescription += getDateRestrictionDescriptionOfDisplaySettings();
+            }
+
+            if (isTaskTypeRestricted) {
+                displaySettingsDescription += addSeperatingSpace(displaySettingsDescription);
+                displaySettingsDescription += getTypeRestrictionDescriptionOfDisplaySettings();
+            }
+
+            if (isStatusRestricted) {
+                displaySettingsDescription += addSeperatingSpace(displaySettingsDescription);
+                displaySettingsDescription += getStatusRestrictionDescriptionOfDisplaySettings();
+            }
+            if (isSearchRestricted) {
+                assert (isDateRestricted == false
+                    && isTaskTypeRestricted == false && isStatusRestricted == false);
+                displaySettingsDescription += getSearchRestrictionDescriptionOfDislplaySettings();
+            }
+        }
+        logger.log(Level.INFO, "Display settings set to: "
+            + displaySettingsDescription);
+    }
+
+    private String getDateRestrictionDescriptionOfDisplaySettings() {
+        if (startDateRestriction == null) {
+            return Global.DESCRIPTION_DEADLINE
+                + Global.dayFormat.format(endDateRestriction) + " "
+                + Global.timeFormat.format(endDateRestriction);
+        } else {
+            return Global.DESCRIPTION_TIMED
+                + Global.dayFormat.format(startDateRestriction) + " "
+                + Global.timeFormat.format(startDateRestriction) + " - "
+                + Global.dayFormat.format(endDateRestriction) + " "
+                + Global.timeFormat.format(endDateRestriction);
+        }
+    }
+
+    private String getTypeRestrictionDescriptionOfDisplaySettings() {
+        String typeRestrictionDescription = Global.DESCRIPTION_TYPE;
+        if (areFloatingTasksDisplayed) {
+            typeRestrictionDescription += Global.PARAMETER_FLOATING;
+        }
+        if (areDeadlineTasksDisplayed && !areFloatingTasksDisplayed) {
+            typeRestrictionDescription += Global.PARAMETER_DEADLINE;
+        } else if (areDeadlineTasksDisplayed) {
+            typeRestrictionDescription += ", " + Global.PARAMETER_DEADLINE;
+        }
+        if (areTimedTasksDisplayed && !areFloatingTasksDisplayed
+            && !areDeadlineTasksDisplayed) {
+            typeRestrictionDescription += Global.PARAMETER_TIMED;
+        } else if (areTimedTasksDisplayed) {
+            typeRestrictionDescription += ", " + Global.PARAMETER_TIMED;
+        }
+        return typeRestrictionDescription;
+    }
+
+    private String getStatusRestrictionDescriptionOfDisplaySettings() {
+        if (areDoneTasksDisplayed) {
+            return Global.DESCRIPTION_STATUS + Global.PARAMETER_DONE;
+        } else {
+            return Global.DESCRIPTION_STATUS + Global.PARAMETER_OPEN;
+        }
+    }
+
+    private String getSearchRestrictionDescriptionOfDislplaySettings() {
+        String searchRestrictionDescription = "";
+        for (String searchedWordOrPhrase : searchedWordsAndPhrases) {
+            if (searchRestrictionDescription.equals("")) {
+                searchRestrictionDescription = Global.DESCRIPTION_SEARCH + "\""
+                    + searchedWordOrPhrase + "\"";
+            } else {
+                searchRestrictionDescription += ", " + "\""
+                    + searchedWordOrPhrase + "\"";
+            }
+        }
+        return searchRestrictionDescription;
+    }
+
+    private String addSeperatingSpace(String displaySettingsDescription) {
+        if (displaySettingsDescription.equals("")) {
+            return "";
+        } else {
+            return " ";
+        }
+    }
+
+    private void resetSearchRestrictionOfDisplaySettings() {
+        isSearchRestricted = false;
+        searchedWordsAndPhrases = null;
+    }
+
+    private void resetStatusRestrictionOfDisplaySettings() {
+        isStatusRestricted = false;
+    }
+
+    private void resetTaskTypeRestrictionOfDisplaySettings() {
+        isTaskTypeRestricted = false;
+    }
+
+    private void resetDateRestrictionOfDisplaySettings() {
+        isDateRestricted = false;
+    }
+
+    private boolean noDisplayRestrictions() {
+        return !isDateRestricted && !isTaskTypeRestricted
+            && !isStatusRestricted && !isSearchRestricted;
+    }
+
+    private boolean noChangesToTaskGiven(String newTaskName,
+        List<Date> newTaskDateTime, boolean removeExistingDate) {
+        return (newTaskDateTime == null) && !removeExistingDate
+            && (newTaskName == null);
+    }
+
+    private boolean noTypeRestrictionGiven() {
+        return (!areFloatingTasksDisplayed && !areDeadlineTasksDisplayed && !areTimedTasksDisplayed)
+            || (areFloatingTasksDisplayed && areDeadlineTasksDisplayed && areTimedTasksDisplayed);
+    }
+
+    private boolean noStatusRestrictionGiven() {
+        return (!areDoneTasksDisplayed && !areOpenTasksDisplayed)
+            || (areDoneTasksDisplayed && areOpenTasksDisplayed);
+    }
+
+    private int getNumberOfWords(String userCommand) {
+        String[] allWords = userCommand.trim().split("\\s+");
+        return allWords.length;
+    }
 }

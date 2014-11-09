@@ -27,6 +27,7 @@ public class Global {
 	public static final String MESSAGE_INVALID_FORMAT = "Invalid command format: \"%1$s\". Refer to help tab to see the list of commands.";
 	public static final String MESSAGE_NO_COMMAND = "No command given.";
 	public static final String MESSAGE_NO_INDEX = "Index does not exist. Please type a valid index.";
+	public static final String MESSAGE_NO_CHANGE = "No changes were made.";
 	public static final String MESSAGE_NULL_ID = "Task has no ID.";
 	public static final String MESSAGE_EMPTY = "No tasks available";
 	public static final String MESSAGE_UNDO_EMPTY = "No commands to undo";
@@ -58,6 +59,21 @@ public class Global {
 	public static final SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy", Locale.ENGLISH);
 	public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
 
+	// Parameters used to restrict the displayed type of tasks or, in case of "none", to remove the date when updating.
+  public static final String PARAMETER_FLOATING = "none";
+  public static final String PARAMETER_DEADLINE = "deadline";
+  public static final String PARAMETER_TIMED = "timed";
+  public static final String PARAMETER_DONE = "done";
+  public static final String PARAMETER_OPEN = "open";
+  
+  // Display Setting Description
+  public static final String DESCRIPTION_ALL = "All";
+  public static final String DESCRIPTION_DEADLINE = "Date: by ";
+  public static final String DESCRIPTION_TIMED = "Date: ";
+  public static final String DESCRIPTION_TYPE = "Type: ";
+  public static final String DESCRIPTION_STATUS = "Status: ";
+  public static final String DESCRIPTION_SEARCH= "Words/Phrases: ";
+	 
 	//@author A0112828H
 	// Possible command types
 	public static enum CommandType {
