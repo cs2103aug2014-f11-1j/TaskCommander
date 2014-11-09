@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.taskcommander.Global.CommandType;
 
+//@author A0128620M
 /**
  * Singleton class that stores tasks temporarily. Contains all of the methods needed to manipulate 
  * the task objects within the temporary list, for internal use and for the Google Integration
@@ -17,7 +18,6 @@ import com.taskcommander.Global.CommandType;
 
 public class Data {
     
-    //@author A0128620M
     private static Logger logger = Logger.getLogger(Controller.class.getName());
     protected ArrayList<Task> tasks;
 
