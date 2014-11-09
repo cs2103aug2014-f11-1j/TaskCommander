@@ -123,16 +123,18 @@ public class DetermineTaskDateTimeTest {
         List<Date> expectedDateTimes8 = new ArrayList<Date>();
         expectedDateTimes8.add(dateTime8);
 
-       /* String inputDateTime9 = "next Monday";
+        String inputDateTime9 = "next Monday";
         calendar = Calendar.getInstance();
         int weekday = calendar.get(Calendar.DAY_OF_WEEK);
         if (weekday != Calendar.MONDAY) {
             int days = (Calendar.SATURDAY - weekday + 2) % 7;
             calendar.add(Calendar.DAY_OF_YEAR, days);
         }
+        else
+        	calendar.add(Calendar.DAY_OF_YEAR, 7);
         Date dateTime9 = calendar.getTime();
         List<Date> expectedDateTimes9 = new ArrayList<Date>();
-        expectedDateTimes9.add(dateTime9);*/
+        expectedDateTimes9.add(dateTime9);
 
         String inputDateTime10 = "today";
         Calendar today = Calendar.getInstance();
@@ -330,10 +332,10 @@ public class DetermineTaskDateTimeTest {
                     commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
                         + inputDateTime8 + " " + "anyString[1]",
                     expectedDateTimes8 },
-              /*  {
+                {
                     commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
                         + inputDateTime9 + " " + "anyString[1]",
-                    expectedDateTimes9 },*/
+                    expectedDateTimes9 },
                 {
                     commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
                         + inputDateTime10 + " " + "anyString[1]",
