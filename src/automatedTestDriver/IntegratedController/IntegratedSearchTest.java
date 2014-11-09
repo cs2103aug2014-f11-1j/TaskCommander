@@ -39,10 +39,10 @@ public class IntegratedSearchTest {
 		String searchPhrase =  "make contribution";
 		
 		return Arrays.asList(new Object[][] {
-				{ searchCommand[0], "Search task with: []"},
-				{ searchCommand[1], "Search task with: []"},
-				{ searchCommand[2], "Search task with: []"},
-				{ searchCommand[3], "Search task with: []"},
+				{ searchCommand[0], "Invalid command format: \"search\". Refer to help tab to see the list of commands."},
+				{ searchCommand[1], "Invalid command format: \"SEARCH\". Refer to help tab to see the list of commands."},
+				{ searchCommand[2], "Invalid command format: \"sEArch\". Refer to help tab to see the list of commands."},
+				{ searchCommand[3], "Invalid command format: \"searcH\". Refer to help tab to see the list of commands."},
 				{ searchCommand[0]+" "+searchPhrase, "Search task with: [make, contribution]"},
 				{ searchCommand[1]+" "+searchPhrase, "Search task with: [make, contribution]"},
 				{ searchCommand[2]+" "+searchPhrase, "Search task with: [make, contribution]"},
