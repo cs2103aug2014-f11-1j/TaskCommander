@@ -10,12 +10,12 @@ import org.junit.Test;
 import com.taskcommander.Data;
 import com.taskcommander.Task;
 
-public class InternalClearTest {
+public class ClearInternalTest {
 	Data tester;
 	Stack<ArrayList<Task>> clearedTasks;
 	ArrayList<Task> tasks;
 
-	public InternalClearTest() {
+	public ClearInternalTest() {
 		tester = Data.getInstance();
 	}
 	

@@ -12,14 +12,14 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import automatedTestDriver.Controller.ControllerTest;
-import automatedTestDriver.Data.DataTest;
+import automatedTestDriver.Data.AllDataTest;
 import automatedTestDriver.GoogleIntegration.GoogleAPIConnectorTest;
 import automatedTestDriver.Integrated.AllIntegratedTest;
 import automatedTestDriver.Parser.AllParserTest;
 import automatedTestDriver.Storage.StorageTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({   ControllerTest.class, AllParserTest.class, DataTest.class,
+@SuiteClasses({   ControllerTest.class, AllParserTest.class, AllDataTest.class,
 	GoogleAPIConnectorTest.class, StorageTest.class, AllIntegratedTest.class})
 public class AllTests {
 

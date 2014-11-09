@@ -15,12 +15,12 @@ import org.junit.runners.Suite.SuiteClasses;
 	UndoTest.class,
 	OpenTest.class,
 	DoneTest.class,
-	InternalAddTest.class,
-	InternalClearTest.class,
-	InternalDeleteTest.class,
-	InternalUpdateTest.class
+	AddInternalTest.class,
+	ClearInternalTest.class,
+	DeleteInternalTest.class,
+	UpdateInternalTest.class
 })
 
-public class DataTest {
+public class AllDataTest {
 	
 }
