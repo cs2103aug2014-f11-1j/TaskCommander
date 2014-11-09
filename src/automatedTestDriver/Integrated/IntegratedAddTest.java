@@ -59,6 +59,10 @@ public class IntegratedAddTest {
 		Date later = calendar.getTime();
 		
 		return Arrays.asList(new Object[][] {
+				{ addCommand+" "+q+content+q+" " + periodLastDaysWithoutDate, "Added: ["+Global.dayFormat.format(today)+" "+"18:00-"+ Global.dayFormat.format(tomorrow)+" 03:00] "+q+content+q },
+				//{ addCommand+" "+q+content+q+" " + deadlineInFormat[0], "Added: [by "+Global.dayFormat.format(later)+" "+ Global.timeFormat.format(later)+"] "+q+content+q },
+				//{ addCommand+" "+q+content+q+" " + deadlineInFormat[1], "Added: [by "+Global.dayFormat.format(later)+" "+ Global.timeFormat.format(later)+"] "+q+content+q },
+				
 				{ addCommand, "Invalid command format: \""+addCommand+"\". Refer to help tab to see the list of commands."},
 				{ addCommand+" "+q+content+q, "Added: "+q+content+q},
 				{ addCommandCapital[0], "Invalid command format: \""+addCommandCapital[0]+"\". Refer to help tab to see the list of commands."},
@@ -69,9 +73,6 @@ public class IntegratedAddTest {
 				{ addCommandCapital[2]+" "+q+content+q, "Added: "+q+content+q},
 				{ addCommand+" "+q+content+q+" " + deadline, "Added: [by Tue Nov 11 '14 17:00] "+q+content+q },
 				{ addCommand+" "+q+content+q+" " + period, "Added: [Wed Dec 3 '14 17:00-Sat Dec 6 '14 18:00] "+q+content+q },
-				{ addCommand+" "+q+content+q+" " + periodLastDaysWithoutDate, "Added: ["+Global.dayFormat.format(today)+" "+"18:00-"+ Global.dayFormat.format(tomorrow)+" 03:00] "+q+content+q },
-				{ addCommand+" "+q+content+q+" " + deadlineInFormat[0], "Added: [by "+Global.dayFormat.format(later)+" "+ Global.timeFormat.format(later)+"] "+q+content+q },
-				{ addCommand+" "+q+content+q+" " + deadlineInFormat[1], "Added: [by "+Global.dayFormat.format(later)+" "+ Global.timeFormat.format(later)+"] "+q+content+q },
 				{ addCommand +" "+q+"Read ma2214 textbook"+q, "Added: \"Read ma2214 textbook\""}
 		});
 	}
@@ -80,4 +81,6 @@ public class IntegratedAddTest {
 	public void testcontainsParameter() {
 		assertEquals(expectedResult, TaskCommander.controller.executeCommand(userCommand)); 
 	}
+   	
+   
 }

@@ -1,261 +1,245 @@
 package automatedTestDriver.Parser;
 import static org.junit.Assert.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import com.taskcommander.TaskCommander;
 
 //@author A0128620M
 /**
-* This class contains all test cases for the method determineSearchedWords(userCommand:String) of the component Parser.
-*/
+ * This class is part of the unit test of the component Parser and contains all
+ * test cases for the method determineSearchedWords(userCommand:String).
+ */
 
+@RunWith(Parameterized.class)
 public class DetermineSearchedWords {
-	
-	/* Test structure
-	 * 
-	 * Initial partition of parameter "userCommand":
-	 * 1. [commandType]+[space(s)]+[string containing the searched words and/or phrases]			depends on [string containing the searched words and/or phrases]
-	 * 2. [string containing the searched words and/or phrases]										depends	on [string containing the searched words and/or phrases]
-	 * 3. [space(s)]+[string containing the searched words and/or phrases]							depends	on [string containing the searched words and/or phrases]
-	 * 4. [empty String]																			invalid																								
-	 * 5. [null]																					invalid
-	 * Further partition of [string containing the searched words and/or phrases]:
-	 * a. [string with n searched words separated by spaces]										valid
-	 * b. [string with m searched phrases]															valid
-	 * c. [string with n searched words separated by spaces and m searched phrases ]				valid
-	 * d. [string with n searched words not separated by spaces]									invalid
-	 * e. [string with n searched words not separated by spaces and m searched phrases]				invalid
-	 */
-	
-	// Test parameters
-		String commandType = "search";
-		String[] searchedWords = { "meeting", "date", "John"};
-		String[] searchedPhrases = { "\"Computer Club\"", "\"Meeting with John.\"", "\"Applying for a summer internship, maybe at Google or another big company.\""};
-		String[] expectedSearchedPhrases = { "Computer Club", "Meeting with John.", "Applying for a summer internship, maybe at Google or another big company."};
-		String emptyString = "";
-		String userCommand;
-		ArrayList<String> resultingSearchedWordsAndPhrases;
-		ArrayList<String> expectedSearchedWordsAndPhrases = new ArrayList<String>();
+    private String userCommand;
+    private List<String> expectedSearchedWordsAndPhrases;
 
-	// Test run
-   	@Test
-	public void testdetermineSearchedWords() {
-   		
-   		//1a
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedWords[0];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedWords[0]+" "+searchedWords[1];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		expectedSearchedWordsAndPhrases.add(searchedWords[1]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedWords[0]+" "+searchedWords[1]+" "+searchedWords[2];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		expectedSearchedWordsAndPhrases.add(searchedWords[1]);
-   		expectedSearchedWordsAndPhrases.add(searchedWords[2]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		//1b
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedPhrases[0];
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedPhrases[0]+" "+searchedPhrases[1];
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[1]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedPhrases[0]+" "+searchedPhrases[1]+" "+searchedPhrases[2];
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[1]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[2]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedPhrases[0]+searchedPhrases[1];
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[1]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedPhrases[0]+searchedPhrases[1]+searchedPhrases[2];
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[1]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[2]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		//1c
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedWords[0]+" "+searchedPhrases[0];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedPhrases[0]+" "+searchedWords[0];
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedWords[0]+" "+searchedPhrases[1]+" "+searchedWords[1];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[1]);
-   		expectedSearchedWordsAndPhrases.add(searchedWords[1]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedWords[0]+" "+searchedWords[1]+" "+searchedPhrases[0];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		expectedSearchedWordsAndPhrases.add(searchedWords[1]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedPhrases[0]+" "+searchedWords[0]+" "+searchedWords[1];
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		expectedSearchedWordsAndPhrases.add(searchedWords[1]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedPhrases[0]+" "+searchedWords[1]+" "+searchedPhrases[1];
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		expectedSearchedWordsAndPhrases.add(searchedWords[1]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[1]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedPhrases[0]+" "+searchedPhrases[1]+" "+searchedWords[0];
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[1]);
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedWords[0]+" "+searchedPhrases[0]+" "+searchedPhrases[1];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[1]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
+    public DetermineSearchedWords(String userCommand,
+        List<String> expectedSearchedWordsAndPhrases) {
+        this.userCommand = userCommand;
+        this.expectedSearchedWordsAndPhrases = expectedSearchedWordsAndPhrases;
+    }
 
-   		//1d
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedWords[0]+searchedWords[1];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]+searchedWords[1]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedWords[0]+searchedWords[1]+searchedWords[2];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]+searchedWords[1]+searchedWords[2]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		//1e
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedWords[0]+searchedWords[1]+" "+searchedPhrases[0];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]+searchedWords[1]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = commandType+" "+searchedPhrases[0]+" "+searchedWords[0]+searchedWords[1];
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]+searchedWords[1]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-  		//2a
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = searchedWords[0];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		//2b
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = searchedPhrases[0];
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		//2c
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = searchedWords[0]+" "+searchedPhrases[0];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
+    /* Test structure
+     * 
+     * Initial partition of parameter "userCommand":
+     * 1. [commandType]+[space(s)]+[string containing the searched word(s) and/or phrase(s)]			
+     * 2. [space(s)]+[string containing the searched word(s) and/or phrase(s)]
+     * 3. [string containing the searched word(s) and/or phrase(s)]																
+     * 4. [empty String]																																											
+     * 5. [null]	
+     * 																				
+     * Further partition of [string containing the searched word(s) and/or phrase(s)]:
+     * a. [string with searched word(s) separated by spaces]	
+     * b. [string with searched phrase(s)]									
+     * c. [string with searched word(s) separated by spaces and m searched phrase(s)]				
+     * d. [string with searched word(s) not separated by spaces]									
+     * e. [string with searched word(s) not separated by spaces and m searched phrase(s)]		
+     */
 
-   		//2d
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = searchedWords[0]+searchedWords[1];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]+searchedWords[1]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
+    // Test parameters
+    @Parameterized.Parameters
+    public static Collection<Object[]> cases() {
+        ArrayList<Object[]> cases = new ArrayList<Object[]>();
+        String commandType = "search";
+        String[] searchedWords = { "meeting", "date", "John" };
+        String[] searchedPhrases = { "\"Computer Club\"",
+            "\"Meeting with John.\"",
+            "\"Applying for a summer internship, maybe at Google or another big company.\"" };
+        String[] expectedSearchedPhrases = { "Computer Club",
+            "Meeting with John.",
+            "Applying for a summer internship, maybe at Google or another big company." };
+        String emptyString = "";
 
-   		//2e
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = searchedWords[0]+searchedWords[1]+" "+searchedPhrases[0];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]+searchedWords[1]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-  		//3a
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = " "+searchedWords[0];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		//3b
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = searchedPhrases[0];
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-   		
-   		//3c
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = " "+searchedWords[0]+" "+searchedPhrases[0];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
+        // 1a
+        cases.add(new Object[] { commandType + " " + searchedWords[0],
+            Arrays.asList(new String[] { searchedWords[0] }) });
+        cases
+            .add(new Object[] {
+                commandType + " " + searchedWords[0] + " " + searchedWords[1],
+                Arrays
+                    .asList(new String[] { searchedWords[0], searchedWords[1] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + " " + searchedWords[1] + " "
+                + searchedWords[2],
+            Arrays.asList(new String[] { searchedWords[0], searchedWords[1],
+                searchedWords[2] }) });
 
-   		//3d
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = " "+searchedWords[0]+searchedWords[1];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]+searchedWords[1]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
+        // 1b
+        cases.add(new Object[] { commandType + " " + searchedPhrases[0],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedPhrases[1],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                expectedSearchedPhrases[1] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedPhrases[1]
+                + " " + searchedPhrases[2],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                expectedSearchedPhrases[1], expectedSearchedPhrases[2] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + searchedPhrases[1],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                expectedSearchedPhrases[1] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + searchedPhrases[1]
+                + searchedPhrases[2],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                expectedSearchedPhrases[1], expectedSearchedPhrases[2] }) });
 
-   		//3e
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = " "+searchedWords[0]+searchedWords[1]+" "+searchedPhrases[0];
-   		expectedSearchedWordsAndPhrases.add(searchedWords[0]+searchedWords[1]);
-   		expectedSearchedWordsAndPhrases.add(expectedSearchedPhrases[0]);
-   		testCase(expectedSearchedWordsAndPhrases, userCommand);
-	
-   		//4
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = emptyString;
-   		testCase(null, userCommand);
-   		
-  		//5
-   		expectedSearchedWordsAndPhrases.clear();
-   		userCommand = null;
-   		testCase(null, userCommand);
-	}
-   	
-	private void testCase(ArrayList<String> expectedSearchedWordsAndPhrases,
-			String userCommand) {
-		ArrayList<String> resultingSearchedWordsAndPhrases = TaskCommander.parser.determineSearchedWords(userCommand);
-		if (expectedSearchedWordsAndPhrases != null) {
-	   		for(int i = 0; i < expectedSearchedWordsAndPhrases.size(); i++) {
-	   			assertEquals(expectedSearchedWordsAndPhrases.get(i),resultingSearchedWordsAndPhrases.get(i)); 
-	   		}
-		} else {
-			assertEquals(expectedSearchedWordsAndPhrases, resultingSearchedWordsAndPhrases);
-		}
-	}
+        // 1c
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + " " + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0],
+                expectedSearchedPhrases[0] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedWords[0],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                searchedWords[0] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + " " + searchedPhrases[0]
+                + " " + searchedWords[1],
+            Arrays.asList(new String[] { searchedWords[0],
+                expectedSearchedPhrases[0], searchedWords[1] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + " " + searchedWords[1] + " "
+                + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0], searchedWords[1],
+                expectedSearchedPhrases[0] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedWords[0]
+                + " " + searchedWords[1],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                searchedWords[0], searchedWords[1] }) });
+
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedWords[1]
+                + " " + searchedPhrases[1],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                searchedWords[1], expectedSearchedPhrases[1] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedPhrases[1]
+                + " " + searchedWords[0],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                expectedSearchedPhrases[1], searchedWords[0] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + " " + searchedPhrases[0]
+                + " " + searchedPhrases[1],
+            Arrays.asList(new String[] { searchedWords[0],
+                expectedSearchedPhrases[0], expectedSearchedPhrases[1] }) });
+
+        // 1d
+        cases
+            .add(new Object[] {
+                commandType + " " + searchedWords[0] + searchedWords[1],
+                Arrays.asList(new String[] { searchedWords[0]
+                    + searchedWords[1] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + searchedWords[1]
+                + searchedWords[2],
+            Arrays.asList(new String[] { searchedWords[0] + searchedWords[1]
+                + searchedWords[2] }) });
+
+        // 1e
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + searchedWords[1] + " "
+                + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0] + searchedWords[1],
+                expectedSearchedPhrases[0] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedWords[0]
+                + searchedWords[1],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                searchedWords[0] + searchedWords[1] }) });
+
+        // 2a
+        cases.add(new Object[] { searchedWords[0],
+            Arrays.asList(new String[] { searchedWords[0] }) });
+
+        // 2b
+        cases.add(new Object[] { searchedPhrases[0],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0] }) });
+
+        // 2c
+        cases.add(new Object[] {
+            searchedWords[0] + " " + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0],
+                expectedSearchedPhrases[0] }) });
+
+        // 2d
+        cases
+            .add(new Object[] {
+                searchedWords[0] + searchedWords[1],
+                Arrays.asList(new String[] { searchedWords[0]
+                    + searchedWords[1] }) });
+
+        // 2e
+        cases.add(new Object[] {
+            searchedWords[0] + searchedWords[1] + " " + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0] + searchedWords[1],
+                expectedSearchedPhrases[0] }) });
+
+        // 3a
+        cases.add(new Object[] { " " + searchedWords[0],
+            Arrays.asList(new String[] { searchedWords[0] }) });
+
+        // 3b
+        cases.add(new Object[] { searchedPhrases[0],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0] }) });
+
+        // 3c
+        cases.add(new Object[] {
+            " " + searchedWords[0] + " " + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0],
+                expectedSearchedPhrases[0] }) });
+
+        // 3d
+        cases
+            .add(new Object[] {
+                " " + searchedWords[0] + searchedWords[1],
+                Arrays.asList(new String[] { searchedWords[0]
+                    + searchedWords[1] }) });
+
+        // 3e
+        cases.add(new Object[] {
+            " " + searchedWords[0] + searchedWords[1] + " "
+                + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0] + searchedWords[1],
+                expectedSearchedPhrases[0] }) });
+
+        // 4
+        cases.add(new Object[] { emptyString, null });
+
+        // 5
+        cases.add(new Object[] { null, null });
+
+        return cases;
+    }
+
+    // Test run
+    @Test
+    public void testDetermineSearchedWords() {
+        ArrayList<String> actualSearchedWordsAndPhrases = TaskCommander.parser
+            .determineSearchedWords(userCommand);
+        String expectedResult = "";
+        String actualResult = "";
+
+        if (expectedSearchedWordsAndPhrases != null) {
+            for (String expectedSearchedWordOrPhrase : expectedSearchedWordsAndPhrases) {
+                expectedResult += " " + expectedSearchedWordOrPhrase;
+            }
+        }
+        if (actualSearchedWordsAndPhrases != null) {
+            for (String actualSearchedWordOrPhrase : actualSearchedWordsAndPhrases) {
+                actualResult += " " + actualSearchedWordOrPhrase;
+            }
+        }
+        assertEquals(expectedResult, actualResult);
+    }
 }
-

@@ -14,12 +14,12 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
 	UndoTest.class,
 	MarkTest.class,
-	InternalAddTest.class,
-	InternalClearTest.class,
-	InternalDeleteTest.class,
-	InternalUpdateTest.class
+	AddInternalTest.class,
+	ClearInternalTest.class,
+	DeleteInternalTest.class,
+	UpdateInternalTest.class
 })
 
-public class DataTest {
+public class AllDataTest {
 	
 }

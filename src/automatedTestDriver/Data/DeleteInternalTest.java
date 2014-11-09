@@ -8,12 +8,12 @@ import com.taskcommander.Data;
 import com.taskcommander.Task;
 
 
-public class InternalDeleteTest {
+public class DeleteInternalTest {
 	Data tester;
 	ArrayList<Task> deletedTasks;
 	ArrayList<Task> tasks;
 	
-	public InternalDeleteTest() {
+	public DeleteInternalTest() {
 		tester = Data.getInstance();
 	}
 	

@@ -12,14 +12,14 @@ import org.junit.Test;
 import com.taskcommander.Data;
 import com.taskcommander.Task;
 
-public class InternalUpdateTest {
+public class UpdateInternalTest {
 	Data tester;
 	Stack<Task> preupdatedTasks;
 	Stack<Task> updatedTasks;
 	Stack<Task> changedTypeTasks;
 	ArrayList<Task> tasks;
 	
-	public InternalUpdateTest() {
+	public UpdateInternalTest() {
 		tester = Data.getInstance();
 	}
 	
