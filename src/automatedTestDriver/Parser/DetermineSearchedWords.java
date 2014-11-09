@@ -33,7 +33,8 @@ public class DetermineSearchedWords {
 	 * 2. [space(s)]+[string containing the searched word(s) and/or phrase(s)]
 	 * 3. [string containing the searched word(s) and/or phrase(s)]																
 	 * 4. [empty String]																																											
-	 * 5. [null]																					
+	 * 5. [null]	
+	 * 																				
 	 * Further partition of [string containing the searched word(s) and/or phrase(s)]:
 	 * a. [string with searched word(s) separated by spaces]	
 	 * b. [string with searched phrase(s)]									
