@@ -19,11 +19,12 @@ public class DetermineCommandTypeTest {
 	private String userCommand;
 	private Global.CommandType expectedResult;
 
-	public DetermineCommandTypeTest(String userCommand, Global.CommandType expectedResult) {
+	public DetermineCommandTypeTest(String userCommand,
+			Global.CommandType expectedResult) {
 		this.userCommand = userCommand;
 		this.expectedResult = expectedResult;
 	}
-	
+
 	/* Test structure
 	 * 
 	 * Initial partition of parameter "userCommand":
@@ -46,58 +47,58 @@ public class DetermineCommandTypeTest {
 
 	// Test parameters
 	@Parameterized.Parameters
-	public static Collection<Object[]>  cases() {
+	public static Collection<Object[]> cases() {
 		Global.CommandType validCommandType = Global.CommandType.ADD;
-		String[] commandType = {"Add", "add", "ADD"};
+		String[] commandType = { "Add", "add", "ADD" };
 		Global.CommandType invalidCommandType = Global.CommandType.INVALID;
 		String anyNonEmptyString = "/\"meeting\" Nov 3rd 2pm";
 		String emptyString = "";
-		
+
 		return Arrays.asList(new Object[][] {
-				
+
 				// 1a, 1b, 1c
-				{ commandType[0]+" "+anyNonEmptyString, validCommandType },
-				{ commandType[1]+" "+anyNonEmptyString, validCommandType },
-				{ commandType[2]+" "+anyNonEmptyString, validCommandType },
-				
+				{ commandType[0] + " " + anyNonEmptyString, validCommandType },
+				{ commandType[1] + " " + anyNonEmptyString, validCommandType },
+				{ commandType[2] + " " + anyNonEmptyString, validCommandType },
+
 				// 2a, 2b, 2c
 				{ commandType[0], validCommandType },
 				{ commandType[1], validCommandType },
 				{ commandType[2], validCommandType },
-				
+
 				// 3a, 3b, 3c
-				{ " "+commandType[0]+" "+anyNonEmptyString, validCommandType },
-				{ " "+commandType[1]+" "+anyNonEmptyString, validCommandType },
-				{ " "+commandType[2]+" "+anyNonEmptyString, validCommandType },
-				
+				{ " " + commandType[0] + " " + anyNonEmptyString, validCommandType },
+				{ " " + commandType[1] + " " + anyNonEmptyString, validCommandType },
+				{ " " + commandType[2] + " " + anyNonEmptyString, validCommandType },
+
 				// 4a, 4b, 4c
-				{ " "+commandType[2], validCommandType },
-				{ " "+commandType[0], validCommandType },
-				{ " "+commandType[1], validCommandType },
-				
+				{ " " + commandType[2], validCommandType },
+				{ " " + commandType[0], validCommandType },
+				{ " " + commandType[1], validCommandType },
+
 				// 5
-				{ commandType[0]+anyNonEmptyString, invalidCommandType },	
-				
+				{ commandType[0] + anyNonEmptyString, invalidCommandType },
+
 				// 6
-				{ anyNonEmptyString+" "+commandType[0], invalidCommandType },
-				
+				{ anyNonEmptyString + " " + commandType[0], invalidCommandType },
+
 				// 7
-				{ anyNonEmptyString+commandType[0], invalidCommandType },
-				
+				{ anyNonEmptyString + commandType[0], invalidCommandType },
+
 				// 8
 				{ anyNonEmptyString, invalidCommandType },
-				
+
 				// 9
 				{ emptyString, invalidCommandType },
-				
+
 				// 10
-				{ null, invalidCommandType },
-				});
+				{ null, invalidCommandType }, });
 	}
 
 	// Test run
-   	@Test
+	@Test
 	public void testDetermineCommandType() {
-		assertEquals(expectedResult, TaskCommander.parser.determineCommandType(userCommand)); 
+		assertEquals(expectedResult,
+				TaskCommander.parser.determineCommandType(userCommand));
 	}
 }

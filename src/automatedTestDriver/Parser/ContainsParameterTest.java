@@ -44,10 +44,10 @@ public class ContainsParameterTest {
 	 * ii.  [empty string]																		
 	 * iii. [null]																				
 	 */
-	
+
 	// Test parameters
 	@Parameterized.Parameters
-	public static Collection<Object[]>  cases() {
+	public static Collection<Object[]> cases() {
 		String commandType = "update";
 		String taskName = "\"meeting\"";
 		String stringExactlyRepresentingSearchedString = "none";
@@ -55,68 +55,96 @@ public class ContainsParameterTest {
 		String stringNotExactlyContainingSearchedString = "nonetimed";
 		String stringNotContainingSearchedString = "other";
 		String emptyString = "";
-		
-		return Arrays.asList(new Object[][] {
-				
-			// 1ai
-			{ commandType+" "+taskName+" "+stringExactlyRepresentingSearchedString, stringExactlyRepresentingSearchedString, true },
-			
-			// 1bi
-			{ commandType+" "+taskName+" "+stringExactlyContainingSearchedString, stringExactlyRepresentingSearchedString, true },
-			
-			// 1ci
-			{ commandType+" "+taskName+" "+stringNotExactlyContainingSearchedString, stringExactlyRepresentingSearchedString, false },
-			
-			// 1di
-			{ commandType+" "+taskName+" "+stringNotContainingSearchedString, stringExactlyRepresentingSearchedString, false },
-			
-			// 1ei
-			{ commandType+" "+taskName+" "+emptyString, stringExactlyRepresentingSearchedString, false },
-			
-			// 2ai
-			{ commandType+" "+stringExactlyRepresentingSearchedString, stringExactlyRepresentingSearchedString, true },
-			
-			// 2bi
-			{ commandType+" "+stringExactlyContainingSearchedString, stringExactlyRepresentingSearchedString, true },
-			
-			// 2ci
-			{ commandType+" "+stringNotExactlyContainingSearchedString, stringExactlyRepresentingSearchedString, false },
-			
-			// 2di
-			{ commandType+" "+stringNotContainingSearchedString, stringExactlyRepresentingSearchedString, false },
-			
-			// 2ei
-			{ commandType+" "+emptyString, stringExactlyRepresentingSearchedString, false },
-			
-			// 3ai
-			{ stringExactlyRepresentingSearchedString, stringExactlyRepresentingSearchedString, true },
-			
-			// 3bi
-			{ stringExactlyContainingSearchedString, stringExactlyRepresentingSearchedString, true },
-			
-			// 3ci
-			{ stringNotExactlyContainingSearchedString, stringExactlyRepresentingSearchedString, false },
-			
-			// 3di
-			{ stringNotContainingSearchedString, stringExactlyRepresentingSearchedString, false },
-			
-			// 3ei
-			{ emptyString, stringExactlyRepresentingSearchedString, false },
-			
-			// 4i
-			{ null, stringExactlyRepresentingSearchedString, false },
-			
-			// 1aii
-			{ commandType+" "+taskName+" "+stringExactlyRepresentingSearchedString, emptyString, false },
-			
-			// 1aiii
-			{ commandType+" "+taskName+" "+stringExactlyRepresentingSearchedString, null, false },
-		});
+
+		return Arrays
+				.asList(new Object[][] {
+
+						// 1ai
+						{
+								commandType + " " + taskName + " "
+										+ stringExactlyRepresentingSearchedString,
+								stringExactlyRepresentingSearchedString, true },
+
+						// 1bi
+						{
+								commandType + " " + taskName + " "
+										+ stringExactlyContainingSearchedString,
+								stringExactlyRepresentingSearchedString, true },
+
+						// 1ci
+						{
+								commandType + " " + taskName + " "
+										+ stringNotExactlyContainingSearchedString,
+								stringExactlyRepresentingSearchedString, false },
+
+						// 1di
+						{
+								commandType + " " + taskName + " "
+										+ stringNotContainingSearchedString,
+								stringExactlyRepresentingSearchedString, false },
+
+						// 1ei
+						{ commandType + " " + taskName + " " + emptyString,
+								stringExactlyRepresentingSearchedString, false },
+
+						// 2ai
+						{ commandType + " " + stringExactlyRepresentingSearchedString,
+								stringExactlyRepresentingSearchedString, true },
+
+						// 2bi
+						{ commandType + " " + stringExactlyContainingSearchedString,
+								stringExactlyRepresentingSearchedString, true },
+
+						// 2ci
+						{ commandType + " " + stringNotExactlyContainingSearchedString,
+								stringExactlyRepresentingSearchedString, false },
+
+						// 2di
+						{ commandType + " " + stringNotContainingSearchedString,
+								stringExactlyRepresentingSearchedString, false },
+
+						// 2ei
+						{ commandType + " " + emptyString,
+								stringExactlyRepresentingSearchedString, false },
+
+						// 3ai
+						{ stringExactlyRepresentingSearchedString,
+								stringExactlyRepresentingSearchedString, true },
+
+						// 3bi
+						{ stringExactlyContainingSearchedString,
+								stringExactlyRepresentingSearchedString, true },
+
+						// 3ci
+						{ stringNotExactlyContainingSearchedString,
+								stringExactlyRepresentingSearchedString, false },
+
+						// 3di
+						{ stringNotContainingSearchedString,
+								stringExactlyRepresentingSearchedString, false },
+
+						// 3ei
+						{ emptyString, stringExactlyRepresentingSearchedString, false },
+
+						// 4i
+						{ null, stringExactlyRepresentingSearchedString, false },
+
+						// 1aii
+						{
+								commandType + " " + taskName + " "
+										+ stringExactlyRepresentingSearchedString, emptyString,
+								false },
+
+						// 1aiii
+						{
+								commandType + " " + taskName + " "
+										+ stringExactlyRepresentingSearchedString, null, false }, });
 	}
 
 	// Test run
-   	@Test
+	@Test
 	public void testcontainsParameter() {
-		assertEquals(expectedResult, TaskCommander.parser.containsParameter(userCommand, parameter)); 
+		assertEquals(expectedResult,
+				TaskCommander.parser.containsParameter(userCommand, parameter));
 	}
 }

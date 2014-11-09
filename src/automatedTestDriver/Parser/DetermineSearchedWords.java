@@ -49,11 +49,9 @@ public class DetermineSearchedWords {
 		ArrayList<Object[]> cases = new ArrayList<Object[]>();
 		String commandType = "search";
 		String[] searchedWords = { "meeting", "date", "John" };
-		String[] searchedPhrases = { "\"Computer Club\"",
-				"\"Meeting with John.\"",
+		String[] searchedPhrases = { "\"Computer Club\"", "\"Meeting with John.\"",
 				"\"Applying for a summer internship, maybe at Google or another big company.\"" };
-		String[] expectedSearchedPhrases = { "Computer Club",
-				"Meeting with John.",
+		String[] expectedSearchedPhrases = { "Computer Club", "Meeting with John.",
 				"Applying for a summer internship, maybe at Google or another big company." };
 		String emptyString = "";
 
@@ -64,22 +62,21 @@ public class DetermineSearchedWords {
 				commandType + " " + searchedWords[0] + " " + searchedWords[1],
 				Arrays.asList(new String[] { searchedWords[0], searchedWords[1] }) });
 		cases.add(new Object[] {
-				commandType + " " + searchedWords[0] + " " + searchedWords[1]
-						+ " " + searchedWords[2],
-				Arrays.asList(new String[] { searchedWords[0],
-						searchedWords[1], searchedWords[2] }) });
+				commandType + " " + searchedWords[0] + " " + searchedWords[1] + " "
+						+ searchedWords[2],
+				Arrays.asList(new String[] { searchedWords[0], searchedWords[1],
+						searchedWords[2] }) });
 
 		// 1b
 		cases.add(new Object[] { commandType + " " + searchedPhrases[0],
 				Arrays.asList(new String[] { expectedSearchedPhrases[0] }) });
 		cases.add(new Object[] {
-				commandType + " " + searchedPhrases[0] + " "
-						+ searchedPhrases[1],
+				commandType + " " + searchedPhrases[0] + " " + searchedPhrases[1],
 				Arrays.asList(new String[] { expectedSearchedPhrases[0],
 						expectedSearchedPhrases[1] }) });
 		cases.add(new Object[] {
-				commandType + " " + searchedPhrases[0] + " "
-						+ searchedPhrases[1] + " " + searchedPhrases[2],
+				commandType + " " + searchedPhrases[0] + " " + searchedPhrases[1] + " "
+						+ searchedPhrases[2],
 				Arrays.asList(new String[] { expectedSearchedPhrases[0],
 						expectedSearchedPhrases[1], expectedSearchedPhrases[2] }) });
 		cases.add(new Object[] {
@@ -102,54 +99,52 @@ public class DetermineSearchedWords {
 				Arrays.asList(new String[] { expectedSearchedPhrases[0],
 						searchedWords[0] }) });
 		cases.add(new Object[] {
-				commandType + " " + searchedWords[0] + " " + searchedPhrases[0]
-						+ " " + searchedWords[1],
+				commandType + " " + searchedWords[0] + " " + searchedPhrases[0] + " "
+						+ searchedWords[1],
 				Arrays.asList(new String[] { searchedWords[0],
 						expectedSearchedPhrases[0], searchedWords[1] }) });
 		cases.add(new Object[] {
-				commandType + " " + searchedWords[0] + " " + searchedWords[1]
-						+ " " + searchedPhrases[0],
-				Arrays.asList(new String[] { searchedWords[0],
-						searchedWords[1], expectedSearchedPhrases[0] }) });
+				commandType + " " + searchedWords[0] + " " + searchedWords[1] + " "
+						+ searchedPhrases[0],
+				Arrays.asList(new String[] { searchedWords[0], searchedWords[1],
+						expectedSearchedPhrases[0] }) });
 		cases.add(new Object[] {
-				commandType + " " + searchedPhrases[0] + " " + searchedWords[0]
-						+ " " + searchedWords[1],
+				commandType + " " + searchedPhrases[0] + " " + searchedWords[0] + " "
+						+ searchedWords[1],
 				Arrays.asList(new String[] { expectedSearchedPhrases[0],
 						searchedWords[0], searchedWords[1] }) });
 
 		cases.add(new Object[] {
-				commandType + " " + searchedPhrases[0] + " " + searchedWords[1]
-						+ " " + searchedPhrases[1],
+				commandType + " " + searchedPhrases[0] + " " + searchedWords[1] + " "
+						+ searchedPhrases[1],
 				Arrays.asList(new String[] { expectedSearchedPhrases[0],
 						searchedWords[1], expectedSearchedPhrases[1] }) });
 		cases.add(new Object[] {
-				commandType + " " + searchedPhrases[0] + " "
-						+ searchedPhrases[1] + " " + searchedWords[0],
+				commandType + " " + searchedPhrases[0] + " " + searchedPhrases[1] + " "
+						+ searchedWords[0],
 				Arrays.asList(new String[] { expectedSearchedPhrases[0],
 						expectedSearchedPhrases[1], searchedWords[0] }) });
 		cases.add(new Object[] {
-				commandType + " " + searchedWords[0] + " " + searchedPhrases[0]
-						+ " " + searchedPhrases[1],
+				commandType + " " + searchedWords[0] + " " + searchedPhrases[0] + " "
+						+ searchedPhrases[1],
 				Arrays.asList(new String[] { searchedWords[0],
 						expectedSearchedPhrases[0], expectedSearchedPhrases[1] }) });
 
 		// 1d
 		cases.add(new Object[] {
 				commandType + " " + searchedWords[0] + searchedWords[1],
-				Arrays.asList(new String[] { searchedWords[0]
-						+ searchedWords[1] }) });
+				Arrays.asList(new String[] { searchedWords[0] + searchedWords[1] }) });
 		cases.add(new Object[] {
 				commandType + " " + searchedWords[0] + searchedWords[1]
 						+ searchedWords[2],
-				Arrays.asList(new String[] { searchedWords[0]
-						+ searchedWords[1] + searchedWords[2] }) });
+				Arrays.asList(new String[] { searchedWords[0] + searchedWords[1]
+						+ searchedWords[2] }) });
 
 		// 1e
 		cases.add(new Object[] {
 				commandType + " " + searchedWords[0] + searchedWords[1] + " "
 						+ searchedPhrases[0],
-				Arrays.asList(new String[] {
-						searchedWords[0] + searchedWords[1],
+				Arrays.asList(new String[] { searchedWords[0] + searchedWords[1],
 						expectedSearchedPhrases[0] }) });
 		cases.add(new Object[] {
 				commandType + " " + searchedPhrases[0] + " " + searchedWords[0]
@@ -172,16 +167,13 @@ public class DetermineSearchedWords {
 						expectedSearchedPhrases[0] }) });
 
 		// 2d
-		cases.add(new Object[] {
-				searchedWords[0] + searchedWords[1],
-				Arrays.asList(new String[] { searchedWords[0]
-						+ searchedWords[1] }) });
+		cases.add(new Object[] { searchedWords[0] + searchedWords[1],
+				Arrays.asList(new String[] { searchedWords[0] + searchedWords[1] }) });
 
 		// 2e
 		cases.add(new Object[] {
 				searchedWords[0] + searchedWords[1] + " " + searchedPhrases[0],
-				Arrays.asList(new String[] {
-						searchedWords[0] + searchedWords[1],
+				Arrays.asList(new String[] { searchedWords[0] + searchedWords[1],
 						expectedSearchedPhrases[0] }) });
 
 		// 3a
@@ -199,17 +191,13 @@ public class DetermineSearchedWords {
 						expectedSearchedPhrases[0] }) });
 
 		// 3d
-		cases.add(new Object[] {
-				" " + searchedWords[0] + searchedWords[1],
-				Arrays.asList(new String[] { searchedWords[0]
-						+ searchedWords[1] }) });
+		cases.add(new Object[] { " " + searchedWords[0] + searchedWords[1],
+				Arrays.asList(new String[] { searchedWords[0] + searchedWords[1] }) });
 
 		// 3e
 		cases.add(new Object[] {
-				" " + searchedWords[0] + searchedWords[1] + " "
-						+ searchedPhrases[0],
-				Arrays.asList(new String[] {
-						searchedWords[0] + searchedWords[1],
+				" " + searchedWords[0] + searchedWords[1] + " " + searchedPhrases[0],
+				Arrays.asList(new String[] { searchedWords[0] + searchedWords[1],
 						expectedSearchedPhrases[0] }) });
 
 		// 4
