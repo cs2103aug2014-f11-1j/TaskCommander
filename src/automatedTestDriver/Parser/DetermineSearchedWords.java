@@ -11,9 +11,9 @@ import com.taskcommander.TaskCommander;
 
 //@author A0128620M
 /**
-* This class is part of the unit test of the component Parser and contains all test cases 
-* for the method determineSearchedWords(userCommand:String).
-*/
+ * This class is part of the unit test of the component Parser and contains all
+ * test cases for the method determineSearchedWords(userCommand:String).
+ */
 
 @RunWith(Parameterized.class)
 public class DetermineSearchedWords {
@@ -47,9 +47,6 @@ public class DetermineSearchedWords {
 	@Parameterized.Parameters
 	public static Collection<Object[]> cases() {
 		ArrayList<Object[]> cases = new ArrayList<Object[]>();
-		String userCommand;
-		ArrayList<String> expectedSearchedWordsAndPhrases = new ArrayList<String>();
-
 		String commandType = "search";
 		String[] searchedWords = { "meeting", "date", "John" };
 		String[] searchedPhrases = { "\"Computer Club\"",
