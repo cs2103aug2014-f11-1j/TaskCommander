@@ -74,7 +74,7 @@ public class IntegratedUpdateTest {
 				
 				//Tasks 1-5 are floating tasks. Tasks 6 and 7 are timed tasks. Task 8 till the end are deadline tasks
 				//Get from Ini function after sorting
-				{ updateCommand[0]+" "+index[1], "Invalid command format: "+updateCommand[0]+" "+index[1] +". Type 'help' to see the list of commands."},
+				{ updateCommand[0]+" "+index[1], "Invalid command format: \""+updateCommand[0]+" "+index[1] +"\". Refer to help tab to see the list of commands."},
 				{ updateCommand[0]+" "+index[1]+" "+changeTimeToBeFloating, "Updated: \"Be patient with friends\""},
 				{ updateCommand[0]+" "+index[2]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Have fun with friends\""},
 				{ updateCommand[0]+" "+index[3]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Prepare for CS2103 Final\""},

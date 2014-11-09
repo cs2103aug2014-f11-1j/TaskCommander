@@ -48,6 +48,14 @@ public class IntegratedDisplayTest {
 		calendar.add(Calendar.MINUTE, 20);
 
 		return Arrays.asList(new Object[][] {
+				{ displayCommand[0]+" " +tasktype[1]+" "+ timePeriod+ " "+openStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: deadline Status: open"},
+				{ displayCommand[0]+" " +tasktype[2]+" "+ timePeriod+ " "+openStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: timed Status: open"},
+				
+				{ displayCommand[0]+" " +tasktype[0]+" " + " "+doneStatus, "Type: none Status: done"},
+				{ displayCommand[0]+" " +tasktype[1]+" "+ timePeriod+ " "+doneStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: deadline Status: done"},
+				{ displayCommand[0]+" " +tasktype[2]+" "+ timePeriod+ " "+doneStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: timed Status: done"},
+				
+				
 				{ displayCommand[0], "All"},
 				{ displayCommand[1], "All"},
 				{ displayCommand[2], "All"},
@@ -60,12 +68,7 @@ public class IntegratedDisplayTest {
 				{ displayCommand[0]+" " +timePeriod, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" - "+"Tue Nov 18 '14 "+Global.timeFormat.format(today)},
 				
 				{ displayCommand[0]+" " +tasktype[0]+" " + " "+openStatus, "Type: none Status: open"},
-				{ displayCommand[0]+" " +tasktype[1]+" "+ timePeriod+ " "+openStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: deadline Status: open"},
-				{ displayCommand[0]+" " +tasktype[2]+" "+ timePeriod+ " "+openStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: timed Status: open"},
 				
-				{ displayCommand[0]+" " +tasktype[0]+" " + " "+doneStatus, "Type: none Status: done"},
-				{ displayCommand[0]+" " +tasktype[1]+" "+ timePeriod+ " "+doneStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: deadline Status: done"},
-				{ displayCommand[0]+" " +tasktype[2]+" "+ timePeriod+ " "+doneStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: timed Status: done"},
 
 		});
 	}

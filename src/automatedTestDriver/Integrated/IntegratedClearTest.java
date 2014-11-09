@@ -35,9 +35,9 @@ public class IntegratedClearTest {
 		String clearCommand[] = {"clear","Clear", "CLEAR", "cleaR"};
 		return Arrays.asList(new Object[][] {
 				{ clearCommand[0], "All content deleted."},
-				{ clearCommand[1], "All content deleted."},
-				{ clearCommand[2], "All content deleted."},
-				{ clearCommand[3], "All content deleted."},
+				{ clearCommand[1], "No tasks available"},
+				{ clearCommand[2], "No tasks available"},
+				{ clearCommand[3], "No tasks available"},
 		});
 	}
 

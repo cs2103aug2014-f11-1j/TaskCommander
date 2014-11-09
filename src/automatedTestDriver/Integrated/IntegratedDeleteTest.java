@@ -58,16 +58,6 @@ public class IntegratedDeleteTest {
 		Date later = calendar.getTime();
 		
 		return Arrays.asList(new Object[][] {
-				{ deleteCommand[0], "Invalid command format: "+deleteCommand[0]+". Type 'help' to see the list of commands."},
-				{ deleteCommand[1], "Invalid command format: "+deleteCommand[1]+". Type 'help' to see the list of commands."},
-				{ deleteCommand[2], "Invalid command format: "+deleteCommand[2]+". Type 'help' to see the list of commands."},
-				{ deleteCommand[3], "Invalid command format: "+deleteCommand[3]+". Type 'help' to see the list of commands."},
-				{ deleteCommand[0]+" "+index[0], "Index does not exist. Please type a valid index."},
-				{ deleteCommand[0]+" "+index[1], "Deleted: \"Be patient with friends\""},
-				{ deleteCommand[0]+" "+index[2], "Deleted: \"Have fun with friends\""},
-				{ deleteCommand[0]+" "+index[3], "Deleted: \"Prepare for CS2103 Final\""},
-				{ deleteCommand[0]+" "+index[4], "Deleted: \"Read MA2214 textbook\""},
-				{ deleteCommand[0]+" "+index[5], "Deleted: \"Talk to people\""},
 				{ deleteCommand[0]+" "+index[6], "Deleted: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"Finish V0.5 in 10 days\""},
 				{ deleteCommand[0]+" "+index[7], "Deleted: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"Contribute to our project\""},
 				{ deleteCommand[0]+" "+index[8], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"Make friends\""},
@@ -75,6 +65,16 @@ public class IntegratedDeleteTest {
 				{ deleteCommand[0]+" "+index[10], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Relax!\""},
 				{ deleteCommand[0]+" "+index[11], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Get married\""},
 				{ deleteCommand[0]+" "+index[12], "Deleted: [by "+Global.dayFormat.format(today)+" 21:00] \"Get some exercise\""},
+				{ deleteCommand[0], "Invalid command format: \""+deleteCommand[0]+"\". Refer to help tab to see the list of commands."},
+				{ deleteCommand[1], "Invalid command format: \""+deleteCommand[1]+"\". Refer to help tab to see the list of commands."},
+				{ deleteCommand[2], "Invalid command format: \""+deleteCommand[2]+"\". Refer to help tab to see the list of commands."},
+				{ deleteCommand[3], "Invalid command format: \""+deleteCommand[3]+"\". Refer to help tab to see the list of commands."},
+				{ deleteCommand[0]+" "+index[0], "Index does not exist. Please type a valid index."},
+				{ deleteCommand[0]+" "+index[1], "Deleted: \"Be patient with friends\""},
+				{ deleteCommand[0]+" "+index[2], "Deleted: \"Have fun with friends\""},
+				{ deleteCommand[0]+" "+index[3], "Deleted: \"Prepare for CS2103 Final\""},
+				{ deleteCommand[0]+" "+index[4], "Deleted: \"Read MA2214 textbook\""},
+				{ deleteCommand[0]+" "+index[5], "Deleted: \"Talk to people\""},
 				{ deleteCommand[0]+" "+index[23], "Index does not exist. Please type a valid index."},
 				{ deleteCommand[0]+" "+index[24], "Index does not exist. Please type a valid index."},
 	

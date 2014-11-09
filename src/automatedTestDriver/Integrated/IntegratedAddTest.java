@@ -59,13 +59,13 @@ public class IntegratedAddTest {
 		Date later = calendar.getTime();
 		
 		return Arrays.asList(new Object[][] {
-				{ addCommand, "Invalid command format: "+addCommand+". Type 'help' to see the list of commands."},
+				{ addCommand, "Invalid command format: \""+addCommand+"\". Refer to help tab to see the list of commands."},
 				{ addCommand+" "+q+content+q, "Added: "+q+content+q},
-				{ addCommandCapital[0], "Invalid command format: "+addCommandCapital[0]+". Type 'help' to see the list of commands."},
+				{ addCommandCapital[0], "Invalid command format: \""+addCommandCapital[0]+"\". Refer to help tab to see the list of commands."},
 				{ addCommandCapital[0]+" "+q+content+q, "Added: "+q+content+q},
-				{ addCommandCapital[1], "Invalid command format: "+addCommandCapital[1]+". Type 'help' to see the list of commands."},
+				{ addCommandCapital[1], "Invalid command format: \""+addCommandCapital[1]+"\". Refer to help tab to see the list of commands."},
 				{ addCommandCapital[1]+" "+q+content+q, "Added: "+q+content+q},
-				{ addCommandCapital[2], "Invalid command format: "+addCommandCapital[2]+". Type 'help' to see the list of commands."},
+				{ addCommandCapital[2], "Invalid command format: \""+addCommandCapital[2]+"\". Refer to help tab to see the list of commands."},
 				{ addCommandCapital[2]+" "+q+content+q, "Added: "+q+content+q},
 				{ addCommand+" "+q+content+q+" " + deadline, "Added: [by Tue Nov 11 '14 17:00] "+q+content+q },
 				{ addCommand+" "+q+content+q+" " + period, "Added: [Wed Dec 3 '14 17:00-Sat Dec 6 '14 18:00] "+q+content+q },
