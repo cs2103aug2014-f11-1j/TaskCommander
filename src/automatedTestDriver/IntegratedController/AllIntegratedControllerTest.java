@@ -1,4 +1,4 @@
-package automatedTestDriver.Integrated;
+package automatedTestDriver.IntegratedController;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -11,6 +11,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({ IntegratedAddTest.class, IntegratedOpenTest.class, IntegratedDeleteTest.class,IntegratedMarkTest.class,
 	IntegratedDisplayTest.class, IntegratedSyncTest.class, IntegratedClearTest.class,IntegratedUpdateTest.class, IntegratedSearchTest.class})
-public class AllIntegratedTest {
+public class AllIntegratedControllerTest {
 	
 }

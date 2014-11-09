@@ -2,10 +2,10 @@ package automatedTestDriver;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import automatedTestDriver.Controller.AllControllerTest;
+
 import automatedTestDriver.Data.AllDataTest;
 import automatedTestDriver.GoogleIntegration.GoogleAPIConnectorTest;
-import automatedTestDriver.Integrated.AllIntegratedTest;
+import automatedTestDriver.IntegratedController.AllIntegratedControllerTest;
 import automatedTestDriver.Parser.AllParserTest;
 import automatedTestDriver.Storage.StorageTest;
 
@@ -15,8 +15,8 @@ import automatedTestDriver.Storage.StorageTest;
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({ AllControllerTest.class, AllParserTest.class, AllDataTest.class,
-    GoogleAPIConnectorTest.class, StorageTest.class, AllIntegratedTest.class })
+@SuiteClasses({AllParserTest.class, AllDataTest.class,
+    GoogleAPIConnectorTest.class, StorageTest.class, AllIntegratedControllerTest.class })
 public class AllTests {
 
 }
