@@ -58,12 +58,12 @@ public class IntegratedDeleteTest {
 		Date later = calendar.getTime();
 		
 		return Arrays.asList(new Object[][] {
-				{ deleteCommand[0]+" "+index[6], "Deleted: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"Finish V0.5 in 10 days\""},
-				{ deleteCommand[0]+" "+index[7], "Deleted: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"Contribute to our project\""},
-				{ deleteCommand[0]+" "+index[8], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"Make friends\""},
-				{ deleteCommand[0]+" "+index[9], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"Eat an apple\""},
-				{ deleteCommand[0]+" "+index[10], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Relax!\""},
-				{ deleteCommand[0]+" "+index[11], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Get married\""},
+				//{ deleteCommand[0]+" "+index[6], "Deleted: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"Finish V0.5 in 10 days\""},
+				//{ deleteCommand[0]+" "+index[7], "Deleted: [Thu Oct 30 '14 "+Global.timeFormat.format(today)+"-Mon Nov 10 '14 "+Global.timeFormat.format(today)+"] \"Contribute to our project\""},
+				//{ deleteCommand[0]+" "+index[8], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"Make friends\""},
+				//{ deleteCommand[0]+" "+index[9], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(today)+"] \"Eat an apple\""},
+				//{ deleteCommand[0]+" "+index[10], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Relax!\""},
+				//{ deleteCommand[0]+" "+index[11], "Deleted: [by "+Global.dayFormat.format(today)+" "+Global.timeFormat.format(later)+"] \"Get married\""},
 				{ deleteCommand[0]+" "+index[12], "Deleted: [by "+Global.dayFormat.format(today)+" 21:00] \"Get some exercise\""},
 				{ deleteCommand[0], "Invalid command format: \""+deleteCommand[0]+"\". Refer to help tab to see the list of commands."},
 				{ deleteCommand[1], "Invalid command format: \""+deleteCommand[1]+"\". Refer to help tab to see the list of commands."},
