@@ -10,7 +10,8 @@ import org.junit.runners.Suite.SuiteClasses;
 //@author A0105753J
 @RunWith(Suite.class)
 @SuiteClasses({ IntegratedAddTest.class, IntegratedOpenTest.class, IntegratedDeleteTest.class,IntegratedMarkTest.class,
-	IntegratedDisplayTest.class, IntegratedSyncTest.class, IntegratedClearTest.class,IntegratedUpdateTest.class, IntegratedSearchTest.class})
+	IntegratedDisplayTest.class, IntegratedSyncTest.class, IntegratedClearTest.class,IntegratedUpdateTest.class, IntegratedSearchTest.class,
+	IntegratedUndoTest.class})
 public class AllIntegratedControllerTest {
 	
 }
