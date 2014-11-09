@@ -39,18 +39,18 @@ public class IntegratedSearchTest {
 		String searchPhrase =  "make contribution";
 		
 		return Arrays.asList(new Object[][] {
-				{ searchCommand[0], String.format(Global.MESSAGE_INVALID_FORMAT, searchCommand[0])},
-				{ searchCommand[1], String.format(Global.MESSAGE_INVALID_FORMAT, searchCommand[1])},
-				{ searchCommand[2], String.format(Global.MESSAGE_INVALID_FORMAT, searchCommand[2])},
-				{ searchCommand[3], String.format(Global.MESSAGE_INVALID_FORMAT, searchCommand[3])},
-				{ searchCommand[0]+" "+searchPhrase, String.format(Global.MESSAGE_INVALID_FORMAT, searchCommand[0]+" "+searchPhrase)},
-				{ searchCommand[1]+" "+searchPhrase, String.format(Global.MESSAGE_INVALID_FORMAT, searchCommand[1]+" "+searchPhrase)},
-				{ searchCommand[2]+" "+searchPhrase, String.format(Global.MESSAGE_INVALID_FORMAT, searchCommand[2]+" "+searchPhrase)},
-				{ searchCommand[3]+" "+searchPhrase, String.format(Global.MESSAGE_INVALID_FORMAT, searchCommand[3]+" "+searchPhrase)},
-				{ searchCommand[0]+" "+searchString, String.format(Global.MESSAGE_SEARCHED,searchString)},
-				{ searchCommand[1]+" "+searchString, String.format(Global.MESSAGE_SEARCHED,searchString)},
-				{ searchCommand[2]+" "+searchString, String.format(Global.MESSAGE_SEARCHED,searchString)},
-				{ searchCommand[3]+" "+searchString, String.format(Global.MESSAGE_SEARCHED,searchString)},
+				{ searchCommand[0], "Search task with: []"},
+				{ searchCommand[1], "Search task with: []"},
+				{ searchCommand[2], "Search task with: []"},
+				{ searchCommand[3], "Search task with: []"},
+				{ searchCommand[0]+" "+searchPhrase, "Search task with: [make, contribution]"},
+				{ searchCommand[1]+" "+searchPhrase, "Search task with: [make, contribution]"},
+				{ searchCommand[2]+" "+searchPhrase, "Search task with: [make, contribution]"},
+				{ searchCommand[3]+" "+searchPhrase, "Search task with: [make, contribution]"},
+				{ searchCommand[0]+" "+searchString, "Search task with: [make]"},
+				{ searchCommand[1]+" "+searchString, "Search task with: [make]"},
+				{ searchCommand[2]+" "+searchString, "Search task with: [make]"},
+				{ searchCommand[3]+" "+searchString, "Search task with: [make]"},
 		});
 	}
 
