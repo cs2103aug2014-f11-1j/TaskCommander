@@ -266,14 +266,13 @@ public class Controller {
         if (hasNoParamters(userCommand)) {
             return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
         }
-
-        searchedWordsAndPhrases = TaskCommander.parser
-            .determineSearchedWords(userCommand);
+        resetDisplayRestrictions();
+        
+        searchedWordsAndPhrases = TaskCommander.parser.determineSearchedWords(userCommand);
         if (searchedWordsAndPhrases == null) {
             return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
         }
-
-        resetDisplayRestrictions();
+        
         isSearchRestricted = true;
         setDisplaySettingsDescription();
 
@@ -549,6 +548,7 @@ public class Controller {
 
     private String getSearchRestrictionDescriptionOfDislplaySettings() {
         String searchRestrictionDescription = "";
+
         for (String searchedWordOrPhrase : searchedWordsAndPhrases) {
             if (searchRestrictionDescription.equals("")) {
                 searchRestrictionDescription = Global.DESCRIPTION_SEARCH + "\""
@@ -558,6 +558,7 @@ public class Controller {
                     + searchedWordOrPhrase + "\"";
             }
         }
+       
         return searchRestrictionDescription;
     }
 
