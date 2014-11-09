@@ -66,8 +66,6 @@ public class UpdateInternalTest {
 		tester.addFloatingTask("Become a philosopher king");
 		String expected = "Updated: \"Become a metaphysics king\"";
 		assertEquals(expected, tester.updateToFloatingTask(0, "Become a metaphysics king"));
-		preupdatedTasks = tester.getPreupdatedTasks();
-		updatedTasks = tester.getUpdatedTasks();
 		
 		tester.clearTasks();
 		

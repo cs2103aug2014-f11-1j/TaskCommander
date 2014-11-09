@@ -496,6 +496,7 @@ public class Data {
 			floatingTask = new FloatingTask(task.getName());
 			floatingTask.setEdited(false);
 			floatingTask.setDone(tasks.get(index).isDone());
+			floatingTask.setId(task.getId());
 			tasks.remove(index);
 			tasks.add(index, floatingTask);
 		} else {
@@ -526,6 +527,7 @@ public class Data {
 			deadlineTask.setEdited(false);
 			deadlineTask.setDone(tasks.get(index).isDone());
 			deadlineTask.setUpdated(task.getUpdated());
+			deadlineTask.setId(task.getId());
 			tasks.remove(index);
 			tasks.add(index, deadlineTask);
 			saveToPermanentStorage();
@@ -560,6 +562,7 @@ public class Data {
 			timedTask = new TimedTask(task.getName(), task.getStartDate(), task.getEndDate());
 			timedTask.setEdited(false);
 			timedTask.setDone(relatedTask.isDone());
+			timedTask.setId(task.getId());
 			tasks.remove(index);
 			tasks.add(index, timedTask);
 		} else {
@@ -584,6 +587,8 @@ public class Data {
 	/**
 	 * Deletes the task directly from the tasks list without the index.
 	 * Used to delete tasks when syncing.
+	 * Checking for invalid index is unnecessary, since this is called internally, independent
+	 * of user input.
 	 * 
 	 * @param 	task
 	 * @return 	       If the delete was successful.
