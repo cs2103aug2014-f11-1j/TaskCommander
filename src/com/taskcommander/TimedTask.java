@@ -72,7 +72,7 @@ public class TimedTask extends DatedTask {
 
     //@author A0128620M
     /**
-     * Compares the date of this timed task to the given timed task in
+     * Compares the start date of this timed task to the given timed task in
      * chronological order.
      * 
      * @param other Timed task

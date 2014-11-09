@@ -59,7 +59,7 @@ public class DeadlineTask extends DatedTask {
     }
 
     /**
-     * Compares the date of this deadline task to the given deadline task in
+     * Compares the end date of this deadline task to the given deadline task in
      * chronological order.
      * 
      * @param other Deadline task
