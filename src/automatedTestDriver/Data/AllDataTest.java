@@ -17,7 +17,10 @@ import org.junit.runners.Suite.SuiteClasses;
 	AddInternalTest.class,
 	ClearInternalTest.class,
 	DeleteInternalTest.class,
-	UpdateInternalTest.class
+	UpdateInternalTest.class,
+	AddGoogleTest.class,
+	DeleteGoogleTest.class,
+	UpdateGoogleTest.class
 })
 
 public class AllDataTest {
