@@ -4,8 +4,7 @@ import com.google.api.client.util.DateTime;
 
 //@author A0112828H
 /**
- * A basic task object.
- * Has a name. May also hold a Google API ID.
+ * A basic task object. Has a name. May also hold a Google API ID.
  * Related Google API: Tasks
  */
 
@@ -19,7 +18,9 @@ public abstract class Task {
     private boolean _edited;
     private DateTime _updated;
 
-    // Possible task types
+    /**
+     * Possible task types
+     */
     public enum TaskType {
         @SerializedName("0")
         FLOATING("FloatingTask"), @SerializedName("1")
@@ -40,6 +41,10 @@ public abstract class Task {
     /**
      * Creates a new Task with given name. Throws IllegalArgumentException if
      * name is not given.
+     * 
+     * @param name
+     * @param type
+     * @return Task instance
      */
     public Task(String name, TaskType taskType) {
         if (name != null) {
@@ -123,6 +128,12 @@ public abstract class Task {
     }
 
     //@author A0128620M
+    /**
+     * Checks if the given object is equal.
+     * 
+     * @param other Object
+     * @return true if so, false if not
+     */
     @Override
     public boolean equals(Object otherObject) {
         if (otherObject == null) {
