@@ -4,18 +4,17 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Stack;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import com.taskcommander.Global.CommandType;
-import com.taskcommander.TaskCommander;
+import com.taskcommander.Data;
 
 @RunWith(Parameterized.class)
 public class UndoTest {
 	private String expectedResult;
+	public static Data tester;
 	
 	public UndoTest(String expectedResult) {
 		this.expectedResult = expectedResult;
@@ -24,15 +23,15 @@ public class UndoTest {
 	//Test Parameters
 	@Parameterized.Parameters
 	public static Collection<Object[]> cases() {
-		TaskCommander.data.clearTasks();
-		Stack<CommandType> operationHistory = TaskCommander.data.getOperationsHistory();
-		operationHistory.clear();
+		tester = Data.getInstance();
+		tester.clearTasks();
+		tester.clearOperationHistory();
 		
-		TaskCommander.data.addFloatingTask("hello");
-		TaskCommander.data.updateToFloatingTask(0,"konnichiwa");
-		TaskCommander.data.deleteTask(0);
-		TaskCommander.data.addFloatingTask("Guten Morgen");
-		TaskCommander.data.clearTasks();
+		tester.addFloatingTask("hello");
+		tester.updateToFloatingTask(0,"konnichiwa");
+		tester.deleteTask(0);
+		tester.addFloatingTask("Guten Morgen");
+		tester.clearTasks();
 		String undoMessage = "Undone latest command: ";
 		
 		
@@ -49,7 +48,7 @@ public class UndoTest {
 	// Test run
    	@Test
 	public void testUndo() {
-		assertEquals(expectedResult, TaskCommander.data.undo()); 
+		assertEquals(expectedResult, tester.undo()); 
 	}
 
 }
