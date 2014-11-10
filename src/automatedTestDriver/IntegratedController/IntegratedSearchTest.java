@@ -4,13 +4,10 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import com.taskcommander.Global;
 import com.taskcommander.TaskCommander;
 
 /**
@@ -37,7 +34,7 @@ public class IntegratedSearchTest {
 		String searchCommand[] = {"search","SEARCH", "sEArch", "searcH"};
 		String searchString = "make";
 		String searchPhrase =  "make contribution";
-		
+
 		return Arrays.asList(new Object[][] {
 				{ searchCommand[0], "Invalid command format: \"search\". Refer to help tab to see the list of commands."},
 				{ searchCommand[1], "Invalid command format: \"SEARCH\". Refer to help tab to see the list of commands."},
@@ -56,7 +53,7 @@ public class IntegratedSearchTest {
 
 	@Test
 	public void testcontainsParameter() {
-		
+
 		assertEquals(expectedResult, TaskCommander.controller.executeCommand(userCommand)); 
 	}
 }

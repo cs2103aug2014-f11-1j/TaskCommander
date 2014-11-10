@@ -639,10 +639,10 @@ public class UI extends Observable implements Observer {
 		}
 	}
 
-	/**
-	 * 
-	 */
 	private void maintainShellSize() {
-		shell.setBounds(shell.getBounds().x, shell.getBounds().y, display.getBounds().width/10*4, display.getBounds().height/10*8);
+		shell.setBounds(shell.getBounds().x, 
+						shell.getBounds().y, 
+						display.getBounds().width/10*4, 
+						display.getBounds().height/10*8);
 	}
 }

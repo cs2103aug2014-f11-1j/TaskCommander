@@ -25,15 +25,15 @@ import com.taskcommander.GoogleAPIConnector;
  * the permissions for this application through the UI.
  */
 public class SyncHandler extends Observable {
+	private static GoogleAPIConnector con = null;
 
 	private static final String STATUS_CANCELLED = "cancelled";
-	private static GoogleAPIConnector con = null;
-	private static final Logger logger = Logger.getLogger(SyncHandler.class.getName());
-
 	private static final String MESSAGE_SYNC_PUSH = "Sending data to Google... %.2f%% completed.";
 	private static final String MESSAGE_SYNC_PULL = "Getting data from Google... %.2f%% completed.";
 	private static final String MESSAGE_SYNC_DONE = "Sync completed.";
 	private static final String MESSAGE_SYNC_FAILED = "Sync failed, please try again.";
+
+	private static final Logger logger = Logger.getLogger(SyncHandler.class.getName());
 
 	public int tasksTotal;
 	public int tasksComplete;
@@ -90,7 +90,7 @@ public class SyncHandler extends Observable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns an UncaughtExceptionHandler that interrupts the thread
 	 * and resets sync state when exceptions are caught.

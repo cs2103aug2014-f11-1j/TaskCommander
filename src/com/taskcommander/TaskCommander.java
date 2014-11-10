@@ -1,11 +1,7 @@
 package com.taskcommander;
 
 public class TaskCommander {
-	/**
-	 * Components
-	 * (Please note: All components except for the framework class "TaskCommander" are  instantiated. 
-	 * In other words, instances instead of classes are used.)
-	 */
+	// Singleton instances of components
 	public static Controller controller = Controller.getInstance();
 	public static Parser parser = Parser.getInstance();
 	public static Storage storage = new Storage(); 
@@ -18,13 +14,14 @@ public class TaskCommander {
 	 * @param  args
 	 */
 	public static void main(String[] args) {
-		//ini();
 		ui.open();
 	}
 	
-	//Note: only call this when the sync command is used
-	//as user should not be asked to login until they
-	//execute a sync command
+	/*
+	 * Note: only call this when the sync command is used as 
+	 * user should not be asked to login until they execute 
+	 * a sync command
+	 */
 	/**
 	 * Sets a new SyncHandler instance.
 	 * May start a login process if user is not

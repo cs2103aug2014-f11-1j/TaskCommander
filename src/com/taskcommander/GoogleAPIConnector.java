@@ -350,21 +350,18 @@ public class GoogleAPIConnector {
 	 * @return       Google ID of task
 	 */
 	private String addTask(FloatingTask task) {
-		if (task == null) {
-			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
-		} else {
-			Task taskToAdd = new Task();
-			taskToAdd.setTitle(task.getName());
-			try {
-				Tasks.TasksOperations.Insert request = tasks.tasks().insert(PRIMARY_TASKS_ID, taskToAdd);
-				Task result = request.execute();
-				if (result != null) {
-					task.setUpdated(result.getUpdated());
-					return result.getId();
-				}
-			} catch (IOException e) {
-				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_ADD), e);
+		assert(task != null);
+		Task taskToAdd = new Task();
+		taskToAdd.setTitle(task.getName());
+		try {
+			Tasks.TasksOperations.Insert request = tasks.tasks().insert(PRIMARY_TASKS_ID, taskToAdd);
+			Task result = request.execute();
+			if (result != null) {
+				task.setUpdated(result.getUpdated());
+				return result.getId();
 			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_ADD), e);
 		}
 		return null;
 	}
@@ -378,22 +375,19 @@ public class GoogleAPIConnector {
 	 * @return       Google ID of task
 	 */
 	private String addTask(DeadlineTask task) {
-		if (task == null) {
-			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
-		} else {
-			Task taskToAdd = new Task();
-			taskToAdd.setTitle(task.getName());
-			taskToAdd.setDue(toDateTime(task.getEndDate()));
-			try {
-				Tasks.TasksOperations.Insert request = tasks.tasks().insert(PRIMARY_TASKS_ID, taskToAdd);
-				Task result = request.execute();
-				if (result != null) {
-					task.setUpdated(result.getUpdated());
-					return result.getId();
-				}
-			} catch (IOException e) {
-				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_ADD), e);
+		assert(task != null);
+		Task taskToAdd = new Task();
+		taskToAdd.setTitle(task.getName());
+		taskToAdd.setDue(toDateTime(task.getEndDate()));
+		try {
+			Tasks.TasksOperations.Insert request = tasks.tasks().insert(PRIMARY_TASKS_ID, taskToAdd);
+			Task result = request.execute();
+			if (result != null) {
+				task.setUpdated(result.getUpdated());
+				return result.getId();
 			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_ADD), e);
 		}
 		return null;
 	}
@@ -406,17 +400,12 @@ public class GoogleAPIConnector {
 	 * @return       Google ID of task
 	 */
 	private String addTask(TimedTask task) {
-		if (task == null){
-			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
-		} else {
-			Event event = new Event();
-			event.setSummary(task.getName());
-			event.setStart(new EventDateTime().setDateTime(toDateTime(task.getStartDate())));			
-			event.setEnd(new EventDateTime().setDateTime(toDateTime(task.getEndDate())));		
-			return addEventToCalendar(task, event);
-
-		}
-		return null;
+		assert(task != null);
+		Event event = new Event();
+		event.setSummary(task.getName());
+		event.setStart(new EventDateTime().setDateTime(toDateTime(task.getStartDate())));			
+		event.setEnd(new EventDateTime().setDateTime(toDateTime(task.getEndDate())));		
+		return addEventToCalendar(task, event);
 	}
 
 	//@author A0112828H
@@ -450,9 +439,8 @@ public class GoogleAPIConnector {
 	 * @return	     TaskCommander Task object
 	 */
 	private com.taskcommander.Task getTask(FloatingTask task) {
-		if (task == null) {
-			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
-		} else if (task.getId() == null) {
+		assert(task != null);
+		if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
 			try {
@@ -481,9 +469,8 @@ public class GoogleAPIConnector {
 	 * @return	     TaskCommander Task object
 	 */
 	private com.taskcommander.Task getTask(DeadlineTask task) {
-		if (task == null) {
-			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
-		} else if (task.getId() == null) {
+		assert(task != null);
+		if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
 			try {
@@ -512,9 +499,8 @@ public class GoogleAPIConnector {
 	 * @return	     TaskCommander Task object
 	 */
 	private com.taskcommander.Task getTask(TimedTask task) {
-		if (task == null) {
-			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
-		} else if (task.getId() == null) {
+		assert(task != null);
+		if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
 			return getEventFromCalendar(task);
@@ -550,9 +536,8 @@ public class GoogleAPIConnector {
 	 * @return	     Success of action
 	 */
 	private boolean deleteTask(FloatingTask task) {
-		if (task == null) {
-			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
-		} else if (task.getId() == null) {
+		assert(task != null);
+		if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
 			logger.log(Level.INFO, "Trying to delete task");
@@ -583,9 +568,8 @@ public class GoogleAPIConnector {
 	 * @return	     Success of action
 	 */
 	private boolean deleteTask(DeadlineTask task) {
-		if (task == null) {
-			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
-		} else if (task.getId() == null) {
+		assert(task != null);
+		if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
 			try {
@@ -613,9 +597,8 @@ public class GoogleAPIConnector {
 	 * @return	     Success of action
 	 */
 	private boolean deleteTask(TimedTask task) {
-		if (task == null) {
-			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
-		} else if (task.getId() == null) {
+		assert(task != null);
+		if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
 			return deleteEventFromCalendar(task);
@@ -652,9 +635,8 @@ public class GoogleAPIConnector {
 	 * @return	     Success of action
 	 */
 	private boolean updateTask(FloatingTask task) {
-		if (task == null) {
-			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
-		} else if (task.getId() == null) {
+		assert(task != null);
+		if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
 			try {
@@ -677,9 +659,8 @@ public class GoogleAPIConnector {
 	 * @return	     Success of action
 	 */
 	private boolean updateTask(DeadlineTask task) {
-		if (task == null) {
-			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
-		} else if (task.getId() == null) {
+		assert(task != null);
+		if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
 			try {
@@ -703,9 +684,8 @@ public class GoogleAPIConnector {
 	 * @return	     Success of action
 	 */
 	private boolean updateTask(TimedTask task) {
-		if (task == null) {
-			logger.log(Level.WARNING, MESSAGE_NULL_TASK);
-		} else if (task.getId() == null) {
+		assert(task != null);
+		if (task.getId() == null) {
 			logger.log(Level.WARNING, MESSAGE_NO_ID);
 		} else {
 			return updateEventToCalendar(task);
@@ -743,7 +723,8 @@ public class GoogleAPIConnector {
 	//@author A0109194A
 	// Changes a Google Task to a TaskCommander Task.
 	public com.taskcommander.Task toTask(Task task) {
-		if (task == null || task.isEmpty()) {
+		assert(task != null);
+		if (task.isEmpty()) {
 			return null;
 		}
 		if (task.containsKey("due")) {
@@ -761,7 +742,8 @@ public class GoogleAPIConnector {
 	//@author A0109194A
 	// Changes a Google Calendar Event to a TaskCommander Task.
 	public com.taskcommander.Task toTask(Event event) {
-		if (event == null || event.isEmpty()) {
+		assert(event != null);
+		if (event.isEmpty()) {
 			return null;
 		}
 
@@ -907,7 +889,7 @@ public class GoogleAPIConnector {
 			}
 		}
 	}
-	
+
 	private String getIdForDoneCalendar() {
 		logger.log(Level.INFO, "Trying to find the Done calendar and get the ID...");
 		try {

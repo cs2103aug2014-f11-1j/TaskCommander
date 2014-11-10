@@ -29,16 +29,16 @@ public class IntegratedAddTest {
 		this.expectedResult = expectedResult;
 	}
 
- 	/*
+	/*
 	 * Test cases for add
 	 * Formats:
 	 * add "content"
 	 * add "content" deadline
 	 * add "content" period
- 	 * 
+	 * 
 	 * There are multiple ways to indicate time. Like "in 20 minutes", "weekend", 
 	 * 	"winter vacation", "5 hours later" and so on
- 	 */
+	 */
 	@Parameterized.Parameters
 	public static Collection<Object[]>  cases() {
 		String addCommand = "add";
@@ -48,7 +48,6 @@ public class IntegratedAddTest {
 		String deadline = "Nov 11 5pm";
 		String period = "3 Dec 5pm - 6 Dec 6pm";
 		String periodLastDaysWithoutDate = "6pm - 3 am";
-		String []deadlineInFormat = {"20 Minutes later","in 20 minutes"};
 
 		Calendar calendar = Calendar.getInstance();
 		Date today = calendar.getTime();
@@ -56,13 +55,10 @@ public class IntegratedAddTest {
 		Date tomorrow = calendar.getTime();
 		calendar.setTimeInMillis(today.getTime());
 		calendar.add(Calendar.MINUTE, 20);
-		Date later = calendar.getTime();
-		
+
 		return Arrays.asList(new Object[][] {
 				{ addCommand+" "+q+content+q+" " + periodLastDaysWithoutDate, "Added: ["+Global.dayFormat.format(today)+" "+"18:00-"+ Global.dayFormat.format(tomorrow)+" 03:00] "+q+content+q },
-				//{ addCommand+" "+q+content+q+" " + deadlineInFormat[0], "Added: [by "+Global.dayFormat.format(later)+" "+ Global.timeFormat.format(later)+"] "+q+content+q },
-				//{ addCommand+" "+q+content+q+" " + deadlineInFormat[1], "Added: [by "+Global.dayFormat.format(later)+" "+ Global.timeFormat.format(later)+"] "+q+content+q },
-				
+
 				{ addCommand, "Invalid command format: \""+addCommand+"\". Refer to help tab to see the list of commands."},
 				{ addCommand+" "+q+content+q, "Added: "+q+content+q},
 				{ addCommandCapital[0], "Invalid command format: \""+addCommandCapital[0]+"\". Refer to help tab to see the list of commands."},
@@ -77,10 +73,8 @@ public class IntegratedAddTest {
 		});
 	}
 
-   	@Test
+	@Test
 	public void testcontainsParameter() {
 		assertEquals(expectedResult, TaskCommander.controller.executeCommand(userCommand)); 
 	}
-   	
-   
 }

@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import com.taskcommander.Global;
 import com.taskcommander.TaskCommander;
 
 /**
@@ -37,7 +36,6 @@ public class IntegratedDisplayTest {
 	public static Collection<Object[]>  cases() {
 		String displayCommand[] = {"display","Display", "DISPLAY", "diSPLay"};
 		String tasktype[] = {"none", "deadline", "timed"};
-		String timePeriod = "Oct 31 - Nov 18";
 		String openStatus = "open";
 		String doneStatus = "done";
 
@@ -48,14 +46,7 @@ public class IntegratedDisplayTest {
 		calendar.add(Calendar.MINUTE, 20);
 
 		return Arrays.asList(new Object[][] {
-				//{ displayCommand[0]+" " +tasktype[1]+" "+ timePeriod+ " "+openStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: deadline Status: open"},
-				//{ displayCommand[0]+" " +tasktype[2]+" "+ timePeriod+ " "+openStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: timed Status: open"},
-				
 				{ displayCommand[0]+" " +tasktype[0]+" " + " "+doneStatus, "Type: none Status: done"},
-				//{ displayCommand[0]+" " +tasktype[1]+" "+ timePeriod+ " "+doneStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: deadline Status: done"},
-				//{ displayCommand[0]+" " +tasktype[2]+" "+ timePeriod+ " "+doneStatus, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" -"+" Tue Nov 18 '14 "+Global.timeFormat.format(today)+ " Type: timed Status: done"},
-				
-				
 				{ displayCommand[0], "All"},
 				{ displayCommand[1], "All"},
 				{ displayCommand[2], "All"},
@@ -65,11 +56,8 @@ public class IntegratedDisplayTest {
 				{ displayCommand[0]+" " +tasktype[2], "Type: timed"},
 				{ displayCommand[0]+" " +openStatus, "Status: open"},
 				{ displayCommand[0]+" " +doneStatus, "Status: done"},
-				//{ displayCommand[0]+" " +timePeriod, "Date: Fri Oct 31 '14 "+ Global.timeFormat.format(today)+" - "+"Tue Nov 18 '14 "+Global.timeFormat.format(today)},
-				
-				{ displayCommand[0]+" " +tasktype[0]+" " + " "+openStatus, "Type: none Status: open"},
-				
 
+				{ displayCommand[0]+" " +tasktype[0]+" " + " "+openStatus, "Type: none Status: open"},
 		});
 	}
 

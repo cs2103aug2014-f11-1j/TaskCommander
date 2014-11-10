@@ -60,11 +60,11 @@ public class LoginManager implements Observer {
 	
 	private static Logger logger = Logger.getLogger(LoginManager.class.getName());
 	
-	/**
-	 * This method returns a LoginManager
-	 * To be called by GoogleAPIConnector
-	 * @return
-	 */
+    /**
+     * Returns the only instance of LoginManager.
+     * 
+     * @return LoginManager instance
+     */
 	public static LoginManager getInstance() {
 		if (instance == null) {
 			instance = new LoginManager();
@@ -89,6 +89,7 @@ public class LoginManager implements Observer {
 		}
 	}
 
+	// Service getter methods
 	/**
 	 * Connects to Google and builds a new Tasks service.
 	 * Requests can be sent once this method is successfully
@@ -119,6 +120,7 @@ public class LoginManager implements Observer {
 		}
 	}
 	
+	// Data store related methods
 	/**
 	 * Gets the datastore factory used
 	 * @return			dataStoreFactory
@@ -127,6 +129,7 @@ public class LoginManager implements Observer {
 		return dataStoreFactory;
 	}
 	
+	// Login and credential methods
 	/**
 	 * Attempts to login.
 	 */
@@ -160,35 +163,7 @@ public class LoginManager implements Observer {
 		}
 		return credential;
 	}
-
-	/**
-	 * Requests the user to login and requests authorisation
-	 * tokens. Has to wait for user to login in the UI and 
-	 * retrieve token.
-	 * @param newCredential 
-	 */
-	private void setTokensFromLogin() {
-		requestAuthorisation();
-	}
-
-	/**
-	 * Gets stored credential from data store and sets the tokens 
-	 * in the local credential.
-	 * @param newCredential 
-	 */
-	private void setTokensFromStoredCredential() {
-		StoredCredential storedCredential;
-		try {
-			storedCredential = dataStore.get(USERNAME);
-			GoogleCredential newCredential = buildCredential();
-			newCredential.setAccessToken(storedCredential.getAccessToken());
-			newCredential.setRefreshToken(storedCredential.getRefreshToken());
-			credential = newCredential;
-		} catch (IOException e) {
-			logger.log(Level.WARNING,"IOException: Unable to retrieve StoredCredential.", e);
-		}
-	}
-
+	
 	/**
 	 * Checks if a credential with the given username has been stored in the 
 	 * data store directory.
@@ -202,7 +177,8 @@ public class LoginManager implements Observer {
 			return false;
 		}
 	}
-
+	
+	//Helper methods
 	/**
 	 * Builds a GoogleCredential.
 	 * @return
@@ -233,6 +209,36 @@ public class LoginManager implements Observer {
 		}
 	}
 
+	// Stored credential methods
+	/**
+	 * Gets stored credential from data store and sets the tokens 
+	 * in the local credential.
+	 * @param newCredential 
+	 */
+	private void setTokensFromStoredCredential() {
+		StoredCredential storedCredential;
+		try {
+			storedCredential = dataStore.get(USERNAME);
+			GoogleCredential newCredential = buildCredential();
+			newCredential.setAccessToken(storedCredential.getAccessToken());
+			newCredential.setRefreshToken(storedCredential.getRefreshToken());
+			credential = newCredential;
+		} catch (IOException e) {
+			logger.log(Level.WARNING,"IOException: Unable to retrieve StoredCredential.", e);
+		}
+	}
+
+	// User login methods
+	/**
+	 * Requests the user to login and requests authorisation
+	 * tokens. Has to wait for user to login in the UI and 
+	 * retrieve token.
+	 * @param newCredential 
+	 */
+	private void setTokensFromLogin() {
+		requestAuthorisation();
+	}
+
 	/**
 	 * Makes an authorisation request to Google.
 	 */
@@ -244,25 +250,6 @@ public class LoginManager implements Observer {
 		}
 		
 		getAuthorisationCode();
-	}
-
-	/**
-	 * Sends a token request to get a GoogleTokenResponse.
-	 * If an IOException occurs, returns null.
-	 * 
-	 * @param code
-	 * @return      Token response
-	 */
-	private GoogleTokenResponse getTokenResponse(String code) {
-		logger.log(Level.INFO, "Get token response from Google with code "+code);
-		try {
-			GoogleTokenResponse response = flow.newTokenRequest(code)
-					.setRedirectUri(REDIRECT_URI).execute();
-			return response;
-		} catch (IOException e) {
-			logger.log(Level.WARNING,"IOException: Unable to execute GoogleTokenResponse", e);
-		}
-		return null;
 	}
 
 	/**
@@ -288,6 +275,10 @@ public class LoginManager implements Observer {
 		TaskCommander.ui.getCodeFromUser(url);
 	}
 
+	/**
+	 * Once updated with the authorisation code, tries to get a token response
+	 * using the code and sets a new credential from the token response.
+	 */
 	@Override
 	public void update(Observable obs, Object obj) {
 		logger.log(Level.INFO, "Login Manager updated, setting credential...");
@@ -295,6 +286,25 @@ public class LoginManager implements Observer {
 		newCredential.setFromTokenResponse(getTokenResponse((String) obj));
 		credential = newCredential;
 		saveCredential();
+	}
+	
+	/**
+	 * Sends a token request to get a GoogleTokenResponse.
+	 * If an IOException occurs, returns null.
+	 * 
+	 * @param code
+	 * @return      Token response
+	 */
+	private GoogleTokenResponse getTokenResponse(String code) {
+		logger.log(Level.INFO, "Get token response from Google with code "+code);
+		try {
+			GoogleTokenResponse response = flow.newTokenRequest(code)
+					.setRedirectUri(REDIRECT_URI).execute();
+			return response;
+		} catch (IOException e) {
+			logger.log(Level.WARNING,"IOException: Unable to execute GoogleTokenResponse", e);
+		}
+		return null;
 	}
 
 }

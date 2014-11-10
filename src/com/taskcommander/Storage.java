@@ -31,7 +31,7 @@ public class Storage {
 	}
 
 	/**
-	 * Returns the contents of the file as an arraylist of Tasks.
+	 * Returns the contents of the file as an ArrayList of Tasks.
 	 */
 	public ArrayList<Task> readFromFile(){
 		ArrayList<Task> tasks = new ArrayList<Task>();

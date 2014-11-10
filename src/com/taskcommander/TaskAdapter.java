@@ -22,9 +22,11 @@ public class TaskAdapter implements JsonSerializer<Task>, JsonDeserializer<Task>
 		case FLOATING:
 			result.add("properties", context.serialize(src, FloatingTask.class));
 			break;
+
 		case TIMED:
 			result.add("properties", context.serialize(src, TimedTask.class));
 			break;
+
 		case DEADLINE:
 			result.add("properties", context.serialize(src, DeadlineTask.class));
 			break;
@@ -38,19 +40,18 @@ public class TaskAdapter implements JsonSerializer<Task>, JsonDeserializer<Task>
 			throws JsonParseException {
 		JsonObject jsonObject = json.getAsJsonObject();
 		int type = Integer.parseInt(jsonObject.get("taskType").getAsString());
-		try {
-			switch (type) {
-			case 0: //FloatingTask
-				return context.deserialize(jsonObject, FloatingTask.class);
-			case 1: //TimedTask
-				return context.deserialize(jsonObject, TimedTask.class);
-			case 2: //DeadlineTask
-				return context.deserialize(jsonObject, DeadlineTask.class);
-			default:
-				return null;
-			}
-		} finally {
-			
+		switch (type) {
+		case 0: //FloatingTask
+			return context.deserialize(jsonObject, FloatingTask.class);
+
+		case 1: //TimedTask
+			return context.deserialize(jsonObject, TimedTask.class);
+
+		case 2: //DeadlineTask
+			return context.deserialize(jsonObject, DeadlineTask.class);
+
+		default:
+			return null;
 		}
 	}
 }

@@ -22,10 +22,10 @@ public abstract class Task {
      * Possible task types
      */
     public enum TaskType {
-        @SerializedName("0")
-        FLOATING("FloatingTask"), @SerializedName("1")
-        TIMED("TimedTask"), @SerializedName("2")
-        DEADLINE("DeadlineTask");
+    	// Serialized names for use with TaskAdapter for saving tasks to JSON
+        @SerializedName("0") FLOATING("FloatingTask"), 
+        @SerializedName("1") TIMED("TimedTask"), 
+        @SerializedName("2") DEADLINE("DeadlineTask");
 
         String name;
 
@@ -130,7 +130,6 @@ public abstract class Task {
     //@author A0128620M
     /**
      * Checks if the given object is equal.
-     * 
      * @param other Object
      * @return true if so, false if not
      */
