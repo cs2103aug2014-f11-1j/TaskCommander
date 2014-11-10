@@ -46,6 +46,8 @@ public class Data {
     private Stack<Task> changedTypeTasks;
     private Stack<CommandType> operationHistory;
     private Stack<Global.CommandType> undoHistory;
+    private Stack<Integer> doneTasks;
+    private Stack<Integer> openTasks;
 
     protected Data() {
         tasks = new ArrayList<Task>();
@@ -57,6 +59,8 @@ public class Data {
         changedTypeTasks = new Stack<Task>();
         operationHistory = new Stack<Global.CommandType>();
         undoHistory = new Stack<Global.CommandType>();
+        doneTasks = new Stack<Integer>();
+        openTasks = new Stack<Integer>();
 
         loadFromPermanentStorage();
     }
@@ -155,13 +159,16 @@ public class Data {
             tasks.remove(index);
             tasks.add(index, floatingTask);
         } else {
-            floatingTask = (FloatingTask) relatedTask;
-            
+        	floatingTask = new FloatingTask(relatedTask.getName());
             if (name != null) {
                 floatingTask.setName(name);
             }
             floatingTask.setEdited(true);
+            tasks.remove(index);
+            tasks.add(index, floatingTask);
         }
+        tasks.remove(index);
+        tasks.add(index, floatingTask);
         
         processUpdateHistory(relatedTask, floatingTask);
         saveToPermanentStorage();
@@ -205,10 +212,9 @@ public class Data {
             deadlineTask.setDone(relatedTask.isDone());
            
             changedTypeTasks.add(relatedTask);
-            tasks.remove(index);
-            tasks.add(index, deadlineTask);
         } else {
-            deadlineTask = (DeadlineTask) relatedTask;
+            deadlineTask = new DeadlineTask(relatedTask.getName(), 
+            		((DeadlineTask) relatedTask).getEndDate());
             
             if (name != null) {
                 deadlineTask.setName(name);
@@ -218,6 +224,8 @@ public class Data {
             }
             deadlineTask.setEdited(true);
         }
+        	tasks.remove(index);
+        	tasks.add(index, deadlineTask);
 
         processUpdateHistory(relatedTask, deadlineTask);
         saveToPermanentStorage();
@@ -261,11 +269,12 @@ public class Data {
             timedTask.setDone(relatedTask.isDone());
 
             changedTypeTasks.add(relatedTask);
-            tasks.remove(index);
-            tasks.add(index, timedTask);
         } else {
             timedTask = (TimedTask) relatedTask;
-
+            timedTask = new TimedTask(relatedTask.getName(),
+            		((TimedTask) relatedTask).getStartDate(),
+            		((TimedTask) relatedTask).getEndDate());
+            
             if (name != null) {
                 timedTask.setName(name);
             }
@@ -277,6 +286,8 @@ public class Data {
             }
             timedTask.setEdited(true);
         }
+        tasks.remove(index);
+        tasks.add(index, timedTask);
 
         processUpdateHistory(relatedTask, timedTask);
         saveToPermanentStorage();
@@ -305,6 +316,8 @@ public class Data {
         } else {
             doneTask.markDone();
             saveToPermanentStorage();
+            saveToOperationHistory(Global.CommandType.DONE);
+            doneTasks.add(index);
 
             switch (doneTask.getType()) {
               case FLOATING:
@@ -343,7 +356,9 @@ public class Data {
         } else {
             openTask.markOpen();
             saveToPermanentStorage();
-
+            saveToOperationHistory(Global.CommandType.OPEN);
+            openTasks.add(index);
+            
             switch (openTask.getType()) {
               case FLOATING:
                   FloatingTask floatingTask = (FloatingTask) openTask;
@@ -451,8 +466,16 @@ public class Data {
             undoCommand = Global.CommandType.UNCLEAR;
             undoClear();
             break;
+        case DONE:
+        	undoCommand = Global.CommandType.OPEN;
+        	undoDone();
+        	break;
+        case OPEN:
+        	undoCommand = Global.CommandType.DONE;
+        	undoOpen();
+        	break;
         default:
-            undo(); // Calls undo again to look for one of the four commands
+            undo(); // Calls undo again to look for one of the six commands
                     // above
         }
         saveToUndoHistory(undoCommand);
@@ -512,7 +535,7 @@ public class Data {
         Task updated = updatedTasks.pop();
         Task beforeUpdate = preupdatedTasks.pop();
         if (updated.getType() != beforeUpdate.getType()) {
-            deletedTasks.remove(deletedTasks.size() - 1);
+            changedTypeTasks.pop();
         }
 
         int index = 0;
@@ -552,6 +575,36 @@ public class Data {
         ArrayList<Task> toRestore = clearedTasks.pop();
         tasks.addAll(toRestore);
         return true;
+    }
+    
+    /**
+     * Undoes the Done command.
+     * @return	Success of undo
+     */
+    private boolean undoDone() {
+    	int index = doneTasks.pop();
+    	if (index != -1) {
+    		Task task = tasks.get(index);
+    		task.markOpen();    
+    		return true;
+    	} else {
+    		return false;
+    	}
+    }
+    
+    /**
+     * Undoes the Open command.
+     * @return	Success of undo.
+     */
+    private boolean undoOpen() {
+    	int index = openTasks.pop();
+    	if (index != -1) {
+    		Task task = tasks.get(index);
+    		task.markDone();
+    		return true;
+    	} else {
+    		return false;
+    	}
     }
     
 	// Methods used by Google Integration:
