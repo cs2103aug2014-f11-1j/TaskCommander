@@ -19,7 +19,7 @@ public class Data {
     
     //@author A0128620M
     private static Logger logger = Logger.getLogger(Controller.class.getName());
-    protected ArrayList<Task> tasks;
+    private ArrayList<Task> tasks;
 
     // Singleton instance for Data
     private static Data theOne;
@@ -49,7 +49,7 @@ public class Data {
     private Stack<Integer> doneTasks;
     private Stack<Integer> openTasks;
 
-    protected Data() {
+    private Data() {
         tasks = new ArrayList<Task>();
         deletedTasks = new ArrayList<Task>();
         addedTasks = new Stack<Task>();
