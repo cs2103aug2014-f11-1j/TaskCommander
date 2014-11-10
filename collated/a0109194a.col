@@ -938,6 +938,9 @@ public class UpdateInternalTest {
 
 		ArrayList<Task> cleared = new ArrayList<Task>();
 		cleared.addAll(tasks);
+		for (Task t : cleared) {
+			t.setEdited(true);
+		}
 		clearedTasks.push(cleared);
 		tasks.clear();
 		saveToOperationHistory(Global.CommandType.CLEAR);
@@ -1975,7 +1978,7 @@ public class UpdateInternalTest {
 			ArrayList<String> taskIds) {
 		if (googleTasks != null) {
 			for (com.google.api.services.tasks.model.Task task : googleTasks) {
-				if (!taskIds.contains(task.getId()) && task.getDeleted() == null) {
+				if (!taskIds.contains(task.getId()) && task.getDeleted() == null && !task.getTitle().equals("")) {
 					TaskCommander.data.addTask(con.toTask(task));
 				}
 				updateTasksComplete(tasksComplete+1);
@@ -2045,7 +2048,10 @@ public class UpdateInternalTest {
 			taskIds = TaskCommander.data.getAllIds();
 			for (com.google.api.services.tasks.model.Task t : googleTasks) {
 				if (t.getDeleted() != null) {
-					int index = taskIds.indexOf(t.getId());
+					int index = -1;
+					if (!taskIds.isEmpty()) {
+						index = taskIds.indexOf(t.getId());
+					}
 					if (index == -1) {
 						continue;
 					} else {
