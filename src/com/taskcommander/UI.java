@@ -112,17 +112,30 @@ public class UI extends Observable implements Observer {
 
 	// String messages for display
 	private static final String INFO_DISPLAY = "Displaying: ";
-	private static final String INFO_HELP = "You can use these commands: \n" +
-			"add \"<task title>\" <date> <end time> \n" +
-			"display [timed] [deadline] [floating] [done|open] [date] [start time] [end time] \n" +
-			"open <index> \n" +
-			"done <index> \n" +
-			"edit \"<task title>\" <date> <end time> \n" +
-			"delete <index of string> \n" +
-			"clear \n" +
-			"sort \n" +
-			"undo \n" +
-			"exit \n";
+	private static final String INFO_HELP = "You can use the following commands: \n" +
+	    "\n"+
+	    "-  add <\"task title\"> <start date> <start time> <to|-> [end date] <end time> \n" +
+	    "-  add \"<task title>\" <end date> <end time> \n" +
+	    "-  add \"<task title>\" \n" +
+	    "\n"+
+			"-  display [timed] [deadline] [none] [done|open] [start date] [start time] [to|-] [end date] [end time] \n" +
+			"-  display [all] \n" +
+			"\n"+
+			"-  update [\"task title\"] [ none | <end date> <end time> | <start  date> <start time> [end date>] <end time>] \n" +
+	    "\n"+
+			"-  open <index> \n" +
+			"-  done <index> \n" +
+			"\n"+
+			"-  delete <index> \n" +
+			"-  clear \n" +
+	    "\n"+
+	    "-  undo \n" +
+      "\n"+
+      "-  search <key word or phrase> | <\"exact key word or phrase\"> \n"+
+      "\n"+
+      "-  sync \n" +
+      "\n"+
+			"-  exit \n";
 	private static final String INSTRUCTIONS_MAIN = "Enter command: ";
 	private static final String INSTRUCTIONS_BROWSER = "Please login to Google and accept application permissions to sync your tasks.";
 	
