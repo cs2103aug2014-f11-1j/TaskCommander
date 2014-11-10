@@ -120,6 +120,7 @@ public class UI extends Observable implements Observer {
 			"edit \"<task title>\" <date> <end time> \n" +
 			"delete <index of string> \n" +
 			"clear \n" +
+			"sync \n" +
 			"sort \n" +
 			"undo \n" +
 			"exit \n";
