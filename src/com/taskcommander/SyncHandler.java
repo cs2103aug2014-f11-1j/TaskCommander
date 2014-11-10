@@ -260,7 +260,7 @@ public class SyncHandler extends Observable {
 			ArrayList<String> taskIds) {
 		if (googleTasks != null) {
 			for (com.google.api.services.tasks.model.Task task : googleTasks) {
-				if (!taskIds.contains(task.getId()) && task.getDeleted() == null) {
+				if (!taskIds.contains(task.getId()) && task.getDeleted() == null && !task.getTitle().equals("")) {
 					TaskCommander.data.addTask(con.toTask(task));
 				}
 				updateTasksComplete(tasksComplete+1);
