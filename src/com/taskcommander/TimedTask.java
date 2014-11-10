@@ -64,6 +64,7 @@ public class TimedTask extends DatedTask {
 
     public void setStartDate(Date startDate) {
         _startDate = startDate;
+        super.setDate(startDate);
     }
 
     public void setEndDate(Date endDate) {
@@ -83,6 +84,8 @@ public class TimedTask extends DatedTask {
     public int compareTo(TimedTask otherTask) {
         return (_startDate.compareTo(otherTask.getStartDate()));
     }
+    
+
 
     /**
      * Checks if the given object is equal.
@@ -109,5 +112,20 @@ public class TimedTask extends DatedTask {
         } else {
             return false;
         }
+    }
+
+    //@author A0128620M
+    /**
+     * Compares the start date of this timed task to the end date of the given
+     * deadline task in chronological order.
+     * 
+     * @param other
+     *            deadline task
+     * @return less/more than zero if before/after the otherTask, zero when same
+     *         date
+     */
+    @Override
+    public int compareTo(DeadlineTask otherTask) {
+        return (_startDate.compareTo(otherTask.getEndDate()));
     }
 }

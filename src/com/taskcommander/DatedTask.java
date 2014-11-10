@@ -3,7 +3,7 @@ import java.util.Date;
 
 //@author A0128620M
 /**
- * A task with a date. Compares DatedTasks by date in chronological order.
+ * A task with one comparable date the timedTask and FloatingTask inherit from.
  */
 
 public abstract class DatedTask extends Task implements Comparable<DatedTask> {
@@ -47,14 +47,10 @@ public abstract class DatedTask extends Task implements Comparable<DatedTask> {
         return (_date.compareTo(otherTask.getDate()));
     }
     
-    public int compareTo(DeadlineTask otherTask) {
-        return 0;
-    }
+    abstract public int compareTo(DeadlineTask otherTask);
     
-    public int compareTo(TimedTask otherTask) {
-        return 0;
-    }
-    
+    abstract int compareTo(TimedTask otherTask);
+
     /**
      * Checks if the given object is equal.
      * 

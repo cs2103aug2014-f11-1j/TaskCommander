@@ -518,7 +518,7 @@ public class UI extends Observable implements Observer {
 	 * @return      String date to display.
 	 */
 	private String getDisplayDate(DeadlineTask task) {
-		return Global.dayFormat.format(task.getEndDate()) + " " + Global.timeFormat.format(task.getEndDate());
+		return Global.dayFormat.format(task.getEndDate()) + " by " + Global.timeFormat.format(task.getEndDate());
 	}
 
 	/**
@@ -544,9 +544,9 @@ public class UI extends Observable implements Observer {
 
 	private String getDoneMessage(Task task) {
 		if (task.isDone()) {
-			return "done";
+			return Global.PARAMETER_DONE;
 		} else {
-			return "not done";
+			return Global.PARAMETER_OPEN;
 		}
 	}
 

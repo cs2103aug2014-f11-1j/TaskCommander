@@ -17,13 +17,13 @@ import com.taskcommander.Global.CommandType;
 
 public class Data {
     
+    //@author A0128620M
     private static Logger logger = Logger.getLogger(Controller.class.getName());
     protected ArrayList<Task> tasks;
 
     // Singleton instance for Data
     private static Data theOne;
 
-	//@author A0128620M
     /**
      * Returns the only instance of Data.
      * @return Data instance.
@@ -67,7 +67,7 @@ public class Data {
 
     // Methods used internally:
     
-    // @author A0128620M
+    //@author A0128620M
     /**
      * Adds a Floating Task to the tasks list.
      * 
@@ -297,7 +297,7 @@ public class Data {
             getTaskInDisplayFormat(timedTask));
     }
 
-    // @author A0128620M
+    //@author A0128620M
     /**
      * Marks a task as done.
      * 
@@ -452,33 +452,33 @@ public class Data {
         Global.CommandType type = operationHistory.pop();
         Global.CommandType undoCommand = null;
         switch (type) {
-        case ADD:
-            undoCommand = Global.CommandType.DELETE;
-            undoAdd();
-            break;
-        case DELETE:
-            undoCommand = Global.CommandType.ADD;
-            undoDelete();
-            break;
-        case UPDATE:
-            undoCommand = Global.CommandType.UPDATE;
-            undoUpdate();
-            break;
-        case CLEAR:
-            undoCommand = Global.CommandType.UNCLEAR;
-            undoClear();
-            break;
-        case DONE:
-        	undoCommand = Global.CommandType.OPEN;
-        	undoDone();
-        	break;
-        case OPEN:
-        	undoCommand = Global.CommandType.DONE;
-        	undoOpen();
-        	break;
-        default:
-            undo(); // Calls undo again to look for one of the six commands
-                    // above
+          case ADD:
+              undoCommand = Global.CommandType.DELETE;
+              undoAdd();
+              break;
+          case DELETE:
+              undoCommand = Global.CommandType.ADD;
+              undoDelete();
+              break;
+          case UPDATE:
+              undoCommand = Global.CommandType.UPDATE;
+              undoUpdate();
+              break;
+          case CLEAR:
+              undoCommand = Global.CommandType.UNCLEAR;
+              undoClear();
+              break;
+          case DONE:
+          	undoCommand = Global.CommandType.OPEN;
+          	undoDone();
+          	break;
+          case OPEN:
+          	undoCommand = Global.CommandType.DONE;
+          	undoOpen();
+          	break;
+          default:
+              undo(); // Calls undo again to look for one of the six commands
+                      // above
         }
         saveToUndoHistory(undoCommand);
         saveToPermanentStorage();
@@ -493,15 +493,15 @@ public class Data {
     private boolean undoAdd() {
         Task toDelete = addedTasks.pop();
         switch (toDelete.getType()) {
-        case TIMED:
-            tasks.remove((TimedTask) toDelete);
-            return true;
-        case DEADLINE:
-            tasks.remove((DeadlineTask) toDelete);
-            return true;
-        case FLOATING:
-            tasks.remove((FloatingTask) toDelete);
-            return true;
+          case TIMED:
+              tasks.remove((TimedTask) toDelete);
+              return true;
+          case DEADLINE:
+              tasks.remove((DeadlineTask) toDelete);
+              return true;
+          case FLOATING:
+              tasks.remove((FloatingTask) toDelete);
+              return true;
         }
         return false;
     }
@@ -515,15 +515,15 @@ public class Data {
         Task toAdd = deletedTasks.get(deletedTasks.size() - 1);
         deletedTasks.remove(deletedTasks.size() - 1);
         switch (toAdd.getType()) {
-        case TIMED:
-            tasks.add((TimedTask) toAdd);
-            return true;
-        case DEADLINE:
-            tasks.add((DeadlineTask) toAdd);
-            return true;
-        case FLOATING:
-            tasks.add((FloatingTask) toAdd);
-            return true;
+          case TIMED:
+              tasks.add((TimedTask) toAdd);
+              return true;
+          case DEADLINE:
+              tasks.add((DeadlineTask) toAdd);
+              return true;
+          case FLOATING:
+              tasks.add((FloatingTask) toAdd);
+              return true;
         }
         return false;
     }
@@ -542,29 +542,29 @@ public class Data {
 
         int index = 0;
         switch (updated.getType()) {
-        case TIMED:
-            index = tasks.indexOf((TimedTask) updated);
-            break;
-        case DEADLINE:
-            index = tasks.indexOf((DeadlineTask) updated);
-            break;
-        case FLOATING:
-            index = tasks.indexOf((FloatingTask) updated);
-            break;
+          case TIMED:
+              index = tasks.indexOf((TimedTask) updated);
+              break;
+          case DEADLINE:
+              index = tasks.indexOf((DeadlineTask) updated);
+              break;
+          case FLOATING:
+              index = tasks.indexOf((FloatingTask) updated);
+              break;
         }
 
         tasks.remove(index);
         switch (beforeUpdate.getType()) {
-        case TIMED:
-            tasks.add(index, (TimedTask) beforeUpdate);
-            return true;
-        case DEADLINE:
-            tasks.add(index, (DeadlineTask) beforeUpdate);
-            return true;
-        case FLOATING:
-            tasks.add(index, (FloatingTask) beforeUpdate);
-            return true;
-        }
+          case TIMED:
+              tasks.add(index, (TimedTask) beforeUpdate);
+              return true;
+          case DEADLINE:
+              tasks.add(index, (DeadlineTask) beforeUpdate);
+              return true;
+          case FLOATING:
+              tasks.add(index, (FloatingTask) beforeUpdate);
+              return true;
+          }
         return false;
     }
     
@@ -896,7 +896,7 @@ public class Data {
                       }
                       break;
                       
-                  default:
+                  case TIMED:
                       TimedTask timedTask = (TimedTask) task;
                       if (matchesTypeAndDateRestrictionsTimed(isDateRestricted,
                           startDate, endDate, isTaskTypeRestricted,
@@ -909,10 +909,25 @@ public class Data {
             }
         }
         Collections.sort(floatingTasks);
+        for (FloatingTask task : floatingTasks) {
+            System.out.println(task.getName());
+            
+        }
         concernedTasks.addAll(floatingTasks);
+        System.out.println("-----");
         Collections.sort(datedTasks);
+        for (DatedTask task : datedTasks) {
+            System.out.println(task.getDate());
+            System.out.println(task.getName());
+        
+        }
+        System.out.println("-----");
         concernedTasks.addAll(datedTasks);
-
+        
+        for (Task task : concernedTasks) {
+            System.out.println(task.getName());
+        }
+        
         return concernedTasks;
     }
     
@@ -925,7 +940,7 @@ public class Data {
         return tasks.indexOf(task);
     }
     
-    //@author A0112828H
+    //@author A0109194A
     /**
      * Returns all tasks.
      * 

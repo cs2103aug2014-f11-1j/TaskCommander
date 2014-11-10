@@ -390,14 +390,18 @@ public class Controller {
     }
 
     // Sets default display settings, that is, overdue and upcoming open tasks
-    // of the next two weeks.
+    // of the next week.
     private void setDefaultDisplaySettings() {
         resetDisplayRestrictions();
 
         isDateRestricted = true;
         startDateRestriction = null;
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.WEEK_OF_YEAR, 2);
+        calendar.add(Calendar.WEEK_OF_YEAR, 1);
+        calendar.set(Calendar.MILLISECOND, 99);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.HOUR, 23);
         endDateRestriction = calendar.getTime();
 
         isStatusRestricted = true;
