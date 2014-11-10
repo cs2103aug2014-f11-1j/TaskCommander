@@ -330,7 +330,10 @@ public class SyncHandler extends Observable {
 			taskIds = TaskCommander.data.getAllIds();
 			for (com.google.api.services.tasks.model.Task t : googleTasks) {
 				if (t.getDeleted() != null) {
-					int index = taskIds.indexOf(t.getId());
+					int index = -1;
+					if (!taskIds.isEmpty()) {
+						index = taskIds.indexOf(t.getId());
+					}
 					if (index == -1) {
 						continue;
 					} else {
