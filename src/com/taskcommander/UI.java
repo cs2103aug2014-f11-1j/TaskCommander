@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public class UI extends Observable implements Observer {
 	private static UI ui;
-	
+
 	// Variables to adjust UI element sizes and layout behaviour
 	private static final int SHELL_MIN_HEIGHT = 400;
 	private static final int SHELL_MIN_WIDTH = 500;
@@ -74,7 +74,7 @@ public class UI extends Observable implements Observer {
 	private static final boolean HELP_FIT_VERTICAL = true;
 	private static final int HELP_COLUMNS_SPAN = 1;
 	private static final int HELP_ROWS_SPAN = 1;
-	
+
 	private static final boolean BROWSER_FIT_HORIZONTAL = true;
 	private static final boolean BROWSER_FIT_VERTICAL = true;
 	private static final int BROWSER_COLUMNS_SPAN = 1;
@@ -112,38 +112,28 @@ public class UI extends Observable implements Observer {
 
 	// String messages for display
 	private static final String INFO_DISPLAY = "Displaying: ";
-	private static final String INFO_HELP = "You can use the following commands: \n" +
-	    "\n"+
-	    "-  add <\"task title\"> <start date> <start time> <to|-> [end date] <end time> \n" +
-	    "-  add \"<task title>\" <end date> <end time> \n" +
-	    "-  add \"<task title>\" \n" +
-	    "\n"+
+	private static final String INFO_HELP = "You can use the following commands: \n\n" +
+			"-  add <\"task title\"> <start date> <start time> <to|-> [end date] <end time> \n" +
+			"-  add \"<task title>\" <end date> <end time> \n" +
+			"-  add \"<task title>\" \n\n" +
 			"-  display [timed] [deadline] [none] [done|open] [start date] [start time] [to|-] [end date] [end time] \n" +
-			"-  display [all] \n" +
-			"\n"+
-			"-  update [\"task title\"] [ none | <end date> <end time> | <start  date> <start time> [end date>] <end time>] \n" +
-	    "\n"+
+			"-  display [all] \n\n" +
+			"-  update [\"task title\"] [ none | <end date> <end time> | <start  date> <start time> [end date>] <end time>] \n\n" +
 			"-  open <index> \n" +
-			"-  done <index> \n" +
-			"\n"+
+			"-  done <index> \n\n" +
 			"-  delete <index> \n" +
-			"-  clear \n" +
-	    "\n"+
-	    "-  undo \n" +
-      "\n"+
-      "-  search <key word or phrase> | <\"exact key word or phrase\"> \n"+
-      "\n"+
-      "-  sync \n" +
-      "\n"+
-			"-  exit \n"+
-			"\n"+
-	    "For more help, you can access our user guide here: http://goo.gl/6bjc7i";
+			"-  clear \n\n" +
+			"-  undo \n\n" +
+			"-  search <key word or phrase> | <\"exact key word or phrase\"> \n\n"+
+			"-  sync \n\n" +
+			"-  exit \n\n"+
+			"For more help, you can access our user guide here: http://goo.gl/6bjc7i";
 	private static final String INSTRUCTIONS_MAIN = "Enter command: ";
 	private static final String INSTRUCTIONS_BROWSER = "Please login to Google and accept application permissions to sync your tasks.";
-	
+
 	// Logger instance
 	private static Logger logger = Logger.getLogger(UI.class.getName());
-	
+
 	// Mutable UI element instances
 	private TabItem mainTab;
 	private TabItem browserTab;
@@ -151,7 +141,7 @@ public class UI extends Observable implements Observer {
 	private Text displayOutput;
 	private Text output;
 	private Browser browser;
-	
+
 	private String displaySettingText;
 	private String code; // For authorisation code from Google
 
@@ -175,6 +165,7 @@ public class UI extends Observable implements Observer {
 		setupTabFolder();
 		createMainTab();
 		createHelpTab();
+		maintainShellSize();
 		runUntilWindowClosed();
 	}
 
@@ -183,7 +174,7 @@ public class UI extends Observable implements Observer {
 		shell.setLayout(new FillLayout());
 		shell.setText(Global.APPLICATION_NAME);
 		shell.setMinimumSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
-		shell.setBounds(shell.getBounds().x, shell.getBounds().y, SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
+		shell.setBounds(display.getBounds().width/10, display.getBounds().height/10, display.getBounds().width/10*3, display.getBounds().height/10*3);
 	}
 
 	// Tabs setup
@@ -292,6 +283,7 @@ public class UI extends Observable implements Observer {
 						updateDisplay(feedback);
 						updateDisplaySettings();
 						clearInput();
+						maintainShellSize();
 					}catch (Exception e) {
 						logger.log(Level.WARNING,"Exception while executing command flow", e);
 					}
@@ -416,6 +408,7 @@ public class UI extends Observable implements Observer {
 			if (!Global.syncing && !input.getEditable()) {
 				if (tabFolder.getItemCount() == 3) { // Tab folder has 3 tabs -> browser tab is open
 					closeBrowserTab();
+					maintainShellSize();
 				}
 				// Accept user input when not syncing
 				input.setEditable(true);
@@ -444,6 +437,7 @@ public class UI extends Observable implements Observer {
 	private void updateDisplay() {
 		clearTableItems();
 		displayTasks(TaskCommander.controller.getDisplayedTasks());
+		maintainShellSize();
 	}
 
 	/** 
@@ -643,5 +637,12 @@ public class UI extends Observable implements Observer {
 				}
 			});
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private void maintainShellSize() {
+		shell.setBounds(shell.getBounds().x, shell.getBounds().y, display.getBounds().width/10*4, display.getBounds().height/10*8);
 	}
 }
