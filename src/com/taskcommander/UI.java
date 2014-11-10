@@ -123,7 +123,8 @@ public class UI extends Observable implements Observer {
 			"sync \n" +
 			"sort \n" +
 			"undo \n" +
-			"exit \n";
+			"exit \n\n"+
+			"For more help, you can access our user guide here: http://goo.gl/6bjc7i";
 	private static final String INSTRUCTIONS_MAIN = "Enter command: ";
 	private static final String INSTRUCTIONS_BROWSER = "Please login to Google and accept application permissions to sync your tasks.";
 	
