@@ -57,7 +57,8 @@ public class DeadlineTask extends DatedTask {
         this.setDone(otherDeadlineTask.isDone());
         this.setEdited(otherDeadlineTask.isEdited());
     }
-
+    
+    //@author A0109194A
     /**
      * Compares the end date of this deadline task to the given deadline task in
      * chronological order.

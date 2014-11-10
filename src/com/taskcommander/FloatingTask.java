@@ -34,7 +34,7 @@ public class FloatingTask extends Task implements Comparable<FloatingTask> {
         this.setEdited(otherFloatingTask.isEdited());
     }
 
-    //A0128620M
+    //A0109194A
     /**
      * Compares the name of this floating task to the given floating task in
      * alphabetically order.

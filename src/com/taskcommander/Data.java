@@ -7,7 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.taskcommander.Global.CommandType;
 
-//@author A0128620M
 /**
  * Singleton class that stores tasks temporarily. Contains all of the methods needed to manipulate 
  * the task objects within the temporary list, for internal use and for the Google Integration
@@ -24,6 +23,7 @@ public class Data {
     // Singleton instance for Data
     private static Data theOne;
 
+	//@author A0128620M
     /**
      * Returns the only instance of Data.
      * @return Data instance.
@@ -124,7 +124,7 @@ public class Data {
         return String.format(Global.MESSAGE_ADDED,
             getTaskInDisplayFormat(timedTask));
     }
-
+    
     /**
      * Updates a FloatingTask with the given index and replaces the old
      * taskName, startDate or endDate respectively and changes the taskType if
@@ -415,6 +415,7 @@ public class Data {
         }
     }
 	
+    //@author A0109194A
     /**
      * Clears all tasks from memory.
      * 
@@ -482,7 +483,8 @@ public class Data {
         saveToPermanentStorage();
         return String.format(Global.MESSAGE_UNDONE, type);
     }
-
+    
+    //@author A0109194A
     /**
      * Undoes the add command.
      * 
@@ -503,7 +505,8 @@ public class Data {
         }
         return false;
     }
-
+    
+    //@author A0109194A
     /**
      * Undoes the delete command.
      * 
@@ -526,6 +529,7 @@ public class Data {
         return false;
     }
 
+    //@author A0109194A
     /**
      * Undoes the update command.
      * 
@@ -565,7 +569,8 @@ public class Data {
         }
         return false;
     }
-
+    
+    //@author A0109194A
     /**
      * Undoes the Clear command.
      * 
@@ -577,6 +582,7 @@ public class Data {
         return true;
     }
     
+    //@author A0109194A
     /**
      * Undoes the Done command.
      * @return	Success of undo
@@ -592,6 +598,7 @@ public class Data {
     	}
     }
     
+    //@author A0109194A
     /**
      * Undoes the Open command.
      * @return	Success of undo.
@@ -609,6 +616,7 @@ public class Data {
     
 	// Methods used by Google Integration:
     
+    //@author A0109194A
     /**
      * Adds a Task to the tasks list by forwarding the task's attributes to the
      * respective add method. It is usually called by the SyncHandler class.
@@ -634,7 +642,8 @@ public class Data {
             return Global.MESSAGE_NULL_ID;
         }
     }
-
+    
+    //@author A0109194A
     /**
      * Adds a Floating Task to the tasks list.
      * 
@@ -648,7 +657,8 @@ public class Data {
         return String.format(Global.MESSAGE_ADDED,
             getTaskInDisplayFormat(floatingTask));
     }
-
+    
+    //@author A0109194A
     /**
      * Adds a Deadline Task to the tasks list.
      * 
@@ -662,7 +672,8 @@ public class Data {
         return String.format(Global.MESSAGE_ADDED,
             getTaskInDisplayFormat(deadlineTask));
     }
-
+    
+    //@author A0109194A
     /**
      * Adds a Timed Task to the tasks list.
      * 
@@ -676,7 +687,8 @@ public class Data {
         return String.format(Global.MESSAGE_ADDED,
             getTaskInDisplayFormat(timedTask));
     }
-
+    
+    //@author A0109194A
     /**
      * Updates a task with a FloatingTask object as a parameter. It is usually
      * called by the SyncHandler.
@@ -707,7 +719,7 @@ public class Data {
             getTaskInDisplayFormat(floatingTask));
     }
 
-
+    //@author A0109194A
     /**
      * Updates a task with a DeadlineTask object as a parameter. It is usually
      * called by the SyncHandler.
@@ -744,7 +756,8 @@ public class Data {
         return String.format(Global.MESSAGE_UPDATED,
             getTaskInDisplayFormat(deadlineTask));
     }
-
+    
+    //@author A0109194A
     /**
      * Updates a task with a TimedTask object as a parameter. It is usually
      * called by the SyncHandler.
@@ -782,7 +795,8 @@ public class Data {
         return String.format(Global.MESSAGE_UPDATED,
             getTaskInDisplayFormat(timedTask));
     }
-
+    
+    //@author A0109194A
     /**
      * Deletes the task directly from the tasks list without the index. Used to
      * delete tasks when syncing. Checking for invalid index is unnecessary,
@@ -1022,7 +1036,7 @@ public class Data {
                 endDate) <= 0));
     }
 	
-	  //@author A0109194A
+	//@author A0109194A
     // Adds the given task to the arrays for keeping track of updated tasks,
     private void processUpdateHistory(Task relatedTask, Task task) {
         saveToOperationHistory(Global.CommandType.UPDATE);

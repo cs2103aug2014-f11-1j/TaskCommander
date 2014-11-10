@@ -70,7 +70,7 @@ public class TimedTask extends DatedTask {
         _endDate = endDate;
     }
 
-    //@author A0128620M
+    //@author A0109194A
     /**
      * Compares the start date of this timed task to the given timed task in
      * chronological order.
