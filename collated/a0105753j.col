@@ -1,0 +1,861 @@
+//@author: a0105753j
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\AllIntegratedControllerTest.java
+	 */
+
+@RunWith(Suite.class)
+@SuiteClasses({ IntegratedAddTest.class, IntegratedOpenTest.class, IntegratedDeleteTest.class,IntegratedMarkTest.class,
+	IntegratedDisplayTest.class, IntegratedSyncTest.class, IntegratedClearTest.class,IntegratedUpdateTest.class, IntegratedSearchTest.class,
+	IntegratedUndoTest.class})
+public class AllIntegratedControllerTest {
+	
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\AllIntegratedControllerTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedAddTest.java
+	 */
+
+@RunWith(Parameterized.class)
+public class IntegratedAddTest {
+
+	private String userCommand;
+	private String expectedResult;
+
+	public IntegratedAddTest(String userCommand, String expectedResult) {
+		this.userCommand = userCommand;
+		this.expectedResult = expectedResult;
+	}
+
+	/*
+	 * Test cases for add
+	 * Formats:
+	 * add "content"
+	 * add "content" deadline
+	 * add "content" period
+	 * 
+	 * There are multiple ways to indicate time. Like "in 20 minutes", "weekend", 
+	 * 	"winter vacation", "5 hours later" and so on
+	 */
+	@Parameterized.Parameters
+	public static Collection<Object[]>  cases() {
+		String addCommand = "add";
+		String addCommandCapital[] = {"Add", "ADD", "AdD"};
+		String q = "\"";
+		String content = "task content";
+		String deadline = "Nov 11 5pm";
+		String period = "3 Dec 5pm - 6 Dec 6pm";
+		String periodLastDaysWithoutDate = "6pm - 3 am";
+
+		Calendar calendar = Calendar.getInstance();
+		Date today = calendar.getTime();
+		calendar.add(Calendar.DAY_OF_YEAR, 1);
+		Date tomorrow = calendar.getTime();
+		calendar.setTimeInMillis(today.getTime());
+		calendar.add(Calendar.MINUTE, 20);
+
+		return Arrays.asList(new Object[][] {
+				{ addCommand+" "+q+content+q+" " + periodLastDaysWithoutDate, "Added: ["+Global.dayFormat.format(today)+" "+"18:00-"+ Global.dayFormat.format(tomorrow)+" 03:00] "+q+content+q },
+
+				{ addCommand, "Invalid command format: \""+addCommand+"\". Refer to help tab to see the list of commands."},
+				{ addCommand+" "+q+content+q, "Added: "+q+content+q},
+				{ addCommandCapital[0], "Invalid command format: \""+addCommandCapital[0]+"\". Refer to help tab to see the list of commands."},
+				{ addCommandCapital[0]+" "+q+content+q, "Added: "+q+content+q},
+				{ addCommandCapital[1], "Invalid command format: \""+addCommandCapital[1]+"\". Refer to help tab to see the list of commands."},
+				{ addCommandCapital[1]+" "+q+content+q, "Added: "+q+content+q},
+				{ addCommandCapital[2], "Invalid command format: \""+addCommandCapital[2]+"\". Refer to help tab to see the list of commands."},
+				{ addCommandCapital[2]+" "+q+content+q, "Added: "+q+content+q},
+				{ addCommand+" "+q+content+q+" " + deadline, "Added: [by Tue Nov 11 '14 17:00] "+q+content+q },
+				{ addCommand+" "+q+content+q+" " + period, "Added: [Wed Dec 3 '14 17:00-Sat Dec 6 '14 18:00] "+q+content+q },
+				{ addCommand +" "+q+"Read ma2214 textbook"+q, "Added: \"Read ma2214 textbook\""}
+		});
+	}
+
+	@Test
+	public void testcontainsParameter() {
+		assertEquals(expectedResult, TaskCommander.controller.executeCommand(userCommand)); 
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedAddTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedClearTest.java
+	 */
+
+@RunWith(Parameterized.class)
+public class IntegratedClearTest {
+
+	private String userCommand;
+	private String expectedResult;
+
+	public IntegratedClearTest(String userCommand, String expectedResult) {
+		this.userCommand = userCommand;
+		this.expectedResult = expectedResult;
+	}
+
+	/*
+	 * Test cases for clear.
+	 * Format: clear
+	 * 
+	 */
+	@Parameterized.Parameters
+	public static Collection<Object[]>  cases() {
+		String clearCommand[] = {"clear","Clear", "CLEAR", "cleaR"};
+		return Arrays.asList(new Object[][] {
+				{ clearCommand[0], "All content deleted."},
+				{ clearCommand[1], "No tasks available"},
+				{ clearCommand[2], "No tasks available"},
+				{ clearCommand[3], "No tasks available"},
+		});
+	}
+
+	@Test
+	public void testcontainsParameter() {
+		assertEquals(expectedResult, TaskCommander.controller.executeCommand(userCommand)); 
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedClearTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedDeleteTest.java
+	 */
+
+@RunWith(Parameterized.class)
+public class IntegratedDeleteTest {
+
+	private String userCommand;
+	private String expectedResult;
+
+	public IntegratedDeleteTest(String userCommand, String expectedResult) {
+		this.userCommand = userCommand;
+		this.expectedResult = expectedResult;
+	}
+	
+	@Before
+	public void ini(){
+		TaskCommander.ini();
+		TaskCommander.controller.executeCommand("display");
+		TaskCommander.controller.getDisplayedTasks();
+	}
+
+	/*
+	 * Test cases for delete
+	 * Format: delete n (index)
+	 */
+	@Parameterized.Parameters
+	public static Collection<Object[]>  cases() {
+		String deleteCommand[] = {"delete","DELETE", "Delete", "deLete"};
+		int noOfTestCases = 25;
+		String index[] = new String[25];
+		for(int i = 0; i < noOfTestCases; i++){
+			index[i] = Integer.toString(i);
+		}
+
+		Calendar calendar = Calendar.getInstance();
+		Date today = calendar.getTime();
+		calendar.add(Calendar.DAY_OF_YEAR, 1);
+		calendar.setTimeInMillis(today.getTime());
+		calendar.add(Calendar.MINUTE, 20);
+		
+		return Arrays.asList(new Object[][] {
+				{ deleteCommand[0], "Invalid command format: \""+deleteCommand[0]+"\". Refer to help tab to see the list of commands."},
+				{ deleteCommand[1], "Invalid command format: \""+deleteCommand[1]+"\". Refer to help tab to see the list of commands."},
+				{ deleteCommand[2], "Invalid command format: \""+deleteCommand[2]+"\". Refer to help tab to see the list of commands."},
+				{ deleteCommand[3], "Invalid command format: \""+deleteCommand[3]+"\". Refer to help tab to see the list of commands."},
+				{ deleteCommand[0]+" "+index[0], "Index does not exist. Please type a valid index."},
+				{ deleteCommand[0]+" "+index[1], "Deleted: \"Be patient with friends\""},
+				{ deleteCommand[0]+" "+index[2], "Deleted: \"Have fun with friends\""},
+				{ deleteCommand[0]+" "+index[3], "Deleted: \"Prepare for CS2103 Final\""},
+				{ deleteCommand[0]+" "+index[4], "Deleted: \"Read MA2214 textbook\""},
+				{ deleteCommand[0]+" "+index[5], "Deleted: \"Talk to people\""},
+				{ deleteCommand[0]+" "+index[23], "Index does not exist. Please type a valid index."},
+				{ deleteCommand[0]+" "+index[24], "Index does not exist. Please type a valid index."},
+	
+		});
+	}
+
+   	@Test
+	public void testcontainsParameter() {
+		assertEquals(expectedResult, TaskCommander.controller.executeCommand(userCommand)); 
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedDeleteTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedDisplayTest.java
+	 */
+
+@RunWith(Parameterized.class)
+public class IntegratedDisplayTest {
+
+	private String userCommand;
+	private String expectedResult;
+
+	public IntegratedDisplayTest(String userCommand, String expectedResult) {
+		this.userCommand = userCommand;
+		this.expectedResult = expectedResult;
+	}
+
+	/*
+	 * Test cases for display.
+	 * Format: display timePeriod status
+	 */
+	@Parameterized.Parameters
+	public static Collection<Object[]>  cases() {
+		String displayCommand[] = {"display","Display", "DISPLAY", "diSPLay"};
+		String tasktype[] = {"none", "deadline", "timed"};
+		String openStatus = "open";
+		String doneStatus = "done";
+
+		Calendar calendar = Calendar.getInstance();
+		Date today = calendar.getTime();
+		calendar.add(Calendar.DAY_OF_YEAR, 1);
+		calendar.setTimeInMillis(today.getTime());
+		calendar.add(Calendar.MINUTE, 20);
+
+		return Arrays.asList(new Object[][] {
+				{ displayCommand[0]+" " +tasktype[0]+" " + " "+doneStatus, "Type: none Status: done"},
+				{ displayCommand[0], "All"},
+				{ displayCommand[1], "All"},
+				{ displayCommand[2], "All"},
+				{ displayCommand[3], "All"},
+				{ displayCommand[0]+" " +tasktype[0], "Type: none"},
+				{ displayCommand[0]+" " +tasktype[1], "Type: deadline"},
+				{ displayCommand[0]+" " +tasktype[2], "Type: timed"},
+				{ displayCommand[0]+" " +openStatus, "Status: open"},
+				{ displayCommand[0]+" " +doneStatus, "Status: done"},
+
+				{ displayCommand[0]+" " +tasktype[0]+" " + " "+openStatus, "Type: none Status: open"},
+		});
+	}
+
+	@Test
+	public void testcontainsParameter() {
+		TaskCommander.controller.executeCommand(userCommand);
+		assertEquals(expectedResult, TaskCommander.controller.getDisplaySettingsDescription()); 
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedDisplayTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedMarkTest.java
+	 */
+
+@RunWith(Parameterized.class)
+public class IntegratedMarkTest {
+
+	private String userCommand;
+	private String expectedResult;
+
+	public IntegratedMarkTest(String userCommand, String expectedResult) {
+		this.userCommand = userCommand;
+		this.expectedResult = expectedResult;
+	}
+	
+	@Before
+	public void ini(){
+		TaskCommander.ini();
+	}
+
+	/*
+	 * Test cases for done.
+	 * Format: done n (index)
+	 * 
+	 */
+	@Parameterized.Parameters
+	public static Collection<Object[]>  cases() {
+		String doneCommand[] = {"done","Done", "DONE", "DonE"};
+		int noOfTestCases = 25;
+		String index[] = new String[25];
+		for(int i = 0; i < noOfTestCases; i++){
+			index[i] = Integer.toString(i);
+		}
+
+		Calendar calendar = Calendar.getInstance();
+		Date today = calendar.getTime();
+		calendar.add(Calendar.DAY_OF_YEAR, 1);
+		calendar.setTimeInMillis(today.getTime());
+		calendar.add(Calendar.MINUTE, 20);
+		
+		return Arrays.asList(new Object[][] {
+				{ doneCommand[0], "Invalid command format: \""+doneCommand[0]+"\". Refer to help tab to see the list of commands."},
+				{ doneCommand[1], "Invalid command format: \""+doneCommand[1]+"\". Refer to help tab to see the list of commands."},
+				{ doneCommand[2], "Invalid command format: \""+doneCommand[2]+"\". Refer to help tab to see the list of commands."},
+				{ doneCommand[3], "Invalid command format: \""+doneCommand[3]+"\". Refer to help tab to see the list of commands."},
+				{ doneCommand[0]+" "+index[0], "Index does not exist. Please type a valid index."},
+				{ doneCommand[0]+" "+index[1], "Already done."},
+				{ doneCommand[0]+" "+index[2], "Done: \"Have fun with friends\""},
+				{ doneCommand[0]+" "+index[3], "Done: \"Prepare for CS2103 Final\""},
+				{ doneCommand[0]+" "+index[4], "Done: \"Read MA2214 textbook\""},
+				{ doneCommand[0]+" "+index[5], "Done: \"Talk to people\""},
+				{ doneCommand[0]+" "+index[6], "Already done."},
+				
+				{ doneCommand[0]+" "+index[23], "Index does not exist. Please type a valid index."},
+				{ doneCommand[0]+" "+index[24], "Index does not exist. Please type a valid index."},
+		});
+	}
+
+   	@Test
+	public void testcontainsParameter() {
+		assertEquals(expectedResult, TaskCommander.controller.executeCommand(userCommand)); 
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedMarkTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedOpenTest.java
+	 */
+
+@RunWith(Parameterized.class)
+public class IntegratedOpenTest {
+
+	private String userCommand;
+	private String expectedResult;
+
+	public IntegratedOpenTest(String userCommand, String expectedResult) {
+		this.userCommand = userCommand;
+		this.expectedResult = expectedResult;
+	}
+	
+	@Before
+	public void ini(){
+		TaskCommander.ini();
+	}
+
+	/*
+	 * Test cases for open.
+	 * Format: open n (index)
+	 */
+	@Parameterized.Parameters
+	public static Collection<Object[]>  cases() {
+		String openCommand[] = {"open","OPEN", "oPen", "opeN"};
+		int noOfTestCases = 25;
+		String index[] = new String[25];
+		for(int i = 0; i < noOfTestCases; i++){
+			index[i] = Integer.toString(i);
+		}
+
+		Calendar calendar = Calendar.getInstance();
+		Date today = calendar.getTime();
+		calendar.add(Calendar.DAY_OF_YEAR, 1);
+		calendar.setTimeInMillis(today.getTime());
+		calendar.add(Calendar.MINUTE, 20);
+		
+		return Arrays.asList(new Object[][] {
+				{ openCommand[0], "Invalid command format: \""+openCommand[0]+"\". Refer to help tab to see the list of commands."},
+				{ openCommand[1], "Invalid command format: \""+openCommand[1]+"\". Refer to help tab to see the list of commands."},
+				{ openCommand[2], "Invalid command format: \""+openCommand[2]+"\". Refer to help tab to see the list of commands."},
+				{ openCommand[3], "Invalid command format: \""+openCommand[3]+"\". Refer to help tab to see the list of commands."},
+				{ openCommand[0]+" "+index[0], "Index does not exist. Please type a valid index."},
+				{ openCommand[0]+" "+index[1], "Opened: \"Be patient with friends\""},
+				{ openCommand[0]+" "+index[2], "Already opened."},
+				{ openCommand[0]+" "+index[3], "Already opened."},
+				{ openCommand[0]+" "+index[4], "Already opened."},
+				{ openCommand[0]+" "+index[8], "Already opened."},
+				{ openCommand[0]+" "+index[15], "Already opened."},
+				{ openCommand[0]+" "+index[23], "Index does not exist. Please type a valid index."},
+				{ openCommand[0]+" "+index[24], "Index does not exist. Please type a valid index."},
+		});
+	}
+
+   	@Test
+	public void testcontainsParameter() {
+		assertEquals(expectedResult, TaskCommander.controller.executeCommand(userCommand)); 
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedOpenTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedSearchTest.java
+	 */
+
+@RunWith(Parameterized.class)
+public class IntegratedSearchTest {
+
+	private String userCommand;
+	private String expectedResult;
+
+	public IntegratedSearchTest(String userCommand, String expectedResult) {
+		this.userCommand = userCommand;
+		this.expectedResult = expectedResult;
+	}
+
+	/*
+	 * Test cases for search 
+	 * Format: search
+	 */
+	@Parameterized.Parameters
+	public static Collection<Object[]>  cases() {
+		String searchCommand[] = {"search","SEARCH", "sEArch", "searcH"};
+		String searchString = "make";
+		String searchPhrase =  "make contribution";
+
+		return Arrays.asList(new Object[][] {
+				{ searchCommand[0], "Invalid command format: \"search\". Refer to help tab to see the list of commands."},
+				{ searchCommand[1], "Invalid command format: \"SEARCH\". Refer to help tab to see the list of commands."},
+				{ searchCommand[2], "Invalid command format: \"sEArch\". Refer to help tab to see the list of commands."},
+				{ searchCommand[3], "Invalid command format: \"searcH\". Refer to help tab to see the list of commands."},
+				{ searchCommand[0]+" "+searchPhrase, "Search task with: [make, contribution]"},
+				{ searchCommand[1]+" "+searchPhrase, "Search task with: [make, contribution]"},
+				{ searchCommand[2]+" "+searchPhrase, "Search task with: [make, contribution]"},
+				{ searchCommand[3]+" "+searchPhrase, "Search task with: [make, contribution]"},
+				{ searchCommand[0]+" "+searchString, "Search task with: [make]"},
+				{ searchCommand[1]+" "+searchString, "Search task with: [make]"},
+				{ searchCommand[2]+" "+searchString, "Search task with: [make]"},
+				{ searchCommand[3]+" "+searchString, "Search task with: [make]"},
+		});
+	}
+
+	@Test
+	public void testcontainsParameter() {
+
+		assertEquals(expectedResult, TaskCommander.controller.executeCommand(userCommand)); 
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedSearchTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedSyncTest.java
+	 */
+
+@RunWith(Parameterized.class)
+public class IntegratedSyncTest {
+
+	private String userCommand;
+	private String expectedResult;
+
+	public IntegratedSyncTest(String userCommand, String expectedResult) {
+		this.userCommand = userCommand;
+		this.expectedResult = expectedResult;
+	}
+
+	/*
+	 * Test cases for sync 
+	 * Format: sync
+	 */
+	@Parameterized.Parameters
+	public static Collection<Object[]>  cases() {
+		String syncCommand[] = {"sync","SYNC", "Sync", "sYNc"};
+		return Arrays.asList(new Object[][] {
+				{ syncCommand[0], "Sync in progress..."},
+				{ syncCommand[1], "Sync in progress..."},
+				{ syncCommand[2], "Sync in progress..."},
+				{ syncCommand[3], "Sync in progress..."},
+		});
+	}
+
+	@Test
+	public void testcontainsParameter() {
+		assertEquals(expectedResult, TaskCommander.controller.executeCommand(userCommand)); 
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedSyncTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedUndoTest.java
+	 */
+
+@RunWith(Parameterized.class)
+public class IntegratedUndoTest {
+
+	private String userCommand;
+	private String expectedResult;
+
+	public IntegratedUndoTest(String userCommand, String expectedResult) {
+		this.userCommand = userCommand;
+		this.expectedResult = expectedResult;
+	}
+
+	@Before
+	public void ini(){
+		TaskCommander.ini();
+	}
+
+	/*
+	 * Test cases for undo.
+	 * Format: undo n (index)
+	 */
+	@Parameterized.Parameters
+	public static Collection<Object[]>  cases() {
+		
+		return Arrays.asList(new Object[][] {
+				{"add \"Content\"", "Undone latest command: ADD."},
+				{"delete 1", "Undone latest command: DELETE."},
+				{"update 1 \"Content\"", "Undone latest command: UPDATE."},
+				{"open 1", "Undone latest command: OPEN."},
+				{"Done 2", "Undone latest command: DONE."},
+				{"clear", "Undone latest command: CLEAR."},
+		});
+	}
+
+	@Test
+	public void testUndo() {
+		TaskCommander.controller.executeCommand(userCommand);
+		assertEquals(expectedResult, TaskCommander.controller.executeCommand("undo")); 
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedUndoTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedUpdateTest.java
+	 */
+
+@RunWith(Parameterized.class)
+public class IntegratedUpdateTest {
+
+	private String userCommand;
+	private String expectedResult;
+
+
+	public IntegratedUpdateTest(String userCommand, String expectedResult) {
+		this.userCommand = userCommand;
+		this.expectedResult = expectedResult;
+	}
+	
+	@Before
+	public void ini(){
+		TaskCommander.ini();
+		TaskCommander.controller.executeCommand("display");
+		TaskCommander.controller.getDisplayedTasks();
+		System.out.println("This is a ini");
+	}
+
+	/*
+	 * Test cases for update.
+	 * Format:
+	 * Update n "content"
+	 * Update n "content" time
+	 * Update n none (remove time constraint)
+	 */
+	@Parameterized.Parameters
+	public static Collection<Object[]>  cases() {
+		String updateCommand[] = {"update","UPDATE", "uPdate", "uPdAtE"};
+		int noOfTestCases = 25;
+		String index[] = new String[25];
+		String changeContent  = "\"content\"";
+		String changeTimeToBeFloating = "none";
+		String changeTimeToBeDeadLine = "Nov 11 3 pm";
+		String changeTimeToBePeriod = "Nov 11 3 pm - Nov 25 6 pm";
+		for(int i = 0; i < noOfTestCases; i++){
+			index[i] = Integer.toString(i);
+		}
+
+		Calendar calendar = Calendar.getInstance();
+		Date today = calendar.getTime();
+		calendar.add(Calendar.DAY_OF_YEAR, 1);
+		calendar.setTimeInMillis(today.getTime());
+		calendar.add(Calendar.MINUTE, 20);
+		
+		return Arrays.asList(new Object[][] {	
+				//Tasks 1-5 are floating tasks. Tasks 6 and 7 are timed tasks. Task 8 till the end are deadline tasks
+				//Get from Ini function after sorting
+				{ updateCommand[0]+" "+index[1], "Invalid command format: \""+updateCommand[0]+" "+index[1] +"\". Refer to help tab to see the list of commands."},
+				{ updateCommand[0]+" "+index[1]+" "+changeTimeToBeFloating, "Updated: \"Be patient with friends\""},
+				{ updateCommand[0]+" "+index[2]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Have fun with friends\""},
+				{ updateCommand[0]+" "+index[3]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Prepare for CS2103 Final\""},
+				{ updateCommand[0]+" "+index[4]+" "+changeContent, "Updated: \"content\""},
+
+				{ updateCommand[0]+" "+index[5]+" "+changeTimeToBeFloating, "Updated: \"Talk to people\""},
+				{ updateCommand[0]+" "+index[5]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Talk to people\""},
+				{ updateCommand[0]+" "+index[5]+" "+changeContent, "Updated: \"content\""},
+				{ updateCommand[0]+" "+index[5]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Talk to people\""},
+				{ updateCommand[0]+" "+index[5]+" "+changeContent+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"content\""},
+				{ updateCommand[0]+" "+index[5]+" "+changeContent+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"content\""},
+
+				//Update timed task
+				{ updateCommand[0]+" "+index[6]+" "+changeTimeToBeFloating, "Updated: \"Finish V0.5 in 10 days\""},
+				{ updateCommand[0]+" "+index[6]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Finish V0.5 in 10 days\""},
+				{ updateCommand[0]+" "+index[6]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Finish V0.5 in 10 days\""},
+				{ updateCommand[0]+" "+index[6]+" "+changeContent+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"content\""},
+				{ updateCommand[0]+" "+index[6]+" "+changeContent+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"content\""},
+				{ updateCommand[0]+" "+index[6]+" "+changeContent+" "+changeTimeToBeFloating, "Updated: \"content\""},
+				
+				{ updateCommand[0]+" "+index[7]+" "+changeTimeToBeFloating, "Updated: \"Contribute to our project\""},
+				{ updateCommand[0]+" "+index[7]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Contribute to our project\""},
+				{ updateCommand[0]+" "+index[7]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Contribute to our project\""},
+				{ updateCommand[0]+" "+index[7]+" "+changeContent+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"content\""},
+				{ updateCommand[0]+" "+index[7]+" "+changeContent+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"content\""},
+				{ updateCommand[0]+" "+index[7]+" "+changeContent+" "+changeTimeToBeFloating, "Updated: \"content\""},
+				
+				{ updateCommand[0]+" "+index[8]+" "+changeTimeToBeFloating, "Updated: \"Get some exercise\""},
+				{ updateCommand[0]+" "+index[8]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Get some exercise\""},
+				{ updateCommand[0]+" "+index[8]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Get some exercise\""},
+				{ updateCommand[0]+" "+index[8]+" "+changeContent+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"content\""},
+				{ updateCommand[0]+" "+index[8]+" "+changeContent+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"content\""},
+				{ updateCommand[0]+" "+index[8]+" "+changeContent+" "+changeTimeToBeFloating, "Updated: \"content\""},
+				
+				{ updateCommand[0]+" "+index[9]+" "+changeTimeToBeFloating, "Updated: \"Do CS2105 P3\""},
+				{ updateCommand[0]+" "+index[9]+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"Do CS2105 P3\""},
+				{ updateCommand[0]+" "+index[9]+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"Do CS2105 P3\""},
+				{ updateCommand[0]+" "+index[9]+" "+changeContent+" "+changeTimeToBePeriod, "Updated: [Tue Nov 11 '14 15:00-Tue Nov 25 '14 18:00] \"content\""},
+				{ updateCommand[0]+" "+index[9]+" "+changeContent+" "+changeTimeToBeDeadLine, "Updated: [by Tue Nov 11 '14 15:00] \"content\""},
+				{ updateCommand[0]+" "+index[9]+" "+changeContent+" "+changeTimeToBeFloating, "Updated: \"content\""},
+			
+				{ updateCommand[0]+" "+index[23]+" "+changeTimeToBeFloating, "Index does not exist. Please type a valid index."},
+				{ updateCommand[0]+" "+index[23]+" "+changeTimeToBeDeadLine, "Index does not exist. Please type a valid index."},
+				{ updateCommand[0]+" "+index[23]+" "+changeContent, "Index does not exist. Please type a valid index."},
+				{ updateCommand[0]+" "+index[23]+" "+changeTimeToBePeriod, "Index does not exist. Please type a valid index."},
+				{ updateCommand[0]+" "+index[24], "Index does not exist. Please type a valid index."},
+		});
+	}
+
+   	@Test
+	public void testcontainsParameter() {
+		assertEquals(expectedResult, TaskCommander.controller.executeCommand(userCommand)); 
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\IntegratedController\IntegratedUpdateTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\UI.java
+	 */
+
+	/**
+	 * Returns the only instance of UI. 
+	 */
+	public static UI getInstance(){
+		if(ui == null) {
+			ui = new UI();
+		}
+		return ui;
+	}
+
+	/**
+	 * @wbp.parser.entryPoint
+	 */
+	public void open() {
+		logger.log(Level.INFO,"Open UI");
+		setupShell();
+		setupTabFolder();
+		createMainTab();
+		createHelpTab();
+		maintainShellSize();
+		runUntilWindowClosed();
+	}
+
+	// Shell setup
+	private void setupShell() {
+		shell.setLayout(new FillLayout());
+		shell.setText(Global.APPLICATION_NAME);
+		shell.setMinimumSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
+		shell.setBounds(display.getBounds().width/10, display.getBounds().height/10, display.getBounds().width/10*3, display.getBounds().height/10*3);
+	}
+
+	// Tabs setup
+	private void setupTabFolder() {
+		tabFolder.setLayout(new GridLayout(TAB_GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE));
+		tabFolder.setSize(SHELL_MIN_WIDTH, SHELL_MIN_HEIGHT);
+	}
+
+	// Main tab setup
+	private void createMainTab() {
+		mainTab = new TabItem(tabFolder, SWT.NONE);
+		mainTab.setText(TAB_MAIN_NAME);
+		setupMainWindow();
+		mainTab.setControl(mainWindow);
+	}
+
+	private void setupMainWindow() {
+		GridLayout layout = new GridLayout(MAIN_GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
+		mainWindow.setLayout(layout);
+		mainWindow.setBounds(shell.getBounds());
+
+		createTextFieldsForMain();
+		setupMainElements();
+		addInputListenerForMain();
+		updateDisplay();
+	}
+
+	private void createTextFieldsForMain() {
+		new Label(mainWindow, SWT.NONE).setText(INFO_DISPLAY);
+		displayOutput = new Text(mainWindow, SWT.WRAP);
+		output = new Text(mainWindow, SWT.BORDER | SWT.WRAP);
+		new Label(mainWindow, SWT.NONE).setText(INSTRUCTIONS_MAIN);
+		input = new Text(mainWindow, SWT.BORDER);
+	}
+
+	private void setupMainElements() {
+		setupDisplayOutput();
+		setupInput();
+		setupOutput();
+		setupTable();
+	}
+
+	private void setupDisplayOutput() {
+		displayOutput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
+				INPUT_COLUMNS_SPAN, INPUT_ROWS_SPAN));
+		updateDisplaySettings();
+	}
+
+	/**
+	 * Gets the latest display settings in a String from the Controller
+	 * and sets it as the text for the display output.
+	 */
+	private void updateDisplaySettings() {
+		displaySettingText = TaskCommander.controller.getDisplaySettingsDescription();
+		displayOutput.setText(displaySettingText);
+	}
+
+	private void setupInput() {
+		GridData inputGridData = new GridData(SWT.FILL, SWT.CENTER, INPUT_FIT_HORIZONTAL, INPUT_FIT_VERTICAL, 
+				INPUT_COLUMNS_SPAN, INPUT_ROWS_SPAN);
+		inputGridData.widthHint = INPUT_PREFERRED_WIDTH;
+		input.setLayoutData(inputGridData);
+	}
+
+	private void setupOutput() {
+		GridData outputGridData = new GridData(SWT.FILL, SWT.CENTER, OUTPUT_FIT_HORIZONTAL, OUTPUT_FIT_VERTICAL, 
+				OUTPUT_COLUMNS_SPAN, OUTPUT_ROWS_SPAN);
+		outputGridData.widthHint = OUTPUT_PREFERRED_WIDTH;
+		output.setLayoutData(outputGridData);
+		output.setText(Global.MESSAGE_WELCOME);
+		output.setForeground(darkBlue);
+		output.setEditable(false);
+	}
+
+	private void setupTable() {
+		GridData tableGridData = new GridData(SWT.FILL, SWT.FILL, TABLE_FIT_HORIZONTAL, TABLE_FIT_VERTICAL, 
+				TABLE_COLUMNS_SPAN, TABLE_ROWS_SPAN);
+		tableGridData.widthHint = TABLE_PREFERRED_WIDTH;
+		tableGridData.heightHint = TABLE_PREFERRED_HEIGHT;
+		table.setLayoutData(tableGridData);
+		table.setHeaderVisible(true);
+		for (int i = 0; i < TABLE_COLUMNS_NUM; i++) {
+			TableColumn column = new TableColumn(table, TABLE_STYLE);
+			column.setText(TABLE_COLUMNS_NAMES[i]);
+		}
+	}
+
+	/**
+	 * Adds a listener to the input text field. 
+	 * 
+	 * Listener is triggered when the return key (Enter) is hit. 
+	 * The user input is then passed on to the Controller component,
+	 * which returns a String to be displayed to the user.
+	 * Calls the display to refresh after each user command.
+	 */
+	private void addInputListenerForMain() {
+		input.addListener(SWT.Traverse, new Listener(){
+			@Override
+			public void handleEvent(org.eclipse.swt.widgets.Event event) {
+				if(event.detail == SWT.TRAVERSE_RETURN)
+					try {
+						logger.log(Level.INFO,"Receive input command with enter key");
+						clearTableItems();
+						String command = input.getText();
+						String feedback = TaskCommander.controller.executeCommand(command);
+						updateDisplay(feedback);
+						updateDisplaySettings();
+						clearInput();
+						maintainShellSize();
+					}catch (Exception e) {
+						logger.log(Level.WARNING,"Exception while executing command flow", e);
+					}
+			}
+		});
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\UI.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\UI.java
+	 */
+
+	/**
+	 * Opens the shell and runs until the shell is closed.
+	 * Disposes of the display.
+	 */
+	private void runUntilWindowClosed() {
+		shell.open();
+		while (!shell.isDisposed()) {
+			if (!Global.syncing && !input.getEditable()) {
+				if (tabFolder.getItemCount() == 3) { // Tab folder has 3 tabs -> browser tab is open
+					closeBrowserTab();
+					maintainShellSize();
+				}
+				// Accept user input when not syncing
+				input.setEditable(true);
+				updateDisplay();
+			} else if (Global.syncing && input.getEditable()) {
+				// Do not accept user input when syncing
+				input.setEditable(false);
+				updateDisplay();
+			}
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
+		disposeElements();
+	}
+
+	private void disposeElements() {
+		display.dispose();
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\UI.java
+
+
+
+
+

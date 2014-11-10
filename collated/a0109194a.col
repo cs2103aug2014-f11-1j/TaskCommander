@@ -1,0 +1,2232 @@
+//@author: a0109194a
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\AddGoogleTest.java
+	 */
+
+/**
+ * Test for Adding Tasks, called by SyncHandler
+ *
+ */
+
+public class AddGoogleTest {
+	Data tester;
+	ArrayList<Task> tasks;
+	Calendar cal;
+	Date start;
+	Date end;
+	String title;
+	String expected;
+	String id;
+	
+	public AddGoogleTest() {
+		tester = Data.getInstance();
+		tasks = tester.getAllTasks();
+		cal = Calendar.getInstance();
+		cal.set(2014, Calendar.NOVEMBER, 10, 15, 00);
+		start = cal.getTime();
+		cal.set(2014,  Calendar.NOVEMBER, 10, 16, 00);
+		end = cal.getTime();
+		title = "Watch a Movie";
+		id = "Anything";
+	}
+	
+	@Test
+	public void nullIdTest() {
+		FloatingTask task = new FloatingTask(title);
+		expected = "Task has no ID.";
+		assertEquals(expected, tester.addTask(task));
+		
+		tester.clearTasks();
+	}
+	
+	
+	@Test
+	public void addFloatingTaskTest() {
+		FloatingTask task = new FloatingTask(title);
+		expected = "Added: \"Watch a Movie\"";
+		task.setId(id);
+		assertEquals(expected, tester.addTask(task));
+		
+		tester.clearTasks();
+	}
+	
+	@Test
+	public void addDeadlineTaskTest() {
+		DeadlineTask task = new DeadlineTask(title, start);
+		expected = "Added: [by Mon Nov 10 '14 15:00] \"Watch a Movie\"";
+		task.setId(id);
+		assertEquals(expected, tester.addTask(task));
+		
+		tester.clearTasks();
+	}
+	
+	@Test
+	public void addTimedTask() {
+		TimedTask task = new TimedTask(title, start, end);
+		expected = "Added: [Mon Nov 10 '14 15:00-16:00] \"Watch a Movie\"";
+		task.setId(id);
+		assertEquals(expected, tester.addTask(task));
+		
+		tester.clearTasks();
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\AddGoogleTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\AddInternalTest.java
+	 */
+
+/**
+ * Test for Internal Add Command.
+ *
+ */
+public class AddInternalTest {
+	Data tester;
+	Stack<Task> addedTests;
+	ArrayList<Task> tasks;
+	
+	public AddInternalTest() {
+		tester = Data.getInstance();
+	}
+	
+	@Test
+	public void addedTasksTests() {
+		addedTests = tester.getAddedTasks();
+		assertNotNull(addedTests);
+	}
+	
+	@Test
+	public void tasksTests() {
+		tasks = tester.getAllTasks();
+		assertNotNull(tasks);
+	}
+	
+	@Test
+	public void addFloatingTaskTest() {
+		String expected = "Added: \"hello\"";
+		assertEquals(expected, tester.addFloatingTask("hello"));
+		
+		tester.clearTasks();
+	}
+	
+	@Test
+	public void addDeadlineTaskTest() {
+		String expected = "Added: [by Mon Nov 10 '14 15:00] \"Enjoy Life\"";
+		
+		Calendar cal = Calendar.getInstance();
+		cal.set(2014, Calendar.NOVEMBER, 10, 15, 00);
+		Date date = cal.getTime();
+
+		assertEquals(expected, tester.addDeadlineTask("Enjoy Life", date));
+		
+		tester.clearTasks();
+	}
+	
+	@Test
+	public void addTimedTaskTest() {
+		String expected = "Added: [Sun Dec 14 '14 15:00-Mon Dec 15 '14 15:00] \"Sing in the Rain\"";
+		
+		Calendar cal = Calendar.getInstance();
+		cal.set(2014, Calendar.DECEMBER, 14, 15, 00);
+		Date startDate = cal.getTime();
+		cal.set(2014, Calendar.DECEMBER, 15, 15, 00);
+		Date endDate = cal.getTime();
+		
+		assertEquals(expected, tester.addTimedTask("Sing in the Rain", startDate, endDate));
+		
+		tester.clearTasks();
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\AddInternalTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\AllDataTest.java
+	 */
+
+/**
+ * This class contains all test cases for the Data class of the Logic Component.
+ * 
+ */
+
+@RunWith(Suite.class)
+@SuiteClasses({
+	UndoTest.class,
+	MarkTest.class,
+	AddInternalTest.class,
+	ClearInternalTest.class,
+	DeleteInternalTest.class,
+	UpdateInternalTest.class,
+	AddGoogleTest.class,
+	DeleteGoogleTest.class,
+	UpdateGoogleTest.class
+})
+
+public class AllDataTest {
+	
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\AllDataTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\ClearInternalTest.java
+	 */
+
+/**
+ * Test for internal clear command
+ *
+ */
+public class ClearInternalTest {
+	Data tester;
+	Stack<ArrayList<Task>> clearedTasks;
+	ArrayList<Task> tasks;
+
+	public ClearInternalTest() {
+		tester = Data.getInstance();
+	}
+	
+	@Test
+	public void clearedTasksTest() {
+		clearedTasks = tester.getClearedTasks();
+		assertNotNull(clearedTasks);
+	}
+	
+	@Test
+	public void emptyClearTest() {
+		String expected = "No tasks available";
+		assertEquals(expected, tester.clearTasks());
+	}
+	
+	@Test
+	public void clearTest() {
+		tester.addFloatingTask("Have Coffee");
+		tester.addFloatingTask("Buy groceries");
+		String expected = "All content deleted.";
+		assertEquals(expected, tester.clearTasks());
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\ClearInternalTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\DeleteGoogleTest.java
+	 */
+
+/**
+ * Test for delete command called by SyncHandler
+ *
+ */
+public class DeleteGoogleTest {
+	Data tester;
+	ArrayList<Task> tasks;
+	
+	public DeleteGoogleTest() {
+		tester = Data.getInstance();
+		tasks = tester.getAllTasks();
+	}
+	
+	@Test
+	public void emptyTasksTests() {
+		tester.clearTasks();
+		int index = 0;
+		assertFalse(tester.deleteFromGoogle(index));
+	}
+	
+	@Test
+	public void deleteTest() {
+		tester.addFloatingTask("Watch a Movie");
+		assertTrue(tester.deleteFromGoogle(0));
+		tester.clearTasks();
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\DeleteGoogleTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\DeleteInternalTest.java
+	 */
+
+/**
+ * Test for intenral delete command
+ *
+ */
+public class DeleteInternalTest {
+	Data tester;
+	ArrayList<Task> deletedTasks;
+	ArrayList<Task> tasks;
+	
+	public DeleteInternalTest() {
+		tester = Data.getInstance();
+	}
+	
+	@Test
+	public void deletedTasksTest() {
+		deletedTasks = tester.getDeletedTasks();
+		assertNotNull(deletedTasks);
+	}
+		
+	@Test
+	public void invalidIndexTest() {
+		tester.addFloatingTask("Hello");
+		int index1 = -1;
+		int index2 = 10;
+		String expected = "Index does not exist. Please type a valid index.";
+		assertEquals(expected, tester.deleteTask(index1));
+		assertEquals(expected, tester.deleteTask(index2));
+	}
+	
+	@Test
+	public void emptyDeleteTest() {
+		tester.clearTasks();
+		String expected = "No tasks available";
+		assertEquals(expected, tester.deleteTask(1));
+	}
+	
+	@Test
+	public void deleteTest() {
+		tester.clearTasks();
+		tester.addFloatingTask("Meet Richard");
+		String expected = "Deleted: \"Meet Richard\"";
+		assertEquals(expected, tester.deleteTask(0));
+		tasks = tester.getAllTasks();
+		deletedTasks = tester.getDeletedTasks();
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\DeleteInternalTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\MarkTest.java
+	 */
+
+/**
+ * Test for marking tasks as done or open
+ *
+ */
+public class MarkTest {
+	public Data tester;
+	ArrayList<Task> tasks;
+	Calendar cal;
+	Date start;
+	Date end;
+	String title;
+	
+	public MarkTest() {
+		tester = Data.getInstance();
+		tester.clearTasks();
+		tasks = tester.getAllTasks();
+		cal = Calendar.getInstance();
+		cal.set(2014, Calendar.NOVEMBER, 10, 15, 00);
+		start = cal.getTime();
+		cal.set(2014,  Calendar.NOVEMBER, 10, 16, 00);
+		end = cal.getTime();
+		title = "Watch a Movie";
+	}
+	
+	@Test
+	public void DoneTest() {		
+		tester.clearTasks();
+		
+		tester.addFloatingTask(title);
+		tester.open(0);
+		tester.addDeadlineTask(title, start);
+		tester.open(1);
+		tester.addTimedTask(title, start, end);
+		tester.open(2);
+		
+		assertEquals("Done: \"Watch a Movie\"", tester.done(0));
+		assertEquals("Done: [by Mon Nov 10 '14 15:00] \"Watch a Movie\"", tester.done(1));
+		assertEquals("Done: [Mon Nov 10 '14 15:00-16:00] \"Watch a Movie\"", tester.done(2));
+		assertEquals("Index does not exist. Please type a valid index.", tester.done(3));
+		assertEquals("Index does not exist. Please type a valid index.", tester.done(-1));
+		assertEquals("Already done.", tester.done(0));		
+	}
+	
+	@Test
+	public void OpenTest() {
+		tester.clearTasks();
+		
+		tester.addFloatingTask(title);
+		tester.done(0);
+		tester.addDeadlineTask(title, start);
+		tester.done(1);
+		tester.addTimedTask(title, start, end);
+		tester.done(2);
+		
+		assertEquals("Opened: \"Watch a Movie\"", tester.open(0));
+		assertEquals("Opened: [by Mon Nov 10 '14 15:00] \"Watch a Movie\"", tester.open(1));
+		assertEquals("Opened: [Mon Nov 10 '14 15:00-16:00] \"Watch a Movie\"", tester.open(2));
+		assertEquals("Index does not exist. Please type a valid index.", tester.open(3));
+		assertEquals("Index does not exist. Please type a valid index.", tester.open(-1));
+		assertEquals("Already opened.", tester.open(0));
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\MarkTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\UndoTest.java
+	 */
+
+/**
+ * Test for undo command
+ *
+ */
+@RunWith(Parameterized.class)
+public class UndoTest {
+	private String expectedResult;
+	public static Data tester;
+	
+	public UndoTest(String expectedResult) {
+		this.expectedResult = expectedResult;
+	}
+	
+	//Test Parameters
+	@Parameterized.Parameters
+	public static Collection<Object[]> cases() {
+		tester = Data.getInstance();
+		tester.clearTasks();
+		tester.clearOperationHistory();
+		
+		tester.addFloatingTask("hello");
+		tester.updateToFloatingTask(0,"konnichiwa");
+		tester.deleteTask(0);
+		tester.addFloatingTask("Guten Morgen");
+		tester.clearTasks();
+		String undoMessage = "Undone latest command: ";
+		
+		
+		return Arrays.asList(new Object[][] {
+			{ undoMessage + CommandType.CLEAR + "." },
+			{ undoMessage + CommandType.ADD + "." },
+			{ undoMessage + CommandType.DELETE + "." },
+			{ undoMessage + CommandType.UPDATE + "." },
+			{ undoMessage + CommandType.ADD + "." },
+			{ "No commands to undo" }
+		});
+	}
+	
+	// Test run
+   	@Test
+	public void testUndo() {
+		assertEquals(expectedResult, tester.undo()); 
+	}
+
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\UndoTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\UpdateGoogleTest.java
+	 */
+
+/**
+ * Test for update method called by SyncHandler
+ *
+ */
+public class UpdateGoogleTest {
+	Data tester;
+	ArrayList<Task> tasks;
+	Calendar cal;
+	Date start;
+	Date end;
+	Date newStart;
+	Date newEnd;
+	String title;
+	String newTitle;
+	String expected;
+	
+	public UpdateGoogleTest() {
+		tester = Data.getInstance();
+		tasks = tester.getAllTasks();
+		cal = Calendar.getInstance();
+		cal.set(2014, Calendar.NOVEMBER, 10, 15, 00);
+		start = cal.getTime();
+		cal.set(2014,  Calendar.NOVEMBER, 10, 16, 00);
+		end = cal.getTime();
+		cal.set(2014, Calendar.NOVEMBER, 11, 15, 00);
+		newStart = cal.getTime();
+		cal.set(2014, Calendar.NOVEMBER, 11, 16, 00);
+		newEnd = cal.getTime();
+		title = "Watch a Movie";
+		newTitle = "Watch Interstellar";
+	}
+	
+	@Test
+	public void updateToFloatingTaskTest() {
+		tester.clearTasks();
+		tester.addFloatingTask(title);
+		FloatingTask newTask = new FloatingTask(newTitle);
+		expected = "Updated: \"Watch Interstellar\"";
+		assertEquals(expected, tester.updateToFloatingTask(0, newTask));
+		
+		tester.addDeadlineTask(title, start);
+		assertEquals(expected, tester.updateToFloatingTask(1, newTask));
+		
+		tester.addTimedTask(title, start, end);
+		assertEquals(expected, tester.updateToFloatingTask(2, newTask));
+		
+		tester.clearTasks();
+	}
+	
+	@Test
+	public void updateToDeadlineTaskTest() {
+		tester.clearTasks();
+		tester.addDeadlineTask(title, start);
+		DeadlineTask newTask = new DeadlineTask(newTitle, newStart);
+		expected = "Updated: [by Tue Nov 11 '14 15:00] \"Watch Interstellar\"";
+		assertEquals(expected, tester.updateToDeadlineTask(0, newTask));
+		
+		tester.addFloatingTask(title);
+		assertEquals(expected, tester.updateToDeadlineTask(1, newTask));
+		
+		tester.addTimedTask(title, start, end);
+		assertEquals(expected, tester.updateToDeadlineTask(2, newTask));
+		
+		tester.clearTasks();
+	}
+	
+	@Test
+	public void updateToTimedTaskTest() {
+		tester.clearTasks();
+		tester.addTimedTask(title, start, end);
+		TimedTask newTask = new TimedTask(newTitle, newStart, newEnd);
+		expected = "Updated: [Tue Nov 11 '14 15:00-16:00] \"Watch Interstellar\"";
+		assertEquals(expected, tester.updateToTimedTask(0, newTask));
+		
+		tester.addFloatingTask(title);
+		assertEquals(expected, tester.updateToTimedTask(1, newTask));
+		
+		tester.addDeadlineTask(title, start);
+		assertEquals(expected, tester.updateToTimedTask(2, newTask));
+		
+		tester.clearTasks();
+	}
+	
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\UpdateGoogleTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\UpdateInternalTest.java
+	 */
+
+/**
+ * Test for internal delete command
+ *
+ */
+public class UpdateInternalTest {
+	Data tester;
+	Stack<Task> preupdatedTasks;
+	Stack<Task> updatedTasks;
+	Stack<Task> changedTypeTasks;
+	ArrayList<Task> tasks;
+	
+	public UpdateInternalTest() {
+		tester = Data.getInstance();
+	}
+	
+	@Test
+	public void preupdatedTasksTest() {
+		preupdatedTasks = tester.getPreupdatedTasks();
+		assertNotNull(preupdatedTasks);
+	}
+	
+	@Test
+	public void updatedTasksTest() {
+		updatedTasks = tester.getUpdatedTasks();
+		assertNotNull(updatedTasks);
+	}
+	
+	@Test
+	public void changedTypeTasksTest() {
+		changedTypeTasks = tester.getChangedTypeTasks();
+		assertNotNull(changedTypeTasks);
+	}
+	
+	@Test
+	public void invalidIndexTest() {
+		tester.addFloatingTask("Hello");
+		int index1 = -1;
+		int index2 = 10;
+		String expected = "Index does not exist. Please type a valid index.";
+		assertEquals(expected, tester.updateToFloatingTask(index1, "Hello"));
+		assertEquals(expected, tester.updateToFloatingTask(index2, "Konnichiwa"));
+	}
+	
+	@Test
+	public void emptyUpdateTest() {
+		tester.clearTasks();
+		String expected = "No tasks available";
+		assertEquals(expected, tester.updateToFloatingTask(0, "Dummy"));
+		assertEquals(expected, tester.updateToDeadlineTask(0, null, null));
+		assertEquals(expected, tester.updateToTimedTask(0, null, null, null));
+	}
+	
+	@Test
+	public void updateToFloatingTaskTest() {
+		tester.clearTasks();
+		tester.addFloatingTask("Become a philosopher king");
+		String expected = "Updated: \"Become a metaphysics king\"";
+		assertEquals(expected, tester.updateToFloatingTask(0, "Become a metaphysics king"));
+		
+		tester.clearTasks();
+		
+		Calendar cal = Calendar.getInstance();
+		cal.set(2014, Calendar.NOVEMBER, 10, 15, 00);
+		Date date = cal.getTime();
+		tester.addDeadlineTask("Eat", date);
+		expected = "Updated: \"Eat Smores\"";
+		assertEquals(expected, tester.updateToFloatingTask(0, "Eat Smores"));
+		
+		tester.clearTasks();
+		
+		cal.set(2014, Calendar.NOVEMBER, 10, 15, 00);
+		Date start = cal.getTime();
+		cal.set(2014, Calendar.DECEMBER, 10, 16, 00);
+		Date end = cal.getTime();
+		tester.addTimedTask("Find Nemo", start, end);
+		expected = "Updated: \"Find Nemo and Father\"";
+		assertEquals(expected, tester.updateToFloatingTask(0, "Find Nemo and Father"));
+		
+		tester.clearTasks();
+	}
+	
+	@Test
+	public void updateToDeadlineTaskTest(){
+		tester.clearTasks();
+		Calendar cal = Calendar.getInstance();
+		cal.set(2014, Calendar.NOVEMBER, 10, 15, 00);
+		Date date = cal.getTime();
+		tester.addDeadlineTask("Have a KitKat", date);
+		
+		cal.set(2014, Calendar.NOVEMBER, 10, 16, 00);
+		Date newDate = cal.getTime();
+		String newTitle = "Have a Kit-Kat";
+		String expected = "Updated: [by Mon Nov 10 '14 16:00] \"Have a Kit-Kat\"";
+		assertEquals(expected, tester.updateToDeadlineTask(0, newTitle, newDate));
+		
+		tester.clearTasks();
+		tester.addFloatingTask("Have a KitKat");
+		assertEquals(expected, tester.updateToDeadlineTask(0, newTitle, newDate));
+		
+		tester.clearTasks();
+		tester.addTimedTask("Have a KitKat", date, newDate);
+		assertEquals(expected, tester.updateToDeadlineTask(0, newTitle, newDate));
+		
+		tester.clearTasks();
+		tester.addFloatingTask("Have a KitKat");
+		expected = "Invalid arguments given.";
+		assertEquals(expected, tester.updateToDeadlineTask(0, newTitle, null));
+		
+		tester.clearTasks();
+	}
+	
+	
+	@Test
+	public void updateToTimedTaskTest() {
+		tester.clearTasks();
+		Calendar cal = Calendar.getInstance();
+		cal.set(2014, Calendar.NOVEMBER, 10, 15, 00);
+		Date start = cal.getTime();
+		cal.set(2014,  Calendar.NOVEMBER, 10, 16, 00);
+		Date end = cal.getTime();
+		String title = "Watch a Movie";
+		tester.addTimedTask(title, start, end);
+		
+		cal.set(2014, Calendar.NOVEMBER, 11, 16, 00);
+		Date newStart = cal.getTime();
+		cal.set(2014, Calendar.NOVEMBER, 11, 17, 00);
+		Date newEnd = cal.getTime();
+		String newTitle = "Watch Interstellar";
+		String expected = "Updated: [Tue Nov 11 '14 16:00-17:00] \"Watch Interstellar\"";
+		assertEquals(expected, tester.updateToTimedTask(0, newTitle, newStart, newEnd));
+		
+		tester.clearTasks();
+		tester.addFloatingTask("Watch a movie");
+		assertEquals(expected, tester.updateToTimedTask(0, newTitle, newStart, newEnd));
+		
+		tester.clearTasks();
+		tester.addDeadlineTask(title, end);
+		assertEquals(expected, tester.updateToTimedTask(0, newTitle, newStart, newEnd));
+
+		tester.clearTasks();
+		tester.addFloatingTask("Have a KitKat");
+		expected = "Invalid arguments given.";
+		assertEquals(expected, tester.updateToTimedTask(0, newTitle, null, null));
+		
+		tester.clearTasks();
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Data\UpdateInternalTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	private ArrayList<Task> deletedTasks; // Used by the Google API.
+	private Stack<ArrayList<Task>> clearedTasks;
+
+	// Variables to store history of tasks for undo command.
+	private Stack<Task> addedTasks;
+	private Stack<Task> preupdatedTasks;
+	private Stack<Task> updatedTasks;
+	private Stack<Task> changedTypeTasks;
+	private Stack<CommandType> operationHistory;
+	private Stack<Global.CommandType> undoHistory;
+	private Stack<Integer> doneTasks;
+	private Stack<Integer> openTasks;
+
+	private Data() {
+		tasks = new ArrayList<Task>();
+		deletedTasks = new ArrayList<Task>();
+		addedTasks = new Stack<Task>();
+		preupdatedTasks = new Stack<Task>();
+		updatedTasks = new Stack<Task>();
+		clearedTasks = new Stack<ArrayList<Task>>();
+		changedTypeTasks = new Stack<Task>();
+		operationHistory = new Stack<Global.CommandType>();
+		undoHistory = new Stack<Global.CommandType>();
+		doneTasks = new Stack<Integer>();
+		openTasks = new Stack<Integer>();
+
+		loadFromPermanentStorage();
+	}
+
+	// Methods used internally:
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	/**
+	 * Updates a FloatingTask with the given index and replaces the old
+	 * taskName, startDate or endDate respectively and changes the taskType if
+	 * needed. If a given date or name parameter equals null, the old value
+	 * remains.
+	 * 
+	 * @param index
+	 * @param taskName
+	 * @return feedback for UI
+	 */
+	public String updateToFloatingTask(int index, String name) {
+		if (tasks.isEmpty()) {
+			return String.format(Global.MESSAGE_EMPTY);
+		}
+		if (isIndexInvalid(index)) {
+			return String.format(Global.MESSAGE_NO_INDEX, index);
+		}
+
+		Task relatedTask = tasks.get(index);
+		FloatingTask floatingTask;
+
+		if (relatedTask.getType() != Task.TaskType.FLOATING) {
+			if (name == null) {
+				name = relatedTask.getName();
+			}
+
+			floatingTask = new FloatingTask(name);
+			floatingTask.setDone(relatedTask.isDone());
+
+			changedTypeTasks.add(relatedTask);
+		} else {
+			floatingTask = new FloatingTask(relatedTask.getName());
+			if (name != null) {
+				floatingTask.setName(name);
+			}  
+		}
+		floatingTask.setEdited(true);
+		tasks.remove(index);
+		tasks.add(index, floatingTask);
+
+		processUpdateHistory(relatedTask, floatingTask);
+		saveToPermanentStorage();
+
+		return String.format(Global.MESSAGE_UPDATED,
+				getTaskInDisplayFormat(floatingTask));
+	}
+
+	/**
+	 * Updates a DeadlineTask with the given index and replaces the old
+	 * taskName, startDate or endDate respectively and changes the taskType if
+	 * needed. If a given date or name parameter equals null, the old value
+	 * remains.
+	 * 
+	 * @param index
+	 * @param taskName
+	 * @param endDate
+	 * @return feedback for UI
+	 */
+	public String updateToDeadlineTask(int index, String name, Date endDate) {
+		if (tasks.isEmpty()) {
+			return String.format(Global.MESSAGE_EMPTY);
+		}
+		if (isIndexInvalid(index)) {
+			return String.format(Global.MESSAGE_NO_INDEX, index);
+		}
+
+		Task relatedTask = tasks.get(index);
+		DeadlineTask deadlineTask;
+
+		if (relatedTask.getType() != Task.TaskType.DEADLINE) {
+			if (name == null) {
+				name = relatedTask.getName();
+			}
+			if (endDate == null) {
+				return Global.MESSAGE_ARGUMENTS_INVALID;
+			}
+
+			deadlineTask = new DeadlineTask(name, endDate);
+			deadlineTask.setDone(relatedTask.isDone());
+
+			changedTypeTasks.add(relatedTask);
+		} else {
+			deadlineTask = new DeadlineTask(relatedTask.getName(), 
+					((DeadlineTask) relatedTask).getEndDate());
+
+			if (name != null) {
+				deadlineTask.setName(name);
+			}
+			if (endDate != null) {
+				deadlineTask.setEndDate(endDate);
+			}
+
+		}
+		deadlineTask.setEdited(true);
+		tasks.remove(index);
+		tasks.add(index, deadlineTask);
+
+		processUpdateHistory(relatedTask, deadlineTask);
+		saveToPermanentStorage();
+
+		return String.format(Global.MESSAGE_UPDATED,
+				getTaskInDisplayFormat(deadlineTask));
+	}
+
+	/**
+	 * Updates a TimedTask with the given index and replaces the old taskName,
+	 * startDate or endDate respectively and changes the taskType if needed. If
+	 * a given date or name parameter equals null, the old value remains.
+	 * 
+	 * @param index
+	 * @param taskName
+	 * @param startDate
+	 * @param endDate
+	 * @return feedback for UI
+	 */
+	public String updateToTimedTask(int index, String name, Date startDate,
+			Date endDate) {
+		if (tasks.isEmpty()) {
+			return String.format(Global.MESSAGE_EMPTY);
+		}
+		if (isIndexInvalid(index)) {
+			return String.format(Global.MESSAGE_NO_INDEX, index);
+		}
+
+		Task relatedTask = tasks.get(index);
+		TimedTask timedTask;
+		if (!relatedTask.getType().equals(Task.TaskType.TIMED)) {
+			if (name == null) {
+				name = relatedTask.getName();
+			}
+			if (startDate == null || endDate == null) {
+				return Global.MESSAGE_ARGUMENTS_INVALID;
+			}
+
+			timedTask = new TimedTask(name, startDate, endDate);
+			timedTask.setDone(relatedTask.isDone());
+
+			changedTypeTasks.add(relatedTask);
+		} else {
+			timedTask = (TimedTask) relatedTask;
+			timedTask = new TimedTask(relatedTask.getName(),
+					((TimedTask) relatedTask).getStartDate(),
+					((TimedTask) relatedTask).getEndDate());
+
+			if (name != null) {
+				timedTask.setName(name);
+			}
+			if (startDate != null) {
+				timedTask.setStartDate(startDate);
+			}
+			if (endDate != null) {
+				timedTask.setEndDate(endDate);
+			}
+
+		}
+		timedTask.setEdited(true);
+		tasks.remove(index);
+		tasks.add(index, timedTask);
+
+		processUpdateHistory(relatedTask, timedTask);
+		saveToPermanentStorage();
+
+		return String.format(Global.MESSAGE_UPDATED,
+				getTaskInDisplayFormat(timedTask));
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	/**
+	 * Clears all tasks from memory.
+	 * 
+	 * @param userCommand
+	 * @return feedback for UI
+	 */
+	public String clearTasks() {
+		if (tasks.isEmpty()) {
+			return String.format(Global.MESSAGE_EMPTY);
+		}
+
+		ArrayList<Task> cleared = new ArrayList<Task>();
+		cleared.addAll(tasks);
+		clearedTasks.push(cleared);
+		tasks.clear();
+		saveToOperationHistory(Global.CommandType.CLEAR);
+		saveToPermanentStorage();
+
+		return String.format(Global.MESSAGE_CLEARED);
+	}
+
+	/**
+	 * This operation undoes the latest command. It supports Add, Delete,
+	 * Update, and Clear commands.
+	 * 
+	 * @return feedback for UI
+	 */
+	public String undo() {
+		if (operationHistory.empty()) {
+			return Global.MESSAGE_UNDO_EMPTY;
+		}
+		Global.CommandType type = operationHistory.pop();
+		Global.CommandType undoCommand = null;
+		switch (type) {
+		case ADD:
+			undoCommand = Global.CommandType.DELETE;
+			undoAdd();
+			break;
+
+		case DELETE:
+			undoCommand = Global.CommandType.ADD;
+			undoDelete();
+			break;
+
+		case UPDATE:
+			undoCommand = Global.CommandType.UPDATE;
+			undoUpdate();
+			break;
+
+		case CLEAR:
+			undoCommand = Global.CommandType.UNCLEAR;
+			undoClear();
+			break;
+
+		case DONE:
+			undoCommand = Global.CommandType.OPEN;
+			undoDone();
+			break;
+
+		case OPEN:
+			undoCommand = Global.CommandType.DONE;
+			undoOpen();
+			break;
+
+		default:
+			undo(); // Calls undo again to look for one of the six commands
+			// above
+		}
+		saveToUndoHistory(undoCommand);
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_UNDONE, type);
+	}
+
+	/**
+	 * Undoes the add command.
+	 * 
+	 * @return Success of undo.
+	 */
+	private boolean undoAdd() {
+		Task toDelete = addedTasks.pop();
+		switch (toDelete.getType()) {
+		case TIMED:
+			tasks.remove((TimedTask) toDelete);
+			return true;
+			
+		case DEADLINE:
+			tasks.remove((DeadlineTask) toDelete);
+			return true;
+			
+		case FLOATING:
+			tasks.remove((FloatingTask) toDelete);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Undoes the delete command.
+	 * 
+	 * @return Success of undo.
+	 */
+	private boolean undoDelete() {
+		Task toAdd = deletedTasks.get(deletedTasks.size() - 1);
+		deletedTasks.remove(deletedTasks.size() - 1);
+		switch (toAdd.getType()) {
+		case TIMED:
+			tasks.add((TimedTask) toAdd);
+			return true;
+			
+		case DEADLINE:
+			tasks.add((DeadlineTask) toAdd);
+			return true;
+			
+		case FLOATING:
+			tasks.add((FloatingTask) toAdd);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Undoes the update command.
+	 * 
+	 * @return Success of undo.
+	 */
+	private boolean undoUpdate() {
+		Task updated = updatedTasks.pop();
+		Task beforeUpdate = preupdatedTasks.pop();
+		if (updated.getType() != beforeUpdate.getType()) {
+			changedTypeTasks.pop();
+		}
+
+		int index = 0;
+		switch (updated.getType()) {
+		case TIMED:
+			index = tasks.indexOf((TimedTask) updated);
+			break;
+			
+		case DEADLINE:
+			index = tasks.indexOf((DeadlineTask) updated);
+			break;
+			
+		case FLOATING:
+			index = tasks.indexOf((FloatingTask) updated);
+			break;
+		}
+
+		tasks.remove(index);
+		switch (beforeUpdate.getType()) {
+		case TIMED:
+			tasks.add(index, (TimedTask) beforeUpdate);
+			return true;
+			
+		case DEADLINE:
+			tasks.add(index, (DeadlineTask) beforeUpdate);
+			return true;
+			
+		case FLOATING:
+			tasks.add(index, (FloatingTask) beforeUpdate);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Undoes the Clear command.
+	 * 
+	 * @return Success of undo.
+	 */
+	private boolean undoClear() {
+		ArrayList<Task> toRestore = clearedTasks.pop();
+		tasks.addAll(toRestore);
+		return true;
+	}
+
+	/**
+	 * Undoes the Done command.
+	 * @return	Success of undo
+	 */
+	private boolean undoDone() {
+		int index = doneTasks.pop();
+		if (index != -1) {
+			Task task = tasks.get(index);
+			task.markOpen();    
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Undoes the Open command.
+	 * @return	Success of undo.
+	 */
+	private boolean undoOpen() {
+		int index = openTasks.pop();
+		if (index != -1) {
+			Task task = tasks.get(index);
+			task.markDone();
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// Methods used by Google Integration:
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	/**
+	 * Adds a Task to the tasks list by forwarding the task's attributes to the
+	 * respective add method. It is usually called by the SyncHandler class.
+	 * 
+	 * @param task
+	 * @return Feedback for UI
+	 */
+	public String addTask(Task task) {
+		logger.log(Level.INFO, "Called addTask(Task task)");
+		if (task.getId() != null) {
+			switch (task.getType()) {
+			case FLOATING:
+				FloatingTask floatingTask = (FloatingTask) task;
+				return addFloatingTask(floatingTask);
+				
+			case DEADLINE:
+				DeadlineTask deadlineTask = (DeadlineTask) task;
+				return addDeadlineTask(deadlineTask);
+				
+			default:
+				TimedTask timedTask = (TimedTask) task;
+				return addTimedTask(timedTask);
+			}
+		} else {
+			return Global.MESSAGE_NULL_ID;
+		}
+	}
+
+	/**
+	 * Adds a Floating Task to the tasks list.
+	 * 
+	 * @param floatingTask
+	 * @return Feedback for UI
+	 */
+	public String addFloatingTask(FloatingTask floatingTask) {
+		floatingTask.setEdited(false);
+		tasks.add(floatingTask);
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_ADDED,
+				getTaskInDisplayFormat(floatingTask));
+	}
+
+	/**
+	 * Adds a Deadline Task to the tasks list.
+	 * 
+	 * @param deadlineTask
+	 * @return Feedback for UI
+	 */
+	public String addDeadlineTask(DeadlineTask deadlineTask) {
+		deadlineTask.setEdited(false);
+		tasks.add(deadlineTask);
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_ADDED,
+				getTaskInDisplayFormat(deadlineTask));
+	}
+
+	/**
+	 * Adds a Timed Task to the tasks list.
+	 * 
+	 * @param timedTask
+	 * @return Feedback for UI
+	 */
+	public String addTimedTask(TimedTask timedTask) {
+		timedTask.setEdited(false);
+		tasks.add(timedTask);
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_ADDED,
+				getTaskInDisplayFormat(timedTask));
+	}
+
+	/**
+	 * Updates a task with a FloatingTask object as a parameter. It is usually
+	 * called by the SyncHandler.
+	 * 
+	 * @param index
+	 * @param task
+	 * @return Feedback for user
+	 */
+	public String updateToFloatingTask(int index, FloatingTask task) {
+		FloatingTask floatingTask;
+		if (tasks.get(index).getType() != Task.TaskType.FLOATING) {
+			floatingTask = new FloatingTask(task.getName());
+			floatingTask.setDone(tasks.get(index).isDone());
+			floatingTask.setId(task.getId());
+			tasks.remove(index);
+			tasks.add(index, floatingTask);
+		} else {
+			floatingTask = (FloatingTask) tasks.get(index);
+			if (task.getName() != null) {
+				floatingTask.setName(task.getName());
+			}
+			
+		}
+		floatingTask.setEdited(false);
+		floatingTask.setUpdated(task.getUpdated());
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_UPDATED,
+				getTaskInDisplayFormat(floatingTask));
+	}
+
+	/**
+	 * Updates a task with a DeadlineTask object as a parameter. It is usually
+	 * called by the SyncHandler.
+	 * 
+	 * @param index
+	 * @param task
+	 * @return Feedback for user
+	 */
+	public String updateToDeadlineTask(int index, DeadlineTask task) {
+		DeadlineTask deadlineTask;
+		if (tasks.get(index).getType() != Task.TaskType.DEADLINE) {
+			deadlineTask = new DeadlineTask(task.getName(), task.getEndDate());
+			deadlineTask.setDone(tasks.get(index).isDone());
+			deadlineTask.setId(task.getId());
+			tasks.remove(index);
+			tasks.add(index, deadlineTask);
+			saveToPermanentStorage();
+			return String.format(Global.MESSAGE_UPDATED,
+					getTaskInDisplayFormat(deadlineTask));
+		} else {
+			deadlineTask = (DeadlineTask) tasks.get(index);
+			if (task.getName() != null) {
+				deadlineTask.setName(task.getName());
+			}
+			if (task.getEndDate() != null) {
+				deadlineTask.setEndDate(task.getEndDate());
+			}
+			
+		}
+		deadlineTask.setEdited(false);
+		deadlineTask.setUpdated(task.getUpdated());
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_UPDATED,
+				getTaskInDisplayFormat(deadlineTask));
+	}
+
+	/**
+	 * Updates a task with a TimedTask object as a parameter. It is usually
+	 * called by the SyncHandler.
+	 * 
+	 * @param index
+	 * @param task
+	 * @return Feedback for user
+	 */
+	public String updateToTimedTask(int index, TimedTask task) {
+		Task relatedTask = tasks.get(index);
+		TimedTask timedTask;
+		if (relatedTask.getType() != Task.TaskType.TIMED) {
+			timedTask = new TimedTask(task.getName(), task.getStartDate(),
+					task.getEndDate());
+			timedTask.setDone(relatedTask.isDone());
+			timedTask.setId(task.getId());
+			tasks.remove(index);
+			tasks.add(index, timedTask);
+		} else {
+			timedTask = (TimedTask) tasks.get(index);
+			if (task.getName() != null) {
+				timedTask.setName(task.getName());
+			}
+			if (task.getStartDate() != null) {
+				timedTask.setStartDate(task.getStartDate());
+			}
+			if (task.getEndDate() != null) {
+				timedTask.setEndDate(task.getEndDate());
+			}
+			
+		}
+		timedTask.setEdited(false);
+		timedTask.setUpdated(task.getUpdated());
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_UPDATED,
+				getTaskInDisplayFormat(timedTask));
+	}
+
+	/**
+	 * Deletes the task directly from the tasks list without the index. Used to
+	 * delete tasks when syncing. Checking for invalid index is unnecessary,
+	 * since this is called internally, independent of user input.
+	 * 
+	 * @param task
+	 * @return If the delete was successful.
+	 */
+	public boolean deleteFromGoogle(int index) {
+		if (tasks.isEmpty()) {
+			return false;
+		} else {
+			tasks.remove(index);
+			saveToPermanentStorage();
+			return true;
+		}
+	}
+
+	// Getter methods for tasks:
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	/**
+	 * Returns all tasks.
+	 * 
+	 * @return tasks list.
+	 */
+	public ArrayList<Task> getAllTasks() {
+		return tasks;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	// Adds the given task to the arrays for keeping track of updated tasks,
+	private void processUpdateHistory(Task relatedTask, Task task) {
+		saveToOperationHistory(Global.CommandType.UPDATE);
+		preupdatedTasks.push(relatedTask);
+		updatedTasks.push(task);
+	}
+
+	private void saveToOperationHistory(Global.CommandType type) {
+		operationHistory.push(type);
+	}
+
+	private void saveToUndoHistory(Global.CommandType type) {
+		undoHistory.push(type);
+	}
+
+	public void clearOperationHistory() {
+		operationHistory.clear();
+	}
+
+	public boolean contains(Task task) {
+		return tasks.contains(task);
+	}
+
+	public Stack<Task> getAddedTasks() {
+		return addedTasks;
+	}
+
+	public ArrayList<Task> getDeletedTasks() {
+		return deletedTasks;
+	}
+
+	public Stack<Task> getPreupdatedTasks() {
+		return preupdatedTasks;
+	}
+
+	public Stack<Task> getUpdatedTasks() {
+		return updatedTasks;
+	}
+
+	public Stack<Task> getChangedTypeTasks() {
+		return changedTypeTasks;
+	}
+
+	public Stack<ArrayList<Task>> getClearedTasks() {
+		return clearedTasks;
+	}
+
+	public Stack<Global.CommandType> getOperationsHistory() {
+		return operationHistory;
+	}
+
+	public ArrayList<String> getAllIds() {
+		ArrayList<String> idList = new ArrayList<String>();
+		for (Task t : tasks) {
+			idList.add(t.getId());
+		}
+		return idList;
+	}
+
+	// Saves the temporary tasks ArrayList to the permanent storage.
+	public void saveToPermanentStorage() {
+		TaskCommander.storage.writeToFile(tasks);
+	}
+
+	// Loads the content from the permanent storage to the tasks ArrayList.
+	public void loadFromPermanentStorage() {
+		tasks = TaskCommander.storage.readFromFile();
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\DeadlineTask.java
+	 */
+
+    /**
+     * Creates a new DeadlineTask with given name, end time and a Google ID.
+     * Throws IllegalArgumentException if null arguments are given.
+     */
+    public DeadlineTask(String name, Date endTime, String googleID) {
+        super(name, TaskType.DEADLINE, endTime);
+        this.setId(googleID);
+        if (endTime != null) {
+            _endDate = endTime;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+    
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\DeadlineTask.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\DeadlineTask.java
+	 */
+
+    /**
+     * Compares the end date of this deadline task to the given deadline task in
+     * chronological order.
+     * 
+     * @param other Deadline task
+     * @return less/more than zero if before/after the otherTask, zero when same
+     *         date
+     */
+    @Override
+    public int compareTo(DeadlineTask otherTask) {
+        return (_endDate.compareTo(otherTask.getEndDate()));
+    }
+
+    /**
+     * Checks if the given object is equal.
+     * 
+     * @param other Object
+     * @return true if so, false if not
+     */
+    @Override
+    public boolean equals(Object otherObject) {
+        if (otherObject == null) {
+            return false;
+        }
+        if (!(otherObject instanceof DeadlineTask)) {
+            return false;
+        }
+        DeadlineTask otherDeadlineTask = (DeadlineTask) otherObject;
+
+        if (this.getType().equals(otherDeadlineTask.getType())
+            && this.getName().equals(otherDeadlineTask.getName())
+            && this.getId() == otherDeadlineTask.getId()
+            && this.getEndDate().equals(otherDeadlineTask.getEndDate())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\DeadlineTask.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Global.java
+	 */
+
+	public static final String MESSAGE_SYNC_IN_PROGRESS = "Sync in progress...";
+	public static final String MESSAGE_SYNC_SUCCESS = "Successfully synced to Google!";
+	public static final String MESSAGE_SYNC_INVALID_TOKEN = "Invalid sync token, clearing event store and re-syncing.";
+	public static final String MESSAGE_SYNC_NO_NEW = "No new events to sync.";
+	public static final String MESSAGE_SYNC_FULL = "Peforming full sync.";
+	public static final String MESSAGE_SYNC_INCREMENTAL = "Performing incremental sync.";
+	public static final String MESSAGE_SYNC_COMPLETE = "Sync complete.";
+	public static final String MESSAGE_SYNC_FAILED = "Sync failed.";
+
+	public static final int INDEX_OFFSET = 1; // Difference between the array index and actual line number
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Global.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	/**
+	 * Returns all Google Tasks
+	 * @return List of Google Tasks
+	 */
+	public List<Task> getAllGoogleTasks(boolean showDeleted) {
+		try {
+			if (showDeleted) {
+				Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID)
+						.setShowDeleted(showDeleted);
+				List<Task> tasks = request.execute().getItems();
+				if (tasks != null) {
+					return tasks;					
+				}
+			} else {			
+				Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
+				List<Task> tasks = request.execute().getItems();
+				if (tasks != null) {
+					return tasks;					
+				}
+			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+		}
+		return null;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	/**
+	 * Returns a List object which holds a request that would be sent to Google
+	 * @return	List object
+	 */
+	public Tasks.TasksOperations.List getListTasksRequest() {
+		try {
+			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
+			return request;
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+			return null;
+		}
+	}
+
+	/**
+	 * Gets all events from Calendar API from the primary calendar,
+	 * starting from current system time.
+	 * @return   Arraylist of TaskCommander Tasks.
+	 */
+	private ArrayList<com.taskcommander.Task> getAllEvents() {
+		try {
+			// Gets events from current time onwards
+			List<Event> events = calendar.events().list(PRIMARY_CALENDAR_ID)
+					.setTimeMin(new DateTime(System.currentTimeMillis())) 
+					.execute().getItems();
+			if (events != null) {
+				ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
+				for (Event event : events) {
+					com.taskcommander.Task task = toTask(event);
+					taskList.add(task);
+				}
+				return taskList;
+			} else {
+				return null;
+			}
+		}  catch (GoogleJsonResponseException e) {
+			if (e.getMessage().contains("401 Unauthorized")) {
+				// If not logged in, login attempt handled outside of this class
+			} else {
+				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+		}
+		return null;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	/**
+	 * Returns all Events
+	 * @return List of Events
+	 */
+	public List<Event> getAllGoogleEvents(boolean showDeleted) {
+		try {
+			if (showDeleted) {
+				List<Event> events = calendar.events().list(PRIMARY_CALENDAR_ID)
+						.setTimeMin(new DateTime(System.currentTimeMillis()))
+						.setShowDeleted(showDeleted)
+						.execute().getItems();
+				if (events != null) {
+					return events;
+				}
+			} else {
+				List<Event> events = calendar.events().list(PRIMARY_CALENDAR_ID)
+						.setTimeMin(new DateTime(System.currentTimeMillis()))
+						.execute().getItems();
+				if (events != null) {
+					return events;
+				}
+			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+		}
+		return null;
+	}
+
+	/**
+	 * Returns a request for listing all the events from Google Calendar
+	 * @return A Google Calendar request
+	 */
+	public Calendar.Events.List getListEventRequest() {
+		try {
+			Calendar.Events.List request = calendar.events().list(PRIMARY_CALENDAR_ID);
+			return request;
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+			return null;
+		}
+	}
+
+	public ArrayList<String> getAllIds() {
+		ArrayList<com.taskcommander.Task> tasks = getAllTasks();
+		ArrayList<String> idList = new ArrayList<String>();
+		for (com.taskcommander.Task t : tasks) {
+			idList.add(t.getId());
+		}
+		return idList;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	/**
+	 * Adds a Task to the Task API, given a DeadlineTask object.
+	 * Returns the Google ID if successful.
+	 * 
+	 * @param task   Custom DeadlineTask object
+	 * @return       Google ID of task
+	 */
+	private String addTask(DeadlineTask task) {
+		assert(task != null);
+		Task taskToAdd = new Task();
+		taskToAdd.setTitle(task.getName());
+		taskToAdd.setDue(toDateTime(task.getEndDate()));
+		try {
+			Tasks.TasksOperations.Insert request = tasks.tasks().insert(PRIMARY_TASKS_ID, taskToAdd);
+			Task result = request.execute();
+			if (result != null) {
+				task.setUpdated(result.getUpdated());
+				return result.getId();
+			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_ADD), e);
+		}
+		return null;
+	}
+
+	/**
+	 * Adds an Event to the Calendar API, given a TimedTask object.
+	 * Returns the Google ID if successful.
+	 * 
+	 * @param task   Custom TimedTask object
+	 * @return       Google ID of task
+	 */
+	private String addTask(TimedTask task) {
+		assert(task != null);
+		Event event = new Event();
+		event.setSummary(task.getName());
+		event.setStart(new EventDateTime().setDateTime(toDateTime(task.getStartDate())));			
+		event.setEnd(new EventDateTime().setDateTime(toDateTime(task.getEndDate())));		
+		return addEventToCalendar(task, event);
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	/**
+	 * Gets an event from the Calendar API, given a TimedTask object.
+	 * The given task must have a Google ID.
+	 * Returns the name of the task if successful. 
+	 * 
+	 * @param task   Custom TimedTask object
+	 * @return	     TaskCommander Task object
+	 */
+	private com.taskcommander.Task getTask(TimedTask task) {
+		assert(task != null);
+		if (task.getId() == null) {
+			logger.log(Level.WARNING, MESSAGE_NO_ID);
+		} else {
+			return getEventFromCalendar(task);
+
+		}
+		return null;
+	}
+
+	/**
+	 * Gets an event from the primary calendar, given a TimedTask.
+	 * @param task
+	 * @return            TaskCommander task
+	 */
+	private com.taskcommander.Task getEventFromCalendar(TimedTask task) {
+		try {
+			Event check = calendar.events().get(PRIMARY_CALENDAR_ID, task.getId()).execute();
+			if (check != null && check.getStatus().equals("confirmed")) {
+				return toTask(check);
+			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+		}
+		return null;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	/**
+	 * Deletes an event from the Calendar API, given a TimedTask object.
+	 * The given task must have a Google ID.
+	 * Returns true if successful. 
+	 * 
+	 * @param task   Custom TimedTask object
+	 * @return	     Success of action
+	 */
+	private boolean deleteTask(TimedTask task) {
+		assert(task != null);
+		if (task.getId() == null) {
+			logger.log(Level.WARNING, MESSAGE_NO_ID);
+		} else {
+			return deleteEventFromCalendar(task);
+		}
+		return false;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	/**
+	 * Updates an event from the Calendar API, given a TimedTask object.
+	 * The given task must have a Google ID.
+	 * Returns true if successful.  
+	 * 
+	 * @param task   Custom TimedTask object
+	 * @return	     Success of action
+	 */
+	private boolean updateTask(TimedTask task) {
+		assert(task != null);
+		if (task.getId() == null) {
+			logger.log(Level.WARNING, MESSAGE_NO_ID);
+		} else {
+			return updateEventToCalendar(task);
+		}
+		return false;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	// Changes a Google Task to a TaskCommander Task.
+	public com.taskcommander.Task toTask(Task task) {
+		assert(task != null);
+		if (task.isEmpty()) {
+			return null;
+		}
+		if (task.containsKey("due")) {
+			DeadlineTask deadlineTask = new DeadlineTask(task.getTitle(), toDate(task.getDue()));
+			deadlineTask.setId(task.getId());
+			deadlineTask.setUpdated(task.getUpdated());
+			return deadlineTask;
+		} else {
+			FloatingTask floatingTask = new FloatingTask(task.getTitle(), task.getId());
+			floatingTask.setUpdated(task.getUpdated());
+			return floatingTask;
+		}
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	// Changes a Google Calendar Event to a TaskCommander Task.
+	public com.taskcommander.Task toTask(Event event) {
+		assert(event != null);
+		if (event.isEmpty()) {
+			return null;
+		}
+
+		TimedTask timedTask;
+		if (event.getStart().getDateTime() != null && event.getEnd().getDateTime() != null) {
+			timedTask = new TimedTask(event.getSummary(),
+					toDate(event.getStart().getDateTime()),
+					toDate(event.getEnd().getDateTime()));
+
+		} else {
+			//Handle all-day event cases
+			timedTask = new TimedTask(event.getSummary(), 
+					toDate(event.getStart().getDate()), 
+					toDate(event.getEnd().getDate()));
+		}
+		timedTask.setId(event.getId());
+		timedTask.setUpdated(event.getUpdated());
+		return timedTask;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\SyncHandler.java
+	 */
+
+	/**
+	 * Pulls tasks that have been changed since last sync to Google services.
+	 * @param tasks
+	 */
+	private void pull() throws IOException {
+		logger.log(Level.INFO, "PULL: Starting Pull");
+		//Get all Tasks
+		ArrayList<Task> tasksToSync = con.getAllTasks();
+		logger.log(Level.INFO, "Tasks to sync: " + tasksToSync.size());
+		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
+		List<com.google.api.services.tasks.model.Task> googleTasks = con.getAllGoogleTasks(true);
+		List<Event> googleEvents = con.getAllGoogleEvents(true);
+		ArrayList<String> taskIds = TaskCommander.data.getAllIds();
+		logger.log(Level.INFO, "PULL: Retrieved All Tasks");
+
+		startSyncState(SyncState.PULL, getTotalTasks(tasksToSync, tasks, googleTasks, googleEvents));
+
+		pullAddedCases(googleTasks, googleEvents, taskIds);
+		pullUpdatedCases(tasksToSync);
+		pullDeletedCases(googleTasks, googleEvents);
+
+		logger.log(Level.INFO, "PULL: End Pull");
+	}
+
+	/**
+	 * Pulls new tasks from Google services that have been
+	 * added since last sync, and adds them locally.
+	 * @param googleTasks
+	 * @param googleEvents
+	 * @param taskIds
+	 */
+	private void pullAddedCases(List<com.google.api.services.tasks.model.Task> googleTasks,
+			List<Event> googleEvents, ArrayList<String> taskIds) {
+		pullAddedCasesForTasks(googleTasks, taskIds);
+		pullAddedCasesForCalendar(googleEvents, taskIds);
+		logger.log(Level.INFO, "PULL: Handled Added Tasks");
+	}
+
+	/**
+	 * Pulls new tasks from Google Calendar service that have been
+	 * added since last sync, and adds them locally.
+	 * @param googleEvents
+	 * @param taskIds
+	 */
+	private void pullAddedCasesForCalendar(List<Event> googleEvents,
+			ArrayList<String> taskIds) {
+		if (googleEvents != null) {
+			//For Events
+			for (Event event: googleEvents) {
+				if (!taskIds.contains(event.getId()) && !event.getStatus().equals(STATUS_CANCELLED)) {
+					TaskCommander.data.addTask(con.toTask(event));
+				}
+				updateTasksComplete(tasksComplete+1);
+			}
+		}
+	}
+
+	/**
+	 * Pulls new tasks from Google Tasks service that have been
+	 * added since last sync, and adds them locally.
+	 * @param googleTasks
+	 * @param taskIds
+	 */
+	private void pullAddedCasesForTasks(
+			List<com.google.api.services.tasks.model.Task> googleTasks,
+			ArrayList<String> taskIds) {
+		if (googleTasks != null) {
+			for (com.google.api.services.tasks.model.Task task : googleTasks) {
+				if (!taskIds.contains(task.getId()) && task.getDeleted() == null) {
+					TaskCommander.data.addTask(con.toTask(task));
+				}
+				updateTasksComplete(tasksComplete+1);
+			}
+		}
+	}
+
+	/**
+	 * Pulls tasks from Google services that have been
+	 * updated since last sync, and updates them locally.
+	 * @param tasksToSync
+	 */
+	private void pullUpdatedCases(ArrayList<Task> tasksToSync) {
+		ArrayList<Task> tasks;
+		ArrayList<String> taskIds;
+		if (tasksToSync != null) {
+			logger.log(Level.INFO, "PULL: Starting Updated Cases");
+			//Updated cases
+			tasks = TaskCommander.data.getAllTasks();
+			taskIds = TaskCommander.data.getAllIds();
+			for (Task t: tasksToSync) {
+				int index = taskIds.indexOf(t.getId());
+				if (index == -1) {
+					continue;
+				}
+				if (t.getUpdated() != tasks.get(index).getUpdated()) {
+					logger.log(Level.INFO, "Caught updated case");
+					switch(t.getType()) {
+					case FLOATING:
+						TaskCommander.data.updateToFloatingTask(index, (FloatingTask) t);
+						break;
+					case TIMED:
+						TaskCommander.data.updateToTimedTask(index, (TimedTask) t);
+						break;
+					case DEADLINE:
+						TaskCommander.data.updateToDeadlineTask(index, (DeadlineTask) t);
+						break;
+					}		
+				}
+				updateTasksComplete(tasksComplete+1);
+			}
+		}
+		logger.log(Level.INFO, "PULL: Handled Updated Cases");
+	}
+
+	/**
+	 * Pulls tasks from Google services that have been
+	 * deleted since last sync, and deletes them locally.
+	 * @param googleTasks
+	 * @param googleEvents
+	 */
+	private void pullDeletedCases(List<com.google.api.services.tasks.model.Task> googleTasks,
+			List<Event> googleEvents) {
+		pullDeletedCasesForTasks(googleTasks);
+		pullDeletedCasesForCalendar(googleEvents);
+	}
+
+	/**
+	 * Pulls tasks from Google Tasks service that have been
+	 * deleted since last sync, and deletes them locally.
+	 * @param googleTasks
+	 */
+	private void pullDeletedCasesForTasks(
+			List<com.google.api.services.tasks.model.Task> googleTasks) {
+		ArrayList<String> taskIds;
+		if (googleTasks != null) {
+			taskIds = TaskCommander.data.getAllIds();
+			for (com.google.api.services.tasks.model.Task t : googleTasks) {
+				if (t.getDeleted() != null) {
+					int index = taskIds.indexOf(t.getId());
+					if (index == -1) {
+						continue;
+					} else {
+						TaskCommander.data.deleteFromGoogle(index);
+					}
+				}
+				updateTasksComplete(tasksComplete+1);
+			}
+		}
+		logger.log(Level.INFO, "PULL: Handled Deleted Google Tasks");
+	}
+
+	/**
+	 * Pulls tasks from Google Calendar service that have been
+	 * deleted since last sync, and deletes them locally.
+	 * @param googleEvents
+	 */
+	private void pullDeletedCasesForCalendar(List<Event> googleEvents) {
+		ArrayList<String> taskIds;
+		if (googleEvents != null) {
+			taskIds = TaskCommander.data.getAllIds();
+			//Deleted Case For Events
+			for (Event event : googleEvents) {
+				if (event.getStatus().equals(STATUS_CANCELLED)) {
+					int index = taskIds.indexOf(event.getId());
+					if (index == -1) {
+						continue;
+					} else {
+						TaskCommander.data.deleteFromGoogle(index);
+					}
+				}
+				updateTasksComplete(tasksComplete+1);
+			}
+		}
+		logger.log(Level.INFO, "PULL: Handled Deleted Google Events");
+	}
+
+	/** 
+	 * Gets total number of tasks from Google services to update locally 
+	 * @param tasksToSync
+	 * @param tasks
+	 * @param googleTasks
+	 * @param googleEvents
+	 * @return               Total number of tasks from Google services to update
+	 */
+	private int getTotalTasks(ArrayList<Task> tasksToSync,
+			ArrayList<Task> tasks,
+			List<com.google.api.services.tasks.model.Task> googleTasks,
+			List<Event> googleEvents) {
+		int total = 0;
+		if (tasksToSync != null) {
+			total += tasksToSync.size();
+		}
+
+		if (tasks != null) {
+			total += tasks.size();
+		}
+
+		if (googleTasks != null) {
+			total += googleTasks.size();
+		}
+
+		if (googleEvents != null) {
+			total += googleEvents.size();
+		}
+		return total;
+
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\SyncHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TimedTask.java
+	 */
+
+/**
+ * A task that has a name, a start date and an end date. May also hold a Google
+ * API ID. Related Google API: Calendar
+ */
+
+public class TimedTask extends DatedTask {
+	private Date _startDate;
+	private Date _endDate;
+
+	/**
+	 * Creates a new TimedTask with given name, start time and end time. Throws
+	 * IllegalArgumentException if null arguments are given.
+	 */
+	public TimedTask(String name, Date startTime, Date endTime) {
+		super(name, TaskType.TIMED, startTime);
+		if (startTime != null && endTime != null) {
+			_startDate = startTime;
+			_endDate = endTime;
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+
+	/**
+	 * Creates a new TimedTask with given name, start time, end time and a
+	 * Google ID. Throws IllegalArgumentException if null arguments are given.
+	 */
+	public TimedTask(String name, Date startTime, Date endTime, String googleID) {
+		super(name, TaskType.TIMED, startTime);
+		this.setId(googleID);
+		if (startTime != null && endTime != null) {
+			_startDate = startTime;
+			_endDate = endTime;
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+
+	/**
+	 * Creates a new TimedTask from a given TimedTask. Used for cloning.
+	 */
+	public TimedTask(TimedTask otherTimedTask) {
+		super(otherTimedTask.getName(), TaskType.TIMED, otherTimedTask
+				.getStartDate());
+		_startDate = otherTimedTask.getStartDate();
+		_endDate = otherTimedTask.getEndDate();
+		this.setId(otherTimedTask.getId());
+		this.setDone(otherTimedTask.isDone());
+		this.setEdited(otherTimedTask.isEdited());
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TimedTask.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TimedTask.java
+	 */
+
+	/**
+	 * Compares the start date of this timed task to the given timed task in
+	 * chronological order.
+	 * @param other Timed task
+	 * @return less/more than zero if before/after the otherTask, zero when same
+	 *         date
+	 */
+	@Override
+	public int compareTo(TimedTask otherTask) {
+		return (_startDate.compareTo(otherTask.getStartDate()));
+	}
+
+	/**
+	 * Checks if the given object is equal.
+	 * @param other Object
+	 * @return true if so, false if not
+	 */
+	@Override
+	public boolean equals(Object otherObject) {
+		if (otherObject == null) {
+			return false;
+		}
+		if (!(otherObject instanceof TimedTask)) {
+			return false;
+		}
+		TimedTask otherTimedTask = (TimedTask) otherObject;
+
+		if (this.getType().equals(otherTimedTask.getType())
+				&& this.getName().equals(otherTimedTask.getName())
+				&& this.getId() == otherTimedTask.getId()
+				&& this.getStartDate().equals(otherTimedTask.getStartDate())
+				&& this.getEndDate().equals(otherTimedTask.getEndDate())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TimedTask.java
+
+
+
+
+

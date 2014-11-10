@@ -1,0 +1,226 @@
+//@author: a0128620m,a0109194a
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	private Data() {
+		tasks = new ArrayList<Task>();
+		deletedTasks = new ArrayList<Task>();
+		addedTasks = new Stack<Task>();
+		preupdatedTasks = new Stack<Task>();
+		updatedTasks = new Stack<Task>();
+		clearedTasks = new Stack<ArrayList<Task>>();
+		operationHistory = new Stack<Global.CommandType>();
+		undoHistory = new Stack<Global.CommandType>();
+
+		loadFromPermanentStorage();
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	/**
+	 * Deletes the task with the given index (as shown with 'display' command).
+	 * Does not execute if there are no lines and if a wrong index is given.
+	 * 
+	 * @param index        Index of the task to delete, as a string. 
+	 * @return             Feedback for user.
+
+	 */
+	public String deleteTask(int index) {
+		if (tasks.isEmpty()) {
+			return String.format(Global.MESSAGE_EMPTY);
+		} 
+
+		if (index > tasks.size() - Global.INDEX_OFFSET || index < 0 ) {
+			return String.format(Global.MESSAGE_NO_INDEX, index);
+		} else {
+			Task deletedTask = tasks.get(index);
+			saveToOperationHistory(Global.CommandType.DELETE);
+			deletedTasks.add(deletedTask);
+			tasks.remove(index);
+			saveToPermanentStorage();
+			switch (deletedTask.getType()) {		// TODO: Extract to method
+			case FLOATING:
+				FloatingTask floatingTask = (FloatingTask) deletedTask;
+				return String.format(Global.MESSAGE_DELETED, getTaskInDisplayFormat(floatingTask));
+			case DEADLINE:
+				DeadlineTask deadlineTask = (DeadlineTask) deletedTask;
+				return String.format(Global.MESSAGE_DELETED, getTaskInDisplayFormat(deadlineTask));
+			default:
+				TimedTask timedTask = (TimedTask) deletedTask;// TODO: find better solution than default
+				return String.format(Global.MESSAGE_DELETED, getTaskInDisplayFormat(timedTask));		
+			}
+		}
+	}
+
+	/**
+	 * Clears all tasks from memory.
+	 * 
+	 * @param userCommand 
+	 * @return             Feedback for user.
+	 */
+	public String clearTasks() {
+		ArrayList<Task> cleared = new ArrayList<Task>();
+		cleared.addAll(tasks);
+		clearedTasks.push(cleared);
+		tasks.clear();
+		saveToOperationHistory(Global.CommandType.CLEAR);
+		saveToPermanentStorage();
+		return String.format(Global.MESSAGE_CLEARED);
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\FloatingTask.java
+	 */
+
+	/**
+	 * Creates a new FloatingTask from a given FloatingTask.
+	 * Used for cloning.
+	 */
+	public FloatingTask(FloatingTask otherFloatingTask) {
+		super(otherFloatingTask.getName(), TaskType.FLOATING);
+		this.setId(otherFloatingTask.getId());
+		this.setDone(otherFloatingTask.isDone());
+		this.setEdited(otherFloatingTask.isEdited());
+	}
+	
+	// A0128620M
+	/**
+	 * Compares the name of this task to the given task 
+	 * in alphabetical order.
+	 */
+	@Override
+	public int compareTo(FloatingTask otherTask) {
+		return (getName().compareTo(otherTask.getName()));
+	}
+	
+	@Override
+	public boolean equals(Object otherObject) {
+		if (otherObject == null) {
+			return false;
+		}
+		if (!(otherObject instanceof FloatingTask)) {
+			return false;
+		}
+		FloatingTask otherFloatingTask = (FloatingTask) otherObject;
+		if (this.getType().equals(otherFloatingTask.getType()) && 
+			this.getName().equals(otherFloatingTask.getName()) && 
+			this.getId() == otherFloatingTask.getId()) {	
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\FloatingTask.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TimedTask.java
+	 */
+
+public class TimedTask extends DatedTask {
+	private Date _startDate;
+	private Date _endDate;
+	
+	/**
+	 * Creates a new TimedTask with given name, start time and end time.
+	 * Throws IllegalArgumentException if null arguments are given.
+	 */
+	public TimedTask(String name, Date startTime, Date endTime){
+		super(name, TaskType.TIMED, startTime);
+		if (startTime != null && endTime !=null) {
+			_startDate = startTime;
+			_endDate = endTime;
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	/**
+	 * Creates a new TimedTask with given name, start time, end time and a Google ID.
+	 * Throws IllegalArgumentException if null arguments are given.
+	 */
+	public TimedTask(String name, Date startTime, Date endTime, String googleID) {
+		super(name, TaskType.TIMED, startTime);
+		this.setId(googleID);
+		if (startTime != null && endTime != null) {
+			_startDate = startTime;
+			_endDate = endTime;
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	/**
+	 * Creates a new TimedTask from a given TimedTask.
+	 * Used for cloning.
+	 */
+	public TimedTask(TimedTask otherTimedTask){
+		super(otherTimedTask.getName(), TaskType.TIMED, otherTimedTask.getStartDate() );
+			_startDate = otherTimedTask.getStartDate();
+			_endDate = otherTimedTask.getEndDate();
+			this.setId(otherTimedTask.getId());
+			this.setDone(otherTimedTask.isDone());
+			this.setEdited(otherTimedTask.isEdited());
+	}
+	
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TimedTask.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TimedTask.java
+	 */
+
+	@Override
+	public boolean equals(Object otherObject) {
+		if (otherObject == null) {
+			return false;
+		}
+		if (!(otherObject instanceof TimedTask)) {
+			return false;
+		}
+		TimedTask otherTimedTask = (TimedTask) otherObject;
+
+		if (this.getType().equals(otherTimedTask.getType()) && 
+			this.getName().equals(otherTimedTask.getName()) && 
+			this.getId() == otherTimedTask.getId() && 
+			this.getStartDate().equals(otherTimedTask.getStartDate()) && 
+			this.getEndDate().equals(otherTimedTask.getEndDate())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TimedTask.java
+
+
+
+
+

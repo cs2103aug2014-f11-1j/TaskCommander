@@ -1,0 +1,2447 @@
+//@author: a0112828h
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\GoogleIntegration\GoogleAPIConnectorTest.java
+	 */
+
+/**
+ * Tests specific methods in the GoogleAPIConnector.
+ * Requires saved login credentials.
+ * Login through the normal flow to get login credentials first before testing this.
+ *
+ */
+public class GoogleAPIConnectorTest {
+	GoogleAPIConnector con;
+
+	public void login() {
+		if (con == null) {
+			con = GoogleAPIConnector.getInstance();
+		}
+		
+		while (!con.getServices()) {
+			System.out.println("Waiting for login...");
+		}
+	}
+
+	@Test
+	public void testLoginFlow() {
+		login();
+		assertNotNull("Able to get Tasks and Calendar services.", con.getServices());
+	}
+	
+	// Test null inputs for CRUD
+	@Test
+	public void testAddNullTask() {
+		login();
+		assertNull(con.addTask(null));
+	}
+	
+	@Test
+	public void testGetNullTask() {
+		login();
+		assertNull(con.getTask(null));
+	}
+	
+	@Test
+	public void testUpdateNullTask() {
+		login();
+		assertFalse(con.updateTask(null));
+	}
+	
+	@Test
+	public void testDeleteNullTask() {
+		login();
+		assertFalse(con.deleteTask(null));
+	}
+	
+	// Test unsynced task inputs for get, update and delete
+	@Test
+	public void testUpdateUnsyncedFloatingTask() {
+		login();
+		FloatingTask task = new FloatingTask("Update Unsynced Floating Task");
+		assertFalse(con.updateTask(task));
+	}
+	
+	@Test
+	public void testUpdateUnsyncedDeadlineTask() {
+		login();
+		DeadlineTask task = new DeadlineTask("Update Unsynced Deadline Task", new Date(System.currentTimeMillis()));
+		assertFalse(con.updateTask(task));
+	}
+	
+	@Test
+	public void testUpdateUnsyncedTimedTask() {
+		login();
+		TimedTask task = new TimedTask("Update Unsynced Timed Task", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		assertFalse(con.updateTask(task));
+	}
+	
+	// Test special case inputs for CRUD
+
+	// Test normal task inputs for each task type for CRUD
+	@Test
+	public void testAddOneFloatingTask() {
+		login();
+		FloatingTask task = new FloatingTask("Add Floating Task");
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(task.getId());
+		assertTrue(con.deleteTask(task));
+	}
+
+	@Test
+	public void testAddOneDeadlineTask() {
+		login();
+		DeadlineTask task = new DeadlineTask("Add Deadline Task", new Date(System.currentTimeMillis()));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(task.getId());
+		assertTrue(con.deleteTask(task));
+	}
+
+	@Test
+	public void testAddOneTimedTask() {
+		login();
+		TimedTask task = new TimedTask("Add Timed Task", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(task.getId());
+		assertTrue(con.deleteTask(task));
+	}
+	
+	@Test
+	public void testGetOneFloatingTask() {
+		login();
+		FloatingTask task = new FloatingTask("Get Floating Task");
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(task.getId());
+		assertNotNull(con.getTask(task));
+		assertTrue(con.deleteTask(task));
+	}
+
+	@Test
+	public void testGetOneDeadlineTask() {
+		login();
+		DeadlineTask task = new DeadlineTask("Get Deadline Task", new Date(System.currentTimeMillis()));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(con.getTask(task));
+		assertTrue(con.deleteTask(task));
+	}
+
+	@Test
+	public void testGetOneTimedTask() {
+		login();
+		TimedTask task = new TimedTask("Get Timed Task", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(con.getTask(task));
+		assertTrue(con.deleteTask(task));
+	}
+	
+	@Test
+	public void testUpdateOneFloatingTask() {
+		login();
+		FloatingTask task = new FloatingTask("Update Floating Task");
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		task.setName("Update Floating Task Changed");
+		assertTrue(con.updateTask(task));
+		assertTrue(con.deleteTask(task));
+	}
+
+	@Test
+	public void testUpdateOneDeadlineTask() {
+		login();
+		DeadlineTask task = new DeadlineTask("Update Deadline Task", new Date(System.currentTimeMillis()));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		task.setName("Update Deadline Task Changed");
+		assertTrue(con.updateTask(task));
+		assertTrue(con.deleteTask(task));
+	}
+
+	@Test
+	public void testUpdateOneTimedTask() {
+		login();
+		TimedTask task = new TimedTask("Update Timed Task", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		task.setName("Update Timed Task Changed");
+		assertTrue(con.updateTask(task));
+		assertTrue(con.deleteTask(task));
+	}
+	
+	@Test
+	public void testDeleteOneFloatingTask() {
+		login();
+		FloatingTask task = new FloatingTask("Delete Floating Task");
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(task.getId());
+		assertTrue(con.deleteTask(task));
+		assertNull(con.getTask(task));
+	}
+
+	@Test
+	public void testDeleteOneDeadlineTask() {
+		login();
+		DeadlineTask task = new DeadlineTask("Delete Deadline Task", new Date(System.currentTimeMillis()));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(task.getId());
+		assertTrue(con.deleteTask(task));
+		assertNull(con.getTask(task));
+	}
+
+	@Test
+	public void testDeleteOneTimedTask() {
+		login();
+		TimedTask task = new TimedTask("Delete Timed Task", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()+2000));
+		String id = con.addTask(task);
+		assertNotNull(id);
+		task.setId(id);
+		assertNotNull(task.getId());
+		assertTrue(con.deleteTask(task));
+		assertNull(con.getTask(task));
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\GoogleIntegration\GoogleAPIConnectorTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Storage\StorageTest.java
+	 */
+
+/**
+ * Tests reading and writing tasks to and from json storage file.
+ * Clears all data in the global storage file before and after running.
+ */
+public class StorageTest {
+	@Test
+	public void testReadingNullTask() {
+		clearFile();
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		tasks.add(null);
+		writeTasksToFile(tasks);
+		assertEquals("Should not read null tasks.", 0, TaskCommander.storage.readFromFile().size());
+		clearFile();
+	}
+
+	@Test
+	public void testReadingOneTask() {
+		clearFile();
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		tasks.add(new FloatingTask("Test Task 1"));
+		writeTasksToFile(tasks);
+		assertEquals("Should read single task.", 1, TaskCommander.storage.readFromFile().size());
+		assertEquals("Should have same task name.", "Test Task 1", TaskCommander.storage.readFromFile().get(0).getName());
+		clearFile();
+	}
+
+	@Test
+	public void testReadingSomeTasks() {
+		clearFile();
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		tasks.add(new FloatingTask("Test Task 1"));
+		tasks.add(new FloatingTask("Test Task 2"));
+		tasks.add(new FloatingTask("Test Task 3"));
+		writeTasksToFile(tasks);
+		assertEquals("Should read 3 tasks.", 3, TaskCommander.storage.readFromFile().size());
+		assertEquals("Should have same task name.", "Test Task 1", TaskCommander.storage.readFromFile().get(0).getName());
+		assertEquals("Should have same task name.", "Test Task 2", TaskCommander.storage.readFromFile().get(1).getName());
+		assertEquals("Should have same task name.", "Test Task 3", TaskCommander.storage.readFromFile().get(2).getName());
+		clearFile();
+	}
+
+	@Test
+	public void testWritingNullTask() {
+		clearFile();
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		tasks.add(null);
+		TaskCommander.storage.writeToFile(tasks);
+		assertEquals("Make sure null task is not written to file.", 0, countLinesInFile());
+		clearFile();
+	}
+
+	@Test
+	public void testWritingOneTask() {
+		clearFile();
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		tasks.add(new FloatingTask("Test Task 1"));
+		TaskCommander.storage.writeToFile(tasks);
+		assertEquals("Make sure there is only 1 line", 1, countLinesInFile());
+		clearFile();
+	}
+
+	@Test
+	public void testWritingSomeTasks() {
+		clearFile();
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		tasks.add(new FloatingTask("Test Task 1"));
+		tasks.add(new FloatingTask("Test Task 2"));
+		tasks.add(new FloatingTask("Test Task 3"));
+		TaskCommander.storage.writeToFile(tasks);
+		assertEquals("Make sure there are 3 lines", 3, countLinesInFile());
+		clearFile();
+	}
+
+	private void writeTasksToFile(ArrayList<Task> tasks) {
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
+		Gson gson = gsonBuilder.create();
+		BufferedWriter bw;
+		try {
+			bw = new BufferedWriter(new FileWriter(new File(Global.FILENAME)));
+			for (Task t : tasks) {
+				bw.write(gson.toJson(t));
+				bw.newLine();
+			}
+			bw.close();
+		} catch (Exception e) {
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+		}
+	}
+
+	private int countLinesInFile() {
+		File file = new File(Global.FILENAME);
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			int count = 0;
+			while (br.readLine()!= null) {
+				count++;
+			}
+			br.close();
+			return count;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
+	private void clearFile() {
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(Global.FILENAME), false));
+			bw.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Storage\StorageTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\DeadlineTask.java
+	 */
+
+/**
+ * A task that has a name and a deadline. May also hold a Google API ID. Related
+ * Google API: Tasks
+ */
+public class DeadlineTask extends DatedTask {
+    private Date _endDate; // Format yyyy-mm-ddTHH:MM:ss
+
+    /**
+     * Creates a new DeadlineTask with given name and end time. Throws
+     * IllegalArgumentException if null arguments are given.
+     */
+    public DeadlineTask(String name, Date endTime) {
+        super(name, TaskType.DEADLINE, endTime);
+        if (endTime != null) {
+            _endDate = endTime;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public Date getEndDate() {
+        return _endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        _endDate = endDate;
+        super.setDate(endDate);
+    }
+    
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\DeadlineTask.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\FloatingTask.java
+	 */
+
+/**
+ * A floating task that has no deadline. Has a name. May also hold a Google API
+ * ID. Related Google API: Tasks
+ */
+
+public class FloatingTask extends Task implements Comparable<FloatingTask> {
+
+    /**
+     * Creates a new FloatingTask.
+     */
+    public FloatingTask(String name) {
+        super(name, TaskType.FLOATING);
+    }
+
+    /**
+     * Creates a new FloatingTask with given name and a Google ID.
+     */
+    public FloatingTask(String name, String googleID) {
+        super(name, TaskType.FLOATING);
+        this.setId(googleID);
+    }
+
+    //@A0109194A
+    /**
+     * Creates a new FloatingTask from a given FloatingTask. Used for cloning.
+     */
+    public FloatingTask(FloatingTask otherFloatingTask) {
+        super(otherFloatingTask.getName(), TaskType.FLOATING);
+        this.setId(otherFloatingTask.getId());
+        this.setDone(otherFloatingTask.isDone());
+        this.setEdited(otherFloatingTask.isEdited());
+    }
+
+    //A0109194A
+    /**
+     * Compares the name of this floating task to the given floating task in
+     * alphabetically order.
+     * 
+     * @param other floating task
+     * @return less/more than zero if before/after the otherTask, zero when same
+     *         equal
+     */
+    @Override
+    public int compareTo(FloatingTask otherTask) {
+        return (getName().compareTo(otherTask.getName()));
+    }
+
+    /**
+     * Checks if the given object is equal.
+     * 
+     * @param other Object
+     * @return true if so, false if not
+     */
+    @Override
+    public boolean equals(Object otherObject) {
+        if (otherObject == null) {
+            return false;
+        }
+        if (!(otherObject instanceof FloatingTask)) {
+            return false;
+        }
+        FloatingTask otherFloatingTask = (FloatingTask) otherObject;
+        if (this.getType().equals(otherFloatingTask.getType())
+            && this.getName().equals(otherFloatingTask.getName())
+            && this.getId() == otherFloatingTask.getId()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\FloatingTask.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Global.java
+	 */
+
+public class Global {
+
+	public static final String APPLICATION_NAME = "Task Commander";
+
+	public static final String MESSAGE_FILE_NOT_GIVEN = "File not given. Please enter a valid file name.";
+	public static final String MESSAGE_FILE_NOT_FOUND = "File not found. Please enter a valid file name.";
+	public static final String MESSAGE_WELCOME = "Welcome to TaskCommander.";
+	public static final String MESSAGE_ADDED = "Added: %1$s";
+	public static final String MESSAGE_UPDATED = "Updated: %1$s";
+	public static final String MESSAGE_DONE = "Done: %1$s";
+	public static final String MESSAGE_ALREADY_DONE = "Already done.";
+	public static final String MESSAGE_OPEN = "Opened: %1$s";
+	public static final String MESSAGE_ALREADY_OPEN = "Already opened.";
+	public static final String MESSAGE_DELETED = "Deleted: %1$s";
+	public static final String MESSAGE_CLEARED = "All content deleted.";
+	public static final String MESSAGE_DISPLAYED = "Display settings successfully adjusted.";
+	public static final String MESSAGE_SEARCHED= "Search task with: %1$s";
+	public static final String MESSAGE_UNDONE = "Undone latest command: %1$s.";
+	public static final String MESSAGE_INVALID_FORMAT = "Invalid command format: \"%1$s\". Refer to help tab to see the list of commands.";
+	public static final String MESSAGE_NO_COMMAND = "No command given.";
+	public static final String MESSAGE_NO_INDEX = "Index does not exist. Please type a valid index.";
+	public static final String MESSAGE_NO_CHANGE = "No changes were made.";
+	public static final String MESSAGE_NULL_ID = "Task has no ID.";
+	public static final String MESSAGE_EMPTY = "No tasks available";
+	public static final String MESSAGE_UNDO_EMPTY = "No commands to undo";
+	public static final String MESSAGE_HELP = "Commands: add ¡°<task title>¡± <date> <end time>,\n display [timed] [deadline] [floating] [done|open] [date] [start time] [end time],\n open <index>, done <index>, delete <index of string>, clear, sort, undo, exit.";
+	public static final String MESSAGE_LINE_FOUND = "Found \"%1$s\".";
+	public static final String MESSAGE_LINE_NOT_FOUND = "The line \"%1$s\" does not exist.";
+	public static final String MESSAGE_SORTED = "Tasks have been sorted.";
+
+	public static final String MESSAGE_FILE_COULD_NOT_BE_WRITTEN = "Error: The File could not be written.";
+	public static final String MESSAGE_FILE_COULD_NOT_BE_LOADED = "Error: The File could not be loaded.";
+	public static final String MESSAGE_EXCEPTION_IO = "Unable to read the data retrieved.";
+	public static final String MESSAGE_ILLEGAL_ARGUMENTS = "Illegal arguments given.";
+	public static final String MESSAGE_ARGUMENTS_INVALID = "Invalid arguments given.";
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Global.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Global.java
+	 */
+
+	// Possible command types
+	public static enum CommandType {
+		ADD, 
+		UPDATE,
+		DONE,
+		OPEN,
+		DELETE,
+		DISPLAY, 
+		SEARCH,
+		CLEAR,
+		UNCLEAR,
+		INVALID,
+		SYNC,
+		UNDO,
+		EXIT
+	}
+
+	public static enum SyncState {
+		PUSH,
+		PULL,
+		DONE,
+		FAILED
+	}
+
+	// Name of Storage File
+	public static String FILENAME = "tasks.json";
+
+	public static boolean syncing = false;
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Global.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+/**
+ * This class is used to connect to the Google API and
+ * invoke the Calendar and Tasks services.
+ * 
+ * Requires permissions and login token from user.
+ * This class can create, read, update or delete tasks
+ * and calendar events for the given Google account.
+ */
+public class GoogleAPIConnector {
+	private static final String MESSAGE_ERROR_GETTING_SERVICES = "Error getting services.";
+	private static final String MESSAGE_ERROR_OPERATION = "Error performing %1$s operation.";
+	private static final String MESSAGE_SERVICES_NULL = "Services null, getting services.";
+	private static final String MESSAGE_NULL_TASK = "Null task given.";
+	private static final String MESSAGE_NO_ID = "Task has not been synced to Google API.";
+	private static final String MESSAGE_NOT_FOUND = "Task was not found.";
+
+	private static final String OPERATION_GET = "get";
+	private static final String OPERATION_ADD = "add";
+	private static final String OPERATION_UPDATE = "update";
+	private static final String OPERATION_DELETE = "delete";
+
+	private static final String PRIMARY_CALENDAR_ID = "primary";
+	private static final String PRIMARY_TASKS_ID = "@default";
+
+	private static GoogleAPIConnector instance;
+	private static LoginManager loginManager;
+
+	//Global instances
+	private static Calendar calendar;
+	static final java.util.List<Calendar> addedCalendarsUsingBatch = Lists.newArrayList();
+	private static Tasks tasks;
+	private static DataStore<String> eventDataStore;
+	private static DataStore<String> taskDataStore;
+	private static final Logger logger = Logger.getLogger(GoogleAPIConnector.class.getName());
+
+	/**
+	 * This method returns a GoogleAPIConnector
+	 * It is to be called by SyncHandler.
+	 * @return GoogleAPIConnector object
+	 */
+	public static GoogleAPIConnector getInstance() {
+		if (instance == null) {
+			instance = new GoogleAPIConnector();
+		}
+		return instance;
+	}
+
+	/**
+	 * Creates a new GoogleAPIHandler instance.
+	 * Also creates a new LoginManager and attempts
+	 * to get the Tasks and Calendar services.
+	 * @throws IOException 
+	 */
+	private GoogleAPIConnector() {
+		loginManager = LoginManager.getInstance();
+		try {
+			eventDataStore = LoginManager.getDataStoreFactory().getDataStore("EventStore");
+			taskDataStore = LoginManager.getDataStoreFactory().getDataStore("TaskStore");
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, MESSAGE_ERROR_GETTING_SERVICES, e);
+		}
+	}
+
+	public boolean getServices() {
+		if (isLoggedIn()) {
+			return true;
+		} else {
+			tasks = loginManager.getTasksService();
+			calendar = loginManager.getCalendarService();
+			return false;
+		}
+	}
+
+	// Checks if the services are not null.
+	public boolean isLoggedIn() {
+		return (tasks != null && calendar != null);
+	}
+
+	public DataStore<String> getTaskDataStore() {
+		return taskDataStore;
+	}
+
+	public DataStore<String> getEventDataStore() {
+		return eventDataStore;
+	}
+
+	/**
+	 * Returns all tasks.
+	 * @return All tasks.
+	 */
+	public ArrayList<com.taskcommander.Task> getAllTasks() {
+		if (!isLoggedIn()) {
+			logger.log(Level.INFO, MESSAGE_SERVICES_NULL);
+			getServices();
+			return null;
+		} else {
+			ArrayList<com.taskcommander.Task> result = getAllFloatingTasks();
+			if (result == null) {
+				return getAllEvents();
+			}
+			result.addAll(getAllEvents());
+			return result;
+		}
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	/**
+	 * Gets all tasks from Tasks API.
+	 * @return   Arraylist of TaskCommander Tasks.
+	 */
+	private ArrayList<com.taskcommander.Task> getAllFloatingTasks() {
+		try {
+			Tasks.TasksOperations.List request = tasks.tasks().list(PRIMARY_TASKS_ID);
+			List<Task> tasks = request.execute().getItems();
+
+			if (tasks != null) {
+				ArrayList<com.taskcommander.Task> taskList = new ArrayList<com.taskcommander.Task>();
+				for (Task task : tasks) {
+					if (task.getTitle() != null && !task.getTitle().equals("")) {
+						taskList.add(toTask(task));
+					}
+				}
+				return taskList;
+			} else {
+				logger.log(Level.SEVERE, "Task list was null");
+				return null;
+			}
+
+		}  catch (GoogleJsonResponseException e) {
+			if (e.getMessage().contains("401 Unauthorized")) {
+				// If not logged in, login attempt handled outside of this class
+			} else {
+				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+		}
+		return null;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	public String addTask(com.taskcommander.Task task) {
+		if (task != null) {
+			switch (task.getType()) {
+			case FLOATING:
+				return addTask((FloatingTask) task);
+			case TIMED:
+				return addTask((TimedTask) task);
+			case DEADLINE:
+				return addTask((DeadlineTask) task);
+			}
+		}
+		return null;
+	}
+
+	public com.taskcommander.Task getTask(com.taskcommander.Task task) {
+		if (task != null) {
+			switch (task.getType()) {
+			case FLOATING:
+				return getTask((FloatingTask) task);
+			case TIMED:
+				return getTask((TimedTask) task);
+			case DEADLINE:
+				return getTask((DeadlineTask) task);
+			}
+		}
+		return null;
+	}
+
+	public boolean updateTask(com.taskcommander.Task task) {
+		if (task != null) {
+			switch (task.getType()) {
+			case FLOATING:
+				return updateTask((FloatingTask) task);
+			case TIMED:
+				return updateTask((TimedTask) task);
+			case DEADLINE:
+				return updateTask((DeadlineTask) task);
+			}
+		}
+		return false;
+	}
+
+	public boolean deleteTask(com.taskcommander.Task task) {
+		if (task != null) {
+			switch (task.getType()) {
+			case FLOATING:
+				return deleteTask((FloatingTask) task);
+			case TIMED:
+				return deleteTask((TimedTask) task);
+			case DEADLINE:
+				return deleteTask((DeadlineTask) task);
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Adds a task to the Tasks API, given a FloatingTask object.
+	 * Returns the Google ID if successful.
+	 * 
+	 * @param task   Custom FloatingTask object
+	 * @return       Google ID of task
+	 */
+	private String addTask(FloatingTask task) {
+		assert(task != null);
+		Task taskToAdd = new Task();
+		taskToAdd.setTitle(task.getName());
+		try {
+			Tasks.TasksOperations.Insert request = tasks.tasks().insert(PRIMARY_TASKS_ID, taskToAdd);
+			Task result = request.execute();
+			if (result != null) {
+				task.setUpdated(result.getUpdated());
+				return result.getId();
+			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_ADD), e);
+		}
+		return null;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	/**
+	 * Adds the given TimedTask as an event to the primary calendar.
+	 * @param task
+	 * @param event
+	 * @return            Google ID of task
+	 */
+	private String addEventToCalendar(TimedTask task, Event event) {
+		try {
+			Event createdEvent = calendar.events().insert(PRIMARY_CALENDAR_ID, event).execute();
+			if (createdEvent != null) {
+				task.setUpdated(createdEvent.getUpdated());
+				return createdEvent.getId();
+			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_ADD), e);
+		} catch (NullPointerException e) {
+			logger.log(Level.SEVERE, MESSAGE_NULL_TASK, e);
+		}
+		return null;
+	}
+
+	/**
+	 * Gets a task from the Tasks API, given a FloatingTask object.
+	 * The given task must have a Google ID.
+	 * Returns the TaskCommander Task if successful. 
+	 * 
+	 * @param task   Custom FloatingTask object
+	 * @return	     TaskCommander Task object
+	 */
+	private com.taskcommander.Task getTask(FloatingTask task) {
+		assert(task != null);
+		if (task.getId() == null) {
+			logger.log(Level.WARNING, MESSAGE_NO_ID);
+		} else {
+			try {
+				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
+				if (check != null) {
+					if (check.getDeleted() == null || !check.getDeleted()) {
+						return toTask(check);
+					}
+				}
+			} catch (IOException e) {
+				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+			} catch (NullPointerException e) {
+				logger.log(Level.SEVERE, "", e);
+			}
+
+		}
+		return null;
+	}
+
+	/**
+	 * Gets a task from the Tasks API, given a DeadlineTask object.
+	 * The given task must have a Google ID.
+	 * Returns the TaskCommander Task if successful. 
+	 * 
+	 * @param task   Custom DeadlineTask object
+	 * @return	     TaskCommander Task object
+	 */
+	private com.taskcommander.Task getTask(DeadlineTask task) {
+		assert(task != null);
+		if (task.getId() == null) {
+			logger.log(Level.WARNING, MESSAGE_NO_ID);
+		} else {
+			try {
+				Task check = tasks.tasks().get(PRIMARY_TASKS_ID, task.getId()).execute();
+				if (check != null) {
+					if (check.getDeleted() == null || !check.getDeleted()) {
+						return toTask(check);
+					}
+				}
+			} catch (IOException e) {
+				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_GET), e);
+			} catch (NullPointerException e) {
+				logger.log(Level.SEVERE, "", e);
+			}
+		}
+		return null;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	/**
+	 * Deletes a task from the Tasks API, given a FloatingTask object.
+	 * The given task must have a Google ID.
+	 * Returns true if successful. 
+	 * 
+	 * @param task   Custom FloatingTask object
+	 * @return	     Success of action
+	 */
+	private boolean deleteTask(FloatingTask task) {
+		assert(task != null);
+		if (task.getId() == null) {
+			logger.log(Level.WARNING, MESSAGE_NO_ID);
+		} else {
+			logger.log(Level.INFO, "Trying to delete task");
+			try {
+				if (getTask(task) != null) {
+					Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
+					request.execute();
+					return (getTask(task) == null);
+				}
+			} catch (IOException e) {
+				if (e.getMessage().contains("404 Not Found") || e.getMessage().contains("410 Gone")) {
+					logger.log(Level.INFO, MESSAGE_NOT_FOUND);
+					return true;
+				} else {
+					logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_DELETE), e);
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Deletes an event from the Tasks API, given a DeadlineTask object.
+	 * The given task must have a Google ID.
+	 * Returns true if successful. 
+	 * 
+	 * @param task   Custom DeadlineTask object
+	 * @return	     Success of action
+	 */
+	private boolean deleteTask(DeadlineTask task) {
+		assert(task != null);
+		if (task.getId() == null) {
+			logger.log(Level.WARNING, MESSAGE_NO_ID);
+		} else {
+			try {
+				Tasks.TasksOperations.Delete request = tasks.tasks().delete(PRIMARY_TASKS_ID, task.getId());
+				request.execute();
+				return (getTask(task) == null);
+			} catch (IOException e) {
+				if (e.getMessage().contains("404 Not Found")) {
+					return true;
+				} else {
+					logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_DELETE), e);
+				}
+			}
+		}
+		return false;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	/**
+	 * Deletes an event from the primary calendar, given a TimedTask.
+	 * @param task
+	 * @return            TaskCommander task
+	 */
+	private boolean deleteEventFromCalendar(TimedTask task) {
+		try {
+			calendar.events().delete(PRIMARY_CALENDAR_ID, task.getId()).execute();
+			return (getTask(task) == null);
+		} catch (IOException e) {
+			if (e.getMessage().contains("404 Not Found")) {
+				return true;
+			} else {
+				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_DELETE), e);
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Updates a task from the Tasks API, given a FloatingTask object.
+	 * The given task must have a Google ID.
+	 * Returns true if successful.  
+	 * 
+	 * @param task   Custom FloatingTask object
+	 * @return	     Success of action
+	 */
+	private boolean updateTask(FloatingTask task) {
+		assert(task != null);
+		if (task.getId() == null) {
+			logger.log(Level.WARNING, MESSAGE_NO_ID);
+		} else {
+			try {
+				Task result = tasks.tasks().update(PRIMARY_TASKS_ID, task.getId(), toGoogleTask(task)).execute();
+				return result != null;
+			} catch (IOException e) {
+				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_UPDATE), e);
+			}
+		}
+		return false;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	/**
+	 * Updates a task from the Tasks API, given a DeadlineTask object.
+	 * The given task must have a Google ID.
+	 * Returns true if successful.  
+	 * 
+	 * @param task   Custom DeadlineTask object
+	 * @return	     Success of action
+	 */
+	private boolean updateTask(DeadlineTask task) {
+		assert(task != null);
+		if (task.getId() == null) {
+			logger.log(Level.WARNING, MESSAGE_NO_ID);
+		} else {
+			try {
+				Task result = tasks.tasks().update(PRIMARY_TASKS_ID, task.getId(), toGoogleTask(task)).execute();
+				task.setUpdated(result.getUpdated());
+				return result != null;
+			} catch (IOException e) {
+				logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_UPDATE), e);
+			}
+		}
+		return false;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	/**
+	 * Updates an event in the primary calendar, given a TimedTask.
+	 * @param task
+	 * @return       Success of action
+	 */
+	private boolean updateEventToCalendar(TimedTask task) {
+		logger.log(Level.INFO, "Trying to update task...");
+		try {
+			Event result = calendar.events().update(PRIMARY_CALENDAR_ID, task.getId(), toGoogleTask(task)).execute();
+			return result != null;
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, String.format(MESSAGE_ERROR_OPERATION, OPERATION_UPDATE), e);
+		}
+		return false;
+	}
+
+	// Changes a Date to a DateTime object.
+	private DateTime toDateTime(Date date) {
+		return new DateTime(date);
+	}
+
+	// Changes a DateTime to a Date object.
+	private Date toDate(DateTime dateTime) {
+		return new Date(dateTime.getValue());
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+	 */
+
+	//The following operations turn a task into a Google Task or Event
+	private Task toGoogleTask(FloatingTask task) {
+		Task newTask = new Task();
+		newTask.setId(task.getId());
+		newTask.setTitle(task.getName());
+		setStatusFromTask(newTask, task);
+		return newTask;
+	}
+
+	private Task toGoogleTask(DeadlineTask task) {
+		Task newTask = new Task();
+		newTask.setId(task.getId());
+		newTask.setTitle(task.getName());
+		newTask.setDue(toDateTime(task.getEndDate()));
+		setStatusFromTask(newTask, task);
+		return newTask;
+	}
+
+	private Event toGoogleTask(TimedTask task) {
+		Event newEvent = new Event();
+		newEvent.setId(task.getId());
+		newEvent.setSummary(task.getName());
+		newEvent.setStart(new EventDateTime().setDateTime(toDateTime(task.getStartDate())));			
+		newEvent.setEnd(new EventDateTime().setDateTime(toDateTime(task.getEndDate())));		
+		return newEvent;
+	}
+
+	private void setStatusFromTask(Task newTask, com.taskcommander.Task task) {
+		if (task.isDone()) {
+			newTask.setStatus("completed");
+		} else {
+			newTask.setStatus("needsAction");
+		}
+	}
+
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\GoogleAPIConnector.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\LoginManager.java
+	 */
+
+/**
+ * This class is used to connect to the Google API and
+ * retrieve Google services after the user logs in through
+ * the UI browser.
+ */
+public class LoginManager implements Observer {
+	private static final String CLIENT_ID = "1009064713944-qqeb136ojidkjv4usaog806gcafu5dmn.apps.googleusercontent.com";
+	private static final String CLIENT_SECRET = "9ILpkbnlGwVMQiqh10za3exf";
+	private static final String APPLICATION_NAME = "Task Commander";
+
+	private static final String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
+
+	private static final String DATA_STORE_DIR = "credentials";
+	private static final String DATA_STORE_NAME = "credentialDataStore";
+
+	// Option to request access type for application. Can be "online" or "offline".
+	private static final String FLOW_ACCESS_TYPE = "offline";
+	// Option to request approval prompt type for application. Can be "force" or "auto".
+	private static final String FLOW_APPROVAL_PROMPT = "auto";
+
+	private static final String USERNAME = "User";
+	
+	private static LoginManager instance;
+
+	private static FileDataStoreFactory dataStoreFactory;
+
+	private HttpTransport httpTransport;
+	private JsonFactory jsonFactory;
+	private GoogleAuthorizationCodeFlow flow;
+	private DataStore<StoredCredential> dataStore;
+	private GoogleCredential credential;
+	
+	private static Logger logger = Logger.getLogger(LoginManager.class.getName());
+	
+    /**
+     * Returns the only instance of LoginManager.
+     * 
+     * @return LoginManager instance
+     */
+	public static LoginManager getInstance() {
+		if (instance == null) {
+			instance = new LoginManager();
+			instance.login();
+		}
+		return instance;
+	}
+	
+	/**
+	 * Returns a LoginManager instance and attempts to login.
+	 */
+	private LoginManager() {
+		httpTransport = new NetHttpTransport();
+		jsonFactory = new JacksonFactory();
+		File dataStoreFile = new File(DATA_STORE_DIR);
+		try {
+			logger.log(Level.INFO,"Retrieving DataStore");
+			dataStoreFactory = new FileDataStoreFactory(dataStoreFile);
+			dataStore = dataStoreFactory.getDataStore(DATA_STORE_NAME);
+		} catch (IOException e) {
+			logger.log(Level.WARNING,"IOException: Unable to retrieve DataStore", e);
+		}
+	}
+
+	// Service getter methods
+	/**
+	 * Connects to Google and builds a new Tasks service.
+	 * Requests can be sent once this method is successfully
+	 * executed.
+	 */
+	public Tasks getTasksService(){
+		if (isLoggedIn()) {
+			logger.log(Level.INFO,"Retrieved Tasks service");
+			return new Tasks.Builder(httpTransport, jsonFactory, credential)
+			.setApplicationName(APPLICATION_NAME).build();
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Connects to Google and builds a new Calendar service.
+	 * Requests can be sent once this method is successfully
+	 * executed.
+	 */
+	public Calendar getCalendarService(){
+		if (isLoggedIn()) {
+			logger.log(Level.INFO,"Retrieved Calendar service");
+			return new Calendar.Builder(httpTransport, jsonFactory, credential)
+			.setApplicationName(APPLICATION_NAME).build();
+		} else {
+			return null;
+		}
+	}
+	
+	// Data store related methods
+	/**
+	 * Gets the datastore factory used
+	 * @return			dataStoreFactory
+	 */
+	public static DataStoreFactory getDataStoreFactory() {
+		return dataStoreFactory;
+	}
+	
+	// Login and credential methods
+	/**
+	 * Attempts to login.
+	 */
+	private void login() {
+		if (credential == null) {
+			credential = getCredential();
+		}
+	}
+	
+	/**
+	 * Checks if logged in.
+	 */
+	private boolean isLoggedIn() {
+		return credential != null;
+	}
+
+	/**
+	 * Gets a GoogleCredential for use in Google API requests,
+	 * either from storage or by sending a request to Google.
+	 * @return           Credential
+	 */
+	private GoogleCredential getCredential() {
+		logger.log(Level.INFO,"Attempting to get credentials.");
+		if(hasStoredCredential()) {
+			logger.log(Level.INFO,"Using stored credential.");
+			setTokensFromStoredCredential();
+			saveCredential();
+		} else {
+			logger.log(Level.INFO,"Getting new credential from login.");
+			setTokensFromLogin();
+		}
+		return credential;
+	}
+	
+	/**
+	 * Checks if a credential with the given username has been stored in the 
+	 * data store directory.
+	 * @return If stored credential exists.
+	 */
+	private boolean hasStoredCredential() {
+		try {
+			return !dataStore.isEmpty() && dataStore.containsKey(USERNAME);
+		} catch (IOException e) {
+			logger.log(Level.WARNING,"IOException: Unable to check if DataStore contains key.", e);
+			return false;
+		}
+	}
+	
+	//Helper methods
+	/**
+	 * Builds a GoogleCredential.
+	 * @return
+	 */
+	private GoogleCredential buildCredential() {
+		logger.log(Level.INFO,"Building credential.");
+		GoogleCredential newCredential = new GoogleCredential.Builder()
+		.setJsonFactory(jsonFactory)
+		.setTransport(httpTransport)
+		.setClientSecrets(CLIENT_ID, CLIENT_SECRET)
+		.addRefreshListener(new DataStoreCredentialRefreshListener(USERNAME, dataStore))
+		.build();
+		return newCredential;
+	}
+
+	/**
+	 * Saves the local credential in the datastore.
+	 */
+	private void saveCredential(){
+		logger.log(Level.INFO, "Saving credential.");
+		StoredCredential storedCredential = new StoredCredential();
+		storedCredential.setAccessToken(credential.getAccessToken());
+		storedCredential.setRefreshToken(credential.getRefreshToken());
+		try {
+			dataStore.set(USERNAME, storedCredential);
+		} catch (IOException e) {
+			logger.log(Level.WARNING,"IOException: Unable to store credential in DataStore.", e);
+		}
+	}
+
+	// Stored credential methods
+	/**
+	 * Gets stored credential from data store and sets the tokens 
+	 * in the local credential.
+	 * @param newCredential 
+	 */
+	private void setTokensFromStoredCredential() {
+		StoredCredential storedCredential;
+		try {
+			storedCredential = dataStore.get(USERNAME);
+			GoogleCredential newCredential = buildCredential();
+			newCredential.setAccessToken(storedCredential.getAccessToken());
+			newCredential.setRefreshToken(storedCredential.getRefreshToken());
+			credential = newCredential;
+		} catch (IOException e) {
+			logger.log(Level.WARNING,"IOException: Unable to retrieve StoredCredential.", e);
+		}
+	}
+
+	// User login methods
+	/**
+	 * Requests the user to login and requests authorisation
+	 * tokens. Has to wait for user to login in the UI and 
+	 * retrieve token.
+	 * @param newCredential 
+	 */
+	private void setTokensFromLogin() {
+		requestAuthorisation();
+	}
+
+	/**
+	 * Makes an authorisation request to Google.
+	 */
+	private void requestAuthorisation() {
+		try {
+			flow = buildAuthorisationCodeFlow();
+		} catch (IOException e) {
+			logger.log(Level.WARNING,"IOException: Unable to build authorisation code flow.", e);
+		}
+		
+		getAuthorisationCode();
+	}
+
+	/**
+	 * Creates the authorisation code flow needed for the authorisation URL.
+	 * @return               GoogleAuthorizationCodeFlow object
+	 * @throws IOException
+	 */
+	private GoogleAuthorizationCodeFlow buildAuthorisationCodeFlow() throws IOException {
+		return new GoogleAuthorizationCodeFlow.Builder(
+				httpTransport, jsonFactory, CLIENT_ID, CLIENT_SECRET, Arrays.asList(TasksScopes.TASKS, CalendarScopes.CALENDAR))
+		.setAccessType(FLOW_ACCESS_TYPE)
+		.setApprovalPrompt(FLOW_APPROVAL_PROMPT)
+		.setDataStoreFactory(dataStoreFactory).build();
+	}
+
+	/**
+	 * Creates the authorisation URL and passes it to the UI.
+	 */
+	private void getAuthorisationCode() {
+		logger.log(Level.INFO, "Request user to login.");
+		String url = flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build();
+		TaskCommander.ui.addObserver(LoginManager.getInstance());
+		TaskCommander.ui.getCodeFromUser(url);
+	}
+
+	/**
+	 * Once updated with the authorisation code, tries to get a token response
+	 * using the code and sets a new credential from the token response.
+	 */
+	@Override
+	public void update(Observable obs, Object obj) {
+		logger.log(Level.INFO, "Login Manager updated, setting credential...");
+		GoogleCredential newCredential = buildCredential();
+		newCredential.setFromTokenResponse(getTokenResponse((String) obj));
+		credential = newCredential;
+		saveCredential();
+	}
+	
+	/**
+	 * Sends a token request to get a GoogleTokenResponse.
+	 * If an IOException occurs, returns null.
+	 * 
+	 * @param code
+	 * @return      Token response
+	 */
+	private GoogleTokenResponse getTokenResponse(String code) {
+		logger.log(Level.INFO, "Get token response from Google with code "+code);
+		try {
+			GoogleTokenResponse response = flow.newTokenRequest(code)
+					.setRedirectUri(REDIRECT_URI).execute();
+			return response;
+		} catch (IOException e) {
+			logger.log(Level.WARNING,"IOException: Unable to execute GoogleTokenResponse", e);
+		}
+		return null;
+	}
+
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\LoginManager.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Storage.java
+	 */
+
+public class Storage {
+
+	private static String _fileName = Global.FILENAME;
+	private static Gson gson;
+
+	/**
+	 * Returns a Storage object.
+	 */
+	public Storage() {
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
+		gson = gsonBuilder.create();
+	}
+
+	/**
+	 * Returns the contents of the file as an ArrayList of Tasks.
+	 */
+	public ArrayList<Task> readFromFile(){
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(new File(_fileName)));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				Task task = gson.fromJson(line, Task.class);
+				if (task != null) {
+					tasks.add(task);
+				}
+			}
+			reader.close();
+			return tasks;
+		} catch (IOException e) {
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+		} 
+		return new ArrayList<Task>();
+	}
+
+	/**
+	 * Writes the content of the data array into storage.
+	 * Will replace any existing content in the storage file.
+	 */
+	public void writeToFile(ArrayList<Task> tasks){
+		BufferedWriter bw;
+		try {
+			bw = new BufferedWriter(new FileWriter(new File(_fileName), false));
+
+			for (Task t : tasks) {
+				if (t != null) {
+					bw.write(gson.toJson(t));
+					bw.newLine();
+				}
+			}
+			bw.close();
+		} catch (Exception e) {
+			System.out.println(Global.MESSAGE_EXCEPTION_IO);
+		}
+	}
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Storage.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\SyncHandler.java
+	 */
+
+/**
+ * Facade for the Google Integration component.
+ * 
+ * Handles synchronisation of data to and from Google services.
+ * Notifies observers with a String message when sync status is updated.
+ * 
+ * To use this class, the user has to sign in and approve
+ * the permissions for this application through the UI.
+ */
+public class SyncHandler extends Observable {
+	private static GoogleAPIConnector con = null;
+
+	private static final String STATUS_CANCELLED = "cancelled";
+	private static final String MESSAGE_SYNC_PUSH = "Sending data to Google... %.2f%% completed.";
+	private static final String MESSAGE_SYNC_PULL = "Getting data from Google... %.2f%% completed.";
+	private static final String MESSAGE_SYNC_DONE = "Sync completed.";
+	private static final String MESSAGE_SYNC_FAILED = "Sync failed, please try again.";
+
+	private static final Logger logger = Logger.getLogger(SyncHandler.class.getName());
+
+	public int tasksTotal;
+	public int tasksComplete;
+	public SyncState syncState;
+
+	public SyncHandler() {
+
+	}
+
+	/**
+	 * Syncs the tasks in memory to Google in a separate thread. 
+	 * Attempts to login if not already logged in.
+	 * Notifies UI when sync state changes.
+	 * @return   Feedback for user
+	 */
+	public String sync() {
+		Global.syncing = true;
+		TaskCommander.syncHandler.addObserver(TaskCommander.ui);
+		if (con == null) {
+			con = GoogleAPIConnector.getInstance();
+		}
+
+		Thread.UncaughtExceptionHandler h = createExceptionHandler();
+		Thread thread = new SyncThread();
+		thread.setUncaughtExceptionHandler(h);
+		thread.start();
+
+		return Global.MESSAGE_SYNC_IN_PROGRESS;
+	}
+
+	/**
+	 * Attempts to get services from GoogleAPIConnector and syncs data to Google.
+	 * If services not available, waits for GoogleAPIConnector to login.
+	 */
+	class SyncThread extends Thread {
+		@Override
+		public void run() {
+			logger.log(Level.INFO, "Waiting for login...");
+			while (!con.getServices()) {
+				try {
+					sleep(10);  // milliseconds
+				} catch (InterruptedException e) {
+					logger.log(Level.WARNING, "Error while trying to sleep in SyncHandler", e);
+				}
+			}
+
+			logger.log(Level.INFO, "Trying to sync...");
+			push();
+			try {
+				pull();
+				resetSyncState(SyncState.DONE);
+			} catch (Exception e) {
+				logger.log(Level.WARNING, Global.MESSAGE_SYNC_FAILED, e);
+			}
+		}
+	}
+
+	/**
+	 * Returns an UncaughtExceptionHandler that interrupts the thread
+	 * and resets sync state when exceptions are caught.
+	 */
+	private UncaughtExceptionHandler createExceptionHandler() {
+		return new Thread.UncaughtExceptionHandler() {
+			public void uncaughtException(Thread th, Throwable ex) {
+				logger.log(Level.WARNING, Global.MESSAGE_SYNC_FAILED, ex);
+				th.interrupt();
+				resetSyncState(SyncState.FAILED);
+			}
+		};
+	}
+
+	/**
+	 * Pushes tasks that have been changed since last sync to Google services.
+	 * @param tasks
+	 */
+	private void push() {
+		ArrayList<Task> tasks = TaskCommander.data.getAllTasks();
+		ArrayList<Task> deletedTasks = TaskCommander.data.getDeletedTasks();
+		Stack<Task> changedTypeTasks = TaskCommander.data.getChangedTypeTasks();
+		Stack<ArrayList<Task>> clearedTasks = TaskCommander.data.getClearedTasks();
+		logger.log(Level.INFO, "PUSH: Retrieved All Tasks");
+		startSyncState(SyncState.PUSH, tasks.size() + deletedTasks.size() + 
+				changedTypeTasks.size() + clearedTasks.size());
+
+		pushUnsyncedTasks(tasks);
+		pushDeletedTasks(deletedTasks);
+		pushChangedTypeTasks(changedTypeTasks);
+		pushClearedTasks(clearedTasks);
+
+		logger.log(Level.INFO, "PUSH: End Push");
+	}
+
+	/**
+	 * Pushes tasks that have been changed since last sync to Google services.
+	 * Does not include tasks that have changed types.
+	 * @param tasks
+	 */
+	private void pushUnsyncedTasks(ArrayList<Task> tasks) {
+		//Handle Added Cases
+		for (Task t : tasks) {
+			if (!t.isSynced()) {
+				if (t.getId() == null) {
+					String result = con.addTask(t);
+					if (result != null) {
+						t.setId(result);
+					}
+				} else if (t.isEdited()) {
+					con.updateTask(t);
+				}
+			}
+			updateTasksComplete(tasksComplete+1);
+		}
+		logger.log(Level.INFO, "PUSH: Handled Added Cases");
+	}
+
+	/**
+	 * Pushes tasks that have been deleted since last sync to Google services.
+	 * @param deletedTasks
+	 */
+	private void pushDeletedTasks(ArrayList<Task> deletedTasks) {
+		// Handle delete cases
+		for (Task t : deletedTasks) {
+			if (!t.isSynced()) {
+				con.deleteTask(t);
+				t.setEdited(false);
+			}
+		}
+		logger.log(Level.INFO, "PUSH: Handled Deleted Cases");
+	}
+
+	/**
+	 * Pushes deletions of tasks that have changed task type 
+	 * since last sync to Google services.
+	 * @param preupdatedTasks
+	 */
+	private void pushChangedTypeTasks(Stack<Task> changedTypeTasks) {
+		// Delete tasks that were updated to a different type
+		for (Task t: changedTypeTasks) {
+			if (t.getId() != null) {
+				con.deleteTask(t);
+			}
+		}
+		logger.log(Level.INFO, "PUSH: Handled Preupdated Cases");
+	}
+
+	/**
+	 * Pushes tasks that have been cleared since last sync to Google services.
+	 * @param clearedTasks
+	 */
+	private void pushClearedTasks(Stack<ArrayList<Task>> clearedTasks) {
+		// Delete tasks that were cleared
+		for (ArrayList<Task> list : clearedTasks) {
+			pushDeletedTasks(list);
+		}
+		logger.log(Level.INFO, "PUSH: Handled Cleared Cases");
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\SyncHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\SyncHandler.java
+	 */
+
+	// Methods for keeping track and notifying observers of sync state
+	private void updateTasksComplete(int completed) {
+		tasksComplete = completed;
+		updateSyncMessage();
+	}
+
+	private void startSyncState(SyncState state, int total) {
+		logger.log(Level.INFO, "Starting sync state " + state + " with " + total + " tasks.");
+		syncState = state;
+		tasksTotal = total;
+		tasksComplete = 0;
+		updateSyncMessage();
+	}
+
+	private void resetSyncState(SyncState state) {
+		Global.syncing = false;
+		syncState = state;
+		tasksTotal = 0;
+		tasksComplete = 0;
+		updateSyncMessage();
+	}
+
+	private void updateSyncMessage() {
+		String message = "";
+		switch (syncState) {
+		case DONE:
+			message = MESSAGE_SYNC_DONE;
+			break;
+		case PUSH:
+			message = String.format(MESSAGE_SYNC_PUSH, getTaskCompletion());
+			break;
+		case PULL:
+			message = String.format(MESSAGE_SYNC_PULL, getTaskCompletion());
+			break;
+		case FAILED:
+			message = MESSAGE_SYNC_FAILED;
+			break;
+		}
+
+		setChanged();
+		notifyObservers(message);
+	}
+
+	/**
+	 * Returns the percentage of task completion as a float.
+	 */
+	private float getTaskCompletion() {
+		if (tasksTotal == 0) {
+			return 0;
+		} else {
+			return (float) tasksComplete / (float) tasksTotal * (float) 100;
+		}
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\SyncHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Task.java
+	 */
+
+/**
+ * A basic task object. Has a name. May also hold a Google API ID.
+ * Related Google API: Tasks
+ */
+
+public abstract class Task {
+    @SerializedName("taskType")
+    // For use with GSON
+    private TaskType _taskType;
+    private String _name;
+    private String _id;
+    private boolean _done;
+    private boolean _edited;
+    private DateTime _updated;
+
+    /**
+     * Possible task types
+     */
+    public enum TaskType {
+    	// Serialized names for use with TaskAdapter for saving tasks to JSON
+        @SerializedName("0") FLOATING("FloatingTask"), 
+        @SerializedName("1") TIMED("TimedTask"), 
+        @SerializedName("2") DEADLINE("DeadlineTask");
+
+        String name;
+
+        private TaskType(String s) {
+            name = s;
+        }
+
+        public String toString() {
+            return name;
+        }
+    }
+
+    /**
+     * Creates a new Task with given name. Throws IllegalArgumentException if
+     * name is not given.
+     * 
+     * @param name
+     * @param type
+     * @return Task instance
+     */
+    public Task(String name, TaskType taskType) {
+        if (name != null) {
+            _name = name;
+            _taskType = taskType;
+            _done = false;
+            _edited = true;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public TaskType getType() {
+        return _taskType;
+    }
+
+    public String getName() {
+        return _name;
+    }
+
+    public String getId() {
+        return _id;
+    }
+
+    public boolean isDone() {
+        return _done;
+    }
+
+    public boolean isEdited() {
+        return _edited;
+    }
+
+    public DateTime getUpdated() {
+        return _updated;
+    }
+
+    /**
+     * Returns true if task has a google id and has not been edited since last
+     * sync
+     * 
+     * @return If task is synced.
+     */
+    public boolean isSynced() {
+        return _id != null && !_edited;
+    }
+
+    public void setType(TaskType taskType) {
+        _taskType = taskType;
+    }
+
+    public void setName(String name) {
+        _name = name;
+    }
+
+    public void setId(String id) {
+        _id = id;
+    }
+
+    public void setDone(boolean done) {
+        _done = done;
+    }
+
+    public void setEdited(boolean edited) {
+        this._edited = edited;
+    }
+
+    public void setUpdated(DateTime updated) {
+        _updated = updated;
+    }
+
+    public void markDone() {
+        _done = true;
+    }
+
+    public void markOpen() {
+        _done = false;
+    }
+
+    public void markSynced() {
+        _edited = false;
+    }
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Task.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TaskAdapter.java
+	 */
+
+/**
+ * Adapter class for serializing and deserializing JSON objects into
+ * Task objects using GSON. 
+ * 
+ * Creates Task subclass objects based on the enum TaskType's string values.
+ * 
+ * Code adapted from: http://ovaraksin.blogspot.com.es/2011/05/json-with-gson-and-abstract-classes.html
+ */
+
+public class TaskAdapter implements JsonSerializer<Task>, JsonDeserializer<Task> {
+	@Override
+	public JsonElement serialize(Task src, Type typeOfSrc, JsonSerializationContext context) {
+		JsonObject result = new JsonObject();
+		switch (src.getType()) {
+		case FLOATING:
+			result.add("properties", context.serialize(src, FloatingTask.class));
+			break;
+
+		case TIMED:
+			result.add("properties", context.serialize(src, TimedTask.class));
+			break;
+
+		case DEADLINE:
+			result.add("properties", context.serialize(src, DeadlineTask.class));
+			break;
+		}
+		System.out.println("ser" + result.toString());
+		return result;
+	}
+
+	@Override
+	public Task deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+			throws JsonParseException {
+		JsonObject jsonObject = json.getAsJsonObject();
+		int type = Integer.parseInt(jsonObject.get("taskType").getAsString());
+		switch (type) {
+		case 0: //FloatingTask
+			return context.deserialize(jsonObject, FloatingTask.class);
+
+		case 1: //TimedTask
+			return context.deserialize(jsonObject, TimedTask.class);
+
+		case 2: //DeadlineTask
+			return context.deserialize(jsonObject, DeadlineTask.class);
+
+		default:
+			return null;
+		}
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TaskAdapter.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TimedTask.java
+	 */
+
+	public Date getStartDate() {
+		return _startDate;
+	}
+
+	public Date getEndDate() {
+		return _endDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		_startDate = startDate;
+		super.setDate(startDate);
+	}
+
+	public void setEndDate(Date endDate) {
+		_endDate = endDate;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TimedTask.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\UI.java
+	 */
+
+/**
+ * Singleton class that has the following functions:
+ * - Creates the UI
+ * - Receives user input and sends it to the controller
+ * - Receives feedback from controller and shows it to the user
+ * - Facilitates Google sync function by allowing user to login through a local browser
+ * - Receives user's authorisation code and sends it to the controller
+ */
+public class UI extends Observable implements Observer {
+	private static UI ui;
+
+	// Variables to adjust UI element sizes and layout behaviour
+	private static final int SHELL_MIN_HEIGHT = 400;
+	private static final int SHELL_MIN_WIDTH = 500;
+
+	private static final int TAB_GRID_COLUMNS_NUM = 1;
+	private static final int MAIN_GRID_COLUMNS_NUM = 2;
+	private static final int BROWSER_GRID_COLUMNS_NUM = 1;
+	private static final boolean GRID_COLUMNS_EQUAL_SIZE = false;
+
+	private static final boolean INPUT_FIT_HORIZONTAL = true;
+	private static final boolean INPUT_FIT_VERTICAL = false;
+	private static final int INPUT_COLUMNS_SPAN = 1;
+	private static final int INPUT_ROWS_SPAN = 1;
+	private static final int INPUT_PREFERRED_WIDTH = 500;
+
+	private static final boolean OUTPUT_FIT_HORIZONTAL = true;
+	private static final boolean OUTPUT_FIT_VERTICAL = false;
+	private static final int OUTPUT_COLUMNS_SPAN = 2;
+	private static final int OUTPUT_ROWS_SPAN = 1;
+	private static final int OUTPUT_PREFERRED_WIDTH = 500;
+
+	private static final int TABLE_STYLE = SWT.NONE;
+	private static final boolean TABLE_FIT_HORIZONTAL = true;
+	private static final boolean TABLE_FIT_VERTICAL = true;
+	private static final int TABLE_COLUMNS_SPAN = 2;
+	private static final int TABLE_ROWS_SPAN = 1;
+	private static final int TABLE_PREFERRED_WIDTH = 500;
+	private static final int TABLE_PREFERRED_HEIGHT = 200;
+	private static final int TABLE_COLUMNS_NUM = 4;
+	private static final String[] TABLE_COLUMNS_NAMES = {"No.", "Date", "Task", "Status"};
+
+	private static final boolean HELP_FIT_HORIZONTAL = true;
+	private static final boolean HELP_FIT_VERTICAL = true;
+	private static final int HELP_COLUMNS_SPAN = 1;
+	private static final int HELP_ROWS_SPAN = 1;
+
+	private static final boolean BROWSER_FIT_HORIZONTAL = true;
+	private static final boolean BROWSER_FIT_VERTICAL = true;
+	private static final int BROWSER_COLUMNS_SPAN = 1;
+	private static final int BROWSER_ROWS_SPAN = 1;
+	private static final int BROWSER_PREFERRED_WIDTH = 500;
+	private static final int BROWSER_PREFERRED_HEIGHT = 120;
+
+	private static final String TAB_MAIN_NAME = "Tasks";
+	private static final String TAB_HELP_NAME = "Help";
+	private static final int TAB_BROWSER_INDEX = 2; // Third tab item
+	private static final String TAB_BROWSER_NAME = "Google Login";
+
+	// Immutable UI element instances
+	private final Display display = Display.getDefault();
+	private final Shell shell = new Shell(display, SWT.CLOSE | SWT.TITLE | SWT.MIN & (~SWT.RESIZE));
+	private final TabFolder tabFolder = new TabFolder(shell, SWT.NONE);
+	private final Composite mainWindow = new Composite(tabFolder, SWT.FILL & (~SWT.RESIZE));
+	private final Composite helpWindow = new Composite(tabFolder, SWT.FILL & (~SWT.RESIZE));
+	private final Composite browserWindow = new Composite(tabFolder, SWT.FILL & (~SWT.RESIZE));
+	private final Table table = new Table(mainWindow, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+
+	// System colours for use to colour UI elements
+	private final Color red = display.getSystemColor(SWT.COLOR_RED);
+	private final Color darkGreen = display.getSystemColor(SWT.COLOR_DARK_GREEN);
+	private final Color blue = display.getSystemColor(SWT.COLOR_BLUE);
+	private final Color darkGray = display.getSystemColor(SWT.COLOR_DARK_GRAY);
+	private final Color darkBlue = display.getSystemColor(SWT.COLOR_DARK_BLUE);
+
+	// Colours set for table columns
+	private final Color COLOR_COL_FIRST = darkGray;
+	private final Color COLOR_COL_SECOND = blue;
+	private final Color COLOR_COL_THIRD = darkBlue;
+	private final Color COLOR_DONE = darkGreen;
+	private final Color COLOR_NOT_DONE = red;
+
+	// String messages for display
+	private static final String INFO_DISPLAY = "Displaying: ";
+	private static final String INFO_HELP = "You can use the following commands: \n\n" +
+			"-  add <\"task title\"> <start date> <start time> <to|-> [end date] <end time> \n" +
+			"-  add \"<task title>\" <end date> <end time> \n" +
+			"-  add \"<task title>\" \n\n" +
+			"-  display [timed] [deadline] [none] [done|open] [start date] [start time] [to|-] [end date] [end time] \n" +
+			"-  display [all] \n\n" +
+			"-  update [\"task title\"] [ none | <end date> <end time> | <start  date> <start time> [end date>] <end time>] \n\n" +
+			"-  open <index> \n" +
+			"-  done <index> \n\n" +
+			"-  delete <index> \n" +
+			"-  clear \n\n" +
+			"-  undo \n\n" +
+			"-  search <key word or phrase> | <\"exact key word or phrase\"> \n\n"+
+			"-  sync \n\n" +
+			"-  exit \n\n"+
+			"For more help, you can access our user guide here: http://goo.gl/6bjc7i";
+	private static final String INSTRUCTIONS_MAIN = "Enter command: ";
+	private static final String INSTRUCTIONS_BROWSER = "Please login to Google and accept application permissions to sync your tasks.";
+
+	// Logger instance
+	private static Logger logger = Logger.getLogger(UI.class.getName());
+
+	// Mutable UI element instances
+	private TabItem mainTab;
+	private TabItem browserTab;
+	private Text input;
+	private Text displayOutput;
+	private Text output;
+	private Browser browser;
+
+	private String displaySettingText;
+	private String code; // For authorisation code from Google
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\UI.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\UI.java
+	 */
+
+	// Help tab setup
+	private void createHelpTab() {
+		TabItem item = new TabItem(tabFolder, SWT.NONE);
+		item.setText(TAB_HELP_NAME);
+		setupHelpWindow();
+		item.setControl(helpWindow);
+	}
+
+	private void setupHelpWindow() {
+		GridLayout layout = new GridLayout(TAB_GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
+		helpWindow.setLayout(layout);
+		helpWindow.setBounds(shell.getBounds());
+
+		createTextFieldsForHelp();
+	}
+
+	private void createTextFieldsForHelp() {
+		Text helpOutput = new Text(helpWindow, SWT.BORDER | SWT.MULTI | SWT.WRAP);
+		helpOutput.setLayoutData(new GridData(SWT.FILL, SWT.FILL, HELP_FIT_HORIZONTAL, HELP_FIT_VERTICAL, 
+				HELP_COLUMNS_SPAN, HELP_ROWS_SPAN));
+		helpOutput.setText(INFO_HELP);
+		helpOutput.setEditable(false);
+	}
+
+	// Browser tab setup
+	private void createBrowserTab(String url) {
+		browserTab = new TabItem(tabFolder, SWT.NONE);
+		browserTab.setText(TAB_BROWSER_NAME);
+		setupBrowserWindow(url);
+		browserTab.setControl(browserWindow);
+		tabFolder.setSelection(browserTab);
+	}
+
+	private void setupBrowserWindow(String url) {
+		GridLayout layout = new GridLayout(BROWSER_GRID_COLUMNS_NUM, GRID_COLUMNS_EQUAL_SIZE);
+		browserWindow.setLayout(layout);
+		browserWindow.setBounds(shell.getBounds());
+
+		createTextFieldsForBrowser();
+		setupBrowser();
+		addInputListenerForBrowser();
+
+		browser.setUrl(url);
+	}
+
+	private void createTextFieldsForBrowser() {
+		new Label(browserWindow, SWT.NONE).setText(INSTRUCTIONS_BROWSER);
+	}
+
+	private void setupBrowser() {
+		browser = new Browser(browserWindow, SWT.FILL | SWT.BORDER& (~SWT.RESIZE));
+		GridData browserGridData = new GridData(SWT.FILL, SWT.FILL, BROWSER_FIT_HORIZONTAL, BROWSER_FIT_VERTICAL, 
+				BROWSER_COLUMNS_SPAN, BROWSER_ROWS_SPAN);
+		browserGridData.widthHint = BROWSER_PREFERRED_WIDTH;
+		browserGridData.heightHint = BROWSER_PREFERRED_HEIGHT;
+		browser.setLayoutData(browserGridData);
+		browser.setUrl("http://www.google.com/");
+	}
+
+	/**
+	 * Adds a listener to check if the web page title changes to
+	 * a Success string, then parses and sets the authorisation code.
+	 */
+	private void addInputListenerForBrowser() {
+		browser.addTitleListener(new TitleListener() {
+			@Override
+			public void changed(TitleEvent event) {
+				logger.log(Level.INFO, "Checking title "+event.title);
+				if(event.title.contains("Success")) {
+					logger.log(Level.INFO, "Success "+event.title);
+					setCode(event.title.replace("Success code=", ""));
+					closeBrowserTab();
+				}
+			}
+		});
+	}
+
+	// Closes browser tab and resets focus to main tab.
+	private void closeBrowserTab() {
+		tabFolder.setSelection(mainTab);
+		tabFolder.getItem(TAB_BROWSER_INDEX).dispose();
+	}
+
+	/**
+	 * Attempts to get authorisation code from user by creating
+	 * browser tab.
+	 * @param url
+	 */
+	public void getCodeFromUser(String url) {
+		logger.log(Level.INFO, "Creating browser...");
+		code = null;
+		createBrowserTab(url);
+	}
+
+	/**
+	 * Sets the Google authorisation code received and 
+	 * notifies observers.
+	 * @param text
+	 */
+	private void setCode(String text) {
+		code = text;
+		setChanged();
+		notifyObservers(code);
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\UI.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\UI.java
+	 */
+
+	/** 
+	 * Updates the display by clearing table items and displaying the
+	 * latest tasks for display from the Controller.
+	 */
+	private void updateDisplay() {
+		clearTableItems();
+		displayTasks(TaskCommander.controller.getDisplayedTasks());
+		maintainShellSize();
+	}
+
+	/** 
+	 * Updates the display by clearing table items and displaying the
+	 * latest tasks for display from the Controller plus a given String 
+	 * in the output field.
+	 * @param  fb     Feedback for user
+	 */
+	private void updateDisplay(String fb) {
+		clearTableItems();
+		displayMessage(fb);
+		displayTasks(TaskCommander.controller.getDisplayedTasks());
+	}
+
+	/**
+	 * Creates table rows and arranges data for display from a given
+	 * arraylist of TaskCommander Task objects. Displays the tasks
+	 * differently based on their type.
+	 * @param tasks   Arraylist of tasks to display
+	 */
+	public void displayTasks(ArrayList<Task> tasks) {
+		int index = 1;
+		String lastDate = null;
+		for (Task task : tasks) { 
+			switch(task.getType()) {
+			case FLOATING:
+				FloatingTask ft = (FloatingTask) task;
+				createRowFromTask(index, ft);
+				break;
+			case DEADLINE:
+				DeadlineTask dt = (DeadlineTask) task;
+				if (isNewDay(dt, lastDate)) {
+					lastDate = getDisplayDate(dt.getDate());
+					createDateRow(lastDate);
+				}
+				createRowFromTask(index, dt);
+				break;
+			case TIMED:
+				TimedTask tt = (TimedTask) task;
+				if (isNewDay(tt, lastDate)) {
+					lastDate = getDisplayDate(tt.getDate());
+					createDateRow(lastDate);
+				}
+				createRowFromTask(index, tt);
+				break;
+			}
+			index++;
+		}
+		packUI();
+	}
+
+	// Methods to create a table row from different types of tasks
+	private void createRowFromTask(int index, FloatingTask task) {
+		TableItem item = new TableItem(table, TABLE_STYLE);
+		item.setText(new String[] {Integer.toString(index),
+				" ", 
+				task.getName(),
+				getDoneMessage(task)});
+		setColorsForTableItem(item, getDoneColor(task));
+	}
+
+	private void createRowFromTask(int index, DeadlineTask task) {
+		TableItem item = new TableItem(table, TABLE_STYLE);
+		item.setText(new String[] {Integer.toString(index),
+				getDisplayDate(task), 
+				task.getName(),
+				getDoneMessage(task)});
+		setColorsForTableItem(item, getDoneColor(task));
+	}
+
+	private void createRowFromTask(int index, TimedTask task) {
+		TableItem item = new TableItem(table, TABLE_STYLE);
+		item.setText(new String[] { Integer.toString(index),
+				getDisplayDate(task), 
+				task.getName(),
+				getDoneMessage(task)});
+		setColorsForTableItem(item, getDoneColor(task));
+	}
+
+	private void createDateRow(String date) {
+		new TableItem(table, TABLE_STYLE);
+	}
+
+	// Helper methods that return formatted Strings for display when given a task
+	/**
+	 * Returns the display date for DeadlineTasks.
+	 * The format is: Date1 Time
+	 * @param task
+	 * @return      String date to display.
+	 */
+	private String getDisplayDate(DeadlineTask task) {
+		return Global.dayFormat.format(task.getEndDate()) + " by " + Global.timeFormat.format(task.getEndDate());
+	}
+
+	/**
+	 * Returns the display date for TimedTasks.
+	 * If the start and end days are different, the format is: Date1 Time - Date2 Time
+	 * If the start and end days are the same, the format is: Date1 Time - Time
+	 * @param task
+	 * @return      String date to display.
+	 */
+	private String getDisplayDate(TimedTask task) {
+		if (hasDifferentDay(task.getStartDate(), task.getEndDate())) {
+			return Global.dayFormat.format(task.getStartDate()) + " " + Global.timeFormat.format(task.getStartDate())+ " - " + 
+					Global.dayFormat.format(task.getEndDate()) + " " + Global.timeFormat.format(task.getEndDate());
+		} else {
+			return Global.dayFormat.format(task.getStartDate()) + " " + Global.timeFormat.format(task.getStartDate())+ " - " + 
+					Global.timeFormat.format(task.getEndDate());
+		}
+	}
+
+	private String getDisplayDate(Date date) {
+		return "["+Global.dayFormat.format(date)+"]";
+	}
+
+	private String getDoneMessage(Task task) {
+		if (task.isDone()) {
+			return Global.PARAMETER_DONE;
+		} else {
+			return Global.PARAMETER_OPEN;
+		}
+	}
+
+	private Color getDoneColor(Task task) {
+		if (task.isDone()) {
+			return COLOR_DONE;
+		} else {
+			return COLOR_NOT_DONE;
+		}
+	}
+
+	/** Checks if the given task has a different day from the
+	 *  last date string, by converting the task's date into
+	 *  a display date string.
+	 * @param task
+	 * @param lastDate
+	 * @return          If the given task has a later day.
+	 */
+	private boolean isNewDay(DatedTask task, String lastDate) {
+		if (lastDate != null) {
+			return !(getDisplayDate(task.getDate()).equals(lastDate));
+		} else {
+			return true;
+		}
+	}
+
+	/** Checks if the given dates have different days.
+	 * @param date1
+	 * @param date2
+	 * @return          If the given dates have different days.
+	 */
+	private boolean hasDifferentDay(Date date1, Date date2) {
+		return !Global.dayFormat.format(date1).equals(Global.dayFormat.format(date2));
+	}
+
+	private void setColorsForTableItem(TableItem item, Color doneColor) {
+		item.setForeground(0, COLOR_COL_FIRST);
+		item.setForeground(1, COLOR_COL_SECOND);
+		item.setForeground(2, COLOR_COL_THIRD);
+		item.setForeground(3, doneColor);
+	}
+
+	// Calls pack() for UI elements.
+	private void packUI() {
+		for (TableColumn t : table.getColumns()) {
+			t.pack();
+		}
+		shell.pack();
+	}
+
+	private void clearTableItems() {
+		table.removeAll();
+	}
+
+	private void clearInput() {
+		input.setText("");
+	}
+
+	private void displayMessage(String s) {
+		output.setText(s);
+		output.setForeground(darkBlue);
+	}
+
+	/**
+	 * Updates the sync progress output with the given String.
+	 * 
+	 * For use with the sync method in the Google Integration component.
+	 */
+	@Override
+	public void update(Observable arg0, Object arg1) {
+		if (arg1 instanceof String) {
+			final String m = (String) arg1;
+			display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					output.setText(m);
+				}
+			});
+		}
+	}
+
+	private void maintainShellSize() {
+		shell.setBounds(shell.getBounds().x, 
+						shell.getBounds().y, 
+						display.getBounds().width/10*4, 
+						display.getBounds().height/10*8);
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\UI.java
+
+
+
+
+

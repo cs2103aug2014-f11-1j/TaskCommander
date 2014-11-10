@@ -1,0 +1,2948 @@
+//@author: a0128620m
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\AllTests.java
+	 */
+
+/**
+ * This class runs both all tests by combining them into one test suite.
+ */
+
+@RunWith(Suite.class)
+@SuiteClasses({ AllParserTest.class, AllDataTest.class,
+    GoogleAPIConnectorTest.class, StorageTest.class,
+    AllIntegratedControllerTest.class })
+public class AllTests {
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\AllTests.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\AllParserTest.java
+	 */
+
+/**
+ * This class runs all unit test cases of the Parser component.
+ */
+
+@RunWith(Suite.class)
+@SuiteClasses({ DetermineCommandTypeTest.class, DetermineTaskNameTest.class,
+    DetermineTaskDateTimeTest.class, DetermineIndexTest.class,
+    DetermineSearchedWords.class, ContainsParameterTest.class })
+public class AllParserTest {
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\AllParserTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\ContainsParameterTest.java
+	 */
+
+/**
+ * This class is part of the unit test of the component Parser and contains all test cases 
+ * for the method containsParameter(userCommand:String, parameter:String).
+ */
+
+@RunWith(Parameterized.class)
+public class ContainsParameterTest {
+    private String userCommand;
+    private String parameter;
+    private boolean expectedResult;
+
+    public ContainsParameterTest(String userCommand, String parameter,
+        boolean expectedResult) {
+        this.userCommand = userCommand;
+        this.parameter = parameter;
+        this.expectedResult = expectedResult;
+    }
+	
+    /* Test structure
+     * 
+     * Initial partition of 1st parameter "userCommand":
+     * 1. [commandType]+[space(s)]+[quoted taskName]+[space(s)]+[any string]					
+     * 2. [commandType]+[space(s)]+[any string]																				
+     * 3. [any string]																																								
+     * 4. [null]																					
+     * Further partition of [any string]:
+     * a. [string which exactly represents the searched string]							
+     * b. [string exactly containing the searched string (surrounded by spaces)]					
+     * c. [string not exactly containing the searched string (not surrounded by spaces)]		
+     * d. [string not containing the searched string at all]				
+     * e. [empty string]														
+     * 
+     * Initial partition of 2nd parameter "parameter":
+     * i.   [any string]																			
+     * ii.  [empty string]																		
+     * iii. [null]																				
+     */
+
+    // Test parameters
+    @Parameterized.Parameters
+    public static Collection<Object[]> cases() {
+        String commandType = "update";
+        String taskName = "\"meeting\"";
+        String stringExactlyRepresentingSearchedString = "none";
+        String stringExactlyContainingSearchedString = "none timed";
+        String stringNotExactlyContainingSearchedString = "nonetimed";
+        String stringNotContainingSearchedString = "other";
+        String emptyString = "";
+
+        return Arrays
+            .asList(new Object[][] {
+
+                // 1ai
+                {
+                    commandType + " " + taskName + " "
+                        + stringExactlyRepresentingSearchedString,
+                    stringExactlyRepresentingSearchedString, true },
+
+                // 1bi
+                {
+                    commandType + " " + taskName + " "
+                        + stringExactlyContainingSearchedString,
+                    stringExactlyRepresentingSearchedString, true },
+
+                // 1ci
+                {
+                    commandType + " " + taskName + " "
+                        + stringNotExactlyContainingSearchedString,
+                    stringExactlyRepresentingSearchedString, false },
+
+                // 1di
+                {
+                    commandType + " " + taskName + " "
+                        + stringNotContainingSearchedString,
+                    stringExactlyRepresentingSearchedString, false },
+
+                // 1ei
+                { commandType + " " + taskName + " " + emptyString,
+                    stringExactlyRepresentingSearchedString, false },
+
+                // 2ai
+                { commandType + " " + stringExactlyRepresentingSearchedString,
+                    stringExactlyRepresentingSearchedString, true },
+
+                // 2bi
+                { commandType + " " + stringExactlyContainingSearchedString,
+                    stringExactlyRepresentingSearchedString, true },
+
+                // 2ci
+                { commandType + " " + stringNotExactlyContainingSearchedString,
+                    stringExactlyRepresentingSearchedString, false },
+
+                // 2di
+                { commandType + " " + stringNotContainingSearchedString,
+                    stringExactlyRepresentingSearchedString, false },
+
+                // 2ei
+                { commandType + " " + emptyString,
+                    stringExactlyRepresentingSearchedString, false },
+
+                // 3ai
+                { stringExactlyRepresentingSearchedString,
+                    stringExactlyRepresentingSearchedString, true },
+
+                // 3bi
+                { stringExactlyContainingSearchedString,
+                    stringExactlyRepresentingSearchedString, true },
+
+                // 3ci
+                { stringNotExactlyContainingSearchedString,
+                    stringExactlyRepresentingSearchedString, false },
+
+                // 3di
+                { stringNotContainingSearchedString,
+                    stringExactlyRepresentingSearchedString, false },
+
+                // 3ei
+                { emptyString, stringExactlyRepresentingSearchedString, false },
+
+                // 4i
+                { null, stringExactlyRepresentingSearchedString, false },
+
+                // 1aii
+                {
+                    commandType + " " + taskName + " "
+                        + stringExactlyRepresentingSearchedString, emptyString,
+                    false },
+
+                // 1aiii
+                {
+                    commandType + " " + taskName + " "
+                        + stringExactlyRepresentingSearchedString, null, false }, });
+    }
+
+    // Test run
+    @Test
+    public void testcontainsParameter() {
+        assertEquals(expectedResult,
+            TaskCommander.parser.containsParameter(userCommand, parameter));
+    }
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\ContainsParameterTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\DetermineCommandTypeTest.java
+	 */
+
+/**
+ * This class is part of the unit test of the component Parser and contains all
+ * test cases for the method determineCommandType(userCommand:String).
+ */
+
+@RunWith(Parameterized.class)
+public class DetermineCommandTypeTest {
+    private String userCommand;
+    private Global.CommandType expectedResult;
+
+    public DetermineCommandTypeTest(String userCommand,
+        Global.CommandType expectedResult) {
+        this.userCommand = userCommand;
+        this.expectedResult = expectedResult;
+    }
+
+    /* Test structure
+     * 
+     * Initial partition of parameter "userCommand":
+     * 1. [commandType]+[space(s)]+[any non-empty string]										
+     * 2. [commandType]																				 
+     * 3. [space(s)]+[commandType]+[space(s)]+[any non-empty string]								
+     * 4. [space(s)]+[commandType]																 
+     * 5. [commandType]+[any non-empty string]														 
+     * 6. [any non-empty string]+[space(s)]+[commandType]											
+     * 7. [any non-empty string]+[commandType]																
+     * 8. [any non-empty string]																			
+     * 9. [empty string]																			
+     * 10.[null]			
+     * 
+     * Further partition of [commandType]
+     * a. [commandType with initial capital letter]
+     * b. [commandType in small letters]	
+     * c. [commandType in capital letters]																	
+     */
+
+    // Test parameters
+    @Parameterized.Parameters
+    public static Collection<Object[]> cases() {
+        Global.CommandType validCommandType = Global.CommandType.ADD;
+        String[] commandType = { "Add", "add", "ADD" };
+        Global.CommandType invalidCommandType = Global.CommandType.INVALID;
+        String anyNonEmptyString = "/\"meeting\" Nov 3rd 2pm";
+        String emptyString = "";
+
+        return Arrays
+            .asList(new Object[][] {
+
+                // 1a, 1b, 1c
+                { commandType[0] + " " + anyNonEmptyString, validCommandType },
+                { commandType[1] + " " + anyNonEmptyString, validCommandType },
+                { commandType[2] + " " + anyNonEmptyString, validCommandType },
+
+                // 2a, 2b, 2c
+                { commandType[0], validCommandType },
+                { commandType[1], validCommandType },
+                { commandType[2], validCommandType },
+
+                // 3a, 3b, 3c
+                { " " + commandType[0] + " " + anyNonEmptyString,
+                    validCommandType },
+                { " " + commandType[1] + " " + anyNonEmptyString,
+                    validCommandType },
+                { " " + commandType[2] + " " + anyNonEmptyString,
+                    validCommandType },
+
+                // 4a, 4b, 4c
+                { " " + commandType[2], validCommandType },
+                { " " + commandType[0], validCommandType },
+                { " " + commandType[1], validCommandType },
+
+                // 5
+                { commandType[0] + anyNonEmptyString, invalidCommandType },
+
+                // 6
+                { anyNonEmptyString + " " + commandType[0], invalidCommandType },
+
+                // 7
+                { anyNonEmptyString + commandType[0], invalidCommandType },
+
+                // 8
+                { anyNonEmptyString, invalidCommandType },
+
+                // 9
+                { emptyString, invalidCommandType },
+
+                // 10
+                { null, invalidCommandType }, });
+    }
+
+    // Test run
+    @Test
+    public void testDetermineCommandType() {
+        assertEquals(expectedResult,
+            TaskCommander.parser.determineCommandType(userCommand));
+    }
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\DetermineCommandTypeTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\DetermineIndexTest.java
+	 */
+
+/**
+ * This class is part of the unit test of the component Parser and contains all
+ * test cases for the method determineIndex(userCommand:String).
+ */
+
+@RunWith(Parameterized.class)
+public class DetermineIndexTest {
+    private String userCommand;
+    private String expectedResult;
+
+    public DetermineIndexTest(String userCommand, String expectedResult) {
+        this.userCommand = userCommand;
+        this.expectedResult = expectedResult;
+    }
+
+    /* Test structure
+     * 
+     * Initial partition of parameter "userCommand":
+     * 1. [any word]+[space(s)]+[indexString]+[space(s)]+[any non-empty string]						
+     * 2. [any word]+[space(s)]+[indexString]															
+     * 3. [any word]+[indexString]																	
+     * 4. [indexString]+[any non-empty string]														
+     * 5. [indexString]	
+     * 6. [space(s)]+[any word]+[indexString]																			
+     * 7. [space(s)]+[index]+[any non-empty string]													
+     * 8. [space(s)]+[indexString]																	
+     * 9. [empty string]																				
+     * 10. [null]					
+     * 																	 
+     * Further partition of [indexString]:
+     * a. [1 .. MAX_INT]																				
+     * b. [MIN_INT .. 0]																				 
+     * c. [any non Integer]																				 
+     */
+
+    // Test parameters
+    @Parameterized.Parameters
+    public static Collection<Object[]> cases() {
+        String anyWord = "update";
+        String anyNonEmptyString = "/\"meeting\" Nov 3rd 2pm";
+        String anyNonInteger = "O"; // letter O instead of number 0
+        int[] index = { Integer.MIN_VALUE - 1, Integer.MIN_VALUE,
+            Integer.MIN_VALUE + 1, -1, 0, 1, 2, -1, Integer.MAX_VALUE,
+            Integer.MAX_VALUE + 1 };
+        int invalidIndex = -1;
+        String emptyString = "";
+
+        return Arrays
+            .asList(new Object[][] {
+
+                // 1a, 1b, 1c
+                {
+                    anyWord + " " + Integer.toString(index[0]) + " "
+                        + anyNonEmptyString, Integer.toString(index[0]) },
+                {
+                    anyWord + " " + Integer.toString(index[1]) + " "
+                        + anyNonEmptyString, Integer.toString(index[1]) },
+                {
+                    anyWord + " " + Integer.toString(index[2]) + " "
+                        + anyNonEmptyString, Integer.toString(index[2]) },
+                {
+                    anyWord + " " + Integer.toString(index[3]) + " "
+                        + anyNonEmptyString, Integer.toString(index[3]) },
+                {
+                    anyWord + " " + Integer.toString(index[4]) + " "
+                        + anyNonEmptyString, Integer.toString(index[4]) },
+                {
+                    anyWord + " " + Integer.toString(index[5]) + " "
+                        + anyNonEmptyString, Integer.toString(index[5]) },
+                {
+                    anyWord + " " + Integer.toString(index[6]) + " "
+                        + anyNonEmptyString, Integer.toString(index[6]) },
+                {
+                    anyWord + " " + Integer.toString(index[7]) + " "
+                        + anyNonEmptyString, Integer.toString(index[7]) },
+                {
+                    anyWord + " " + Integer.toString(index[8]) + " "
+                        + anyNonEmptyString, Integer.toString(index[8]) },
+                {
+                    anyWord + " " + Integer.toString(index[9]) + " "
+                        + anyNonEmptyString, Integer.toString(index[9]) },
+                { anyWord + " " + anyNonInteger + " " + anyNonEmptyString,
+                    Integer.toString(invalidIndex) },
+
+                // 2a, 2b, 2c
+                { anyWord + " " + Integer.toString(index[0]),
+                    Integer.toString(index[0]) },
+                { anyWord + " " + Integer.toString(index[1]),
+                    Integer.toString(index[1]) },
+                { anyWord + " " + Integer.toString(index[2]),
+                    Integer.toString(index[2]) },
+                { anyWord + " " + Integer.toString(index[3]),
+                    Integer.toString(index[3]) },
+                { anyWord + " " + Integer.toString(index[4]),
+                    Integer.toString(index[4]) },
+                { anyWord + " " + Integer.toString(index[5]),
+                    Integer.toString(index[5]) },
+                { anyWord + " " + Integer.toString(index[6]),
+                    Integer.toString(index[6]) },
+                { anyWord + " " + Integer.toString(index[7]),
+                    Integer.toString(index[7]) },
+                { anyWord + " " + Integer.toString(index[8]),
+                    Integer.toString(index[8]) },
+                { anyWord + " " + Integer.toString(index[9]),
+                    Integer.toString(index[9]) },
+                { anyWord + " " + anyNonInteger, Integer.toString(invalidIndex) },
+
+                // 3b
+                { anyWord + Integer.toString(index[6]),
+                    Integer.toString(invalidIndex) },
+
+                // 4b
+                { Integer.toString(index[6]) + anyNonEmptyString,
+                    Integer.toString(invalidIndex) },
+
+                // 5b
+                { Integer.toString(index[6]), Integer.toString(invalidIndex) },
+
+                // 6b
+                { " " + anyWord + Integer.toString(index[6]),
+                    Integer.toString(invalidIndex) },
+
+                // 7b
+                { " " + Integer.toString(index[6]) + anyNonEmptyString,
+                    Integer.toString(invalidIndex) },
+
+                // 8b
+                { " " + Integer.toString(index[6]),
+                    Integer.toString(invalidIndex) },
+
+                // 9
+                { emptyString, Integer.toString(invalidIndex) },
+
+                // 10
+                { null, Integer.toString(invalidIndex) }, });
+    }
+
+    // Test run
+    @Test
+    public void testDetermineIndex() {
+        assertEquals(expectedResult,
+            Integer.toString(TaskCommander.parser.determineIndex(userCommand)));
+    }
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\DetermineIndexTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\DetermineSearchedWords.java
+	 */
+
+/**
+ * This class is part of the unit test of the component Parser and contains all
+ * test cases for the method determineSearchedWords(userCommand:String).
+ */
+
+@RunWith(Parameterized.class)
+public class DetermineSearchedWords {
+    private String userCommand;
+    private List<String> expectedSearchedWordsAndPhrases;
+
+    public DetermineSearchedWords(String userCommand,
+        List<String> expectedSearchedWordsAndPhrases) {
+        this.userCommand = userCommand;
+        this.expectedSearchedWordsAndPhrases = expectedSearchedWordsAndPhrases;
+    }
+
+    /* Test structure
+     * 
+     * Initial partition of parameter "userCommand":
+     * 1. [commandType]+[space(s)]+[string containing the searched word(s) and/or phrase(s)]			
+     * 2. [space(s)]+[string containing the searched word(s) and/or phrase(s)]
+     * 3. [string containing the searched word(s) and/or phrase(s)]																
+     * 4. [empty String]																																											
+     * 5. [null]	
+     * 																				
+     * Further partition of [string containing the searched word(s) and/or phrase(s)]:
+     * a. [string with searched word(s) separated by spaces]	
+     * b. [string with searched phrase(s)]									
+     * c. [string with searched word(s) separated by spaces and m searched phrase(s)]				
+     * d. [string with searched word(s) not separated by spaces]									
+     * e. [string with searched word(s) not separated by spaces and m searched phrase(s)]		
+     */
+
+    // Test parameters
+    @Parameterized.Parameters
+    public static Collection<Object[]> cases() {
+        ArrayList<Object[]> cases = new ArrayList<Object[]>();
+        String commandType = "search";
+        String[] searchedWords = { "meeting", "date", "John" };
+        String[] searchedPhrases = { "\"Computer Club\"",
+            "\"Meeting with John.\"",
+            "\"Applying for a summer internship, maybe at Google or another big company.\"" };
+        String[] expectedSearchedPhrases = { "Computer Club",
+            "Meeting with John.",
+            "Applying for a summer internship, maybe at Google or another big company." };
+        String emptyString = "";
+
+        // 1a
+        cases.add(new Object[] { commandType + " " + searchedWords[0],
+            Arrays.asList(new String[] { searchedWords[0] }) });
+        cases
+            .add(new Object[] {
+                commandType + " " + searchedWords[0] + " " + searchedWords[1],
+                Arrays
+                    .asList(new String[] { searchedWords[0], searchedWords[1] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + " " + searchedWords[1] + " "
+                + searchedWords[2],
+            Arrays.asList(new String[] { searchedWords[0], searchedWords[1],
+                searchedWords[2] }) });
+
+        // 1b
+        cases.add(new Object[] { commandType + " " + searchedPhrases[0],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedPhrases[1],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                expectedSearchedPhrases[1] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedPhrases[1]
+                + " " + searchedPhrases[2],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                expectedSearchedPhrases[1], expectedSearchedPhrases[2] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + searchedPhrases[1],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                expectedSearchedPhrases[1] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + searchedPhrases[1]
+                + searchedPhrases[2],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                expectedSearchedPhrases[1], expectedSearchedPhrases[2] }) });
+
+        // 1c
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + " " + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0],
+                expectedSearchedPhrases[0] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedWords[0],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                searchedWords[0] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + " " + searchedPhrases[0]
+                + " " + searchedWords[1],
+            Arrays.asList(new String[] { searchedWords[0],
+                expectedSearchedPhrases[0], searchedWords[1] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + " " + searchedWords[1] + " "
+                + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0], searchedWords[1],
+                expectedSearchedPhrases[0] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedWords[0]
+                + " " + searchedWords[1],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                searchedWords[0], searchedWords[1] }) });
+
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedWords[1]
+                + " " + searchedPhrases[1],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                searchedWords[1], expectedSearchedPhrases[1] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedPhrases[1]
+                + " " + searchedWords[0],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                expectedSearchedPhrases[1], searchedWords[0] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + " " + searchedPhrases[0]
+                + " " + searchedPhrases[1],
+            Arrays.asList(new String[] { searchedWords[0],
+                expectedSearchedPhrases[0], expectedSearchedPhrases[1] }) });
+
+        // 1d
+        cases
+            .add(new Object[] {
+                commandType + " " + searchedWords[0] + searchedWords[1],
+                Arrays.asList(new String[] { searchedWords[0]
+                    + searchedWords[1] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + searchedWords[1]
+                + searchedWords[2],
+            Arrays.asList(new String[] { searchedWords[0] + searchedWords[1]
+                + searchedWords[2] }) });
+
+        // 1e
+        cases.add(new Object[] {
+            commandType + " " + searchedWords[0] + searchedWords[1] + " "
+                + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0] + searchedWords[1],
+                expectedSearchedPhrases[0] }) });
+        cases.add(new Object[] {
+            commandType + " " + searchedPhrases[0] + " " + searchedWords[0]
+                + searchedWords[1],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0],
+                searchedWords[0] + searchedWords[1] }) });
+
+        // 2a
+        cases.add(new Object[] { searchedWords[0],
+            Arrays.asList(new String[] { searchedWords[0] }) });
+
+        // 2b
+        cases.add(new Object[] { searchedPhrases[0],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0] }) });
+
+        // 2c
+        cases.add(new Object[] {
+            searchedWords[0] + " " + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0],
+                expectedSearchedPhrases[0] }) });
+
+        // 2d
+        cases
+            .add(new Object[] {
+                searchedWords[0] + searchedWords[1],
+                Arrays.asList(new String[] { searchedWords[0]
+                    + searchedWords[1] }) });
+
+        // 2e
+        cases.add(new Object[] {
+            searchedWords[0] + searchedWords[1] + " " + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0] + searchedWords[1],
+                expectedSearchedPhrases[0] }) });
+
+        // 3a
+        cases.add(new Object[] { " " + searchedWords[0],
+            Arrays.asList(new String[] { searchedWords[0] }) });
+
+        // 3b
+        cases.add(new Object[] { searchedPhrases[0],
+            Arrays.asList(new String[] { expectedSearchedPhrases[0] }) });
+
+        // 3c
+        cases.add(new Object[] {
+            " " + searchedWords[0] + " " + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0],
+                expectedSearchedPhrases[0] }) });
+
+        // 3d
+        cases
+            .add(new Object[] {
+                " " + searchedWords[0] + searchedWords[1],
+                Arrays.asList(new String[] { searchedWords[0]
+                    + searchedWords[1] }) });
+
+        // 3e
+        cases.add(new Object[] {
+            " " + searchedWords[0] + searchedWords[1] + " "
+                + searchedPhrases[0],
+            Arrays.asList(new String[] { searchedWords[0] + searchedWords[1],
+                expectedSearchedPhrases[0] }) });
+
+        // 4
+        cases.add(new Object[] { emptyString, null });
+
+        // 5
+        cases.add(new Object[] { null, null });
+
+        return cases;
+    }
+
+    // Test run
+    @Test
+    public void testDetermineSearchedWords() {
+        ArrayList<String> actualSearchedWordsAndPhrases = TaskCommander.parser
+            .determineSearchedWords(userCommand);
+        String expectedResult = "";
+        String actualResult = "";
+
+        if (expectedSearchedWordsAndPhrases != null) {
+            for (String expectedSearchedWordOrPhrase : expectedSearchedWordsAndPhrases) {
+                expectedResult += " " + expectedSearchedWordOrPhrase;
+            }
+        }
+        if (actualSearchedWordsAndPhrases != null) {
+            for (String actualSearchedWordOrPhrase : actualSearchedWordsAndPhrases) {
+                actualResult += " " + actualSearchedWordOrPhrase;
+            }
+        }
+        assertEquals(expectedResult, actualResult);
+    }
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\DetermineSearchedWords.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\DetermineTaskDateTimeTest.java
+	 */
+
+/**
+ * This class is part of the unit test of the component Parser and contains all
+ * test cases for the method determineTakDateTime(userCommand:String).
+ */
+
+@RunWith(Parameterized.class)
+public class DetermineTaskDateTimeTest {
+    private String userCommand;
+    private List<Date> expectedDateTimes;
+
+    public DetermineTaskDateTimeTest(String userCommand,
+        List<Date> expectedDateTimes) {
+        this.userCommand = userCommand;
+        this.expectedDateTimes = expectedDateTimes;
+    }
+
+    /* Test structure
+     * 
+     * Initial partition of parameter "userCommand":
+     * - [commandType with/without index]+[space(s)]+[any string]+[space(s)]+[DateTime(s)]+[space(s)]+[any string]								
+     * - [commandType with/without index]+[space(s)]+[any string]+[space(s)]+[DateTime(s)]														
+     * - [commandType with/without index]+[space(s)]+[DateTime(s)]+[space(s)]+[any string]														
+     * - [commandType with/without index]+[space(s)]+[DateTime(s)]																				
+     * - [space(s)]+[DateTime(s)]																									
+     * - [DateTime(s)]																										
+     * - [commandType with/without index]+[space(s)]+[any string]+[space(s)]+[DateTime(s)]+[space(s)]+[any string]+[space(s)]+[DateTime(s)]+[space(s)]+[any string]								
+     * - [commandType with/without index]+[space(s)]+[any string]+[space(s)]+[DateTime(s)]+[space(s)]+[any string]+[space(s)]+[DateTime(s)]													
+     * - [commandType with/without index]+[space(s)]+[DateTime(s)]+[space(s)]+[any string]+[space(s)]+[DateTime(s)]	
+     * - [space(s)]+[DateTime(s)]+[space(s)]+[any string]+[space(s)]+[DateTime(s)]
+     * - [DateTime(s)]+[space(s)]+[any string]+[space(s)]+[DateTime(s)]
+     * - [empty string]
+     * - [null]					
+     * Further partition of [DateTime(s)]:
+     * - [one DateTime]																											
+     * - [two DateTime]																										
+     * - [three and more DateTime]																										
+     * Further partition of [one date]:
+     * - [formal dates]: yyyy-mm-dd, yyyy/mm/dd, mm/dd/yyyy, mm/dd/yy ..
+     * - [relaxed dates]: Nov 5, Nov 5th, Nov 5 '14, Nov 5 2014 ..
+     * - [relative dates]: next monday, today, tomorrow, next week ..
+     * - [formal time]: hh:mm, hham, hhpm, hh.mmam, hh.mmpm,  hh am, hh pm, hh.mm am, hh.mm pm
+     * - [relaxed time]: noon, evening, midnight
+     * - [relative times]: in 30 minutes, 6 hours ago
+     * Further partition of [two DateTime]:	
+     * - [both DateTime separated by a "to"]																					
+     * - [both DateTime separated by a "-" which is surrounded by spaces] 	
+     * - [first date is before second date]
+     * - [first date is after second date]																												
+     * - [only one date with two times given where second time is after the first time]
+     * - [only one date with two times given where second time is before the first time]
+     */
+	
+    // Test parameters
+    @Parameterized.Parameters
+    public static Collection<Object[]> cases() {
+        String[] commandTypeWithOrWithoutIndex = { "add", "update 3" };
+        String[] anyString = { "/\"meeting with John\"", "none",
+            "another thing" };
+        String emptyString = "";
+
+        Calendar calendar = Calendar.getInstance();
+
+        String inputDateTime1 = "2014-10-03 15:00";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime1 = calendar.getTime();
+        List<Date> expectedDateTimes1 = new ArrayList<Date>();
+        expectedDateTimes1.add(dateTime1);
+
+        String inputDateTime2 = "2014/10/03 3pm";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime2 = calendar.getTime();
+        List<Date> expectedDateTimes2 = new ArrayList<Date>();
+        expectedDateTimes2.add(dateTime2);
+
+        String inputDateTime3 = "10/03 3.00pm";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime3 = calendar.getTime();
+        List<Date> expectedDateTimes3 = new ArrayList<Date>();
+        expectedDateTimes3.add(dateTime3);
+
+        String inputDateTime4 = "10/03/14 3 pm";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime4 = calendar.getTime();
+        List<Date> expectedDateTimes4 = new ArrayList<Date>();
+        expectedDateTimes4.add(dateTime4);
+
+        String inputDateTime5 = "Oct 3 3.00 pm";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime5 = calendar.getTime();
+        List<Date> expectedDateTimes5 = new ArrayList<Date>();
+        expectedDateTimes5.add(dateTime5);
+
+        String inputDateTime6 = "Oct 3rd 3.00 Pm";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime6 = calendar.getTime();
+        List<Date> expectedDateTimes6 = new ArrayList<Date>();
+        expectedDateTimes6.add(dateTime6);
+
+        String inputDateTime7 = "Oct 3 '14 3:00 PM";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime7 = calendar.getTime();
+        List<Date> expectedDateTimes7 = new ArrayList<Date>();
+        expectedDateTimes7.add(dateTime7);
+
+        String inputDateTime8 = "Oct 3 2014 15";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime8 = calendar.getTime();
+        List<Date> expectedDateTimes8 = new ArrayList<Date>();
+        expectedDateTimes8.add(dateTime8);
+
+        String inputDateTime9 = "next Monday";
+        calendar = Calendar.getInstance();
+        int weekday = calendar.get(Calendar.DAY_OF_WEEK);
+        if (weekday != Calendar.MONDAY) {
+            int days = (Calendar.SATURDAY - weekday + 2) % 7;
+            calendar.add(Calendar.DAY_OF_YEAR, days);
+        }
+        else
+        	calendar.add(Calendar.DAY_OF_YEAR, 7);
+        Date dateTime9 = calendar.getTime();
+        List<Date> expectedDateTimes9 = new ArrayList<Date>();
+        expectedDateTimes9.add(dateTime9);
+
+        String inputDateTime10 = "today";
+        Calendar today = Calendar.getInstance();
+        Date dateTime10 = today.getTime();
+        List<Date> expectedDateTimes10 = new ArrayList<Date>();
+        expectedDateTimes10.add(dateTime10);
+
+        String inputDateTime11 = "tommorrow";
+        Calendar tommorrow = Calendar.getInstance();
+        tommorrow.add(Calendar.DATE, 1);
+        Date dateTime11 = tommorrow.getTime();
+        List<Date> expectedDateTimes11 = new ArrayList<Date>();
+        expectedDateTimes11.add(dateTime11);
+
+        String inputDateTime12 = "next week";
+        Calendar nextWeek = Calendar.getInstance();
+        nextWeek.add(Calendar.DATE, 7);
+        Date dateTime12 = nextWeek.getTime();
+        List<Date> expectedDateTimes12 = new ArrayList<Date>();
+        expectedDateTimes12.add(dateTime12);
+
+        String inputDateTime13 = "Nov 5th noon";
+        calendar.set(2014, 10, 5, 12, 0);
+        Date dateTime13 = calendar.getTime();
+        List<Date> expectedDateTimes13 = new ArrayList<Date>();
+        expectedDateTimes13.add(dateTime13);
+
+        String inputDateTime14 = "Nov 5th evening";
+        calendar.set(2014, 10, 5, 19, 0);
+        Date dateTime14 = calendar.getTime();
+        List<Date> expectedDateTimes14 = new ArrayList<Date>();
+        expectedDateTimes14.add(dateTime14);
+
+        String inputDateTime15 = "Nov 5th midnight";
+        calendar.set(2014, 10, 5, 00, 0);
+        Date dateTime15 = calendar.getTime();
+        List<Date> expectedDateTimes15 = new ArrayList<Date>();
+        expectedDateTimes15.add(dateTime15);
+
+        String inputDateTime16 = "in 30 min";
+        Calendar in30Min = Calendar.getInstance();
+        in30Min.add(Calendar.MINUTE, 30);
+        Date dateTime16 = in30Min.getTime();
+        List<Date> expectedDateTimes16 = new ArrayList<Date>();
+        expectedDateTimes16.add(dateTime16);
+
+        String inputDateTime17 = "2014-10-03 15:00 to 16:00";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime17a = calendar.getTime();
+        calendar.set(2014, 9, 3, 16, 0);
+        Date dateTime17b = calendar.getTime();
+        List<Date> expectedDateTimes17 = new ArrayList<Date>();
+        expectedDateTimes17.add(dateTime17a);
+        expectedDateTimes17.add(dateTime17b);
+
+        String inputDateTime18 = "2014-10-03 15:00 To 16:00";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime18a = calendar.getTime();
+        calendar.set(2014, 9, 3, 16, 0);
+        Date dateTime18b = calendar.getTime();
+        List<Date> expectedDateTimes18 = new ArrayList<Date>();
+        expectedDateTimes18.add(dateTime18a);
+        expectedDateTimes18.add(dateTime18b);
+
+        String inputDateTime19 = "2014-10-03 15:00 TO 16:00";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime19a = calendar.getTime();
+        calendar.set(2014, 9, 3, 16, 0);
+        Date dateTime19b = calendar.getTime();
+        List<Date> expectedDateTimes19 = new ArrayList<Date>();
+        expectedDateTimes19.add(dateTime19a);
+        expectedDateTimes19.add(dateTime19b);
+
+        String inputDateTime20 = "2014-10-03 15:00 - 16:00";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime20a = calendar.getTime();
+        calendar.set(2014, 9, 3, 16, 0);
+        Date dateTime20b = calendar.getTime();
+        List<Date> expectedDateTimes20 = new ArrayList<Date>();
+        expectedDateTimes20.add(dateTime20a);
+        expectedDateTimes20.add(dateTime20b);
+
+        String inputDateTime21 = "2014-10-03 15:00 - Oct 4th '14 12:00";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime21a = calendar.getTime();
+        calendar.set(2014, 9, 4, 12, 0);
+        Date dateTime21b = calendar.getTime();
+        List<Date> expectedDateTimes21 = new ArrayList<Date>();
+        expectedDateTimes21.add(dateTime21a);
+        expectedDateTimes21.add(dateTime21b);
+
+        String inputDateTime22 = "2014-10-03 15:00 - Oct 1st '14 12:00";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime22a = calendar.getTime();
+        calendar.set(2014, 9, 1, 12, 0);
+        Date dateTime22b = calendar.getTime();
+        List<Date> expectedDateTimes22 = new ArrayList<Date>();
+        expectedDateTimes22.add(dateTime22b);
+        expectedDateTimes22.add(dateTime22a);
+
+        String inputDateTime23 = "2014-10-03 15:00 - 12:00";
+        calendar.set(2014, 9, 3, 15, 0);
+        Date dateTime23a = calendar.getTime();
+        calendar.set(2014, 9, 4, 12, 0);
+        Date dateTime23b = calendar.getTime();
+        List<Date> expectedDateTimes23 = new ArrayList<Date>();
+        expectedDateTimes23.add(dateTime23a);
+        expectedDateTimes23.add(dateTime23b);
+
+        return Arrays
+            .asList(new Object[][] {
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime1 + " " + "anyString[1]",
+                    expectedDateTimes1 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime1, expectedDateTimes1 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + inputDateTime1
+                        + " " + anyString[0], expectedDateTimes1 },
+                { commandTypeWithOrWithoutIndex[0] + " " + inputDateTime1,
+                    expectedDateTimes1 },
+                { " " + inputDateTime1, expectedDateTimes1 },
+                { inputDateTime1, expectedDateTimes1 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime1 + " " + "anyString[1]" + " "
+                        + inputDateTime13 + " " + "anyString[2]",
+                    expectedDateTimes13 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime1 + " " + "anyString[1]" + " "
+                        + inputDateTime13, expectedDateTimes13 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + inputDateTime1
+                        + " " + "anyString[1]" + " " + inputDateTime13,
+                    expectedDateTimes13 },
+                {
+                    " " + inputDateTime1 + " " + "anyString[1]" + " "
+                        + inputDateTime13, expectedDateTimes13 },
+                {
+                    inputDateTime1 + " " + "anyString[1]" + " "
+                        + inputDateTime13, expectedDateTimes13 },
+                {
+                    commandTypeWithOrWithoutIndex[1] + " " + anyString[0] + " "
+                        + inputDateTime1 + " " + "anyString[1]",
+                    expectedDateTimes1 },
+                {
+                    commandTypeWithOrWithoutIndex[1] + " " + anyString[0] + " "
+                        + inputDateTime1, expectedDateTimes1 },
+                {
+                    commandTypeWithOrWithoutIndex[1] + " " + inputDateTime1
+                        + " " + anyString[0], expectedDateTimes1 },
+                { commandTypeWithOrWithoutIndex[1] + " " + inputDateTime1,
+                    expectedDateTimes1 },
+                {
+                    commandTypeWithOrWithoutIndex[1] + " " + anyString[0] + " "
+                        + inputDateTime1 + " " + "anyString[1]" + " "
+                        + inputDateTime13 + " " + "anyString[2]",
+                    expectedDateTimes13 },
+                {
+                    commandTypeWithOrWithoutIndex[1] + " " + anyString[0] + " "
+                        + inputDateTime1 + " " + "anyString[1]" + " "
+                        + inputDateTime13, expectedDateTimes13 },
+                {
+                    commandTypeWithOrWithoutIndex[1] + " " + inputDateTime1
+                        + " " + "anyString[1]" + " " + inputDateTime13,
+                    expectedDateTimes13 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime2 + " " + "anyString[1]",
+                    expectedDateTimes2 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime3 + " " + "anyString[1]",
+                    expectedDateTimes3 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime4 + " " + "anyString[1]",
+                    expectedDateTimes4 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime5 + " " + "anyString[1]",
+                    expectedDateTimes5 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime6 + " " + "anyString[1]",
+                    expectedDateTimes6 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime7 + " " + "anyString[1]",
+                    expectedDateTimes7 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime8 + " " + "anyString[1]",
+                    expectedDateTimes8 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime9 + " " + "anyString[1]",
+                    expectedDateTimes9 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime10 + " " + "anyString[1]",
+                    expectedDateTimes10 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime11 + " " + "anyString[1]",
+                    expectedDateTimes11 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime12 + " " + "anyString[1]",
+                    expectedDateTimes12 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime13 + " " + "anyString[1]",
+                    expectedDateTimes13 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime14 + " " + "anyString[1]",
+                    expectedDateTimes14 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime15 + " " + "anyString[1]",
+                    expectedDateTimes15 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime16 + " " + "anyString[1]",
+                    expectedDateTimes16 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime17 + " " + "anyString[1]",
+                    expectedDateTimes17 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime18 + " " + "anyString[1]",
+                    expectedDateTimes18 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime19 + " " + "anyString[1]",
+                    expectedDateTimes19 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime20 + " " + "anyString[1]",
+                    expectedDateTimes20 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime21 + " " + "anyString[1]",
+                    expectedDateTimes21 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime22 + " " + "anyString[1]",
+                    expectedDateTimes22 },
+                {
+                    commandTypeWithOrWithoutIndex[0] + " " + anyString[0] + " "
+                        + inputDateTime23 + " " + "anyString[1]",
+                    expectedDateTimes23 }, { emptyString, null },
+                { null, null } });
+    }
+
+    // Test run
+    @Test
+    public void testDetermineTaskDateTime() {
+        List<Date> actualDateTimes = TaskCommander.parser
+            .determineTaskDateTime(userCommand);
+        String expectedResult = "";
+        String actualResult = "";
+        if (expectedDateTimes != null) {
+            for (Date expectedDateTime : expectedDateTimes) {
+                expectedResult += " "
+                    + Global.dayFormat.format(expectedDateTime) + " "
+                    + Global.timeFormat.format(expectedDateTime);
+            }
+        }
+        if (actualDateTimes != null) {
+            for (Date actualDateTime : actualDateTimes) {
+                actualResult += " " + Global.dayFormat.format(actualDateTime)
+                    + " " + Global.timeFormat.format(actualDateTime);
+            }
+        }
+        assertEquals(expectedResult, actualResult);
+    }
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\DetermineTaskDateTimeTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\DetermineTaskNameTest.java
+	 */
+
+/**
+ * This class is part of the unit test of the component Parser and contains all
+ * test cases for the method determineTaskName(userCommand:String).
+ */
+
+@RunWith(Parameterized.class)
+public class DetermineTaskNameTest {
+    private String userCommand;
+    private String expectedResult;
+
+    public DetermineTaskNameTest(String userCommand, String expectedResult) {
+        this.userCommand = userCommand;
+        this.expectedResult = expectedResult;
+    }
+	
+    /* Test structure
+     * 
+     * Initial partition of parameter "userCommand":
+     * 1. [commandType]+[space(s)]+[any string]+[space(s)]+[quoted taskName]+[space(s)]+[any string]			
+     * 2. [commandType]+[space(s)]+[any string]+[space(s)]+[quoted taskName]									
+     * 3. [commandType]+[space(s)]+[quoted taskName]															
+     * 4. [commandType]+[any string]+[quoted taskName]+[any string]											
+     * 5. [commandType]+[space(s)]+[any string]+[quoted taskName]											
+     * 6. [commandType]+[quoted taskName]																	
+     * 7. [any string]+[space(s)]+[quoted taskName]+[space(s)]+[any string]									
+     * 8. [any string]+[space(s)]+[quoted taskName]															
+     * 9. [space(s)]+[quoted taskName]																		
+     * 10.[any string]+[quoted taskName]+[any string]															
+     * 11.[space(s)]+[any string]+[quoted taskName]															
+     * 12.[quoted taskName]																					
+     * 13.[empty string]																																										
+     * 14.[null]																								
+     * Further partition of [quoted taskName]:
+     * a. [quoted taskName without including quotes]															
+     * b. [quoted taskName with including quotes]															
+     */
+
+    // Test parameters
+    @Parameterized.Parameters
+    public static Collection<Object[]> cases() {
+        String commandType = "update";
+        String anyNonEmptyString = "Nov 3rd 2pm";
+        String quotedTaskNameWithoutIncludingQuotes = "\"Meeting with John.\"";
+        String quotedTaskNameWithIncludingQuotes = "\"Meeting with John at the bar \"Relaxation\".\"";
+        String expectedTaskNameWithoutIncludingQuotes = "Meeting with John.";
+        String expectedTaskNameWithIncludingQuotes = "Meeting with John at the bar \"Relaxation\".";
+        String emptyString = "";
+
+        return Arrays
+            .asList(new Object[][] {
+                // 1a - 12a
+                {
+                    commandType + " " + anyNonEmptyString + " "
+                        + quotedTaskNameWithoutIncludingQuotes + " "
+                        + anyNonEmptyString,
+                    expectedTaskNameWithoutIncludingQuotes },
+                {
+                    commandType + " " + anyNonEmptyString + " "
+                        + quotedTaskNameWithoutIncludingQuotes,
+                    expectedTaskNameWithoutIncludingQuotes },
+                { commandType + " " + quotedTaskNameWithoutIncludingQuotes,
+                    expectedTaskNameWithoutIncludingQuotes },
+                {
+                    commandType + " " + anyNonEmptyString
+                        + quotedTaskNameWithoutIncludingQuotes
+                        + anyNonEmptyString,
+                    expectedTaskNameWithoutIncludingQuotes },
+                {
+                    commandType + " " + anyNonEmptyString
+                        + quotedTaskNameWithoutIncludingQuotes,
+                    expectedTaskNameWithoutIncludingQuotes },
+                { commandType + quotedTaskNameWithoutIncludingQuotes,
+                    expectedTaskNameWithoutIncludingQuotes },
+                {
+                    anyNonEmptyString + " "
+                        + quotedTaskNameWithoutIncludingQuotes + " "
+                        + anyNonEmptyString,
+                    expectedTaskNameWithoutIncludingQuotes },
+                {
+                    anyNonEmptyString + " "
+                        + quotedTaskNameWithoutIncludingQuotes,
+                    expectedTaskNameWithoutIncludingQuotes },
+                { " " + quotedTaskNameWithoutIncludingQuotes,
+                    expectedTaskNameWithoutIncludingQuotes },
+                {
+                    anyNonEmptyString + quotedTaskNameWithoutIncludingQuotes
+                        + anyNonEmptyString,
+                    expectedTaskNameWithoutIncludingQuotes },
+                { anyNonEmptyString + quotedTaskNameWithoutIncludingQuotes,
+                    expectedTaskNameWithoutIncludingQuotes },
+                { quotedTaskNameWithoutIncludingQuotes,
+                    expectedTaskNameWithoutIncludingQuotes },
+
+                // 1b - 12b
+                {
+                    commandType + " " + anyNonEmptyString + " "
+                        + quotedTaskNameWithIncludingQuotes + " "
+                        + anyNonEmptyString,
+                    expectedTaskNameWithIncludingQuotes },
+                {
+                    commandType + " " + anyNonEmptyString + " "
+                        + quotedTaskNameWithIncludingQuotes,
+                    expectedTaskNameWithIncludingQuotes },
+                { commandType + " " + quotedTaskNameWithIncludingQuotes,
+                    expectedTaskNameWithIncludingQuotes },
+                {
+                    commandType + " " + anyNonEmptyString
+                        + quotedTaskNameWithIncludingQuotes + anyNonEmptyString,
+                    expectedTaskNameWithIncludingQuotes },
+                {
+                    commandType + " " + anyNonEmptyString
+                        + quotedTaskNameWithIncludingQuotes,
+                    expectedTaskNameWithIncludingQuotes },
+                { commandType + quotedTaskNameWithIncludingQuotes,
+                    expectedTaskNameWithIncludingQuotes },
+                {
+                    anyNonEmptyString + " " + quotedTaskNameWithIncludingQuotes
+                        + " " + anyNonEmptyString,
+                    expectedTaskNameWithIncludingQuotes },
+                { anyNonEmptyString + " " + quotedTaskNameWithIncludingQuotes,
+                    expectedTaskNameWithIncludingQuotes },
+                { " " + quotedTaskNameWithIncludingQuotes,
+                    expectedTaskNameWithIncludingQuotes },
+                {
+                    anyNonEmptyString + quotedTaskNameWithIncludingQuotes
+                        + anyNonEmptyString,
+                    expectedTaskNameWithIncludingQuotes },
+                { anyNonEmptyString + quotedTaskNameWithIncludingQuotes,
+                    expectedTaskNameWithIncludingQuotes },
+                { quotedTaskNameWithIncludingQuotes,
+                    expectedTaskNameWithIncludingQuotes },
+
+                // 13, 14
+                { emptyString, null }, { null, null }, });
+    }
+
+    // Test run
+    @Test
+    public void testcontainsParameter() {
+        assertEquals(expectedResult,
+            TaskCommander.parser.determineTaskName(userCommand));
+    }
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\automatedTestDriver\Parser\DetermineTaskNameTest.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Controller.java
+	 */
+
+/**
+ * Singleton class that determines and executes commands from user input, and
+ * passes feedback to the UI. Acts as a facade class and delegates commands to
+ * other classes. Delegates data manipulation commands to the Data component.
+ * Delegates sync commands to the Google Integration component. Handles view
+ * settings adjusted by display commands.
+ */
+
+public class Controller {
+    private static Logger logger = Logger.getLogger(Controller.class.getName());
+    
+    // Tasks currently displayed by the UI needed by commands with index.
+    private ArrayList<Task> displayedTasks;
+
+    // Display settings, adjusted by display command.
+    private String displaySettingsDescription;
+
+    private boolean isDateRestricted;
+    private Date startDateRestriction;
+    private Date endDateRestriction;
+
+    private  boolean isTaskTypeRestricted;
+    private boolean areFloatingTasksDisplayed;
+    private boolean areDeadlineTasksDisplayed;
+    private boolean areTimedTasksDisplayed;
+
+    private boolean isStatusRestricted;
+    private boolean areDoneTasksDisplayed;
+    private boolean areOpenTasksDisplayed;
+
+    private boolean isSearchRestricted;
+    private ArrayList<String> searchedWordsAndPhrases;
+
+    // Singleton instance of Controller.
+    private static Controller theOne;
+
+    private Controller() {
+        setDefaultDisplaySettings();
+    }
+
+    /**
+     * Returns the only instance of Controller.
+     * 
+     * @return Controller instance
+     */
+    public static Controller getInstance() {
+        if (theOne == null) {
+            theOne = new Controller();
+        }
+        return theOne;
+    }
+
+    /**
+     * Parses the command from the user and executes it if valid. Afterwards a
+     * feedback String is returned.
+     * 
+     * @param userCommand
+     * @return feedback for UI
+     */
+    public String executeCommand(String userCommand) {
+        if (userCommand == null | userCommand == "") {
+            return String.format(Global.MESSAGE_NO_COMMAND);
+        }
+
+        Global.CommandType commandType = TaskCommander.parser
+            .determineCommandType(userCommand);
+
+        switch (commandType) {
+          case ADD:
+              return addTask(userCommand);
+  
+          case UPDATE:
+              return updateTask(userCommand);
+  
+          case DONE:
+              return doneTask(userCommand);
+  
+          case OPEN:
+              return openTask(userCommand);
+          case DELETE:
+              return deleteTask(userCommand);
+  
+          case DISPLAY:
+              return displayTasks(userCommand);
+  
+          case SEARCH:
+              return searchForTasks(userCommand);
+  
+          case CLEAR:
+              return clearTasks(userCommand);
+  
+          case SYNC:
+              return syncTasks(userCommand);
+  
+          case UNDO:
+              return undoTask(userCommand);
+  
+          case EXIT:
+              System.exit(0);
+  
+          default:
+              return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+    }
+	
+    /**
+     * Returns the tasks which are supposed to be displayed by the UI according
+     * to the current display settings.
+     * 
+     * @return tasks to be displayed
+     */
+    public ArrayList<Task> getDisplayedTasks() {
+        if (noDisplayRestrictions()) {
+            displayedTasks = TaskCommander.data.getCopiedTasks();
+        } else {
+            displayedTasks = TaskCommander.data.getCopiedTasks(
+                isDateRestricted, startDateRestriction, endDateRestriction,
+                isTaskTypeRestricted, areFloatingTasksDisplayed,
+                areDeadlineTasksDisplayed, areTimedTasksDisplayed,
+                isStatusRestricted, areDoneTasksDisplayed,
+                areOpenTasksDisplayed, isSearchRestricted,
+                searchedWordsAndPhrases);
+        }
+        return displayedTasks;
+    }
+
+    /**
+     * Returns the current display settings consolidated as a String.
+     * 
+     * @return description of display settings
+     */
+    public String getDisplaySettingsDescription() {
+        return displaySettingsDescription;
+    }
+	
+    // Checks the add command from the user and forwards it to Data.
+    String addTask(String userCommand) {
+        if (hasNoParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        String taskName = TaskCommander.parser.determineTaskName(userCommand);
+        List<Date> taskDateTime = TaskCommander.parser
+            .determineTaskDateTime(userCommand);
+
+        if (taskName == null || isTaskDateTimeInvalid(taskDateTime)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        } else {
+            return addTaskToData(taskName, taskDateTime);
+        }
+    }
+
+    // Checks the update command from the user and forwards it to Data.
+    private String updateTask(String userCommand) {
+        if (hasNoParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        int indexDisplayedTasks = TaskCommander.parser
+            .determineIndex(userCommand) - Global.INDEX_OFFSET;
+        if (isIndexDisplayedTasksInvalid(indexDisplayedTasks)) {
+            return String.format(Global.MESSAGE_NO_INDEX, indexDisplayedTasks
+                + Global.INDEX_OFFSET);
+        }
+
+        String newTaskName = TaskCommander.parser
+            .determineTaskName(userCommand);
+
+        List<Date> newTaskDateTime = TaskCommander.parser
+            .determineTaskDateTime(userCommand);
+        if (isTaskDateTimeInvalid(newTaskDateTime)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        boolean removeExistingDate = TaskCommander.parser.containsParameter(
+            userCommand, Global.PARAMETER_FLOATING);
+        if (noChangesToTaskGiven(newTaskName, newTaskDateTime, removeExistingDate)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        Task relatedTask = displayedTasks.get(indexDisplayedTasks);
+        return updateTaskInData(relatedTask, newTaskName, newTaskDateTime,
+            removeExistingDate);
+    }
+
+    // Checks the done command from the user and forwards it to Data.
+    private String doneTask(String userCommand) {
+        if (hasNoParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        int indexDisplayedTasks = TaskCommander.parser
+            .determineIndex(userCommand) - Global.INDEX_OFFSET;
+        if (isIndexDisplayedTasksInvalid(indexDisplayedTasks)) {
+            return String.format(Global.MESSAGE_NO_INDEX, indexDisplayedTasks
+                + Global.INDEX_OFFSET);
+        }
+
+        Task relatedTask = displayedTasks.get(indexDisplayedTasks);
+        return TaskCommander.data.done(TaskCommander.data
+            .getIndexOf(relatedTask));
+    }
+
+
+    // Checks the open command from the user and forwards it to Data.
+    private String openTask(String userCommand) {
+        if (hasNoParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        int indexDisplayedTasks = TaskCommander.parser
+            .determineIndex(userCommand) - Global.INDEX_OFFSET;
+        if (isIndexDisplayedTasksInvalid(indexDisplayedTasks)) {
+            return String.format(Global.MESSAGE_NO_INDEX, indexDisplayedTasks
+                + Global.INDEX_OFFSET);
+        }
+
+        Task relatedTask = displayedTasks.get(indexDisplayedTasks);
+        return TaskCommander.data.open(TaskCommander.data
+            .getIndexOf(relatedTask));
+    }
+
+    // Checks the delete command from the user and forwards it to the Data.
+    private String deleteTask(String userCommand) {
+        if (hasNoParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        int indexDisplayedTasks = TaskCommander.parser
+            .determineIndex(userCommand) - Global.INDEX_OFFSET;
+        if (isIndexDisplayedTasksInvalid(indexDisplayedTasks)) {
+            return Global.MESSAGE_NO_INDEX;
+        }
+
+        Task relatedTask = displayedTasks
+            .get(indexDisplayedTasks);
+        return TaskCommander.data.deleteTask(TaskCommander.data
+            .getIndexOf(relatedTask));
+    }
+
+    // Checks the display command from the user and adjusts the settings.
+    private String displayTasks(String userCommand) {
+        List<Date> taskDateTimes = TaskCommander.parser
+            .determineTaskDateTime(userCommand);
+        if (isTaskDateTimeInvalid(taskDateTimes)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+
+        updateDisplayRestrictions(userCommand, taskDateTimes);
+        setDisplaySettingsDescription();
+
+        return Global.MESSAGE_DISPLAYED;
+    }
+
+    // Checks the search command from the user and forwards it to the Data.
+    private String searchForTasks(String userCommand) {
+        if (hasNoParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+        resetDisplayRestrictions();
+        
+        searchedWordsAndPhrases = TaskCommander.parser.determineSearchedWords(userCommand);
+        if (searchedWordsAndPhrases == null) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+        
+        isSearchRestricted = true;
+        setDisplaySettingsDescription();
+
+        return String.format(Global.MESSAGE_SEARCHED, searchedWordsAndPhrases);
+    }
+
+    // Checks the clear command from the user and forwards it to the Data.
+    private String clearTasks(String userCommand) {
+        if (hasParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+        return TaskCommander.data.clearTasks();
+    }
+
+    // Checks the clear command from the user and forwards it to the Data.
+    private String syncTasks(String userCommand) {
+        if (hasParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+        if (TaskCommander.syncHandler == null) {
+            TaskCommander.getSyncHandler();
+        }
+        return TaskCommander.syncHandler.sync();
+    }
+
+    // Checks the undo command from the user and forwards it to the Data.
+    private String undoTask(String userCommand) {
+        if (hasParamters(userCommand)) {
+            return String.format(Global.MESSAGE_INVALID_FORMAT, userCommand);
+        }
+        return TaskCommander.data.undo();
+    }
+
+    // Processes the addition of the task to the respective method in Data.
+    private String addTaskToData(String taskName, List<Date> taskDateTime) {
+        if (taskDateTime == null) {
+            return TaskCommander.data.addFloatingTask(taskName);
+        } else if (taskDateTime.size() == 1) {
+            return TaskCommander.data.addDeadlineTask(taskName,
+                taskDateTime.get(0));
+        } else {
+            assert (taskDateTime.size() >= 2);
+            Date startDate = taskDateTime.get(0);
+            Date endDate = taskDateTime.get(1);
+            return TaskCommander.data
+                .addTimedTask(taskName, startDate, endDate);
+        }
+    }
+
+    // Processes the update of the task to the respective method in Data.
+    private String updateTaskInData(Task relatedTask, String newTaskName,
+        List<Date> newTaskDateTime, boolean removeExistingDate) {
+        Task.TaskType newTaskType;
+        Date newStartDate = null;
+        Date newEndDate = null;
+
+        if (newTaskDateTime != null) {
+            if (newTaskDateTime.size() == 1) {
+                newTaskType = Task.TaskType.DEADLINE;
+                newEndDate = newTaskDateTime.get(0);
+            } else {
+                assert (newTaskDateTime.size() >= 2);
+                newTaskType = Task.TaskType.TIMED;
+                newStartDate = newTaskDateTime.get(0);
+                newEndDate = newTaskDateTime.get(1);
+            }
+        } else if (removeExistingDate) {
+            newTaskType = Task.TaskType.FLOATING;
+        } else {
+            Task.TaskType oldTaskType = relatedTask.getType();
+            newTaskType = oldTaskType;
+        }
+
+        int indexOfRelatedTask = TaskCommander.data.getIndexOf(relatedTask);
+        switch (newTaskType) {
+        case FLOATING:
+            return TaskCommander.data.updateToFloatingTask(indexOfRelatedTask,
+                newTaskName);
+        case DEADLINE:
+            return TaskCommander.data.updateToDeadlineTask(indexOfRelatedTask,
+                newTaskName, newEndDate);
+        default:
+            return TaskCommander.data.updateToTimedTask(indexOfRelatedTask,
+                newTaskName, newStartDate, newEndDate);
+        }
+    }
+    
+    // Checks if given list is valid, i.e. contains either one or two DateTimes.
+    private boolean isTaskDateTimeInvalid(List<Date> taskDateTimes) {
+        if (taskDateTimes != null && taskDateTimes.size() > 2) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+	
+    // Checks if given index for displayed tasks list is valid.
+    private boolean isIndexDisplayedTasksInvalid(int indexDisplayedTasks) {
+        if (indexDisplayedTasks > displayedTasks.size() - Global.INDEX_OFFSET
+            || indexDisplayedTasks < 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Checks if userCommand has no parameters, i.e. only contains commandType.
+    private boolean hasNoParamters(String userCommand) {
+        return getNumberOfWords(userCommand) == 1;
+    }
+
+    // Checks if userCommand has parameters, i.e. not only contains commandType.
+    private boolean hasParamters(String userCommand) {
+        return getNumberOfWords(userCommand) > 1;
+    }
+
+    // Sets default display settings, that is, overdue and upcoming open tasks
+    // of the next week.
+    private void setDefaultDisplaySettings() {
+        resetDisplayRestrictions();
+
+        isDateRestricted = true;
+        startDateRestriction = null;
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.WEEK_OF_YEAR, 1);
+        calendar.set(Calendar.MILLISECOND, 99);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.HOUR, 11);
+        endDateRestriction = calendar.getTime();
+        
+        System.out.println(Global.dayFormat.format(endDateRestriction) + " "
+        + Global.timeFormat.format(endDateRestriction));
+
+        isStatusRestricted = true;
+        areDoneTasksDisplayed = false;
+        areOpenTasksDisplayed = true;
+
+        setDisplaySettingsDescription();
+    }	
+
+    // Sets date, task type, status restrictions and resets search restrictions
+    // of display settings.
+    private void updateDisplayRestrictions(String userCommand,
+        List<Date> taskDateTimes) {
+        setDateRestrictionOfDisplaySettings(taskDateTimes);
+        setTaskTypeRestrictionsOfDisplaySettings(userCommand);
+        setStatusRestrictionOfDisplaySettings(userCommand);
+        resetSearchRestrictionOfDisplaySettings();
+    }
+
+    // Resets date, task type and status restrictions of display settings.
+    private void resetDisplayRestrictions() {
+        resetDateRestrictionOfDisplaySettings();
+        resetTaskTypeRestrictionOfDisplaySettings();
+        resetStatusRestrictionOfDisplaySettings();
+        resetSearchRestrictionOfDisplaySettings();
+    }
+
+    // Sets the date restrictions of the display settings.
+    private void setDateRestrictionOfDisplaySettings(List<Date> taskDateTimes) {
+        if (taskDateTimes != null) {
+            if (taskDateTimes.size() == 1) {
+                isDateRestricted = true;
+                startDateRestriction = null;
+                endDateRestriction = taskDateTimes.get(0);
+            } else {
+                assert (taskDateTimes.size() >= 2);
+                isDateRestricted = true;
+                startDateRestriction = taskDateTimes.get(0);
+                endDateRestriction = taskDateTimes.get(1);
+            }
+        } else {
+            resetDateRestrictionOfDisplaySettings();
+            startDateRestriction = null;
+            endDateRestriction = null;
+        }
+    }
+
+    // Sets the task type restrictions of the display settings.
+    private void setTaskTypeRestrictionsOfDisplaySettings(String userCommand) {
+        areFloatingTasksDisplayed = TaskCommander.parser.containsParameter(
+            userCommand, Global.PARAMETER_FLOATING);
+        areDeadlineTasksDisplayed = TaskCommander.parser.containsParameter(
+            userCommand, Global.PARAMETER_DEADLINE);
+        areTimedTasksDisplayed = TaskCommander.parser.containsParameter(
+            userCommand, Global.PARAMETER_TIMED);
+        
+        if (noTypeRestrictionGiven()) {
+            resetTaskTypeRestrictionOfDisplaySettings();
+        } else {
+            isTaskTypeRestricted = true;
+        }
+    }
+
+    // Sets the status restrictions of the display settings.
+    private void setStatusRestrictionOfDisplaySettings(String userCommand) {
+        areDoneTasksDisplayed = TaskCommander.parser.containsParameter(
+            userCommand, Global.PARAMETER_DONE);
+        areOpenTasksDisplayed = TaskCommander.parser.containsParameter(
+            userCommand, Global.PARAMETER_OPEN);
+        
+        if (noStatusRestrictionGiven()) {
+            resetStatusRestrictionOfDisplaySettings();
+        } else {
+            isStatusRestricted = true;
+        }
+    }
+
+    // Sets the description of display settings by consolidating it to a string.
+    private void setDisplaySettingsDescription() {
+        if (noDisplayRestrictions()) {
+            displaySettingsDescription = Global.DESCRIPTION_ALL;
+        } else {
+            displaySettingsDescription = "";
+
+            if (isDateRestricted) {
+                displaySettingsDescription += getDateRestrictionDescriptionOfDisplaySettings();
+            }
+
+            if (isTaskTypeRestricted) {
+                displaySettingsDescription += addSeperatingSpace(displaySettingsDescription);
+                displaySettingsDescription += getTypeRestrictionDescriptionOfDisplaySettings();
+            }
+
+            if (isStatusRestricted) {
+                displaySettingsDescription += addSeperatingSpace(displaySettingsDescription);
+                displaySettingsDescription += getStatusRestrictionDescriptionOfDisplaySettings();
+            }
+            if (isSearchRestricted) {
+                assert (isDateRestricted == false
+                    && isTaskTypeRestricted == false && isStatusRestricted == false);
+                displaySettingsDescription += getSearchRestrictionDescriptionOfDislplaySettings();
+            }
+        }
+        logger.log(Level.INFO, "Display settings set to: "
+            + displaySettingsDescription);
+    }
+
+    private String getDateRestrictionDescriptionOfDisplaySettings() {
+        if (startDateRestriction == null) {
+            return Global.DESCRIPTION_DEADLINE
+                + Global.dayFormat.format(endDateRestriction) + " "
+                + Global.timeFormat.format(endDateRestriction);
+        } else {
+            return Global.DESCRIPTION_TIMED
+                + Global.dayFormat.format(startDateRestriction) + " "
+                + Global.timeFormat.format(startDateRestriction) + " - "
+                + Global.dayFormat.format(endDateRestriction) + " "
+                + Global.timeFormat.format(endDateRestriction);
+        }
+    }
+
+    private String getTypeRestrictionDescriptionOfDisplaySettings() {
+        String typeRestrictionDescription = Global.DESCRIPTION_TYPE;
+        if (areFloatingTasksDisplayed) {
+            typeRestrictionDescription += Global.PARAMETER_FLOATING;
+        }
+        if (areDeadlineTasksDisplayed && !areFloatingTasksDisplayed) {
+            typeRestrictionDescription += Global.PARAMETER_DEADLINE;
+        } else if (areDeadlineTasksDisplayed) {
+            typeRestrictionDescription += ", " + Global.PARAMETER_DEADLINE;
+        }
+        if (areTimedTasksDisplayed && !areFloatingTasksDisplayed
+            && !areDeadlineTasksDisplayed) {
+            typeRestrictionDescription += Global.PARAMETER_TIMED;
+        } else if (areTimedTasksDisplayed) {
+            typeRestrictionDescription += ", " + Global.PARAMETER_TIMED;
+        }
+        return typeRestrictionDescription;
+    }
+
+    private String getStatusRestrictionDescriptionOfDisplaySettings() {
+        if (areDoneTasksDisplayed) {
+            return Global.DESCRIPTION_STATUS + Global.PARAMETER_DONE;
+        } else {
+            return Global.DESCRIPTION_STATUS + Global.PARAMETER_OPEN;
+        }
+    }
+
+    private String getSearchRestrictionDescriptionOfDislplaySettings() {
+        String searchRestrictionDescription = "";
+
+        for (String searchedWordOrPhrase : searchedWordsAndPhrases) {
+            if (searchRestrictionDescription.equals("")) {
+                searchRestrictionDescription = Global.DESCRIPTION_SEARCH + "\""
+                    + searchedWordOrPhrase + "\"";
+            } else {
+                searchRestrictionDescription += ", " + "\""
+                    + searchedWordOrPhrase + "\"";
+            }
+        }
+       
+        return searchRestrictionDescription;
+    }
+
+    private String addSeperatingSpace(String displaySettingsDescription) {
+        if (displaySettingsDescription.equals("")) {
+            return "";
+        } else {
+            return " ";
+        }
+    }
+
+    private void resetSearchRestrictionOfDisplaySettings() {
+        isSearchRestricted = false;
+        searchedWordsAndPhrases = null;
+    }
+
+    private void resetStatusRestrictionOfDisplaySettings() {
+        isStatusRestricted = false;
+    }
+
+    private void resetTaskTypeRestrictionOfDisplaySettings() {
+        isTaskTypeRestricted = false;
+    }
+
+    private void resetDateRestrictionOfDisplaySettings() {
+        isDateRestricted = false;
+    }
+
+    private boolean noDisplayRestrictions() {
+        return !isDateRestricted && !isTaskTypeRestricted
+            && !isStatusRestricted && !isSearchRestricted;
+    }
+
+    private boolean noChangesToTaskGiven(String newTaskName,
+        List<Date> newTaskDateTime, boolean removeExistingDate) {
+        return (newTaskDateTime == null) && !removeExistingDate
+            && (newTaskName == null);
+    }
+
+    private boolean noTypeRestrictionGiven() {
+        return (!areFloatingTasksDisplayed && !areDeadlineTasksDisplayed && !areTimedTasksDisplayed)
+            || (areFloatingTasksDisplayed && areDeadlineTasksDisplayed && areTimedTasksDisplayed);
+    }
+
+    private boolean noStatusRestrictionGiven() {
+        return (!areDoneTasksDisplayed && !areOpenTasksDisplayed)
+            || (areDoneTasksDisplayed && areOpenTasksDisplayed);
+    }
+
+    private int getNumberOfWords(String userCommand) {
+        String[] allWords = userCommand.trim().split("\\s+");
+        return allWords.length;
+    }
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Controller.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	private static Logger logger = Logger.getLogger(Controller.class.getName());
+	private ArrayList<Task> tasks;
+
+	// Singleton instance for Data
+	private static Data theOne;
+
+	/**
+	 * Returns the only instance of Data.
+	 * @return Data instance.
+	 */
+	public static Data getInstance() {
+		if (theOne == null) {
+			theOne = new Data();
+		}
+		return theOne;
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	/**
+	 * Adds a Floating Task to the tasks list.
+	 * 
+	 * @param taskName
+	 * @return feedback for UI
+	 */
+	public String addFloatingTask(String taskName) {
+		FloatingTask floatingTask = new FloatingTask(taskName);
+		tasks.add(floatingTask);
+
+		saveToOperationHistory(Global.CommandType.ADD);
+		addedTasks.push(floatingTask);
+		saveToPermanentStorage();
+
+		return String.format(Global.MESSAGE_ADDED,
+				getTaskInDisplayFormat(floatingTask));
+	}
+
+	/**
+	 * Adds a Deadline Task to the tasks list.
+	 * 
+	 * @param taskName
+	 * @param endDate
+	 * @return feedback for UI
+	 */
+	public String addDeadlineTask(String taskName, Date endDate) {
+		DeadlineTask deadlineTask = new DeadlineTask(taskName, endDate);
+		tasks.add(deadlineTask);
+
+		saveToOperationHistory(Global.CommandType.ADD);
+		addedTasks.push(deadlineTask);
+		saveToPermanentStorage();
+
+		return String.format(Global.MESSAGE_ADDED,
+				getTaskInDisplayFormat(deadlineTask));
+	}
+
+	/**
+	 * Adds a Timed Task to the tasks list.
+	 * 
+	 * @param taskName
+	 * @param startDate
+	 * @param endDate
+	 * @return feedback for UI
+	 */
+	public String addTimedTask(String taskName, Date startDate, Date endDate) {
+		TimedTask timedTask = new TimedTask(taskName, startDate, endDate);
+		tasks.add(timedTask);
+
+		saveToOperationHistory(Global.CommandType.ADD);
+		addedTasks.push(timedTask);
+		saveToPermanentStorage();
+
+		return String.format(Global.MESSAGE_ADDED,
+				getTaskInDisplayFormat(timedTask));
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	/**
+	 * Marks a task as done.
+	 * 
+	 * @param index
+	 * @return feedback for UI
+	 */
+	public String done(int index) {
+		if (tasks.isEmpty()) {
+			return String.format(Global.MESSAGE_EMPTY);
+		}
+		if (isIndexInvalid(index)) {
+			return String.format(Global.MESSAGE_NO_INDEX, index);
+		}
+
+		Task doneTask = tasks.get(index);
+		if (doneTask.isDone()) {
+			return String.format(Global.MESSAGE_ALREADY_DONE);
+		} else {
+			doneTask.markDone();
+			saveToPermanentStorage();
+			saveToOperationHistory(Global.CommandType.DONE);
+			doneTasks.add(index);
+
+			switch (doneTask.getType()) {
+			case FLOATING:
+				FloatingTask floatingTask = (FloatingTask) doneTask;
+				return String.format(Global.MESSAGE_DONE,
+						getTaskInDisplayFormat(floatingTask));
+
+			case DEADLINE:
+				DeadlineTask deadlineTask = (DeadlineTask) doneTask;
+				return String.format(Global.MESSAGE_DONE,
+						getTaskInDisplayFormat(deadlineTask));
+
+			default:
+				TimedTask timedTask = (TimedTask) doneTask;
+				return String.format(Global.MESSAGE_DONE,
+						getTaskInDisplayFormat(timedTask));
+			}
+		}
+	}
+
+	/**
+	 * Marks a task as open.
+	 * 
+	 * @param index
+	 * @return feedback for UI
+	 */
+	public String open(int index) {
+		if (tasks.isEmpty()) {
+			return String.format(Global.MESSAGE_EMPTY);
+		}
+		if (isIndexInvalid(index)) {
+			return String.format(Global.MESSAGE_NO_INDEX, index);
+		}
+
+		Task openTask = tasks.get(index);
+		if (!openTask.isDone()) {
+			return String.format(Global.MESSAGE_ALREADY_OPEN);
+		} else {
+			openTask.markOpen();
+			saveToPermanentStorage();
+			saveToOperationHistory(Global.CommandType.OPEN);
+			openTasks.add(index);
+
+			switch (openTask.getType()) {
+			case FLOATING:
+				FloatingTask floatingTask = (FloatingTask) openTask;
+				return String.format(Global.MESSAGE_OPEN,
+						getTaskInDisplayFormat(floatingTask));
+
+			case DEADLINE:
+				DeadlineTask deadlineTask = (DeadlineTask) openTask;
+				return String.format(Global.MESSAGE_OPEN,
+						getTaskInDisplayFormat(deadlineTask));
+
+			default:
+				TimedTask timedTask = (TimedTask) openTask;
+				return String.format(Global.MESSAGE_OPEN,
+						getTaskInDisplayFormat(timedTask));
+			}
+		}
+	}
+
+	/**
+	 * Deletes the task with the given index. Does not execute if there are no
+	 * lines and if a wrong index is given.
+	 * 
+	 * @param index
+	 * @return feedback for UI
+	 */
+	public String deleteTask(int index) {
+		if (tasks.isEmpty()) {
+			return String.format(Global.MESSAGE_EMPTY);
+		}
+		if (isIndexInvalid(index)) {
+			return String.format(Global.MESSAGE_NO_INDEX, index);
+		}
+
+		Task deletedTask = tasks.get(index);
+		saveToOperationHistory(Global.CommandType.DELETE);
+		deletedTasks.add(deletedTask);
+		deletedTask.setEdited(true);
+		tasks.remove(index);
+		saveToPermanentStorage();
+
+		switch (deletedTask.getType()) {
+		case FLOATING:
+			FloatingTask floatingTask = (FloatingTask) deletedTask;
+			return String.format(Global.MESSAGE_DELETED,
+					getTaskInDisplayFormat(floatingTask));
+
+		case DEADLINE:
+			DeadlineTask deadlineTask = (DeadlineTask) deletedTask;
+			return String.format(Global.MESSAGE_DELETED,
+					getTaskInDisplayFormat(deadlineTask));
+
+		default:
+			TimedTask timedTask = (TimedTask) deletedTask;
+			return String.format(Global.MESSAGE_DELETED,
+					getTaskInDisplayFormat(timedTask));
+		}
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	/**
+	 * Returns a sorted list consisting of copies of all tasks of the tasks
+	 * list.
+	 * @return sorted copy of tasks list.
+	 */
+	public ArrayList<Task> getCopiedTasks() {
+		ArrayList<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
+		ArrayList<DatedTask> datedTasks = new ArrayList<DatedTask>();
+		ArrayList<Task> allTasks = new ArrayList<Task>();
+
+		for (Task task : tasks) {
+			if (task.getType().equals(Task.TaskType.FLOATING)) {
+				floatingTasks.add(new FloatingTask((FloatingTask) task));
+			} else if (task.getType().equals(Task.TaskType.DEADLINE)) {
+				datedTasks.add(new DeadlineTask((DeadlineTask) task));
+			} else if (task.getType().equals(Task.TaskType.TIMED)) {
+				datedTasks.add(new TimedTask((TimedTask) task));
+			}
+		}
+
+		Collections.sort(floatingTasks);
+		allTasks.addAll(floatingTasks);
+		Collections.sort(datedTasks);
+		allTasks.addAll(datedTasks);
+
+		return allTasks;
+	}
+
+	/**
+	 * Returns a sorted list consisting of copies of those tasks of the tasks
+	 * list which satisfy the given DateTime, TaskType, Status and Search
+	 * restrictions.
+	 * 
+	 * @param isDateRestricted
+	 * @param startDate
+	 * @param endDate
+	 * @param isTaskTypeRestricted
+	 * @param areFloatingTasksDisplayed
+	 * @param areDeadlineTasksDisplayed
+	 * @param areTimedTasksDisplayed
+	 * @param isStatusRestricted
+	 * @param areDoneTasksDisplayed
+	 * @param areOpenTasksDisplayed
+	 * @param isSearchRestricted
+	 * @param searchedWords
+	 * @return sorted copy of tasks list satisfying given restrictions.
+	 */
+	public ArrayList<Task> getCopiedTasks(boolean isDateRestricted,
+			Date startDate, Date endDate, boolean isTaskTypeRestricted,
+			boolean areFloatingTasksDisplayed, boolean areDeadlineTasksDisplayed,
+			boolean areTimedTasksDisplayed, boolean isStatusRestricted,
+			boolean areDoneTasksDisplayed, boolean areOpenTasksDisplayed,
+			boolean isSearchedWordRestricted, ArrayList<String> searchedWords) {
+		ArrayList<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
+		ArrayList<DatedTask> datedTasks = new ArrayList<DatedTask>();
+		ArrayList<Task> concernedTasks = new ArrayList<Task>();
+		boolean containsSearchedWords = false;
+
+		for (Task task : tasks) {
+			if (isSearchedWordRestricted) {
+				containsSearchedWords = checkStringForWords(searchedWords,
+						task.getName());
+			}
+
+			if (matchesSearchAndStatusRestrictions(isStatusRestricted,
+					areDoneTasksDisplayed, isSearchedWordRestricted,
+					containsSearchedWords, task)) {
+
+				switch (task.getType()) {
+				case FLOATING:
+					FloatingTask floatingTask = (FloatingTask) task;
+					if (matchesTypeAndDateRestrictionsFloating(
+							isDateRestricted, isTaskTypeRestricted,
+							areFloatingTasksDisplayed)) {
+						floatingTasks.add(floatingTask);
+
+					}
+					break;
+
+				case DEADLINE:
+					DeadlineTask deadlineTask = (DeadlineTask) task;
+					if (matchesTypeAndDateRestrictionsDeadline(
+							isDateRestricted, startDate, endDate,
+							isTaskTypeRestricted, areDeadlineTasksDisplayed,
+							deadlineTask)) {
+						datedTasks.add(deadlineTask);
+					}
+					break;
+
+				case TIMED:
+					TimedTask timedTask = (TimedTask) task;
+					if (matchesTypeAndDateRestrictionsTimed(isDateRestricted,
+							startDate, endDate, isTaskTypeRestricted,
+							areTimedTasksDisplayed, timedTask)) {
+						datedTasks.add(timedTask);
+					}
+					break;
+				}
+			}
+		}
+		Collections.sort(floatingTasks);
+		concernedTasks.addAll(floatingTasks);
+		Collections.sort(datedTasks);
+		concernedTasks.addAll(datedTasks);
+
+		return concernedTasks;
+	}
+
+	/**
+	 * Returns the index of the given task object within the tasks ArrayList.
+	 * 
+	 * @return index
+	 */
+	public int getIndexOf(Task task) {
+		return tasks.indexOf(task);
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	// Helper methods
+	// Checks if given string contains any strings from the given ArrayList.
+	private boolean checkStringForWords(ArrayList<String> searchedWords,
+			String taskName) {
+		boolean containsSearchedWords;
+		containsSearchedWords = true;
+
+		for (String searchedWord : searchedWords) {
+			if (!taskName.contains(searchedWord)) {
+				logger.log(Level.INFO, "Doesn't contain the word");
+				containsSearchedWords = false;
+			}
+		}
+		return containsSearchedWords;
+	}
+
+	// Checks if the type and Date of the timed task matches the restrictions.
+	private boolean matchesTypeAndDateRestrictionsTimed(
+			boolean isDateRestricted, Date startDate, Date endDate,
+			boolean isTaskTypeRestricted, boolean areTimedTasksDisplayed,
+			TimedTask timedTask) {
+		return (!isTaskTypeRestricted || areTimedTasksDisplayed)
+				&& checkDateRestrictionForTimedTask(
+						isDateRestricted, startDate, endDate, timedTask);
+	}
+
+	// Checks if the type and Date of the deadline task matches the restrictions.
+	private boolean matchesTypeAndDateRestrictionsDeadline(
+			boolean isDateRestricted, Date startDate, Date endDate,
+			boolean isTaskTypeRestricted, boolean areDeadlineTasksDisplayed,
+			DeadlineTask deadlineTask) {
+		return (!isTaskTypeRestricted || areDeadlineTasksDisplayed)
+				&& checkDateRestrictionForDeadlineTask(
+						isDateRestricted, startDate, endDate,
+						deadlineTask);
+	}
+
+	// Checks if the type and Date of the floating task matches the restrictions.
+	private boolean matchesTypeAndDateRestrictionsFloating(boolean isDateRestricted,
+			boolean isTaskTypeRestricted, boolean areFloatingTasksDisplayed) {
+		return (!isTaskTypeRestricted || areFloatingTasksDisplayed) && checkDateRestrictionForFloatingTask(isDateRestricted);
+	}
+
+	// Checks if the searchedWords and Type matches to the given task.
+	private boolean matchesSearchAndStatusRestrictions(
+			boolean isStatusRestricted, boolean areDoneTasksDisplayed,
+			boolean isSearchedWordRestricted, boolean containsSearchedWords,
+			Task task) {
+		return (!isSearchedWordRestricted || containsSearchedWords)
+				&& checkStatusRestricted(isStatusRestricted, areDoneTasksDisplayed,
+						task);
+	}
+
+	// Checks if the status of the given task matches the status parameters.
+	private boolean checkStatusRestricted(boolean isStatusRestricted,
+			boolean areDoneTasksDisplayed, Task task) {
+		return !isStatusRestricted
+				|| (isStatusRestricted && areDoneTasksDisplayed == task.isDone());
+	}
+
+	// Checks if the date is restricted for FloatingTasks.
+	private boolean checkDateRestrictionForFloatingTask(boolean isDateRestricted) {
+		return !isDateRestricted;
+	}
+
+	// Checks if the deadline task matches the date restrictions.
+	private boolean checkDateRestrictionForDeadlineTask(
+			boolean isDateRestricted, Date startDate, Date endDate,
+			DeadlineTask deadlineTask) {
+		return !isDateRestricted
+				|| (isDateRestricted
+						&& (startDate == null || deadlineTask.getEndDate().compareTo(
+								startDate) >= 0) && (deadlineTask.getEndDate().compareTo(
+										endDate) <= 0));
+	}
+
+	// Checks if the timed task matches the date restrictions.
+	private boolean checkDateRestrictionForTimedTask(boolean isDateRestricted,
+			Date startDate, Date endDate, TimedTask timedTask) {
+		return !isDateRestricted
+				|| (isDateRestricted
+						&& (startDate == null || timedTask.getStartDate().compareTo(
+								startDate) >= 0) && (timedTask.getEndDate().compareTo(
+										endDate) <= 0));
+	}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+	 */
+
+	// Returns the given floating task displayed as a formatted String.
+	private String getTaskInDisplayFormat(FloatingTask floatingTask) {
+		return "\"" + floatingTask.getName() + "\"";
+	}
+
+	// Returns the given deadline task displayed as a formatted String.
+	private String getTaskInDisplayFormat(DeadlineTask deadlineTask) {
+		return "[by " + Global.dayFormat.format(deadlineTask.getEndDate())
+				+ " " + Global.timeFormat.format(deadlineTask.getEndDate()) + "]"
+				+ " \"" + deadlineTask.getName() + "\"";
+	}
+
+	// Returns the given timed task displayed as a formatted String.
+	private String getTaskInDisplayFormat(TimedTask timedTask) {
+		if (Global.dayFormat.format(timedTask.getStartDate()).equals(
+				Global.dayFormat.format(timedTask.getEndDate()))) {
+			return "[" + Global.dayFormat.format(timedTask.getStartDate())
+					+ " " + Global.timeFormat.format(timedTask.getStartDate())
+					+ "-" + Global.timeFormat.format(timedTask.getEndDate()) + "]"
+					+ " \"" + timedTask.getName() + "\"";
+		} else {
+			return "[" + Global.dayFormat.format(timedTask.getStartDate())
+					+ " " + Global.timeFormat.format(timedTask.getStartDate())
+					+ "-" + Global.dayFormat.format(timedTask.getEndDate()) + " "
+					+ Global.timeFormat.format(timedTask.getEndDate()) + "]"
+					+ " \"" + timedTask.getName() + "\"";
+		}
+	}
+
+	private boolean isIndexInvalid(int index) {
+		return index > tasks.size() - Global.INDEX_OFFSET || index < 0;
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Data.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\DatedTask.java
+	 */
+
+/**
+ * A task with one comparable date the timedTask and FloatingTask inherit from.
+ */
+
+public abstract class DatedTask extends Task implements Comparable<DatedTask> {
+    private Date _date;
+
+    /**
+     * Creates a new DatedTask with given name, task type and date. Throws
+     * IllegalArgumentException if null arguments are given.
+     * 
+     * @param name
+     * @param type
+     * @param date
+     * @return Date instance
+     * 
+     */
+    public DatedTask(String name, TaskType taskType, Date date) {
+        super(name, taskType);
+        if (date != null) {
+            _date = date;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public Date getDate() {
+        return _date;
+    }
+
+    public void setDate(Date date) {
+        _date = date;
+    }
+
+    /**
+     * Compares the date of this task to the given task in chronological order.
+     * 
+     * @param other DatedTask
+     * @return less/more than zero if before/after the otherTask, zero when same date
+     */
+    @Override
+    public int compareTo(DatedTask otherTask) {
+        return (_date.compareTo(otherTask.getDate()));
+    }
+    
+    abstract public int compareTo(DeadlineTask otherTask);
+    
+    abstract int compareTo(TimedTask otherTask);
+
+    /**
+     * Checks if the given object is equal.
+     * 
+     * @param other Object
+     * @return true if so, false if not
+     */
+    @Override
+    public boolean equals(Object otherObject) {
+        if (otherObject == null) {
+            return false;
+        }
+        if (!(otherObject instanceof DatedTask)) {
+            return false;
+        }
+        switch (this.getType()) {
+          case DEADLINE:
+              return ((DeadlineTask) this).equals(otherObject);
+          case TIMED:
+              return ((TimedTask) this).equals(otherObject);
+          default:
+              return false;
+        }
+    }
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\DatedTask.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\DeadlineTask.java
+	 */
+
+    /**
+     * Creates a new DeadlineTask from a given DeadlineTask. Used for cloning.
+     */
+    public DeadlineTask(DeadlineTask otherDeadlineTask) {
+        super(otherDeadlineTask.getName(), TaskType.DEADLINE, otherDeadlineTask
+            .getEndDate());
+        _endDate = otherDeadlineTask.getEndDate();
+        this.setId(otherDeadlineTask.getId());
+        this.setDone(otherDeadlineTask.isDone());
+        this.setEdited(otherDeadlineTask.isEdited());
+    }
+    
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\DeadlineTask.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\DeadlineTask.java
+	 */
+
+    /**
+     * Compares the end date of this timed task to the start date of the given
+     * timed task in chronological order.
+     * 
+     * @param other timed task
+     * @return less/more than zero if before/after the otherTask, zero when same
+     *         date
+     */
+    @Override
+    int compareTo(TimedTask otherTask) {
+        return (_endDate.compareTo(otherTask.getStartDate()));
+    }  
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\DeadlineTask.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Global.java
+	 */
+
+	// Global Date Format
+	public static final SimpleDateFormat dayFormat = new SimpleDateFormat("EEE MMM d ''yy", Locale.ENGLISH);
+	public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+
+	// Parameters used to restrict the displayed type of tasks or, in case of "none", to remove the date when updating.
+	public static final String PARAMETER_FLOATING = "none";
+	public static final String PARAMETER_DEADLINE = "deadline";
+	public static final String PARAMETER_TIMED = "timed";
+	public static final String PARAMETER_DONE = "done";
+	public static final String PARAMETER_OPEN = "open";
+
+	// Display Setting Description
+	public static final String DESCRIPTION_ALL = "All";
+	public static final String DESCRIPTION_DEADLINE = "Date: by ";
+	public static final String DESCRIPTION_TIMED = "Date: ";
+	public static final String DESCRIPTION_TYPE = "Type: ";
+	public static final String DESCRIPTION_STATUS = "Status: ";
+	public static final String DESCRIPTION_SEARCH= "Words/Phrases: ";
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Global.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Parser.java
+	 */
+
+/**
+ * Analyzes the user's input and extracts values. Provides several methods to
+ * parse the user's command and extract the command type and its related command
+ * parameters like index, name or date, etc.
+ */
+public class Parser {
+	private static Logger logger = Logger.getLogger(Parser.class.getName());
+
+	private static final String MESSAGE_NO_COMMANDTYPE = "User command doesn't contain a command type.";
+	private static final String MESSAGE_NO_TASKNAME = "User command doesn't contain a task name.";
+	private static final String MESSAGE_NO_INDEX = "User command doesn't contain an index.";
+	private static final String MESSAGE_NO_DATETIMES = "User command doesn't contain any dateTimes.";
+	private static final int INVALID_INDEX = -1;
+
+	// Singleton instance for Data
+	private static Parser theOne;
+
+	private Parser() {
+	}
+
+	/**
+	 * Returns the only instance of Parser.
+	 * 
+	 * @return Parser instance
+	 */
+	public static Parser getInstance() {
+		if (theOne == null) {
+			theOne = new Parser();
+		}
+		return theOne;
+	}
+
+	/**
+	 * Determines a supported command type from given String (not case
+	 * sensitive).
+	 * 
+	 * @param userCommand
+	 * @return commandType
+	 */
+	public Global.CommandType determineCommandType(String userCommand) {
+		if (userCommand == null || userCommand.equals("")) {
+			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
+			return Global.CommandType.INVALID;
+		}
+
+		String commandTypeString;
+
+		try {
+			commandTypeString = getFirstWord(userCommand);
+		} catch (Exception e) {
+			logger.log(Level.INFO, MESSAGE_NO_COMMANDTYPE);
+			return Global.CommandType.INVALID;
+		}
+
+		if (commandTypeString.equalsIgnoreCase("add")) {
+			return Global.CommandType.ADD;
+		} else if (commandTypeString.equalsIgnoreCase("update")) {
+			return Global.CommandType.UPDATE;
+		} else if (commandTypeString.equalsIgnoreCase("done")) {
+			return Global.CommandType.DONE;
+		} else if (commandTypeString.equalsIgnoreCase("open")) {
+			return Global.CommandType.OPEN;
+		} else if (commandTypeString.equalsIgnoreCase("delete")) {
+			return Global.CommandType.DELETE;
+		} else if (commandTypeString.equalsIgnoreCase("clear")) {
+			return Global.CommandType.CLEAR;
+		} else if (commandTypeString.equalsIgnoreCase("display")) {
+			return Global.CommandType.DISPLAY;
+		} else if (commandTypeString.equalsIgnoreCase("search")) {
+			return Global.CommandType.SEARCH;
+		} else if (commandTypeString.equalsIgnoreCase("sync")) {
+			return Global.CommandType.SYNC;
+		} else if (commandTypeString.equalsIgnoreCase("undo")) {
+			return Global.CommandType.UNDO;
+		} else if (commandTypeString.equalsIgnoreCase("exit")) {
+			return Global.CommandType.EXIT;
+		} else {
+			return Global.CommandType.INVALID;
+		}
+	}
+
+	/**
+	 * Determines the name of the task which has to be put in quotation marks.
+	 * Returns null if name not found.
+	 * 
+	 * @param userCommand
+	 * @return taskName
+	 */
+	public String determineTaskName(String userCommand) {
+		if (userCommand == null || userCommand.equals("")) {
+			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
+			return null;
+		}
+
+		String userCommandWithoutCommandType = removeCommandType(userCommand);
+
+		try {
+			return getQuotedSubstring(userCommandWithoutCommandType);
+		} catch (Exception e) {
+			logger.log(Level.INFO, MESSAGE_NO_TASKNAME);
+			return null;
+		}
+	}
+
+	/**
+	 * Determines the end date and/or start date of the stated task within given
+	 * command string. Returns null if no date found. If the user command
+	 * contains a numeric command parameter like an index in second place, it
+	 * will be removed before parsing the dates and times in order to avoid mix
+	 * ups.
+	 * 
+	 * @param userCommand
+	 * @return dateTimes
+	 */
+	public List<Date> determineTaskDateTime(String userCommand) {
+		if (userCommand == null || userCommand.equals("")) {
+			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
+			return null;
+		}
+
+		String userCommandWithoutIndex = removeIndex(userCommand);
+		String userCommandWithoutCommandType = removeCommandType(userCommandWithoutIndex);
+		String userCommandWithoutTaskNameAndCommandType = removeTaskName(userCommandWithoutCommandType);
+		List<Date> dateTimes;
+
+		try {
+			dateTimes = getDateTimes(userCommandWithoutTaskNameAndCommandType);
+		} catch (Exception e) {
+			logger.log(Level.INFO, MESSAGE_NO_DATETIMES);
+			return null;
+		}
+		dateTimes = checkOrderOfDateTimes(dateTimes);
+		return dateTimes;
+	}
+
+	/**
+	 * Determines the index which is provided with the update, delete, done or
+	 * open command. Returns INVALID_INDEX if not found.
+	 * 
+	 * @param userCommand
+	 * @return index
+	 */
+	public int determineIndex(String userCommand) {
+		if (userCommand == null || userCommand.equals("")) {
+			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
+			return INVALID_INDEX;
+		}
+
+		try {
+			String indexString = getSecondWord(userCommand);
+			int indexInteger = Integer.parseInt(indexString);
+			return indexInteger;
+		} catch (Exception e) {
+			logger.log(Level.INFO, MESSAGE_NO_INDEX);
+			return INVALID_INDEX;
+		}
+	}
+
+	/**
+	 * Determines the single words and phrases one searches for and returns them
+	 * as an ArrayList. Returns null if no word or phrase found.
+	 * 
+	 * @param userCommand
+	 * @return ArrayList containing the searched words and phrases
+	 */
+	public ArrayList<String> determineSearchedWords(String userCommand) {
+		if (userCommand == null || userCommand.equals("")) {
+			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
+			return null;
+		}
+
+		String userCommandWithoutCommandType = removeCommandType(userCommand);
+
+		ArrayList<String> searchedWords = new ArrayList<String>();
+		Pattern pattern = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"");
+		Matcher matcher = pattern.matcher(userCommandWithoutCommandType);
+
+		while (matcher.find()) {
+			if (matcher.group(1) != null) {
+				searchedWords.add(matcher.group(1)); // Phrase in double quotes
+			} else {
+				searchedWords.add(matcher.group()); // Single word
+			}
+		}
+		return searchedWords;
+	}
+
+	/**
+	 * Determines if the user command contains exactly the given string, e.g.
+	 * "none", "timed", "deadline" (not case sensitive).
+	 * @param userCommand
+	 * @param parameter
+	 * @return true if user command contains given parameter
+	 */
+	public boolean containsParameter(String userCommand, String parameter) {
+		if (userCommand == null || userCommand.equals("") || parameter == null
+				|| parameter.equals("")) {
+			logger.log(Level.WARNING, Global.MESSAGE_ILLEGAL_ARGUMENTS);
+			return false;
+		}
+		String userCommandWithoutCommandType = removeCommandType(userCommand);
+		String userCommandWithoutTaskNameAndCommandType = removeTaskName(userCommandWithoutCommandType);
+
+		return userCommandWithoutTaskNameAndCommandType.matches("(?i).*\\b"
+				+ parameter + "\\b.*");
+	}
+
+	/**
+	 * Checks if the given list contains a start and an end date, and if the
+	 * parsed end date occurs before the start date. If so and if both dates are
+	 * on the same day, it indicates that the time period should actually start
+	 * from one day and end the next day. However, if the end date is on a
+	 * different day before the start date, it switches both days so that the
+	 * prior one comes first.
+	 */
+	private List<Date> checkOrderOfDateTimes(List<Date> dateTimes) {
+		if (dateTimes != null && dateTimes.size() == 2) {
+			Date startDate = dateTimes.get(0);
+			Date endDate = dateTimes.get(1);
+			if (endDate.compareTo(startDate) < 0) {
+				Calendar startCal = Calendar.getInstance();
+				startCal.setTime(startDate);
+				startCal.set(Calendar.HOUR_OF_DAY, 0);
+				Calendar endCal = Calendar.getInstance();
+				endCal.setTime(endDate);
+				endCal.set(Calendar.HOUR_OF_DAY, 0);
+
+				if (endCal.compareTo(startCal) == 0) {
+					Calendar c = Calendar.getInstance();
+					c.setTime(endDate);
+					c.add(Calendar.DATE, 1);
+					endDate = c.getTime();
+					dateTimes.set(1, endDate);
+				} else {
+					dateTimes.set(0, endDate);
+					dateTimes.set(1, startDate);
+				}
+			}
+		}
+		return dateTimes;
+	}
+
+	// Returns dateTimes within the given string using external Natty library.
+	private List<Date> getDateTimes(String str) throws Exception {
+		List<Date> dates = null;
+
+		com.joestelmach.natty.Parser nattyParser = new com.joestelmach.natty.Parser();
+		List<DateGroup> groups = nattyParser.parse(str);
+
+		for (DateGroup group : groups) {
+			dates = group.getDates();
+		}
+		return dates;
+	}
+
+	// Removes the index, if it exists in the given string.
+	private String removeIndex(String userCommand) {
+		String result;
+		Global.CommandType commandType = TaskCommander.parser
+				.determineCommandType(userCommand);
+
+		if (commandType.equals(Global.CommandType.UPDATE)
+				|| commandType.equals(Global.CommandType.DONE)
+				|| commandType.equals(Global.CommandType.OPEN)
+				|| commandType.equals(Global.CommandType.DELETE)) {
+
+			try {
+				result = removeSecondWord(userCommand);
+			} catch (Exception e) {
+				logger.log(Level.INFO, MESSAGE_NO_INDEX);
+				return null;
+			}
+		} else {
+			result = userCommand;
+		}
+		return result;
+	}
+
+	// Removes the commandType if existing.
+	private String removeCommandType(String userCommand) {
+		Global.CommandType commandType = TaskCommander.parser
+				.determineCommandType(userCommand);
+		if (!commandType.equals(Global.CommandType.INVALID)) {
+			try {
+				return removeFirstWord(userCommand);
+			} catch (Exception e) {
+				logger.log(Level.INFO, MESSAGE_NO_COMMANDTYPE);
+				return userCommand;
+			}
+		} else {
+			return userCommand;
+		}
+	}
+
+	// Removes the quoted task name if existing.
+	private String removeTaskName(String userCommand) {
+		try {
+			return removeQuotedSubstring(userCommand);
+		} catch (Exception e) {
+			logger.log(Level.INFO, MESSAGE_NO_TASKNAME);
+			return userCommand;
+		}
+	}
+
+	/*
+	 * Removes the quoted substring within the given string. It is assumed that
+	 * all quotation marks between the first quote and the last quote belong to
+	 * the substring.
+	 */
+	private String removeQuotedSubstring(String str) throws Exception {
+		return str.replaceFirst(
+				str.substring(str.indexOf("\"") + 1, str.lastIndexOf("\"")), "");
+	}
+
+	private String getFirstWord(String str) throws Exception {
+		return str.trim().split("\\s+")[0];
+	}
+
+	private String getSecondWord(String str) throws Exception {
+		return str.trim().split("\\s+")[1];
+
+	}
+
+	private String getQuotedSubstring(String str) throws Exception {
+		return str.substring(str.indexOf("\"") + 1, str.lastIndexOf("\""))
+				.trim();
+	}
+
+	private String removeFirstWord(String str) throws Exception {
+		return str.replaceFirst(getFirstWord(str), "").trim();
+	}
+
+	private String removeSecondWord(String str) throws Exception {
+		return str.replaceFirst(getSecondWord(str), "");
+	}
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Parser.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Task.java
+	 */
+
+    /**
+     * Checks if the given object is equal.
+     * @param other Object
+     * @return true if so, false if not
+     */
+    @Override
+    public boolean equals(Object otherObject) {
+        if (otherObject == null) {
+            return false;
+        }
+        
+        if (!(otherObject instanceof Task)) {
+            return false;
+        }
+        switch (this.getType()) {
+          case FLOATING:
+              return ((FloatingTask) this).equals(otherObject);
+          case DEADLINE:
+              return ((DeadlineTask) this).equals(otherObject);
+          case TIMED:
+              return ((TimedTask) this).equals(otherObject);
+          default:
+              return false;
+        }
+    }
+}
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\Task.java
+
+
+
+
+
+	/**
+	 * origin: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TimedTask.java
+	 */
+
+	/**
+	 * Compares the start date of this timed task to the end date of the given
+	 * deadline task in chronological order.
+	 * @param other deadline task
+	 * @return less/more than zero if before/after the otherTask, zero when same date
+	 */
+	@Override
+	public int compareTo(DeadlineTask otherTask) {
+		return (_startDate.compareTo(otherTask.getEndDate()));
+	}
+}
+
+	// End of segment: C:/Users/Mishie/Documents/Eclipse_Workspaces/CS2103/TaskCommander/src/\com\taskcommander\TimedTask.java
+
+
+
+
+
