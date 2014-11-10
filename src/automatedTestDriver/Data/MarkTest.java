@@ -11,6 +11,11 @@ import org.junit.Test;
 import com.taskcommander.Data;
 import com.taskcommander.Task;
 
+//@author A0109194A
+/**
+ * Test for marking tasks as done or open
+ *
+ */
 public class MarkTest {
 	public Data tester;
 	ArrayList<Task> tasks;

@@ -14,6 +14,11 @@ import com.taskcommander.FloatingTask;
 import com.taskcommander.Task;
 import com.taskcommander.TimedTask;
 
+//@author A0109194A
+/**
+ * Test for update method called by SyncHandler
+ *
+ */
 public class UpdateGoogleTest {
 	Data tester;
 	ArrayList<Task> tasks;

@@ -125,6 +125,7 @@ public class Data {
             getTaskInDisplayFormat(timedTask));
     }
     
+    //@author A0109194A
     /**
      * Updates a FloatingTask with the given index and replaces the old
      * taskName, startDate or endDate respectively and changes the taskType if
@@ -296,6 +297,7 @@ public class Data {
             getTaskInDisplayFormat(timedTask));
     }
 
+    // @author A0128620M
     /**
      * Marks a task as done.
      * 
@@ -437,7 +439,6 @@ public class Data {
         return String.format(Global.MESSAGE_CLEARED);
     }
 
-    //@author A0109194A
     /**
      * This operation undoes the latest command. It supports Add, Delete,
      * Update, and Clear commands.
@@ -484,7 +485,6 @@ public class Data {
         return String.format(Global.MESSAGE_UNDONE, type);
     }
     
-    //@author A0109194A
     /**
      * Undoes the add command.
      * 
@@ -506,7 +506,6 @@ public class Data {
         return false;
     }
     
-    //@author A0109194A
     /**
      * Undoes the delete command.
      * 
@@ -529,7 +528,6 @@ public class Data {
         return false;
     }
 
-    //@author A0109194A
     /**
      * Undoes the update command.
      * 
@@ -570,7 +568,6 @@ public class Data {
         return false;
     }
     
-    //@author A0109194A
     /**
      * Undoes the Clear command.
      * 
@@ -582,7 +579,6 @@ public class Data {
         return true;
     }
     
-    //@author A0109194A
     /**
      * Undoes the Done command.
      * @return	Success of undo
@@ -598,7 +594,6 @@ public class Data {
     	}
     }
     
-    //@author A0109194A
     /**
      * Undoes the Open command.
      * @return	Success of undo.
@@ -643,7 +638,6 @@ public class Data {
         }
     }
     
-    //@author A0109194A
     /**
      * Adds a Floating Task to the tasks list.
      * 
@@ -658,7 +652,6 @@ public class Data {
             getTaskInDisplayFormat(floatingTask));
     }
     
-    //@author A0109194A
     /**
      * Adds a Deadline Task to the tasks list.
      * 
@@ -673,7 +666,6 @@ public class Data {
             getTaskInDisplayFormat(deadlineTask));
     }
     
-    //@author A0109194A
     /**
      * Adds a Timed Task to the tasks list.
      * 
@@ -688,7 +680,6 @@ public class Data {
             getTaskInDisplayFormat(timedTask));
     }
     
-    //@author A0109194A
     /**
      * Updates a task with a FloatingTask object as a parameter. It is usually
      * called by the SyncHandler.
@@ -719,7 +710,6 @@ public class Data {
             getTaskInDisplayFormat(floatingTask));
     }
 
-    //@author A0109194A
     /**
      * Updates a task with a DeadlineTask object as a parameter. It is usually
      * called by the SyncHandler.
@@ -757,7 +747,6 @@ public class Data {
             getTaskInDisplayFormat(deadlineTask));
     }
     
-    //@author A0109194A
     /**
      * Updates a task with a TimedTask object as a parameter. It is usually
      * called by the SyncHandler.
@@ -796,7 +785,6 @@ public class Data {
             getTaskInDisplayFormat(timedTask));
     }
     
-    //@author A0109194A
     /**
      * Deletes the task directly from the tasks list without the index. Used to
      * delete tasks when syncing. Checking for invalid index is unnecessary,

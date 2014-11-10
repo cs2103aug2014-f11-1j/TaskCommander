@@ -7,7 +7,11 @@ import org.junit.Test;
 import com.taskcommander.Data;
 import com.taskcommander.Task;
 
-
+//@author A0109194A
+/**
+ * Test for intenral delete command
+ *
+ */
 public class DeleteInternalTest {
 	Data tester;
 	ArrayList<Task> deletedTasks;

@@ -14,6 +14,12 @@ import com.taskcommander.FloatingTask;
 import com.taskcommander.Task;
 import com.taskcommander.TimedTask;
 
+//@author A0109194A
+/**
+ * Test for Adding Tasks, called by SyncHandler
+ *
+ */
+
 public class AddGoogleTest {
 	Data tester;
 	ArrayList<Task> tasks;

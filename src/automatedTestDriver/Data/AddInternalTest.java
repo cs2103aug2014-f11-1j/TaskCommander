@@ -11,6 +11,11 @@ import org.junit.Test;
 import com.taskcommander.Data;
 import com.taskcommander.Task;
 
+//@author A0109194A
+/**
+ * Test for Internal Add Command.
+ *
+ */
 public class AddInternalTest {
 	Data tester;
 	Stack<Task> addedTests;

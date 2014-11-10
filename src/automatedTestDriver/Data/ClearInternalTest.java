@@ -10,6 +10,11 @@ import org.junit.Test;
 import com.taskcommander.Data;
 import com.taskcommander.Task;
 
+//@author A0109194A
+/**
+ * Test for internal clear command
+ *
+ */
 public class ClearInternalTest {
 	Data tester;
 	Stack<ArrayList<Task>> clearedTasks;

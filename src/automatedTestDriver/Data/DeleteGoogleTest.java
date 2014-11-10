@@ -8,6 +8,11 @@ import org.junit.Test;
 import com.taskcommander.Data;
 import com.taskcommander.Task;
 
+//@author A0109194A
+/**
+ * Test for delete command called by SyncHandler
+ *
+ */
 public class DeleteGoogleTest {
 	Data tester;
 	ArrayList<Task> tasks;
