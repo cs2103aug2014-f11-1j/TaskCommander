@@ -22,23 +22,23 @@ public class Controller {
     private ArrayList<Task> displayedTasks;
 
     // Display settings, adjusted by display command.
-    String displaySettingsDescription;
+    private String displaySettingsDescription;
 
-    boolean isDateRestricted;
-    Date startDateRestriction;
-    Date endDateRestriction;
+    private boolean isDateRestricted;
+    private Date startDateRestriction;
+    private Date endDateRestriction;
 
-    boolean isTaskTypeRestricted;
-    boolean areFloatingTasksDisplayed;
-    boolean areDeadlineTasksDisplayed;
-    boolean areTimedTasksDisplayed;
+    private  boolean isTaskTypeRestricted;
+    private boolean areFloatingTasksDisplayed;
+    private boolean areDeadlineTasksDisplayed;
+    private boolean areTimedTasksDisplayed;
 
-    boolean isStatusRestricted;
-    boolean areDoneTasksDisplayed;
-    boolean areOpenTasksDisplayed;
+    private boolean isStatusRestricted;
+    private boolean areDoneTasksDisplayed;
+    private boolean areOpenTasksDisplayed;
 
-    boolean isSearchRestricted;
-    ArrayList<String> searchedWordsAndPhrases;
+    private boolean isSearchRestricted;
+    private ArrayList<String> searchedWordsAndPhrases;
 
     // Singleton instance of Controller.
     private static Controller theOne;

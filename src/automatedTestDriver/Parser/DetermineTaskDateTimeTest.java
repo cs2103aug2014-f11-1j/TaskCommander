@@ -50,7 +50,7 @@ public class DetermineTaskDateTimeTest {
      * - [two DateTime]																										
      * - [three and more DateTime]																										
      * Further partition of [one date]:
-     * - [formal dates]: yyyy-mm-dd, yyyy/mm/dd, dd/mm/yyyy, mm/dd/yy ..
+     * - [formal dates]: yyyy-mm-dd, yyyy/mm/dd, mm/dd/yyyy, mm/dd/yy ..
      * - [relaxed dates]: Nov 5, Nov 5th, Nov 5 '14, Nov 5 2014 ..
      * - [relative dates]: next monday, today, tomorrow, next week ..
      * - [formal time]: hh:mm, hham, hhpm, hh.mmam, hh.mmpm,  hh am, hh pm, hh.mm am, hh.mm pm
