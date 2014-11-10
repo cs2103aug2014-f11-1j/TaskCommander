@@ -431,6 +431,9 @@ public class Data {
 
 		ArrayList<Task> cleared = new ArrayList<Task>();
 		cleared.addAll(tasks);
+		for (Task t : cleared) {
+			t.setEdited(true);
+		}
 		clearedTasks.push(cleared);
 		tasks.clear();
 		saveToOperationHistory(Global.CommandType.CLEAR);
