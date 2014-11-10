@@ -222,7 +222,7 @@ public class UI extends Observable implements Observer {
 	 * and sets it as the text for the display output.
 	 */
 	private void updateDisplaySettings() {
-		displaySettingText = TaskCommander.controller.displaySettingsDescription;
+		displaySettingText = TaskCommander.controller.getDisplaySettingsDescription();
 		displayOutput.setText(displaySettingText);
 	}
 
